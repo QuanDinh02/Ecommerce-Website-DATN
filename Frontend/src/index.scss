@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import '/src/styles/sass/abstract/variables';
+
+@import '/src/styles/sass/base/animations';
+@import '/src/styles/sass/base/base';
+@import '/src/styles/sass/base/typography';
+@import '/src/styles/sass/base/utilities';
+
+@import '/src/styles/sass/components/input';
+@import '/src/styles/sass/components/button';
+@import '/src/styles/sass/components/pagination';
+
+@import '/src/styles/sass/layout/header';
+@import '/src/styles/sass/layout/footer';
+
+@import '/src/styles/sass/pages/register';
+@import '/src/styles/sass/pages/homepage';

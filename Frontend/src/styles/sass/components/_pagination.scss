@@ -1,0 +1,28 @@
+.pagination-container {
+
+    .page-active-background {
+        background-color: #2563EB !important;
+        color           : white !important;
+        padding: 10px;
+        border-radius: 4px;
+    }
+
+    .page-item {
+        padding: 6px;
+        border-radius: 4px;
+    }
+
+    .pre-next {
+        color: #2563EB;
+    }
+
+    .page-background {
+        color           : black;
+        background-color: #F9F9F9;
+    }
+}
+
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}

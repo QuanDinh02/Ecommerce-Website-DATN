@@ -1,0 +1,86 @@
+.header__top {
+    @apply w-full text-white primary-color z-50;
+
+    .section_top {
+        @apply flex items-center w-[80rem] h-[76px] font-bold mx-auto px-[30px];
+
+        .logo {
+            @apply text-2xl cursor-pointer w-60 font-bold;
+        }
+    
+        .search-bar {
+            @apply w-[37.5rem] h-[2.625rem] rounded-[5px] bg-white flex justify-between;
+
+            &__text {
+                @apply flex items-center px-4 flex-1;
+            }
+            &__btn {
+                @apply w-[6.25rem] text-white font-bold bg-black flex items-center justify-center rounded-r-[5px] cursor-pointer;
+            }
+        }
+    
+        .navigation {
+            @apply flex flex-1 items-center justify-end gap-10;
+    
+            .count {
+                @apply w-5 h-5 bg-black flex items-center justify-center rounded-full text-xs;
+            }
+
+            .favorite-items {
+                @apply cursor-pointer;
+                .icon {
+                    @apply w-7 h-7 text-black;
+                }
+            }
+    
+            .shopping-cart {
+                @apply cursor-pointer;
+                .icon {
+                    @apply w-9 h-9 text-black;
+                }
+            }
+    
+            .authentication {
+                @apply flex text-sm text-black items-center;
+    
+                .icon {
+                    @apply w-9 h-9 mr-2;
+                }
+            }
+    
+            .nav-item {
+                @apply hover:text-white duration-300; 
+                box-shadow: none;
+            }
+    
+            .active {
+                @apply text-white;
+            }
+        }
+    }
+}
+
+.header__bottom {
+    @apply w-full text-white primary-color ;
+
+    .section_bottom {
+        @apply flex items-center w-[80rem] h-[52px] font-bold mx-auto px-[30px];
+
+        .categories {
+            @apply w-60;
+
+            .main {
+                @apply w-fit flex items-center gap-4 text-black cursor-pointer;
+            }
+        }
+
+        .recent-products {
+            @apply text-black font-medium flex items-center gap-2 cursor-pointer;
+        }
+
+        .order-tracking {
+            @apply text-black cursor-pointer font-medium flex-1 flex items-center justify-end;
+        }
+    }
+}
+

@@ -1,0 +1,61 @@
+.footer {
+    @apply w-full bg-white;
+
+    .subscribe-section {
+        @apply h-full mx-auto px-[30px] py-10 w-[80rem]; 
+
+        .subscribe-text {
+            @apply text-gray-500;
+        }
+
+        .subscribe-box {
+            @apply w-[41.875rem] flex items-center;
+
+            input {
+                @apply text-black font-normal px-4 outline-none border border-gray-400 h-12 flex-1 rounded-l-[4px];
+            }
+
+            .subscribe-btn {
+                @apply w-[10.625rem] primary-color px-8 h-12 flex items-center justify-center cursor-pointer rounded-r-[4px];
+            }
+        }
+    }
+
+    .links-section {
+        @apply h-full mx-auto px-[30px] mt-10 mb-28 w-[80rem] flex justify-between;
+
+        .links-item {
+            .title {
+                @apply font-medium text-lg;
+            }
+
+            .link {
+                @apply my-2 cursor-pointer hover:underline text-gray-500;
+            }
+        }
+    }
+
+    .social-media-apps-section {
+        @apply h-full mx-auto px-[30px] w-[80rem] mb-5 flex items-center justify-between ;
+
+        .icons {
+            @apply flex items-center gap-6;
+
+            .icon {
+                @apply w-7 h-7 text-gray-700 cursor-pointer hover:text-[#FCB800];
+            }
+        }
+
+        .platforms {
+            @apply flex gap-6;
+
+            img {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .copyright {
+        @apply h-full bg-[#D9D9D9] text-gray-700 py-2 text-center;
+    }
+}

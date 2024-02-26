@@ -1,0 +1,7 @@
+.form_button {
+    @apply font-medium bg-gray-300 px-9 py-3.5 cursor-no-drop w-full;
+}
+
+.form_button_valid {
+    @apply font-medium primary-color text-white px-9 py-3.5 cursor-pointer w-full;
+}

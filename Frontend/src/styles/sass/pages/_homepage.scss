@@ -1,0 +1,25 @@
+.homepage-container {
+    .swiper-pagination {
+        position: unset !important;
+        margin-top: 30px;
+    }
+
+    .swiper-pagination-bullet {
+        width: 10px;
+        height: 10px;
+    }
+
+    .swiper-pagination-bullet-active {
+        background-color: #FCB800;
+    }
+
+    .swiper-button-prev, .swiper-button-next {
+        @apply text-gray-600 p-6;
+        background-color: rgba(255, 255, 255, 0.6);
+        color: #000 !important;
+
+        &::after {
+            font-size: 24px;
+        }
+    }  
+}
