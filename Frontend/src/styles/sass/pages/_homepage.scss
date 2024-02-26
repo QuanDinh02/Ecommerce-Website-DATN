@@ -22,4 +22,18 @@
             font-size: 24px;
         }
     }  
+
+    .sub-menu {
+        animation: slideRightToLeft 0.2s ease-in;
+    }
+}
+
+@keyframes slideRightToLeft {
+    0% {
+        left: 280px;
+    }
+
+    100% {
+        left: 240px;
+    }
 }

@@ -1,17 +1,16 @@
 import React from 'react';
-import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from '@/redux/reducer/rootReducer';
-import { UserLogin } from '@/redux/actions/action';
-// import { staffLogout, fetchAccount } from '@/services/userServices';
+import { Link, useNavigate } from 'react-router-dom';
+import { MdKeyboardArrowRight } from "react-icons/md";
 import _ from 'lodash';
-import { successToast1 } from '@/components/Toast/Toast';
 import { IoIosSearch } from "react-icons/io";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { BsHeart, BsPerson } from "react-icons/bs";
 import { FiMenu } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
+import { menuCategoryItems } from '@/data/homepage';
 import classNames from 'classnames';
+import Item6 from '../assets/img/homepage/item6.svg';
+
 export interface IAccount {
     id: number
     username: string
@@ -20,68 +19,13 @@ export interface IAccount {
 
 const Header = () => {
 
-    const location = useLocation();
     const navigate = useNavigate();
-    const [ignore, setIgnore] = React.useState<boolean>(false);
-
-    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
-    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
-
-    const dispatch = useDispatch();
-
-    const roles = ["Quản lý", "Nhân viên"];
-
-    const handleCheckRole = (role: string) => {
-        return roles.some(item => item === role);
-    }
-
-    React.useEffect(() => {
-        if (checkIsIgnorePathnames(location.pathname)) {
-            setIgnore(true);
-        } else {
-            setIgnore(false);
-        };
-    }, [location]);
-
-    const ignorePathnames = [
-        '/register', '/login'
-    ]
-
-    const checkIsIgnorePathnames = (pathname: string) => {
-        return ignorePathnames.includes(pathname);
-    }
-
-    // const fetchAccountInfo = async () => {
-    //     let result: any = await fetchAccount();
-    //     if (result && !_.isEmpty(result.DT)) {
-    //         let userData = result.DT;
-    //         let data = {
-    //             isAuthenticated: userData.isAuthenticated,
-    //             account: {
-    //                 id: userData.id,
-    //                 username: userData.username,
-    //                 role: userData.role
-    //             }
-    //         }
-    //         dispatch(UserLogin(data));
-    //     }
-    // }
-
-    React.useEffect(() => {
-        //fetchAccountInfo();
-    }, []);
-
-    // const handeStaffLogout = async () => {
-    //     let result: any = await staffLogout();
-    //     if (result && result.EC === 0) {
-    //         successToast1(result.EM);
-    //         setTimeout(() => {
-    //             window.location.reload();
-    //         }, 1500);
-    //     }
-    // }
 
     const [scrollPosition, setScrollPosition] = React.useState(0);
+
+    const [showMenu, setShowMenu] = React.useState<boolean>(false);
+    const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
+    const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
 
     const handleScroll = () => {
         const position = window.pageYOffset;
@@ -103,14 +47,86 @@ const Header = () => {
         }
     );
 
+    const handleShowMenu = (show: boolean, check: boolean) => {
+        if (show && check) {
+            setShowMenu(true);
+        } else {
+            setShowMenu(false);
+        }
+    }
+
+    const handleShowSubmenu = (show: boolean, check: boolean) => {
+        if (show && check) {
+            setShowSubmenu(true);
+        } else {
+            setShowSubmenu(false);
+        }
+    }
+
     return (
         <>
             <div className={headerStickyStyle}>
                 <div className='section_top'>
-                    <div className='logo' onClick={() => navigate('/')}>
-                        <span className='text-black'>Fox</span>
-                        <span className='text-white'>Mart</span>
-                    </div>
+                    {
+                        scrollPosition > 144 ?
+                            <div className='categories relative cursor-pointer'
+                                onClick={() => setShowMenu(!showMenu)}>
+                                <div className='main'>
+                                    <FiMenu className="w-8 h-8" />
+                                    <span className='text-lg'>Danh mục</span>
+                                </div>
+                                {
+                                    showMenu &&
+                                    <div className='absolute top-[3.375rem] z-50' onMouseLeave={() => handleShowMenu(false, true)}>
+                                        <div className="menu-sidebar w-60 border border-gray-300 bg-white relative text-black font-normal">
+                                            {menuCategoryItems.map((item, index) => {
+                                                return (
+                                                    <div key={`category-item-${index}`} className="w-full px-3.5 py-3 hover:bg-[#FCB800] cursor-pointer flex items-center flex gap-4 group"
+                                                        onMouseEnter={() => handleShowSubmenu(true, item.sub_menu.check)}
+
+                                                    >
+                                                        <span>{item.icon}</span>
+                                                        <div className="flex-1 flex items-center justify-between">
+                                                            <span>{item.name}</span>
+                                                            <span>{item.sub_menu.check === true ? <MdKeyboardArrowRight className="w-5 h-5 text-gray-400 group-hover:text-black" /> : ""}</span>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                            {
+                                                showSubmenu &&
+                                                <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[238px]  border border-gray-400 bg-white px-8 py-6 flex gap-10">
+                                                    <div className="sub-menu-category">
+                                                        <div className="title font-bold mb-3">Đồ điện</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Home video & Theaters</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">TV & Videos</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Headphones</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Video Games</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Wireless Speaker</div>
+                                                    </div>
+                                                    <div className="sub-menu-category">
+                                                        <div className="title font-bold mb-3">Đồ điện</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Home video & Theaters</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">TV & Videos</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Headphones</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Video Games</div>
+                                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Wireless Speaker</div>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                            :
+                            <div className='logo' onClick={() => navigate('/')}>
+                                <span className='text-black'>Fox</span>
+                                <span className='text-white'>Mart</span>
+                            </div>
+                    }
+
                     <div className='search-bar'>
                         <div className='search-bar__text'>
                             <IoIosSearch className="w-6 h-6 text-gray-500" />
@@ -136,7 +152,7 @@ const Header = () => {
                 </div>
             </div>
             <div className='w-full border-t border-gray-600'></div>
-            <div className='header__bottom'>
+            <div className='header__bottom relative'>
                 <div className='section_bottom'>
                     <div className='categories'>
                         <div className='main'>
@@ -144,7 +160,7 @@ const Header = () => {
                             <span>Danh mục</span>
                         </div>
                     </div>
-                    <div className='recent-products'>
+                    <div className='recent-products font-normal' onMouseEnter={() => setShowViewProduct(true)}>
                         <span>Sản phẩm xem gần đây</span>
                         <IoIosArrowDown />
                     </div>
@@ -152,6 +168,20 @@ const Header = () => {
                         <span>Theo dõi đơn hàng</span>
                     </div>
                 </div>
+                {
+                    showViewProduct &&
+                    <div className='recently-viewed-products absolute top-[3.25rem] bg-white w-full px-12 py-5' onMouseLeave={() => setShowViewProduct(false)}>
+                        <div className='w-[80rem] mx-auto px-[30px] h-full flex flex-wrap'>
+                            <div className='viewed-item border-2 border-white hover:border-[#FCB800] duration-500 cursor-pointer'>
+                                <img src={Item6} alt="" className='w-24 h-24' />
+                            </div>
+                        </div>
+                        <div className='text-black mt-10 text-center'>
+                            <span className='cursor-pointer underline hover:text-[#FCB800] duration-300'>Xem tất cả các sản phẩm bạn đã xem</span>
+                        </div>
+                    </div>
+                }
+
             </div>
         </>
 

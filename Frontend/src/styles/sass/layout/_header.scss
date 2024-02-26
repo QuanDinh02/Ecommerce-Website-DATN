@@ -1,8 +1,20 @@
 .header__top {
-    @apply w-full text-white primary-color z-50;
+    @apply w-full text-white primary-color z-40;
 
     .section_top {
         @apply flex items-center w-[80rem] h-[76px] font-bold mx-auto px-[30px];
+
+        .sub-menu {
+            animation: slideRightToLeft 0.2s ease-in;
+        }
+
+        .categories {
+            @apply w-60;
+
+            .main {
+                @apply w-fit flex items-center gap-4 text-black cursor-pointer;
+            }
+        }
 
         .logo {
             @apply text-2xl cursor-pointer w-60 font-bold;
@@ -61,7 +73,7 @@
 }
 
 .header__bottom {
-    @apply w-full text-white primary-color ;
+    @apply w-full text-white primary-color z-20;
 
     .section_bottom {
         @apply flex items-center w-[80rem] h-[52px] font-bold mx-auto px-[30px];
@@ -80,7 +92,31 @@
 
         .order-tracking {
             @apply text-black cursor-pointer font-medium flex-1 flex items-center justify-end;
-        }
+        }  
+    }
+
+    .recently-viewed-products {
+        animation: slideBottomToTop 0.2s ease-in;
+    }
+}
+
+@keyframes slideRightToLeft {
+    0% {
+        left: 280px;
+    }
+
+    100% {
+        left: 238px;
+    }
+}
+
+@keyframes slideBottomToTop {
+    0% {
+        top: 82px;
+    }
+
+    100% {
+        top: 52px;
     }
 }
 

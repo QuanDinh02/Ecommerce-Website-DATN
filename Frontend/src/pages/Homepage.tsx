@@ -254,7 +254,7 @@ const Homepage = () => {
                         })}
                         {
                             showSubmenu &&
-                            <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px]  border border-gray-400 bg-white px-8 py-6 flex gap-10">
+                            <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px] border border-gray-400 bg-white px-8 py-6 flex gap-10">
                                 <div className="sub-menu-category">
                                     <div className="title font-bold mb-3">Đồ điện</div>
                                     <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Home video & Theaters</div>
