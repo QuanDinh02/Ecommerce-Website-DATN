@@ -1,12 +1,20 @@
 import React from 'react';
-import { RiEyeCloseLine, RiEyeLine } from "react-icons/ri";
+import { PiEyeLight, PiEyeSlash } from "react-icons/pi";
 import Button from '@/components/Button';
 import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
-
-interface INewAccount {
+import { GoMail } from "react-icons/go";
+import { BsFacebook } from "react-icons/bs";
+import Google_Icon from '../assets/img/login_page/google_icon.svg';
+interface INewShopAccount {
     name: string
-    age: number
+    shop_name: string
+    email: string
+    phone: string
+    password: string
+}
+
+interface INewCustomerAccount {
     phone: string
     password: string
 }
@@ -17,74 +25,46 @@ interface APIReponse {
     EM: string
 }
 
+enum PATH {
+    Login = "/login",
+}
+
 const RegisterPage = () => {
 
-    const [showPassword, setShowPassword] = React.useState<boolean>(false);
     const navigate = useNavigate();
 
-    const [showErrorMsg, setShowErrorMsg] = React.useState<boolean>(false);
-    const [showSuccessMsg, setShowSuccessMsg] = React.useState<boolean>(false);
+    const [showPassword, setShowPassword] = React.useState<boolean>(false);
+    const [isCustomer, setIsCustomer] = React.useState<boolean>(true);
 
-    const [newAccount, setNewAccount] = useImmer<INewAccount>({
+    const [newCustomerAccount, setNewCustomerAccount] = useImmer<INewCustomerAccount>({
+        phone: "",
+        password: "",
+    });
+
+    const [newShopAccount, setNewShopAccount] = useImmer<INewShopAccount>({
         name: "",
-        age: 0,
+        shop_name: "",
+        email: "",
         phone: "",
         password: "",
     });
 
     const handleOnChange = (field: string, value: string) => {
-        setNewAccount(draft => {
+        if (isCustomer) {
+            setNewCustomerAccount(draft => {
+                draft[field] = value;
+            });
+        }
+        setNewShopAccount(draft => {
             draft[field] = value;
         });
     }
 
     const checkFullField = () => {
-        return newAccount.name.length > 0 && newAccount.phone.length > 0 && newAccount.password.length > 0 && !isNaN(newAccount.age);
-    }
-
-    // const handleRegister = async () => {
-    //     setShowErrorMsg(false);
-    //     if (!checkFullField()) {
-    //         return;
-    //     } else {
-
-    //         let result: APIReponse | null = await createCustomer({
-    //             name: newAccount.name,
-    //             age: newAccount.age,
-    //             gender: "",
-    //             address: "",
-    //             email: "",
-    //             phone: newAccount.phone
-    //         });
-
-    //         if (result) {
-    //             if (result.EC !== 0) {
-    //                 setShowErrorMsg(true);
-    //             } else {
-    //                 let { id, phone } = result.DT;
-    //                 let response = await createCustomerAccount({
-    //                     customerID: id,
-    //                     username: phone,
-    //                     password: newAccount.password
-    //                 })
-    //                 if (response) {
-    //                     if (response.EC !== 0) {
-    //                         setShowErrorMsg(true);
-    //                     } else {
-    //                         setShowSuccessMsg(true);
-    //                         setTimeout(() => {
-    //                             setShowSuccessMsg(false);
-    //                             navigate('/login');
-    //                         }, 1500);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    const redirectLoginPage = () => {
-        navigate("/login");
+        if (isCustomer) {
+            return newCustomerAccount.phone.length > 0 && newCustomerAccount.password.length > 0;
+        }
+        return newShopAccount.phone.length > 0 && newShopAccount.password.length > 0 && newShopAccount.name.length > 0 && newShopAccount.shop_name.length > 0;
     }
 
     const requiredTag = () => {
@@ -97,57 +77,81 @@ const RegisterPage = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
 
+
     return (
         <div className='signin-container'>
-            <div className="flex items-center justify-center py-20 px-3 form-container bg-blue-600 min-h-screen">
-                <div className="register-form w-[31.25rem] rounded-[4px] bg-white px-5 py-10 shadow-lg opacity-95">
-                    <div className="login-form__title text-black font-medium text-2xl text-center mb-8">Đăng ký</div>
-                    <div className="login-form__main flex flex-col gap-5">
-                        {
-                            showErrorMsg &&
-                            <div className='border border-red-300 bg-red-100 w-full rounded-[4px] px-3 py-5'>
-                                <span>Thông tin đăng ký không đúng quy định !</span>
-                            </div>
-                        }
-                        {
-                            showSuccessMsg &&
-                            <div className='border border-green-300 bg-green-100 w-full rounded-[4px] px-3 py-5'>
-                                <span>Đăng ký thành công !</span>
-                            </div>
-                        }
-                        <div className='flex items-center justify-end'>
-                            <span>{requiredTag()}</span>
-                            <span> Bắt buộc</span>
-                        </div>
-                        <div className="w-full">
-                            <div className='input_label'>Họ và Tên {requiredTag()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleOnChange("name", e.target.value)} />
-                        </div>
-                        <div className="w-full">
-                            <div className='input_label'>Tuổi {requiredTag()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleOnChange("age", e.target.value)} />
-                        </div>
-                        <div className="w-full">
+            <div className="flex justify-center py-20 px-3 bg-[#EEEEEE] min-h-screen">
+                <div className="login-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
+                    <div className="login-form__title text-black text-xl mb-5">Đăng ký</div>
+                    <div className="login-form__main flex flex-col gap-2 duration-800">
+                        <div className='w-full'>
                             <div className='input_label'>Số điện thoại {requiredTag()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleOnChange("phone", e.target.value)} />
+                            <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
                         </div>
                         <div className='w-full'>
-                            <div className='input_label'>Password {requiredTag()}</div>
+                            <div className='input_label'>Mật khẩu {requiredTag()}</div>
                             <div className='relative'>
-                                <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange("password", e.target.value)} />
+                                <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} />
                                 <div className='absolute top-3 right-2 ' onClick={() => setShowPassword(!showPassword)}>
-                                    {!showPassword ? <RiEyeCloseLine className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <RiEyeLine className="w-5 h-5 text-xl cursor-pointer" />}
+                                    {!showPassword ? <PiEyeSlash className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <PiEyeLight className="w-5 h-5 text-xl cursor-pointer" />}
                                 </div>
                             </div>
                         </div>
-                        <div className='mt-10 mb-7 w-full'>
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out
+                        ${!isCustomer ? "h-60" : "h-0"}`}>
+                            <div className='w-full'>
+                                <div className='input_label'>Họ và tên {requiredTag()}</div>
+                                <input type="text" className="form_input" onChange={(e) => handleOnChange('name', e.target.value)} />
+                            </div>
+                            <div className='w-full'>
+                                <div className='input_label'>Tên shop {requiredTag()}</div>
+                                <input type="text" className="form_input" onChange={(e) => handleOnChange('shop_name', e.target.value)} />
+                            </div>
+                            <div className='w-full'>
+                                <div className='input_label'>Email </div>
+                                <input type="text" className="form_input" onChange={(e) => handleOnChange('email', e.target.value)} />
+                            </div>
+                        </div>
+                        <div className='mt-2'>
+                            <div className='flex items-center gap-2 mb-2 cursor-pointer w-fit' onClick={() => setIsCustomer(true)}>
+                                <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
+                                    {isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
+                                </div>
+                                <div>Khách hàng</div>
+                            </div>
+                            <div className='flex items-center gap-2 cursor-pointer w-fit' onClick={() => setIsCustomer(false)}>
+                                <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
+                                    {!isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
+                                </div>
+                                <div>Người bán</div>
+                            </div>
+                        </div>
+                        <div className='mt-6 w-full'>
                             <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'}>ĐĂNG KÝ</Button>
                         </div>
-                        <div className='text-center text-large'>
-                            <span className='font-medium'>Đã có tài khoản?</span>
-                            <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer' onClick={() => redirectLoginPage()}>Đăng nhập</span>
+                        <div className='flex items-center my-2'>
+                            <div className='border-t border-gray-400 w-2/5'></div>
+                            <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
+                            <div className='border-t border-gray-400 w-2/5'></div>
                         </div>
-                        <div className='w-full text-center cursor-pointer hover:text-red-500' onClick={() => navigate("/")}>&#8672; Trở về trang chủ</div>
+                        <div className='others-login-method'>
+                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+                                <GoMail className="w-6 h-6" />
+                                <div>Đăng ký bằng email</div>
+                            </div>
+                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+                                <BsFacebook className="w-6 h-6 text-[#1877f2]" />
+                                <div>Tiếp tục với facebook</div>
+                            </div>
+                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer hover:shadow-md'>
+                                <img src={Google_Icon} alt="" className="w-6 h-6" />
+                                <div>Tiếp tục với Google</div>
+                            </div>
+                        </div>
+                        <div className='text-center mt-4'>
+                            <span className='text-gray-400'>Đã có tài khoản?</span>
+                            <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => navigate(PATH.Login)}>Đăng nhập tại đây</span>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 .form_input {
-    @apply rounded-[4px] px-4 py-3 text-sm outline-none border border-gray-400 w-full;
+    @apply rounded-[4px] px-4 py-3 text-sm outline-none border border-gray-300 w-full focus:border-black;
 }
 
 .input_label {

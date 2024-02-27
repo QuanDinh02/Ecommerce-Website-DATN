@@ -44,20 +44,20 @@ const router = createBrowserRouter(
             },
           ]
         },
+        {
+          path: "register",
+          element: <RegisterPage />,
+        },
+        {
+          path: "login",
+          element: <LoginPage/>,
+        },
+        {
+          path: "reset",
+          element: <ForgotPasswordPage/>
+        },
       ],
-    },
-    {
-      path: "register",
-      element: <RegisterPage />,
-    },
-    {
-      path: "login",
-      element: <LoginPage/>,
-    },
-    {
-      path: "reset",
-      element: <ForgotPasswordPage/>
-    },
+    }, 
   ], {
   basename: import.meta.env.VITE_BASE_URL
 });

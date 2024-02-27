@@ -1,7 +1,7 @@
 .form_button {
-    @apply font-medium bg-gray-300 px-9 py-3.5 cursor-no-drop w-full;
+    @apply font-medium bg-gray-300 px-9 py-3 cursor-no-drop w-full rounded-[4px];
 }
 
 .form_button_valid {
-    @apply font-medium primary-color text-white px-9 py-3.5 cursor-pointer w-full;
+    @apply font-medium primary-color text-black px-9 py-3 cursor-pointer w-full rounded-[4px] hover:opacity-80;
 }
