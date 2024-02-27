@@ -13,7 +13,7 @@ import { PiEyeLight, PiEyeSlash } from "react-icons/pi";
 
 enum PATH {
     Register = "/register",
-    ResetPassword = "/reset"
+    ResetPassword = "/reset-password"
 }
 
 const USER = {
@@ -78,7 +78,7 @@ const LoginPage = () => {
         <div className='login-container'>
             <div className="flex justify-center py-20 px-3 bg-[#EEEEEE] min-h-screen">
                 <div className="login-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
-                    <div className="login-form__title text-black text-xl mb-5">Đăng nhập</div>
+                    <div className="login-form__title text-black text-xl mb-5 text-center font-medium">Đăng nhập</div>
                     <div className="login-form__main flex flex-col gap-2">
                         <div className='w-full'>
                             <div className='input_label'>Số điện thoại/ Email</div>
@@ -102,7 +102,7 @@ const LoginPage = () => {
                                 </div>
                                 <div className='text-sm'>Ghi nhớ đăng nhập</div>
                             </div>
-                            <div className="text-orange-400 cursor-pointer hover:underline text-sm">Quên mật khẩu ?</div>
+                            <div className="text-orange-400 cursor-pointer hover:underline text-sm" onClick={() => redirectPage(PATH.ResetPassword)}>Quên mật khẩu ?</div>
                         </div>
                         <div className='mt-6 w-full'>
                             <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'}>ĐĂNG NHẬP</Button>

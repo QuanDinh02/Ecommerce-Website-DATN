@@ -17,6 +17,7 @@ interface INewShopAccount {
 interface INewCustomerAccount {
     phone: string
     password: string
+    email
 }
 
 interface APIReponse {
@@ -39,6 +40,7 @@ const RegisterPage = () => {
     const [newCustomerAccount, setNewCustomerAccount] = useImmer<INewCustomerAccount>({
         phone: "",
         password: "",
+        email: ""
     });
 
     const [newShopAccount, setNewShopAccount] = useImmer<INewShopAccount>({
@@ -81,9 +83,9 @@ const RegisterPage = () => {
     return (
         <div className='signin-container'>
             <div className="flex justify-center py-20 px-3 bg-[#EEEEEE] min-h-screen">
-                <div className="login-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
-                    <div className="login-form__title text-black text-xl mb-5">Đăng ký</div>
-                    <div className="login-form__main flex flex-col gap-2 duration-800">
+                <div className="signin-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
+                    <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Đăng ký</div>
+                    <div className="signin-form__main flex flex-col gap-2 duration-800">
                         <div className='w-full'>
                             <div className='input_label'>Số điện thoại {requiredTag()}</div>
                             <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
@@ -97,8 +99,12 @@ const RegisterPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out
-                        ${!isCustomer ? "h-60" : "h-0"}`}>
+                        <div className='w-full'>
+                            <div className='input_label'>Email {requiredTag()}</div>
+                            <input type="text" className="form_input" onChange={(e) => handleOnChange('email', e.target.value)} />
+                        </div>
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-2
+                        ${!isCustomer ? "h-44" : "h-0"}`}>
                             <div className='w-full'>
                                 <div className='input_label'>Họ và tên {requiredTag()}</div>
                                 <input type="text" className="form_input" onChange={(e) => handleOnChange('name', e.target.value)} />
@@ -106,10 +112,6 @@ const RegisterPage = () => {
                             <div className='w-full'>
                                 <div className='input_label'>Tên shop {requiredTag()}</div>
                                 <input type="text" className="form_input" onChange={(e) => handleOnChange('shop_name', e.target.value)} />
-                            </div>
-                            <div className='w-full'>
-                                <div className='input_label'>Email </div>
-                                <input type="text" className="form_input" onChange={(e) => handleOnChange('email', e.target.value)} />
                             </div>
                         </div>
                         <div className='mt-2'>
