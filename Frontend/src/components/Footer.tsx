@@ -8,6 +8,7 @@ import AppStore from "../assets/img/footer/app_store.png";
 const Footer = () => {
     return (
         <div className="footer">
+            <div className="w-full border-t border-gray-300"></div>
             <div className="subscribe-section flex items-center justify-between">
                 <div className="subscribe-text">Đăng ký để biết thêm thông tin về sản phẩm và các ưu đãi</div>
                 <div className="subscribe-box">
