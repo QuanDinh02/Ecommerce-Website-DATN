@@ -11,6 +11,7 @@ import RegisterPage from '@/pages/RegisterPage.tsx';
 import LoginPage from '@/pages/LoginPage.tsx';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage.tsx';
 import CategoryPage from '@/pages/Category/CategoryPage.tsx';
+import ProductDetailPage from '@/pages/Product/ProductDetailPage.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -48,6 +49,10 @@ const router = createBrowserRouter(
         {
           path: "category",
           element: <CategoryPage/>
+        },
+        {
+          path: "product-detail",
+          element: <ProductDetailPage/>
         },
         {
           path: "register",

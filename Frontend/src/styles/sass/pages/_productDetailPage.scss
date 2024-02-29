@@ -1,0 +1,14 @@
+.product-detail-container {
+
+    .swiper-button-prev,
+    .swiper-button-next {
+        @apply text-gray-600;
+        background-color: rgba(163, 163, 163, 0.6);
+        color           : white !important;
+        font-weight     : 700;
+
+        &::after {
+            font-size: 12px;
+        }
+    }
+}
