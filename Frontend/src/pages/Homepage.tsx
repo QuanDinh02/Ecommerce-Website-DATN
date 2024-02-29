@@ -32,11 +32,28 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { GoStarFill } from "react-icons/go";
 import { FaFireAlt } from "react-icons/fa";
-import { PiTShirtLight } from "react-icons/pi";
+import { PiShoppingCartLight, PiTShirtLight } from "react-icons/pi";
+import { successToast1 } from "@/components/Toast/Toast";
+import { IoEyeOutline } from "react-icons/io5";
+import { IoMdHeartEmpty } from "react-icons/io";
+import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
+import { TbMinusVertical } from "react-icons/tb";
 
 const Homepage = () => {
 
     const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
+
+    const [imageList1, setImageList1] = React.useState([
+        Item, Item2, Item3, Item4, Item5, Item6, Item7, Item8, Item9
+    ]);
+
+    const [imageList2, setImageList2] = React.useState([
+        Item, Item2, Item3, Item4, Item, Item2, Item3, Item4
+    ]);
+
+    const [imageList3, setImageList3] = React.useState([
+        Item5, Item6, Item7, Item8, Item9, Item5, Item6, Item7, Item8, Item9
+    ]);
 
     const handleShowSubmenu = (show: boolean, check: boolean) => {
         if (show && check) {
@@ -46,192 +63,14 @@ const Homepage = () => {
         }
     }
 
-    const swiperSlides = () => {
-        return (
-            <>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item2} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item3} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item4} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item5} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item2} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item3} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide className="hover:border hover:border-gray-500 item cursor-pointer">
-                    <img src={Item4} alt="" className="w-full mb-2.5 item__image" />
-                    <div className="item__content">
-                        <div className="item-title hover:text-[#FCB800] duration-300 text-blue-600 mb-4 line-clamp-2">Grand Slam Indoor Of Show Jumping Novel</div>
-                        <div className="item-price flex items-center gap-2 mb-2.5">
-                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                        </div>
-                        <div className="item-ratings flex items-center gap-2">
-                            <div className="stars-rating flex items-center">
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                                <GoStarFill className="text-[#FCB800]" />
-                            </div>
-                            <div className="rating-counts">123</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-            </>
-        )
+    const hanldeFavoriteItem = () => {
+        successToast1("Thêm vào sản phẩm yêu thích thành công");
     }
+
+    const hanldeAddShoppingCart = () => {
+        successToast1("Thêm vào giỏ hàng thành công");
+    }
+
     return (
         <div className="homepage-container w-full bg-[#EEEEEE]">
             <div className='px-[30px] w-[80rem] mx-auto  py-8'>
@@ -304,14 +143,68 @@ const Homepage = () => {
                         <Swiper
                             slidesPerView={5}
                             spaceBetween={30}
-
+                            className="product-list"
                             pagination={{
                                 clickable: true,
                             }}
                             modules={[Pagination]}
 
                         >
-                            {swiperSlides()}
+                            {
+                                imageList1 && imageList1.length > 0 &&
+                                imageList1.map((item, index) => {
+                                    return (
+                                        <SwiperSlide>
+                                            <div className="product cursor-pointer px-4 py-2 group" key={`sale-off-product-${index}`}>
+                                                <div className="relative">
+                                                    <div className="product__image w-40 mx-auto mb-6"><img src={item} alt="" /></div>
+                                                    <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                                                            <PiShoppingCartLight className="w-6 h-6 " />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                                                            <IoEyeOutline className="w-6 h-6" />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Xem nhanh</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                                                            <IoMdHeartEmpty className="w-6 h-6" />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Yêu thích</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
+                                                <div className="product__price flex items-center gap-2 mb-2.5">
+                                                    <div className="price text-[#1A732E] font-medium">768,000 đ</div>
+                                                    <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
+                                                </div>
+                                                <div className="product__ratings flex items-center gap-2">
+                                                    <div className="stars-rating flex items-center">
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                    </div>
+                                                    <div className="rating-counts">123</div>
+                                                </div>
+                                            </div>
+                                        </SwiperSlide>
+                                    )
+                                })
+                            }
                         </Swiper>
                     </div>
                 </div>
@@ -342,135 +235,116 @@ const Homepage = () => {
                                 </Swiper>
                             </div>
                             <div className="item-category flex items-center gap-6 mb-2.5">
-                                <div className="text-gray-500 cursor-pointer hover:text-black">Hàng mới</div>
+                                <div className="text-black font-medium cursor-pointer hover:text-black">Hàng mới</div>
                                 <div className="text-gray-500 cursor-pointer hover:text-black">Bán chạy</div>
                                 <div className="text-gray-500 cursor-pointer hover:text-black">Giảm giá</div>
                             </div>
                             <div className="border-t border-gray-300 mb-4"></div>
-                            <div className="item-list w-full flex items-center">
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item2} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item3} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item5} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <Swiper
+                                slidesPerView={3}
+                                spaceBetween={20}
+                                className="product-list"
+                                modules={[Pagination]}
+
+                            >
+                                {
+                                    imageList2 && imageList2.length > 0 &&
+                                    imageList2.map((item, index) => {
+                                        return (
+                                            <SwiperSlide>
+                                                <div className="product cursor-pointer px-4 py-2 group border border-white hover:border-gray-400" key={`sale-off-product-${index}`}>
+                                                    <div className="relative">
+                                                        <div className="product__image w-36 mx-auto mb-6"><img src={item} alt="" /></div>
+                                                        <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                                                                <PiShoppingCartLight className="w-6 h-6 " />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                                                                <IoEyeOutline className="w-6 h-6" />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Xem nhanh</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                                                                <IoMdHeartEmpty className="w-6 h-6" />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Yêu thích</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
+                                                    <div className="product__price flex items-center gap-2 mb-2.5">
+                                                        <div className="price text-[#1A732E] font-medium">768,000 đ</div>
+                                                        <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
+                                                    </div>
+                                                    <div className="product__ratings flex items-center gap-2">
+                                                        <div className="stars-rating flex items-center">
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                        </div>
+                                                        <div className="rating-counts">123</div>
+                                                    </div>
+                                                </div>
+                                            </SwiperSlide>
+                                        )
+                                    })
+                                }
+                            </Swiper>
                         </div>
                         <div className="right-content w-1/3 border-l border-gray-300 p-5">
                             <div className="text-xl">Đề xuất dành cho bạn</div>
                             <div className="border-t border-gray-300 mt-3 mb-4"></div>
                             <div className="list">
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item2} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item2} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item3} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item3} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4">
-                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item4} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
@@ -510,135 +384,116 @@ const Homepage = () => {
                                 </Swiper>
                             </div>
                             <div className="item-category flex items-center gap-6 mb-2.5">
-                                <div className="text-gray-500 cursor-pointer hover:text-black">Hàng mới</div>
+                                <div className="text-black font-medium cursor-pointer hover:text-black">Hàng mới</div>
                                 <div className="text-gray-500 cursor-pointer hover:text-black">Bán chạy</div>
                                 <div className="text-gray-500 cursor-pointer hover:text-black">Giảm giá</div>
                             </div>
                             <div className="border-t border-gray-300 mb-4"></div>
-                            <div className="item-list w-full flex items-center">
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item6} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item7} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item8} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="w-1/4 item cursor-pointer">
-                                    <img src={Item9} alt="" className="w-4/5 h-4/5 mb-2.5 item__image" />
-                                    <div className="item__content">
-                                        <div className="item-title text-blue-600 mb-4 line-clamp-2 hover:text-[#FCB800] duration-300">Grand Slam Indoor Of Show Jumping Novel</div>
-                                        <div className="item-price flex items-center gap-2 mb-2.5">
-                                            <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                            <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                        </div>
-                                        <div className="item-ratings flex items-center gap-2">
-                                            <div className="stars-rating flex items-center">
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                                <GoStarFill className="text-[#FCB800]" />
-                                            </div>
-                                            <div className="rating-counts">123</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <Swiper
+                                slidesPerView={3}
+                                spaceBetween={20}
+                                className="product-list"
+                                modules={[Pagination]}
+
+                            >
+                                {
+                                    imageList3 && imageList3.length > 0 &&
+                                    imageList3.map((item, index) => {
+                                        return (
+                                            <SwiperSlide>
+                                                <div className="product cursor-pointer px-4 py-2 group border border-white hover:border-gray-400" key={`sale-off-product-${index}`}>
+                                                    <div className="relative">
+                                                        <div className="product__image w-36 mx-auto mb-6"><img src={item} alt="" /></div>
+                                                        <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                                                                <PiShoppingCartLight className="w-6 h-6 " />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                                                                <IoEyeOutline className="w-6 h-6" />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Xem nhanh</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                                                                <IoMdHeartEmpty className="w-6 h-6" />
+                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                        <span className="text-sm">Yêu thích</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
+                                                    <div className="product__price flex items-center gap-2 mb-2.5">
+                                                        <div className="price text-[#1A732E] font-medium">768,000 đ</div>
+                                                        <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
+                                                    </div>
+                                                    <div className="product__ratings flex items-center gap-2">
+                                                        <div className="stars-rating flex items-center">
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                            <GoStarFill className="text-[#FCB800]" />
+                                                        </div>
+                                                        <div className="rating-counts">123</div>
+                                                    </div>
+                                                </div>
+                                            </SwiperSlide>
+                                        )
+                                    })
+                                }
+                            </Swiper>
                         </div>
                         <div className="right-content w-1/3 border-l border-gray-300 p-5">
                             <div className="text-xl">Đề xuất dành cho bạn</div>
                             <div className="border-t border-gray-300 mt-3 mb-4"></div>
                             <div className="list">
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item6} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item6} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item7} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item7} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item8} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item8} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item9} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item9} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4 mb-4">
-                                    <div><img src={Recommend_Item6} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item6} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
                                     </div>
                                 </div>
                                 <div className="item cursor-pointer flex items-center gap-4">
-                                    <div><img src={Recommend_Item7} alt="" className="w-16 h-16"/></div>
+                                    <div><img src={Recommend_Item7} alt="" className="w-16 h-16" /></div>
                                     <div>
                                         <div className="item-name text-blue-600 line-clamp-2 hover:text-[#FCB800] duration-300 mb-1">Xbox One Wireless Controller Black Color</div>
                                         <div className="text-sm">167,000 đ</div>
