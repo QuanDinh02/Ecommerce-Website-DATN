@@ -12,6 +12,10 @@ import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
 import { TbMinusVertical } from "react-icons/tb";
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
+import { PiShoppingCartLight } from "react-icons/pi";
+import { IoEyeOutline } from "react-icons/io5";
+import { IoMdHeartEmpty } from "react-icons/io";
+import { successToast1 } from "@/components/Toast/Toast";
 
 const CategoryPage = () => {
 
@@ -95,6 +99,15 @@ const CategoryPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }
+
+    const hanldeFavoriteItem = () => {
+        successToast1("Thêm vào sản phẩm yêu thích thành công");
+    }
+
+    const hanldeAddShoppingCart = () => {
+        successToast1("Thêm vào giỏ hàng thành công");
     }
 
     return (
@@ -274,10 +287,36 @@ const CategoryPage = () => {
                                 {productsByCategory && productsByCategory.length > 0 && productsByCategory.map((item, index) => {
                                     return (
                                         <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`}>
-                                            <div className="product__image w-40 mx-auto mb-12"><img src={item.image} alt="" /></div>
-                                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 group-hover:text-[#FCB800]">{item.name}</div>
+                                            <div className="product__image w-40 mx-auto mb-6"><img src={item.image} alt="" /></div>
+                                            <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
+                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                                                    <PiShoppingCartLight className="w-6 h-6 "/>
+                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                            <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                                                    <IoEyeOutline className="w-6 h-6" />
+                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                            <span className="text-sm">Xem nhanh</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                                                    <IoMdHeartEmpty className="w-6 h-6"/>
+                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                            <span className="text-sm">Yêu thích</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
                                             <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(item.price)}</div>
-                                            <div className="flex items-center mb-1">
+                                            <div className="flex items-center mb-1 group-hover:hidden">
                                                 <div className="product__rating-stars flex items-center gap-x-1">
                                                     {
                                                         [...Array(Math.floor(item.ratings))].map((item, index) => {
@@ -297,7 +336,7 @@ const CategoryPage = () => {
                                                 <TbMinusVertical className="text-gray-300" />
                                                 <div className="text-sm">Đã bán {numberKFormat(item.selling_count)}</div>
                                             </div>
-                                            <div className="product_ratings flex items-center text-sm ">
+                                            <div className="product_ratings group-hover:hidden flex items-center text-sm ">
                                                 <div className="font-bold">{item.ratings}</div>
                                                 <div>/5.0</div>
                                                 <div>({item.ratings_count})</div>
@@ -305,7 +344,6 @@ const CategoryPage = () => {
                                         </div>
                                     )
                                 })}
-
                             </div>
                             :
                             <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
@@ -350,8 +388,8 @@ const CategoryPage = () => {
                                                 </div>
                                                 <div className="product__right-content w-60">
                                                     <div className="product__price font-medium text-xl mb-2 tracking-wide mb-2">{CurrencyFormat(item.price)}</div>
-                                                    <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80">Thêm vào giỏ hàng</div>
-                                                    <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit"><FaRegHeart/> Yêu thích</div>
+                                                    <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
+                                                    <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={() => hanldeFavoriteItem()}><FaRegHeart /> Yêu thích</div>
                                                 </div>
                                             </div>
                                         </div>
