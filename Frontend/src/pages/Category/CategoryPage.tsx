@@ -129,7 +129,7 @@ const CategoryPage = () => {
     React.useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
-    
+
     return (
         <>
             <div className="category-container">
@@ -307,10 +307,13 @@ const CategoryPage = () => {
                                 <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
                                     {productsByCategory && productsByCategory.length > 0 && productsByCategory.map((item, index) => {
                                         return (
-                                            <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`}>
+                                            <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => navigate("/product-detail")}>
                                                 <div className="product__image w-40 mx-auto mb-6"><img src={item.image} alt="" /></div>
                                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        hanldeAddShoppingCart();
+                                                    }}>
                                                         <PiShoppingCartLight className="w-6 h-6 " />
                                                         <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                                             <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -318,7 +321,10 @@ const CategoryPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => handleQuickView()}>
+                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleQuickView();
+                                                    }}>
                                                         <IoEyeOutline className="w-6 h-6" />
                                                         <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                                             <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -326,7 +332,10 @@ const CategoryPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        hanldeFavoriteItem();
+                                                    }}>
                                                         <IoMdHeartEmpty className="w-6 h-6" />
                                                         <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                                             <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -370,7 +379,10 @@ const CategoryPage = () => {
                                 <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
                                     {productsByCategory && productsByCategory.length > 0 && productsByCategory.map((item, index) => {
                                         return (
-                                            <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4" key={`category-item-${index}`}>
+                                            <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
+                                                key={`category-item-${index}`}
+                                                onClick={() => navigate("/product-detail")}
+                                            >
                                                 <div className="product__image w-44 mx-auto mb-12"><img src={item.image} alt="" /></div>
                                                 <div className="flex-1 flex justify-between">
                                                     <div className="product__left-content w-80">
@@ -409,8 +421,14 @@ const CategoryPage = () => {
                                                     </div>
                                                     <div className="product__right-content w-60">
                                                         <div className="product__price font-medium text-xl mb-2 tracking-wide mb-2">{CurrencyFormat(item.price)}</div>
-                                                        <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
-                                                        <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={() => hanldeFavoriteItem()}><FaRegHeart /> Yêu thích</div>
+                                                        <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            hanldeAddShoppingCart();
+                                                        }}>Thêm vào giỏ hàng</div>
+                                                        <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            hanldeFavoriteItem()
+                                                        }}><FaRegHeart /> Yêu thích</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -502,7 +520,6 @@ const CategoryPage = () => {
                     </div>
                 </div>
             </Modal>
-
         </>
     )
 }
