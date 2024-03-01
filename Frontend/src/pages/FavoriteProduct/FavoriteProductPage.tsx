@@ -8,6 +8,7 @@ import Item9 from '../../assets/img/homepage/item9.svg';
 import { useImmer } from "use-immer";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { successToast1 } from "@/components/Toast/Toast";
+import React from "react";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -48,6 +49,10 @@ const FavoriteProductPage = () => {
     const hanldeRemoveFavoriteItem = () => {
         successToast1("Xóa thành công");
     }
+
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, []);
 
     return (
         <div className="shopping-cart-container">

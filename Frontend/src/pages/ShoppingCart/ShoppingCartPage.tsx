@@ -8,6 +8,7 @@ import Item9 from '../../assets/img/homepage/item9.svg';
 import { useImmer } from "use-immer";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { successToast1 } from "@/components/Toast/Toast";
+import React from "react";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN", ""
@@ -58,6 +59,10 @@ const ShoppingCartPage = () => {
     const hanldeRemoveFavoriteItem = () => {
         successToast1("Xóa thành công");
     }
+
+    // React.useEffect(() => {
+    //     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    // }, []);
 
     return (
         <div className="shopping-cart-container">
@@ -110,10 +115,32 @@ const ShoppingCartPage = () => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="shopping-cart-payment">
+                    <div className="shopping-cart-payment mt-20 flex justify-between">
                         <div>
-                            <div className="text-lg">Phiếu giảm giá</div>
-
+                            <div className="text-lg tracking-wide">Phiếu giảm giá</div>
+                            <div className="w-[23rem] border border-gray-400 h-12 mt-6 px-5 flex items-center">
+                                <input type="text" className="outline-none w-full" placeholder="Nhập mã giảm giá" />
+                            </div>
+                            <div className="bg-[#FCB800] px-5 py-3 w-fit mt-6 font-medium cursor-pointer hover:opacity-80">Áp dụng mã giảm giá</div>
+                        </div>
+                        <div>
+                            <div className="w-[23rem] bg-gray-100 border border-gray-400 px-8 py-5">
+                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 mb-4">
+                                    <div>Tổng</div>
+                                    <div>{CurrencyFormat(597000)}</div>
+                                </div>
+                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 text-sm pb-10 mb-6">
+                                    <div>Phí vận chuyển</div>
+                                    <div>+{CurrencyFormat(20000)}</div>
+                                </div>
+                                <div className="flex items-center justify-between text-lg font-medium">
+                                    <div>Tổng cộng</div>
+                                    <div className="text-red-500 text-xl font-bold">{CurrencyFormat(617000)}</div>
+                                </div>
+                            </div>
+                            <div className="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold">
+                                Tiến hành thanh toán
+                            </div>
                         </div>
                     </div>
                 </div>
