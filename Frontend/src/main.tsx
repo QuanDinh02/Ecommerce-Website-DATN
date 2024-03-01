@@ -12,6 +12,8 @@ import LoginPage from '@/pages/LoginPage.tsx';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage.tsx';
 import CategoryPage from '@/pages/Category/CategoryPage.tsx';
 import ProductDetailPage from '@/pages/Product/ProductDetailPage.tsx';
+import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
+import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -53,6 +55,14 @@ const router = createBrowserRouter(
         {
           path: "product-detail",
           element: <ProductDetailPage/>
+        },
+        {
+          path: "cart",
+          element: <ShoppingCartPage/>
+        },
+        {
+          path: "favorite-products",
+          element: <FavoriteProductPage/>
         },
         {
           path: "register",

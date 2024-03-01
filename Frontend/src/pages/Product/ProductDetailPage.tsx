@@ -34,10 +34,13 @@ import { useImmer } from "use-immer";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { TbMinusVertical } from "react-icons/tb";
+import Modal from "@/components/Modal";
 
 const ProductDetailPage = () => {
 
     const navigate = useNavigate();
+
+    const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
     const [selectedImage, setSelectedImage] = React.useState({
         id: 1,
@@ -138,7 +141,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -146,7 +152,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -154,7 +163,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -196,7 +208,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item2} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -204,7 +219,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -212,7 +230,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -254,7 +275,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item3} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -262,7 +286,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -270,7 +297,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -312,7 +342,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item4} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -320,7 +353,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -328,7 +364,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -370,7 +409,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item5} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -378,7 +420,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -386,7 +431,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -428,7 +476,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item6} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -436,7 +487,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -444,7 +498,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -486,7 +543,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item7} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -494,7 +554,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -502,7 +565,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -544,7 +610,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item8} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -552,7 +621,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -560,7 +632,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -602,7 +677,10 @@ const ProductDetailPage = () => {
                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
                         <div className="product__image w-40 mx-auto mb-6"><img src={Item9} alt="" /></div>
                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeAddShoppingCart()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeAddShoppingCart();
+                            }}>
                                 <PiShoppingCartLight className="w-6 h-6 " />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -610,7 +688,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative">
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                setShowQuickView(true);
+                            }}>
                                 <IoEyeOutline className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -618,7 +699,10 @@ const ProductDetailPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={() => hanldeFavoriteItem()}>
+                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                e.stopPropagation();
+                                hanldeFavoriteItem()
+                            }}>
                                 <IoMdHeartEmpty className="w-6 h-6" />
                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
                                     <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
@@ -660,252 +744,316 @@ const ProductDetailPage = () => {
         )
     }
 
-    return (
-        <div className="product-detail-container">
-            <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
-                <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
-                    <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
-                    <MdOutlineArrowForwardIos />
-                    <div className="cursor-pointer hover:underline">Điện thoại/ Thiết bị</div>
-                    <MdOutlineArrowForwardIos />
-                    <div className="font-medium cursor-pointer hover:underline">Điện Thoại Di Động Apple iPhone Retina 6s Plus 64GB</div>
-                </div>
-            </div>
-            <div className="product-detail__content mt-16 mb-24">
-                <div className="main w-[80rem] mx-auto px-[30px]">
-                    <div className="flex">
-                        <div className="product__images mr-16">
-                            <div className="w-80 h-80">
-                                <img src={selectedImage.image} className="select-none" />
-                            </div>
-                            <div className="swiper-list w-80 mt-2 mb-5">
-                                <Swiper
-                                    spaceBetween={10}
-                                    slidesPerView={4}
-                                    navigation={true}
-                                    modules={[Navigation]}
-                                    className="mySwiper"
-                                >
-                                    {images && images.length > 0 && images.map((item, index) => {
-                                        return (
-                                            <SwiperSlide>
-                                                <img
-                                                    key={`image-${index}`}
-                                                    src={item.image}
-                                                    className={selectedImage.id === item.id ? "border-2 border-[#FCB800] cursor-pointer select-none" : "border-2 boder-gray-600 cursor-pointer select-none"}
-                                                    onClick={() => setSelectedImage(item)}
-                                                />
-                                            </SwiperSlide>
-                                        )
-                                    })}
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, []);
 
-                                </Swiper>
-                            </div>
-                        </div>
-                        <div className="product__informations flex-1">
-                            <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
-                            <div className="product__rating-stars flex items-center gap-x-3 mt-1">
-                                <div className="flex items-center gap-x-0.5">
-                                    {
-                                        [...Array(5)].map((item, index) => {
+    return (
+        <>
+
+            <div className="product-detail-container">
+                <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+                    <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
+                        <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
+                        <MdOutlineArrowForwardIos />
+                        <div className="cursor-pointer hover:underline">Điện thoại/ Thiết bị</div>
+                        <MdOutlineArrowForwardIos />
+                        <div className="font-medium cursor-pointer hover:underline">Điện Thoại Di Động Apple iPhone Retina 6s Plus 64GB</div>
+                    </div>
+                </div>
+                <div className="product-detail__content mt-16 mb-24">
+                    <div className="main w-[80rem] mx-auto px-[30px]">
+                        <div className="flex">
+                            <div className="product__images mr-16">
+                                <div className="w-80 h-80">
+                                    <img src={selectedImage.image} className="select-none" />
+                                </div>
+                                <div className="swiper-list w-80 mt-2 mb-5">
+                                    <Swiper
+                                        spaceBetween={10}
+                                        slidesPerView={4}
+                                        navigation={true}
+                                        modules={[Navigation]}
+                                        className="mySwiper"
+                                    >
+                                        {images && images.length > 0 && images.map((item, index) => {
                                             return (
-                                                <GoStarFill className="text-[#FCB800]" />
+                                                <SwiperSlide>
+                                                    <img
+                                                        key={`image-${index}`}
+                                                        src={item.image}
+                                                        className={selectedImage.id === item.id ? "border-2 border-[#FCB800] cursor-pointer select-none" : "border-2 boder-gray-600 cursor-pointer select-none"}
+                                                        onClick={() => setSelectedImage(item)}
+                                                    />
+                                                </SwiperSlide>
                                             )
-                                        })
-                                    }
-                                    <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
-                                </div>
-                                <GoDotFill className="text-gray-300 w-3 h-3" />
-                                <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
-                                    <MdOutlineMessage className="w-5 h-5" />
-                                    <span>101 đánh giá</span>
-                                </div>
-                                <GoDotFill className="text-gray-300 w-3 h-3" />
-                                <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
-                                    <IoBagCheckOutline className="w-5 h-5" />
-                                    <span>Đã bán 2k2</span>
+                                        })}
+
+                                    </Swiper>
                                 </div>
                             </div>
-                            <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
-                            <div className="shop flex items-center gap-x-4">
-                                <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
-                                <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
-                            </div>
-                            <div className="border-t border-gray-300 w-full my-4"></div>
-                            <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
-                                <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
-                                <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
-                                <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
-                                <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
-                            </div>
-                            <div className="border-t border-gray-300 w-full my-4"></div>
-                            <div className="flex items-end gap-x-4">
-                                <div>
-                                    <div className="mb-1">Số lượng</div>
-                                    <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
-                                        <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
-                                        <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
-                                        <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                            <div className="product__informations flex-1">
+                                <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
+                                <div className="product__rating-stars flex items-center gap-x-3 mt-1">
+                                    <div className="flex items-center gap-x-0.5">
+                                        {
+                                            [...Array(5)].map((item, index) => {
+                                                return (
+                                                    <GoStarFill className="text-[#FCB800]" />
+                                                )
+                                            })
+                                        }
+                                        <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
+                                    </div>
+                                    <GoDotFill className="text-gray-300 w-3 h-3" />
+                                    <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
+                                        <MdOutlineMessage className="w-5 h-5" />
+                                        <span>101 đánh giá</span>
+                                    </div>
+                                    <GoDotFill className="text-gray-300 w-3 h-3" />
+                                    <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
+                                        <IoBagCheckOutline className="w-5 h-5" />
+                                        <span>Đã bán 2k2</span>
                                     </div>
                                 </div>
-                                <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
-                                <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="border-t border-gray-300 w-full my-4"></div>
-                    <div className="product__info-detail">
-                        <div className="flex items-center mb-5">
-                            {
-                                productDetail && productDetail.length > 0 &&
-                                productDetail.map((item, index) => {
-                                    if (item.selected) {
-                                        return (
-                                            <div className="px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer" key={`detail-${item.id}`}>{item.name}</div>
-                                        )
-                                    }
-                                    return (
-                                        <div
-                                            className="px-5 py-2 border-b-2 border-gray-300 text-gray-400 font-medium cursor-pointer"
-                                            key={`detail-${item.id}`}
-                                            onClick={() => hanldeSetProductDetail(item.id)}
-                                        >{item.name}</div>
-                                    )
-                                })
-                            }
-                        </div>
-                        {
-                            productDetail[0].selected &&
-                            <>
-                                <div className="product__info-description w-[50rem] text-gray-500 text-justify mb-5">
-                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                    Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
+                                <div className="shop flex items-center gap-x-4">
+                                    <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
+                                    <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
                                 </div>
-                                <div className="w-[37rem] flex border boder-gray-400 mb-16">
-                                    <table className='w-1/3'>
-                                        <tbody>
-                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                <td className="text-gray-600 py-2 px-2">Model</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                <td className="text-gray-600 py-2 px-2">Style</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                <td className="text-gray-600 py-2 px-2">Certificate</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                <td className="text-gray-600 py-2 px-2">Size</td>
-                                            </tr>
-                                            <tr className='bg-[#EFF2F4]'>
-                                                <td className="text-gray-600 py-2 px-2">Memory</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <table className='w-2/3'>
-                                        <tbody>
-                                            <tr className='border-b boder-gray-400'>
-                                                <td className="py-2 px-2">#8786867</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400'>
-                                                <td className="py-2 px-2">Classic style</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400'>
-                                                <td className="py-2 px-2">ISO-898921212</td>
-                                            </tr>
-                                            <tr className='border-b boder-gray-400'>
-                                                <td className="py-2 px-2">34mm x 450mm x 19mm</td>
-                                            </tr>
-                                            <tr className=''>
-                                                <td className="py-2 px-2">36GB RAM</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                <div className="border-t border-gray-300 w-full my-4"></div>
+                                <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
+                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
+                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
+                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
+                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
                                 </div>
-                            </>
-                        }
-                        {
-                            productDetail[1].selected &&
-                            <>
-                                <div className="border bg-gray-100 border-gray-300 p-5 mb-8">
-                                    <div className="product_ratings flex items-center gap-x-3 mb-4">
-                                        <div className="text-3xl font-bold text-[#FCB800]">5.0</div>
-                                        <div className="flex items-center">
-                                            {
-                                                [...Array(5)].map((item, index) => {
-                                                    return (
-                                                        <GoStarFill className="text-[#FCB800] w-5 h-5" />
-                                                    )
-                                                })
-                                            }
+                                <div className="border-t border-gray-300 w-full my-4"></div>
+                                <div className="flex items-end gap-x-4">
+                                    <div>
+                                        <div className="mb-1">Số lượng</div>
+                                        <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                            <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                            <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
+                                            <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
                                         </div>
                                     </div>
-                                    <div className="product_rating_filter flex items-center gap-x-2">
-                                        <div className={ratingFilter === 0 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(0)}>Tất cả</div>
-                                        <div className={ratingFilter === 5 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(5)}>5 sao (232)</div>
-                                        <div className={ratingFilter === 4 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(4)}>4 sao (12)</div>
-                                        <div className={ratingFilter === 3 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(3)}>3 sao (31)</div>
-                                        <div className={ratingFilter === 2 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(2)}>2 sao (4)</div>
-                                        <div className={ratingFilter === 1 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(1)}>1 sao (1)</div>
-                                    </div>
+                                    <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
+                                    <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
                                 </div>
-                                <div>
-                                    {commentList && commentList.length > 0 &&
-                                        commentList.map((item, index) => {
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <div className="product__info-detail">
+                            <div className="flex items-center mb-5">
+                                {
+                                    productDetail && productDetail.length > 0 &&
+                                    productDetail.map((item, index) => {
+                                        if (item.selected) {
                                             return (
-                                                <div key={`customer-comment-${item.id}`} className="mb-10">
-                                                    <div className="flex gap-x-2 mb-3">
-                                                        <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">MN</div>
-                                                        <div className="flex flex-col">
-                                                            <div className="flex items-center gap-x-2">
-                                                                <div className="font-medium">{item.customer_name}</div>
-                                                                <div className="flex items-center gap-x-1">
-                                                                    {
-                                                                        [...Array(Math.floor(item.ratings))].map((item, index) => {
-                                                                            return (
-                                                                                <GoStarFill className="text-[#FCB800] w-4 h-4" />
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                    {
-                                                                        [...Array(5 - Math.floor(item.ratings))].map((item, index) => {
-                                                                            return (
-                                                                                <GoStarFill className="text-gray-300 w-4 h-4" />
-                                                                            )
-                                                                        })
-                                                                    }
+                                                <div className="px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer" key={`detail-${item.id}`}>{item.name}</div>
+                                            )
+                                        }
+                                        return (
+                                            <div
+                                                className="px-5 py-2 border-b-2 border-gray-300 text-gray-400 font-medium cursor-pointer"
+                                                key={`detail-${item.id}`}
+                                                onClick={() => hanldeSetProductDetail(item.id)}
+                                            >{item.name}</div>
+                                        )
+                                    })
+                                }
+                            </div>
+                            {
+                                productDetail[0].selected &&
+                                <>
+                                    <div className="product__info-description w-[50rem] text-gray-500 text-justify mb-5">
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                        Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                    </div>
+                                    <div className="w-[37rem] flex border boder-gray-400 mb-16">
+                                        <table className='w-1/3'>
+                                            <tbody>
+                                                <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
+                                                    <td className="text-gray-600 py-2 px-2">Model</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
+                                                    <td className="text-gray-600 py-2 px-2">Style</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
+                                                    <td className="text-gray-600 py-2 px-2">Certificate</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
+                                                    <td className="text-gray-600 py-2 px-2">Size</td>
+                                                </tr>
+                                                <tr className='bg-[#EFF2F4]'>
+                                                    <td className="text-gray-600 py-2 px-2">Memory</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <table className='w-2/3'>
+                                            <tbody>
+                                                <tr className='border-b boder-gray-400'>
+                                                    <td className="py-2 px-2">#8786867</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400'>
+                                                    <td className="py-2 px-2">Classic style</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400'>
+                                                    <td className="py-2 px-2">ISO-898921212</td>
+                                                </tr>
+                                                <tr className='border-b boder-gray-400'>
+                                                    <td className="py-2 px-2">34mm x 450mm x 19mm</td>
+                                                </tr>
+                                                <tr className=''>
+                                                    <td className="py-2 px-2">36GB RAM</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
+                            }
+                            {
+                                productDetail[1].selected &&
+                                <>
+                                    <div className="border bg-gray-100 border-gray-300 p-5 mb-8">
+                                        <div className="product_ratings flex items-center gap-x-3 mb-4">
+                                            <div className="text-3xl font-bold text-[#FCB800]">5.0</div>
+                                            <div className="flex items-center">
+                                                {
+                                                    [...Array(5)].map((item, index) => {
+                                                        return (
+                                                            <GoStarFill className="text-[#FCB800] w-5 h-5" />
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
+                                        <div className="product_rating_filter flex items-center gap-x-2">
+                                            <div className={ratingFilter === 0 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(0)}>Tất cả</div>
+                                            <div className={ratingFilter === 5 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(5)}>5 sao (232)</div>
+                                            <div className={ratingFilter === 4 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(4)}>4 sao (12)</div>
+                                            <div className={ratingFilter === 3 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(3)}>3 sao (31)</div>
+                                            <div className={ratingFilter === 2 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(2)}>2 sao (4)</div>
+                                            <div className={ratingFilter === 1 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(1)}>1 sao (1)</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {commentList && commentList.length > 0 &&
+                                            commentList.map((item, index) => {
+                                                return (
+                                                    <div key={`customer-comment-${item.id}`} className="mb-10">
+                                                        <div className="flex gap-x-2 mb-3">
+                                                            <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">MN</div>
+                                                            <div className="flex flex-col">
+                                                                <div className="flex items-center gap-x-2">
+                                                                    <div className="font-medium">{item.customer_name}</div>
+                                                                    <div className="flex items-center gap-x-1">
+                                                                        {
+                                                                            [...Array(Math.floor(item.ratings))].map((item, index) => {
+                                                                                return (
+                                                                                    <GoStarFill className="text-[#FCB800] w-4 h-4" />
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                        {
+                                                                            [...Array(5 - Math.floor(item.ratings))].map((item, index) => {
+                                                                                return (
+                                                                                    <GoStarFill className="text-gray-300 w-4 h-4" />
+                                                                                )
+                                                                            })
+                                                                        }
+                                                                    </div>
                                                                 </div>
+
+                                                                <div className="text-gray-600">{item.date}</div>
                                                             </div>
 
-                                                            <div className="text-gray-600">{item.date}</div>
                                                         </div>
-
+                                                        <div className="w-[50rem] text-gray-500">{item.content}</div>
                                                     </div>
-                                                    <div className="w-[50rem] text-gray-500">{item.content}</div>
-                                                </div>
-                                            )
-                                        })
-                                    }
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                </>
+                            }
+                            <div>
+                                <div className="font-medium text-xl">Các sản phẩm liên quan</div>
+                                <div className="banner w-full mb-5">
+                                    <Swiper
+                                        navigation={true}
+                                        modules={[Navigation]}
+                                        className="mySwiper product-list"
+                                        spaceBetween={10}
+                                        slidesPerView={5}
+                                    >
+                                        {swiperSlides()}
+                                    </Swiper>
                                 </div>
-                            </>
-                        }
-                        <div>
-                            <div className="font-medium text-xl">Các sản phẩm liên quan</div>
-                            <div className="banner w-full mb-5">
-                                <Swiper
-                                    navigation={true}
-                                    modules={[Navigation]}
-                                    className="mySwiper product-list"
-                                    spaceBetween={10}
-                                    slidesPerView={5}
-                                >
-                                    {swiperSlides()}
-                                </Swiper>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <Modal show={showQuickView} setShow={setShowQuickView} size="customize">
+                <div className="product-quick-view flex w-full relative">
+                    <div className="product-quick-view__image w-2/5">
+                        <img src={Product01} alt="" className="w-[26.875rem] h-[26.875rem]" />
+                    </div>
+                    <div className="product-quick-view__info w-3/5">
+                        <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
+                        <div className="product__rating-stars flex items-center gap-x-3 mt-1">
+                            <div className="flex items-center gap-x-0.5">
+                                {
+                                    [...Array(5)].map((item, index) => {
+                                        return (
+                                            <GoStarFill className="text-[#FCB800]" />
+                                        )
+                                    })
+                                }
+                                <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
+                            </div>
+                            <GoDotFill className="text-gray-300 w-3 h-3" />
+                            <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
+                                <MdOutlineMessage className="w-5 h-5" />
+                                <span>101 đánh giá</span>
+                            </div>
+                            <GoDotFill className="text-gray-300 w-3 h-3" />
+                            <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
+                                <IoBagCheckOutline className="w-5 h-5" />
+                                <span>Đã bán 2k2</span>
+                            </div>
+                        </div>
+                        <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
+                        <div className="shop flex items-center gap-x-4">
+                            <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
+                            <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
+                        </div>
+                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
+                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
+                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
+                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
+                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
+                        </div>
+                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <div className="flex items-end gap-x-4">
+                            <div>
+                                <div className="mb-1">Số lượng</div>
+                                <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                    <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                    <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
+                                    <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                </div>
+                            </div>
+                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
+                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
+        </>
     )
 }
 

@@ -47,8 +47,24 @@
     
             .shopping-cart {
                 @apply cursor-pointer;
+            
                 .icon {
                     @apply w-9 h-9 text-black;
+                }
+
+                .widget-shopping-cart {
+                    animation: appearAnimation 0.3s ease-in;
+                    cursor: auto;
+                    &::before {
+                        content     : "";
+                        position    : absolute;
+                        top         : -19px;
+                        left        : 50%;
+                        margin-left : -5px;
+                        border-width: 10px;
+                        border-style: solid;
+                        border-color: transparent transparent white transparent;
+                    }
                 }
             }
     
@@ -117,6 +133,16 @@
 
     100% {
         top: 52px;
+    }
+}
+
+@keyframes appearAnimation {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
     }
 }
 
