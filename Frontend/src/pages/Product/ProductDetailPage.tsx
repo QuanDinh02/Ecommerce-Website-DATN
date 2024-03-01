@@ -662,7 +662,7 @@ const ProductDetailPage = () => {
 
     return (
         <div className="product-detail-container">
-            <div className="product-detail__breadcrumb border-b border-gray-300">
+            <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
                 <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                     <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                     <MdOutlineArrowForwardIos />
