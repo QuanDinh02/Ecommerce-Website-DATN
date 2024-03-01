@@ -14,6 +14,7 @@ import CategoryPage from '@/pages/Category/CategoryPage.tsx';
 import ProductDetailPage from '@/pages/Product/ProductDetailPage.tsx';
 import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
 import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
+import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -59,6 +60,10 @@ const router = createBrowserRouter(
         {
           path: "cart",
           element: <ShoppingCartPage/>
+        },
+        {
+          path: "payment",
+          element: <PaymentPage/>
         },
         {
           path: "favorite-products",

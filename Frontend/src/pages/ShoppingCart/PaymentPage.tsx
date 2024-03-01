@@ -1,3 +1,4 @@
+
 import { CurrencyFormat } from "@/utils/numberFormat";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -11,10 +12,10 @@ import { successToast1 } from "@/components/Toast/Toast";
 import React from "react";
 
 const tableHeaders = [
-    "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN", ""
+    "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN"
 ];
 
-const ShoppingCartPage = () => {
+const PaymentPage = () => {
 
     const navigate = useNavigate();
 
@@ -45,19 +46,10 @@ const ShoppingCartPage = () => {
         }
     ]);
 
-    const handleProductAmount = (num: any, id: number) => {
-        setCartItems(draft => {
-            draft.forEach(item => {
-                if (item.id === id && !isNaN(num) && num > 0) {
-                    item.amount = +num;
-                }
-            })
-        })
-
-    }
-
-    const hanldeRemoveFavoriteItem = () => {
-        successToast1("Xóa thành công");
+    const requiredTag = () => {
+        return (
+            <span className='text-red-500 font-medium'>(*)</span>
+        )
     }
 
     React.useEffect(() => {
@@ -65,17 +57,17 @@ const ShoppingCartPage = () => {
     }, []);
 
     return (
-        <div className="shopping-cart-container">
-            <div className="shopping-cart__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+        <div className="payment-container">
+            <div className="payment__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
                 <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                     <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                     <MdOutlineArrowForwardIos />
-                    <div className="font-medium cursor-pointer hover:underline">Giỏ hàng</div>
+                    <div className="font-medium cursor-pointer hover:underline">Thanh toán</div>
                 </div>
             </div>
-            <div className="shopping-cart__content mt-16 mb-24">
+            <div className="payment__content mt-16 mb-24">
                 <div className="main main w-[80rem] mx-auto px-[30px]">
-                    <div className="title text-4xl text-center font-medium mb-20">Giỏ hàng</div>
+                    <div className="title text-4xl text-center font-medium mb-20">Thanh toán</div>
                     <div className="w-full">
                         <table className="table-auto w-full bg-white">
                             <thead>
@@ -99,14 +91,11 @@ const ShoppingCartPage = () => {
                                                 </td>
                                                 <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
                                                 <td className="py-3 px-2">
-                                                    <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
-                                                        <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(item.amount - 1, item.id)} />
-                                                        <input type="text" className="w-1/2 text-center outline-none select-none" value={item.amount} onChange={(e) => handleProductAmount(e.target.value, item.id)} />
-                                                        <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(item.amount + 1, item.id)} />
+                                                    <div>
+                                                        {item.amount}
                                                     </div>
                                                 </td>
                                                 <td className="py-3 px-2">{CurrencyFormat(item.price * item.amount)}</td>
-                                                <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => hanldeRemoveFavoriteItem()} /></td>
                                             </tr>
                                         )
                                     })
@@ -115,17 +104,52 @@ const ShoppingCartPage = () => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="shopping-cart-payment mt-20 flex justify-between">
+                    <div className="payment-order- mt-20 flex justify-between">
                         <div>
-                            <div className="text-lg tracking-wide">Phiếu giảm giá</div>
-                            <div className="w-[23rem] border border-gray-400 h-12 mt-6 px-5 flex items-center">
-                                <input type="text" className="outline-none w-full" placeholder="Nhập mã giảm giá" />
+                            <div className="text-lg tracking-wide font-medium mb-6">Thông tin giao hàng</div>
+                            <div className="mb-4">
+                                <div className="mb-2">Họ và Tên {requiredTag()}</div>
+                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập họ và tên" />
                             </div>
-                            <div className="bg-[#FCB800] px-5 py-3 w-fit mt-6 font-medium cursor-pointer hover:opacity-80">Áp dụng mã giảm giá</div>
+                            <div className="mb-4">
+                                <div className="mb-2">Số điện thoại {requiredTag()}</div>
+                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập họ và tên" />
+                            </div>
+                            <div className="mb-4">
+                                <div className="mb-2">Địa chỉ {requiredTag()}</div>
+                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập họ và tên" />
+                            </div>
+                            <div className="mb-4">
+                                <div className="mb-2">Địa chỉ giao hàng (nếu khác với địa chỉ hiện có)</div>
+                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập họ và tên" />
+                            </div>
+                            <div className="mb-4">
+                                <div className="mb-2">Ghi chú</div>
+                                <textarea className="outline-none w-[40rem] h-12 border border-gray-400 px-3 py-2 h-40" placeholder="Ghi chú cho đơn hàng" />
+                            </div>
                         </div>
                         <div>
-                            <div className="w-[23rem] bg-gray-100 border border-gray-400 px-8 py-5">
-                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 mb-4">
+                            <div className="text-lg tracking-wide font-medium">Thông tin đơn hàng</div>
+                            <div className="w-[23rem] bg-gray-100 border border-gray-400 px-8 py-5 mt-6">
+                                <div className="flex items-center justify-between pb-2 border-b border-gray-300 mb-4 font-medium">
+                                    <div>SẢN PHẨM</div>
+                                    <div>THÀNH TIỀN</div>
+                                </div>
+                                <div className="pb-2 border-b border-gray-300 mb-4">
+                                    {
+                                        cartItems && cartItems.length > 0 &&
+                                        cartItems.map((item, index) => {
+                                            return (
+                                                <div className="flex justify-between mb-2 text-sm">
+                                                    <div className="w-60 line-clamp-2">{item.name}</div>
+                                                    <div>{CurrencyFormat(item.price)}</div>
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
+
+                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 mb-4 font-medium">
                                     <div>Tổng</div>
                                     <div>{CurrencyFormat(597000)}</div>
                                 </div>
@@ -142,7 +166,7 @@ const ShoppingCartPage = () => {
                                     <div className="text-red-500 text-xl font-bold">{CurrencyFormat(617000)}</div>
                                 </div>
                             </div>
-                            <div className="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold" onClick={() => navigate("/payment")}>Tiến hành thanh toán</div>
+                            <div className="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold">Thanh toán</div>
                         </div>
                     </div>
                 </div>
@@ -151,4 +175,4 @@ const ShoppingCartPage = () => {
     )
 }
 
-export default ShoppingCartPage;
+export default PaymentPage;
