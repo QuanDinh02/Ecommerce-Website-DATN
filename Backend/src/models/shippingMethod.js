@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class ShippingMethod extends Model {
     static associate(models) {
         ShippingMethod.belongsTo(models.ShippingUnit, { foreignKey: 'unitID' });
+        ShippingMethod.hasMany(models.Order, { foreignKey: 'shipMethod' });
     }
   }
   ShippingMethod.init({

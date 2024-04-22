@@ -6,6 +6,9 @@ module.exports = (sequelize, DataTypes) => {
   class Promotion extends Model {
     static associate(models) {
         Promotion.hasMany(models.PromotionUser, { foreignKey: 'promotionID' });
+        Promotion.hasMany(models.PromotionProduct, { foreignKey: 'promotionID' });
+        Promotion.hasMany(models.OrderItem, { foreignKey: 'promotionID' });
+        Promotion.hasMany(models.PromotionOrder, { foreignKey: 'promotionID' });
     }
   }
   Promotion.init({
