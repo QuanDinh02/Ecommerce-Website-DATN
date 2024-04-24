@@ -2,35 +2,39 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.bulkInsert('Customers', [
-      {
-        name: 'Nguyen Van A',
-        age: 44,
-        gender: 'Nam',
-        address: '123 Hoàng Văn Thụ',
-        email: 'nguyenvana@gmail.com',
-        phone: '0901231234'
-      },
-      {
-        name: 'Nguyen Van B',
-        age: 54,
-        gender: 'Nam',
-        address: '234 Hoàng Văn Thụ',
-        email: 'nguyenvanb@gmail.com',
-        phone: '0902342344'
-      },{
-        name: 'Nguyen Thi C',
-        age: 32,
-        gender: 'Nữ',
-        address: '1/12 Hoàng Văn Thụ',
-        email: 'nguyenthic@gmail.com',
-        phone: '0831654456'
-      }
-    ], {});
-  },
+    async up(queryInterface, Sequelize) {
+        await queryInterface.bulkInsert('Customer', [
+            {
+                //id: 1
+                name: "Lê Thiên Bảo",
+                mobile: "0728884440",
+                email: "lethienbao@gmail.com",
+                gender: 1,
+                birth: new Date(),
+                userID: 4,
+            },
+            {
+                //id: 2
+                name: "Võ Hoàng Anh",
+                mobile: "0928882441",
+                email: "vohoanganh@gmail.com",
+                gender: 0,
+                birth: new Date(),
+                userID: 5,
+            },
+            {
+                //id: 3
+                name: "Dương Minh Nhật",
+                mobile: "0828881240",
+                email: "duongminhnhat@gmail.com",
+                gender: 1,
+                birth: new Date(),
+                userID: 6,
+            },
+        ], {});
+    },
 
-  async down(queryInterface, Sequelize) {
-    await queryInterface.bulkDelete('Customers', null, {});
-  }
+    async down(queryInterface, Sequelize) {
+        await queryInterface.bulkDelete('Customer', null, {});
+    }
 };

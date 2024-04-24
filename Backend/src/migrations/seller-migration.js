@@ -12,6 +12,9 @@ module.exports = {
             name: {
                 type: Sequelize.STRING
             },
+            shopName: {
+                type: Sequelize.STRING
+            },
             mobile: {
                 type: Sequelize.STRING(10)
             },

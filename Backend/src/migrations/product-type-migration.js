@@ -12,16 +12,22 @@ module.exports = {
             type: {
                 type: Sequelize.STRING
             },
+            typeName: {
+                type: Sequelize.STRING
+            },
             quantity: {
                 type: Sequelize.INTEGER
             },
             size: {
-                type: Sequelize.INTEGER
+                type: Sequelize.STRING
             },
             color: {
                 type: Sequelize.STRING
             },
-            prize: {
+            currentPrice: {
+                type: Sequelize.INTEGER
+            },
+            price: {
                 type: Sequelize.INTEGER
             },
             productID: {

@@ -12,9 +12,6 @@ module.exports = {
             name: {
                 type: Sequelize.STRING
             },
-            typeName: {
-                type: Sequelize.STRING
-            },
             summary: {
                 type: Sequelize.TEXT("medium")
             },
