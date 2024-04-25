@@ -17,10 +17,6 @@ import { CiSpeaker } from "react-icons/ci";
 export const menuCategoryItems = [
     {
         icon: <CiStar className="w-5 h-5"/>,
-        name: "Hot Sale",
-        sub_menu: {
-            check: false
-        }
     },
     {
         icon: <CiSpeaker className="w-5 h-5"/>,
@@ -116,3 +112,39 @@ export const clientBenefits = [
         subtitle: "Đội ngũ chăm sóc khách hàng tận tình"
     }
 ]
+
+export const categoryIcon = [
+    {
+        icon: <CiStar className="w-5 h-5" />,
+    },
+    {
+        icon: <CiSpeaker className="w-5 h-5" />,
+    },
+    {
+        icon: <PiTShirtLight className="w-5 h-5" />,
+    },
+    {
+        icon: <TbToolsKitchen className="w-5 h-5" />,
+    },
+    {
+        icon: <PiHeartbeatLight className="w-5 h-5" />,
+    },
+    {
+        icon: <IoDiamondOutline className="w-5 h-5" />,
+    },
+    {
+        icon: <HiOutlineComputerDesktop className="w-5 h-5" />,
+    },
+    {
+        icon: <LiaBabyCarriageSolid className="w-5 h-5" />,
+    },
+    {
+        icon: <IoTennisballOutline className="w-5 h-5" />,
+    },
+    {
+        icon: <CiMobile4 className="w-5 h-5" />,
+    },
+    {
+        icon: <IoBookOutline className="w-5 h-5" />,
+    }
+];

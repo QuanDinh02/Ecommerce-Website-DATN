@@ -51,23 +51,23 @@ const router = createBrowserRouter(
         },
         {
           path: "category",
-          element: <CategoryPage/>
+          element: <CategoryPage />
         },
         {
           path: "product-detail",
-          element: <ProductDetailPage/>
+          element: <ProductDetailPage />
         },
         {
           path: "cart",
-          element: <ShoppingCartPage/>
+          element: <ShoppingCartPage />
         },
         {
           path: "payment",
-          element: <PaymentPage/>
+          element: <PaymentPage />
         },
         {
           path: "favorite-products",
-          element: <FavoriteProductPage/>
+          element: <FavoriteProductPage />
         },
         {
           path: "register",
@@ -75,22 +75,20 @@ const router = createBrowserRouter(
         },
         {
           path: "login",
-          element: <LoginPage/>,
+          element: <LoginPage />,
         },
         {
           path: "reset-password",
-          element: <ForgotPasswordPage/>
+          element: <ForgotPasswordPage />
         },
       ],
-    }, 
+    },
   ], {
   basename: import.meta.env.VITE_BASE_URL
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  </React.StrictMode>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
 )

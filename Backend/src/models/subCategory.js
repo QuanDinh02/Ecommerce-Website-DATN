@@ -5,9 +5,9 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class SubCategory extends Model {
     static associate(models) {
-        SubCategory.belongsTo(models.Seller, { foreignKey: 'shopID' });
-        SubCategory.belongsTo(models.Category, { foreignKey: 'categoryID' });
-        SubCategory.hasMany(models.ProductSubCategory, { foreignKey: 'subCategoryID' });
+      SubCategory.belongsTo(models.Seller, { foreignKey: 'shopID' });
+      SubCategory.belongsTo(models.Category, { foreignKey: 'categoryID' });
+      SubCategory.belongsToMany(models.Product, { through: 'ProductSubCategory', foreignKey: 'subCategoryID' });
     }
   }
   SubCategory.init({

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdCancel, MdOutlineMessage } from "react-icons/md";
 import { CategoryItems } from "@/data/category";
 import { useImmer } from "use-immer";
@@ -23,6 +23,7 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 const CategoryPage = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
@@ -127,6 +128,8 @@ const CategoryPage = () => {
     }
 
     React.useEffect(() => {
+        let { category_id } = location.state;
+        console.log("Category ID = ",category_id);
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
 

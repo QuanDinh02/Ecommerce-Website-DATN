@@ -1,4 +1,4 @@
-import { menuCategoryItems, clientBenefits } from "@/data/homepage";
+import { clientBenefits } from "@/data/homepage";
 import React from "react";
 import { MdKeyboardArrowRight, MdOutlineMessage } from "react-icons/md";
 import Banner from '../assets/img/homepage/Banner.svg';
@@ -43,11 +43,12 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
 
+import CategoryMenu from "@/components/Homepage/CategoryMenu";
+
 const Homepage = () => {
 
     const navigate = useNavigate();
 
-    const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
     const [amount, setAmount] = React.useState<number>(1);
@@ -63,14 +64,6 @@ const Homepage = () => {
     const [imageList3, setImageList3] = React.useState([
         Item5, Item6, Item7, Item8, Item9, Item5, Item6, Item7, Item8, Item9
     ]);
-
-    const handleShowSubmenu = (show: boolean, check: boolean) => {
-        if (show && check) {
-            setShowSubmenu(true);
-        } else {
-            setShowSubmenu(false);
-        }
-    }
 
     const hanldeFavoriteItem = () => {
         successToast1("Thêm vào sản phẩm yêu thích thành công");
@@ -95,45 +88,7 @@ const Homepage = () => {
             <div className="homepage-container w-full bg-[#EEEEEE]">
                 <div className='px-[30px] w-[80rem] mx-auto  py-8'>
                     <div className="section flex">
-                        <div className="menu-sidebar w-60 border border-gray-300 bg-white relative"
-                            onMouseLeave={() => handleShowSubmenu(false, true)}>
-                            {menuCategoryItems.map((item, index) => {
-                                return (
-                                    <div key={`category-item-${index}`} className="w-full px-3.5 py-3 hover:bg-[#FCB800] cursor-pointer flex items-center flex gap-4 group"
-                                        onMouseEnter={() => handleShowSubmenu(true, item.sub_menu.check)}
-                                        onClick={() => navigate("/category")}
-                                    >
-                                        <span>{item.icon}</span>
-                                        <div className="flex-1 flex items-center justify-between">
-                                            <span>{item.name}</span>
-                                            <span>{item.sub_menu.check === true ? <MdKeyboardArrowRight className="w-5 h-5 text-gray-400 group-hover:text-black" /> : ""}</span>
-                                        </div>
-                                    </div>
-                                )
-                            })}
-                            {
-                                showSubmenu &&
-                                <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px] border border-gray-400 bg-white px-8 py-6 flex gap-10">
-                                    <div className="sub-menu-category">
-                                        <div className="title font-bold mb-3">Đồ điện</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Home video & Theaters</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">TV & Videos</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Headphones</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Video Games</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Wireless Speaker</div>
-                                    </div>
-                                    <div className="sub-menu-category">
-                                        <div className="title font-bold mb-3">Đồ điện</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Home video & Theaters</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">TV & Videos</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Headphones</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Video Games</div>
-                                        <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300">Wireless Speaker</div>
-                                    </div>
-                                </div>
-                            }
-
-                        </div>
+                        <CategoryMenu/>
                         <div className="banner flex-1 border border-gray-300 ml-[50px]">
                             <img src={Banner} alt="" className="w-full h-full" />
                         </div>
