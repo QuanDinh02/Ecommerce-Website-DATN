@@ -43,7 +43,7 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
 
-import CategoryMenu from "@/components/Homepage/CategoryMenu";
+import CategoryMenu from "@/components/CategoryMenu";
 
 const Homepage = () => {
 

@@ -11,8 +11,8 @@ module.exports = {
                 quantity: 100,
                 size: "M (50kg-65kg)",
                 color: "ĐEN",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 145000,
+                price: 240000,
                 productID: 1,
             },
             {
@@ -22,8 +22,8 @@ module.exports = {
                 quantity: 100,
                 size: "L (65kg-72kg)",
                 color: "ĐEN",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 145000,
+                price: 240000,
                 productID: 1,
             },
             {
@@ -33,8 +33,8 @@ module.exports = {
                 quantity: 100,
                 size: "XL (75kg trở lên)",
                 color: "ĐEN",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 145000,
+                price: 240000,
                 productID: 1,
             },
             {
@@ -45,7 +45,7 @@ module.exports = {
                 size: "M (50kg-65kg)",
                 color: "TRẮNG",
                 currentPrice: 135000,
-                price: 250000,
+                price: 230000,
                 productID: 1,
             },
             {
@@ -56,7 +56,7 @@ module.exports = {
                 size: "L (65kg-72kg)",
                 color: "TRẮNG",
                 currentPrice: 135000,
-                price: 250000,
+                price: 230000,
                 productID: 1,
             },
             {
@@ -67,7 +67,7 @@ module.exports = {
                 size: "XL (75kg trở lên)",
                 color: "TRẮNG",
                 currentPrice: 135000,
-                price: 250000,
+                price: 230000,
                 productID: 1,
             },
             {
@@ -77,8 +77,8 @@ module.exports = {
                 quantity: 50,
                 size: "M (50kg-65kg)",
                 color: "VÀNG",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 125000,
+                price: 220000,
                 productID: 1,
             },
             {
@@ -88,8 +88,8 @@ module.exports = {
                 quantity: 100,
                 size: "L (65kg-72kg)",
                 color: "VÀNG",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 125000,
+                price: 220000,
                 productID: 1,
             },
             {
@@ -99,8 +99,8 @@ module.exports = {
                 quantity: 0,
                 size: "XL (75kg trở lên)",
                 color: "VÀNG",
-                currentPrice: 135000,
-                price: 250000,
+                currentPrice: 125000,
+                price: 220000,
                 productID: 1,
             },
             //----------------------------------------------------------

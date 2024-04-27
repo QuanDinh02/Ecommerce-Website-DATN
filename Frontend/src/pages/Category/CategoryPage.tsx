@@ -1,7 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdCancel, MdOutlineMessage } from "react-icons/md";
-import { CategoryItems } from "@/data/category";
 import { useImmer } from "use-immer";
 import { FaCheck } from "react-icons/fa6";
 import { GoDotFill, GoStarFill } from "react-icons/go";
@@ -9,7 +8,6 @@ import { BsGrid3X3 } from "react-icons/bs";
 import { TfiViewListAlt } from "react-icons/tfi";
 import { productsByCategory } from "@/data/category";
 import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
-import { TbMinusVertical } from "react-icons/tb";
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { PiShoppingCartLight } from "react-icons/pi";
@@ -17,16 +15,85 @@ import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
-import Product01 from '../../assets/img/product_detail/product_01.svg';
+import Product01 from '../../assets/img/products_by_category/product_01.svg';
 import { FiMinus, FiPlus } from "react-icons/fi";
+import { getSubCategoryByCategory } from "@/services/subCategoryService";
+import { getProductsByCategory, getProductsBySubCategory } from "@/services/productService";
+import ProductRating from "@pages/Category/ProductRating";
+import classNames from "classnames";
+
+interface ISubCategory {
+    id: number
+    title: string
+    active: boolean
+}
+
+interface ISubCategoryActive {
+    id: number
+    title: string
+}
+interface ICategory {
+    id: number
+    name: string
+}
+
+interface ICateogryProduct {
+    id: number
+    current_price: number
+    price: number
+    image: string
+    name: string
+}
+
+interface IData {
+    page: number
+    page_total: number
+    product_list: ICateogryProduct[]
+    total_items: number
+}
 
 const CategoryPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [previewImage, setPreviewImage] = React.useState("");
+
+    // const handleOnChange = (type, value) => {
+    //     if (type === 'image') {
+    //         setPreviewImage(URL.createObjectURL(value));
+    //     }
+
+    //     setModalData(draft => {
+    //         draft[type] = value;
+    //     })
+    // }
+
+    // <input
+    //     class="form-control"
+    //     type="file"
+    //     id="formFile"
+    //     hidden
+    //     onChange={(event) => handleOnChange('image', event.target.files[0])}
+    // />
+
+    const [activeCategory, setActiveCategory] = React.useState<ICategory>({
+        id: 0,
+        name: ""
+    });
+
+    const [activeSubCategory, setActiveSubCategory] = React.useState<ISubCategoryActive>({
+        id: 0,
+        title: ""
+    });
+
+    const [subCategoryList, setSubCategoryList] = useImmer<ISubCategory[]>([]);
+
+    const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
+
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
+    const [totalItems, setTotalItems] = React.useState<number>(0);
 
     const [filterItems, setFilterItems] = useImmer([
         {
@@ -127,11 +194,96 @@ const CategoryPage = () => {
         }
     }
 
+    const handleSelectSubCategory = (subCategory_id: number, subCategory_title: string) => {
+        setActiveSubCategory({
+            ...activeSubCategory, id: subCategory_id, title: subCategory_title
+        });
+
+        fetchProductsBySubCategory(subCategory_id, 1);
+        
+        setSubCategoryList(draft => {
+            draft.forEach(item => {
+                if (item.id === subCategory_id) {
+                    item.active = true;
+                } else {
+                    item.active = false;
+                }
+            })
+        });
+    }
+
+    const handleSelectCategory = (category_id: number, category_title: string) => {
+        setActiveCategory({
+            ...activeCategory, id: category_id, name: category_title
+        });
+
+        setActiveSubCategory({
+            ...activeSubCategory, id: 0, title: ""
+        });
+    }
+
+    const fetchSubCategory = async (category_id: number) => {
+        let response: ISubCategory[] = await getSubCategoryByCategory(+category_id);
+        if (response) {
+            let data = response.map(item => {
+                return {
+                    ...item, active: false
+                }
+            })
+            setSubCategoryList(data);
+        }
+    }
+
+    const fetchProductsByCategory = async (category_id: number) => {
+        let response: IData = await getProductsByCategory(+category_id, +currentPage);
+        if (response) {
+            setProductList(response.product_list);
+            setTotalPages(response.page_total);
+            setTotalItems(response.total_items);
+        }
+    }
+
+    const fetchProductsBySubCategory = async (sub_category_id: number, page: number) => {
+        let response: IData = await getProductsBySubCategory(+sub_category_id, +page);
+        if (response) {
+            setProductList(response.product_list);
+            setTotalPages(response.page_total);
+            setTotalItems(response.total_items);
+        }
+    }
+
+    const activeSubCategoryStyle = (active: boolean) => classNames(
+        "mb-2 duration-300 cursor-pointer",
+        {
+            'text-[#FCB800]': active,
+            'hover:text-[#FCB800]': !active,
+
+        }
+    );
+
     React.useEffect(() => {
-        let { category_id } = location.state;
-        console.log("Category ID = ",category_id);
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        let { category_id, category_name, sub_category_id, sub_category_name } = location.state;
+
+        setActiveCategory({
+            ...activeCategory, id: category_id, name: category_name
+        });
+
+        setActiveSubCategory({
+            ...activeSubCategory, id: sub_category_id ? sub_category_id : 0, title: sub_category_name ? sub_category_name : ""
+        });
+
+        fetchSubCategory(category_id);
+        fetchProductsByCategory(category_id);
     }, []);
+
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    }, [])
+
+    React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        fetchProductsByCategory(activeCategory.id);
+    }, [currentPage])
 
     return (
         <>
@@ -139,8 +291,20 @@ const CategoryPage = () => {
                 <div className="category__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
                     <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                         <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
-                        <MdOutlineArrowForwardIos />
-                        <div className="font-medium cursor-pointer hover:underline">Điện thoại/ Thiết bị</div>
+                        {
+                            (activeSubCategory.id === 0) ?
+                                <>
+                                    <MdOutlineArrowForwardIos />
+                                    <div className="font-medium cursor-pointer hover:underline" onClick={() => handleSelectCategory(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
+                                </>
+                                :
+                                <>
+                                    <MdOutlineArrowForwardIos />
+                                    <div className="cursor-pointer hover:underline" onClick={() => handleSelectCategory(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
+                                    <MdOutlineArrowForwardIos />
+                                    <div className="font-medium cursor-pointer hover:underline">{activeSubCategory.title}</div>
+                                </>
+                        }
                     </div>
                 </div>
                 <div className="category__content mt-4 mb-24">
@@ -148,9 +312,13 @@ const CategoryPage = () => {
                         <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
                             <div className="section">
                                 <div className="section__title text-lg mb-3">Danh mục sản phẩm</div>
-                                {CategoryItems.map((item, index) => {
+                                {subCategoryList.map((item, index) => {
                                     return (
-                                        <div key={`category-item-${index}`} className="mb-2 duration-300 hover:text-[#FCB800] cursor-pointer">{item}</div>
+                                        <div
+                                            key={`sub-category-item-${item.id}`}
+                                            className={activeSubCategoryStyle(item.active)}
+                                            onClick={() => handleSelectSubCategory(item.id, item.title)}
+                                        >{item.title}</div>
                                     )
                                 })}
                                 <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
@@ -250,7 +418,7 @@ const CategoryPage = () => {
                         <div className="main__item-list flex-1">
                             <div className="box">
                                 <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
-                                    <div className="text-2xl mb-2">Điện thoại/ Phụ kiện</div>
+                                    <div className="text-2xl my-2">{activeSubCategory.id !== 0 ? activeSubCategory.title : activeCategory.name}</div>
                                     <div className="flex items-center gap-x-1 mb-5">
                                         <span className="font-medium">299</span>
                                         <span className="text-gray-500">sản phẩm được tìm thấy trong Điện thoại/ Phụ kiện</span>
@@ -308,10 +476,16 @@ const CategoryPage = () => {
                             </div>
                             {itemGrid ?
                                 <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
-                                    {productsByCategory && productsByCategory.length > 0 && productsByCategory.map((item, index) => {
+                                    {productList && productList.length > 0 && productList.map((item, index) => {
                                         return (
                                             <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => navigate("/product-detail")}>
-                                                <div className="product__image w-40 mx-auto mb-6"><img src={item.image} alt="" /></div>
+                                                <div className="product__image">
+                                                    {item.image ?
+                                                        <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
+                                                        :
+                                                        <img src={Product01} className="w-40 h-60" />
+                                                    }
+                                                </div>
                                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                         e.stopPropagation();
@@ -347,33 +521,18 @@ const CategoryPage = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
-                                                <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(item.price)}</div>
-                                                <div className="flex items-center mb-1 group-hover:hidden">
-                                                    <div className="product__rating-stars flex items-center gap-x-1">
-                                                        {
-                                                            [...Array(Math.floor(item.ratings))].map((item, index) => {
-                                                                return (
-                                                                    <GoStarFill className="text-[#FCB800]" />
-                                                                )
-                                                            })
-                                                        }
-                                                        {
-                                                            [...Array(5 - Math.floor(item.ratings))].map((item, index) => {
-                                                                return (
-                                                                    <GoStarFill className="text-gray-400" />
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                    <TbMinusVertical className="text-gray-300" />
-                                                    <div className="text-sm">Đã bán {numberKFormat(item.selling_count)}</div>
+                                                <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
+                                                    <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
                                                 </div>
-                                                <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                                                    <div className="font-bold">{item.ratings}</div>
-                                                    <div>/5.0</div>
-                                                    <div>({item.ratings_count})</div>
-                                                </div>
+
+                                                <ProductRating
+                                                    ratings={4.9}
+                                                    ratings_count={123}
+                                                    selling_count={123}
+                                                    key={`item-rating-${item.id}`}
+                                                />
                                             </div>
                                         )
                                     })}

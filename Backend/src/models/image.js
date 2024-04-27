@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         productID: DataTypes.BIGINT,
         productTypeID: DataTypes.BIGINT,
         productReviewID: DataTypes.BIGINT,
+        image: DataTypes.TEXT("medium")
     }, {
         sequelize,
         modelName: 'Image',

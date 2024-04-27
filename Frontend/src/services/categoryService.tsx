@@ -1,12 +1,5 @@
 import axios from '../customization/axiosCustomization';
-
-const LIMIT: number = 10;
-
-export interface APIResponse {
-    EC: number
-    DT: any
-    EM: string
-}
+import { APIResponse, LIMIT } from './common';
 
 // export const fetchCustomersWithPagination = async (currentPage) => {
 //     let result: APIResponse = await axios.get(`/api/customer-management?limit=${LIMIT}&page=${currentPage}`);

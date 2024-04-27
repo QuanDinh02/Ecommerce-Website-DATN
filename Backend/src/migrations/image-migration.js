@@ -17,6 +17,9 @@ module.exports = {
             },
             productReviewID: {
                 type: Sequelize.BIGINT
+            },
+            image: {
+                type: Sequelize.TEXT("medium")
             }
         });
     },

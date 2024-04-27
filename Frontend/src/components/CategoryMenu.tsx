@@ -15,6 +15,11 @@ interface ICategory {
     sub_category_list: ISubCategory[]
 }
 
+interface IHoverCategory {
+    id: number
+    title: string
+}
+
 const CategoryMenu = () => {
 
     const navigate = useNavigate();
@@ -31,13 +36,18 @@ const CategoryMenu = () => {
 
     const [subMenuData, setSubMenuData] = React.useState<ISubCategory[]>([]);
 
-    const [hoverCategory, setHoverCategory] = React.useState<string>("");
+    const [hoverCategory, setHoverCategory] = React.useState<IHoverCategory>({
+        id: 0,
+        title: ""
+    });
 
-    const handleShowSubmenu = (show: boolean, check: boolean, list: ISubCategory[], category_title: string) => {
+    const handleShowSubmenu = (show: boolean, check: boolean, list: ISubCategory[], category_id: number, category_title: string) => {
 
         if (show && check) {
             setShowSubmenu(true);
-            setHoverCategory(category_title);
+            setHoverCategory({
+                ...hoverCategory, id: category_id, title: category_title
+            });
             setSubMenuData(list);
         } else {
             setShowSubmenu(false);
@@ -51,8 +61,19 @@ const CategoryMenu = () => {
         }
     }
 
-    const handleCategoryNavigation = (category_id: number) => {
-        navigate("/category", { state: {category_id: category_id} })
+    const handleCategoryNavigation = (category_id: number, category_title: string) => {
+        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+    }
+
+    const handleSubCategoryNavigation = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
+        navigate("/category", {
+            state: {
+                category_id: category_id,
+                category_name: category_title,
+                sub_category_id: sub_category_id,
+                sub_category_name: sub_category_title
+            }
+        })
     }
 
     React.useEffect(() => {
@@ -61,12 +82,12 @@ const CategoryMenu = () => {
 
     return (
         <div className="menu-sidebar w-60 border border-gray-300 bg-white relative"
-            onMouseLeave={() => handleShowSubmenu(false, true, [], "")}>
+            onMouseLeave={() => handleShowSubmenu(false, true, [], 0, "")}>
             {menuData && menuData.length > 0 && menuData.map((item, index) => {
                 return (
                     <div key={`category-item-${item.id}`} className="w-full px-3.5 py-3 hover:bg-[#FCB800] cursor-pointer flex items-center flex gap-4 group"
-                        onMouseEnter={() => handleShowSubmenu(true, item.sub_category_list.length > 0, item.sub_category_list, item.title)}
-                        onClick={() => handleCategoryNavigation(item.id)}
+                        onMouseEnter={() => handleShowSubmenu(true, item.sub_category_list.length > 0, item.sub_category_list, item.id, item.title)}
+                        onClick={() => handleCategoryNavigation(item.id, item.title)}
                     >
                         <span>{categoryIcon[index].icon}</span>
                         <div className="flex-1 flex items-center justify-between">
@@ -80,11 +101,15 @@ const CategoryMenu = () => {
                 showSubmenu &&
                 <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px] border border-gray-400 bg-white px-8 py-6 flex gap-10">
                     <div className="sub-menu-category">
-                        <div className="title font-bold mb-3">{hoverCategory}</div>
+                        <div className="title font-bold mb-3">{hoverCategory.title}</div>
                         {subMenuData && subMenuData.length > 0 &&
                             subMenuData.map((item, index) => {
                                 return (
-                                    <div className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300" key={`sub-category-${item.id}`}>{item.title}</div>
+                                    <div
+                                        className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300"
+                                        key={`sub-category-${item.id}`}
+                                        onClick={() => handleSubCategoryNavigation(hoverCategory.id, hoverCategory.title, item.id, item.title)}
+                                    >{item.title}</div>
                                 )
                             })
                         }

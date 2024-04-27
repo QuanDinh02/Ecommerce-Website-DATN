@@ -4,7 +4,10 @@ export const numberWithDotFormater = (num: number) => {
 }
 
 export const numberKFormat = (num: number) => {
-    return `${num/1000}k`;
+    if(num >= 1000) {
+        return`${num/1000}k`;
+    }
+    return `${num}`;
 }
 export const CurrencyFormat = (number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);

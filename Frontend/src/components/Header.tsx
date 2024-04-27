@@ -15,7 +15,7 @@ import Item3 from '../assets/img/homepage/item3.svg';
 import Item6 from '../assets/img/homepage/item6.svg';
 import { CurrencyFormat } from '@/utils/numberFormat';
 
-import CategoryMenu from "@/components/Homepage/CategoryMenu";
+import CategoryMenu from "@/components/CategoryMenu";
 export interface IAccount {
     id: number
     username: string

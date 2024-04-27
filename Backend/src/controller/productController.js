@@ -42,6 +42,35 @@ const getProductsBySubCategory = async (req, res) => {
     }
 }
 
+const handleUpdateProductImage = async (req, res) => {
+    try {
+        if (req.file) {
+            const encoded = req.file.buffer.toString('base64')
+
+            let data = {
+                ...req.body, image: encoded
+            }
+
+            let result = await productServices.putUpdateProductImage(data);
+
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
-    getProductsByCategory, getProductsBySubCategory
+    getProductsByCategory, getProductsBySubCategory,
+    handleUpdateProductImage
 }

@@ -22,14 +22,14 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 return item.id;
             })
 
-            let productListRaw = await db.SubCategory.findAll({
+            let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
                 raw: true,
                 nest: true,
                 attributes: [],
                 include: {
                     model: db.Product,
                     attributes: ['id', 'name'],
-                    through: { attributes: [] }
+                    through: { attributes: [] },
                 },
                 where: {
                     id: {
@@ -37,7 +37,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     },
                 }
             });
-         
+
             const pageTotal = Math.ceil(productListRaw.length / item_limit);
 
             productListRaw.reverse();
@@ -52,12 +52,51 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 }
             });
 
+            let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+                let productTypes = await db.ProductType.findAll({
+                    raw: true,
+                    attributes: ['id', 'currentPrice', 'price'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+
+                let { currentPrice } = _.minBy(productTypes, (o) => {
+                    return o.currentPrice;
+                })
+
+                let { price } = _.minBy(productTypes, (o) => {
+                    return o.price;
+                })
+
+                let productImages = await db.Image.findOne({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'image'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+                return {
+                    ...item,
+                    image: productImages.image,
+                    current_price: currentPrice,
+                    price: price
+                }
+            }));
+
             return {
                 EC: 0,
                 DT: {
                     page: page,
                     page_total: pageTotal,
-                    product_list: productListFinal
+                    total_items: count,
+                    product_list: productListFinalWithImage
                 },
                 EM: 'Get products by category !'
             }
@@ -83,7 +122,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
             let offSet = (page - 1) * item_limit;
 
-            let productListRaw = await db.SubCategory.findAll({
+            let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
                 raw: true,
                 nest: true,
                 attributes: [],
@@ -98,7 +137,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     },
                 }
             });
-         
+
             const pageTotal = Math.ceil(productListRaw.length / item_limit);
 
             productListRaw.reverse();
@@ -113,12 +152,51 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                 }
             });
 
+            let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+                let productTypes = await db.ProductType.findAll({
+                    raw: true,
+                    attributes: ['id', 'currentPrice', 'price'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+
+                let { currentPrice } = _.minBy(productTypes, (o) => {
+                    return o.currentPrice;
+                })
+
+                let { price } = _.minBy(productTypes, (o) => {
+                    return o.price;
+                })
+
+                let productImages = await db.Image.findOne({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'image'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+                return {
+                    ...item,
+                    image: productImages.image,
+                    current_price: currentPrice,
+                    price: price
+                }
+            }));
+
             return {
                 EC: 0,
                 DT: {
                     page: page,
                     page_total: pageTotal,
-                    product_list: productListFinal
+                    total_items: count,
+                    product_list: productListFinalWithImage
                 },
                 EM: 'Get products by sub-category !'
             }
@@ -138,6 +216,46 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
     }
 }
 
+const putUpdateProductImage = async (data) => {
+    try {
+        let { id, image } = data;
+
+        let existImage = await db.Image.findOne({
+            where: {
+                id: +id
+            },
+            attributes: ['id'],
+            raw: true
+        })
+
+        if (!_.isEmpty(existImage)) {
+
+            let result = await db.Image.update({
+                image: image
+            }, {
+                where: {
+                    id: +id
+                }
+            });
+            return {
+                EC: 0,
+                EM: 'Update product image successfully !',
+                DT: ''
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
+
+
 module.exports = {
-    getProductsByCategory, getProductsBySubCategory
+    getProductsByCategory, getProductsBySubCategory,
+    putUpdateProductImage
 }

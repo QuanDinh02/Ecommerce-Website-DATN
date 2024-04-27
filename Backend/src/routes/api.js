@@ -2,9 +2,12 @@ import express from 'express';
 import apiController from '../controller/apiController';
 import categoryController from '../controller/categoryController';
 import productController from '../controller/productController';
+import subCategoryController from '../controller/subCategoryController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
+const multer  = require('multer')
+const upload = multer();
 
 const ApiRoute = (app) => {
 
@@ -20,6 +23,10 @@ const ApiRoute = (app) => {
     router.get('/products/category', productController.getProductsByCategory);
 
     router.get('/products/sub-category', productController.getProductsBySubCategory);
+
+    router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
+
+    router.put('/product',upload.single('image'),productController.handleUpdateProductImage);
 
     return app.use('/api', router);
 }
