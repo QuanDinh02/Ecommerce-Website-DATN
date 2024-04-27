@@ -24,6 +24,10 @@ const Modal = (props: MProps) => {
         'customize_2': 'w-[72.25rem] h-5/6',
     };
 
+    const handleCloseModal = () => {
+        document.body.style.overflow = "scroll";
+        setShow(false)
+    }
     return (
         <>
             {show &&
@@ -36,7 +40,7 @@ const Modal = (props: MProps) => {
                                     {children}
                                 </div>
                             </div>
-                            <div className={type != "full" ? "absolute top-[-15px] right-[-15px] z-50" : "absolute top-[5px] right-[5px] z-50"} onClick={() => setShow(false)}>
+                            <div className={type != "full" ? "absolute top-[-15px] right-[-15px] z-50" : "absolute top-[5px] right-[5px] z-50"} onClick={() => handleCloseModal()}>
                                 <IoIosCloseCircle className="w-10 h-10 cursor-pointer hover:text-[#FCB800] bg-white rounded-full" />
                             </div>
                         </div>

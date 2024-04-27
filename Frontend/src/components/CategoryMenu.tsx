@@ -62,11 +62,28 @@ const CategoryMenu = () => {
     }
 
     const handleCategoryNavigation = (category_id: number, category_title: string) => {
+        if (location.pathname === "/category") {
+            navigate("/category", { state: { category_id: category_id, category_name: category_title } });
+            window.scrollTo({ top: 0, left: 0 });
+            window.location.reload();
+        }
         navigate("/category", { state: { category_id: category_id, category_name: category_title } })
     }
 
     const handleSubCategoryNavigation = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
-        navigate("/category", {
+        if (location.pathname === "/sub-category") {
+            navigate("/sub-category", {
+                state: {
+                    category_id: category_id,
+                    category_name: category_title,
+                    sub_category_id: sub_category_id,
+                    sub_category_name: sub_category_title
+                }
+            })
+            window.scrollTo({ top: 0, left: 0 });
+            window.location.reload();
+        }
+        navigate("/sub-category", {
             state: {
                 category_id: category_id,
                 category_name: category_title,

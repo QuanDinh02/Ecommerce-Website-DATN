@@ -15,6 +15,7 @@ import ProductDetailPage from '@/pages/Product/ProductDetailPage.tsx';
 import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
 import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
+import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -25,6 +26,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
 
 const router = createBrowserRouter(
   [
@@ -52,6 +54,10 @@ const router = createBrowserRouter(
         {
           path: "category",
           element: <CategoryPage />
+        },
+        {
+          path: "sub-category",
+          element: <SubCategoryPage/>
         },
         {
           path: "product-detail",

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MdKeyboardArrowRight } from "react-icons/md";
 import _ from 'lodash';
 import { IoIosSearch } from "react-icons/io";
@@ -25,6 +25,7 @@ export interface IAccount {
 const Header = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
@@ -85,14 +86,6 @@ const Header = () => {
         }
     }
 
-    const handleShowSubmenu = (show: boolean, check: boolean) => {
-        if (show && check) {
-            setShowSubmenu(true);
-        } else {
-            setShowSubmenu(false);
-        }
-    }
-
     return (
         <>
             <div className={headerStickyStyle}>
@@ -108,8 +101,7 @@ const Header = () => {
                                 {
                                     showMenu &&
                                     <div className='absolute top-[3.375rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
-                                        <CategoryMenu/>
-                                        
+                                        <CategoryMenu />
                                     </div>
                                 }
                             </div>
@@ -136,9 +128,9 @@ const Header = () => {
                             <div className='count absolute right-[-5px] top-[16px]'>3</div>
                             {
                                 showMiniShoppingCart &&
-                                <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400' 
-                                onMouseEnter={() => setShowMiniShoppingCart(true)}
-                                onMouseLeave={() => setShowMiniShoppingCart(false)}
+                                <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
+                                    onMouseEnter={() => setShowMiniShoppingCart(true)}
+                                    onMouseLeave={() => setShowMiniShoppingCart(false)}
                                 >
                                     {shoppingCartItems && shoppingCartItems.length > 0 &&
                                         shoppingCartItems.map((item, index) => {
@@ -184,11 +176,21 @@ const Header = () => {
             <div className='w-full border-t border-gray-600'></div>
             <div className='header__bottom relative'>
                 <div className='section_bottom'>
-                    <div className='categories'>
+                    <div className='categories relative' onClick={() => {
+                        if (location.pathname !== "/") {
+                            setShowMenu(!showMenu)
+                        }
+                    }}>
                         <div className='main'>
                             <FiMenu className="w-6 h-6" />
                             <span>Danh mục</span>
                         </div>
+                        {
+                            showMenu &&
+                            <div className='absolute top-[2.5rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
+                                <CategoryMenu />
+                            </div>
+                        }
                     </div>
                     <div className='recent-products font-normal' onMouseEnter={() => setShowViewProduct(true)}>
                         <span>Sản phẩm xem gần đây</span>

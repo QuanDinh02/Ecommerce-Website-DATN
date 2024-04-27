@@ -17,16 +17,14 @@ import { successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
 import Product01 from '../../assets/img/products_by_category/product_01.svg';
 import { FiMinus, FiPlus } from "react-icons/fi";
-import { getSubCategoryByCategory } from "@/services/subCategoryService";
-import { getProductsByCategory } from "@/services/productService";
+import { getProductsBySubCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
 import { TailSpin } from 'react-loader-spinner';
 
-interface ISubCategory {
+interface ISubCategoryActive {
     id: number
     title: string
 }
-
 interface ICategory {
     id: number
     name: string
@@ -47,7 +45,7 @@ interface IData {
     total_items: number
 }
 
-const CategoryPage = () => {
+const SubCategoryPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -56,30 +54,15 @@ const CategoryPage = () => {
 
     const [previewImage, setPreviewImage] = React.useState("");
 
-    // const handleOnChange = (type, value) => {
-    //     if (type === 'image') {
-    //         setPreviewImage(URL.createObjectURL(value));
-    //     }
-
-    //     setModalData(draft => {
-    //         draft[type] = value;
-    //     })
-    // }
-
-    // <input
-    //     class="form-control"
-    //     type="file"
-    //     id="formFile"
-    //     hidden
-    //     onChange={(event) => handleOnChange('image', event.target.files[0])}
-    // />
-
     const [activeCategory, setActiveCategory] = React.useState<ICategory>({
         id: 0,
         name: ""
     });
 
-    const [subCategoryList, setSubCategoryList] = useImmer<ISubCategory[]>([]);
+    const [activeSubCategory, setActiveSubCategory] = React.useState<ISubCategoryActive>({
+        id: 0,
+        title: ""
+    });
 
     const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
 
@@ -178,7 +161,6 @@ const CategoryPage = () => {
 
     const handleQuickView = () => {
         setShowQuickView(true);
-        document.body.style.overflow = "hidden";
     }
 
     const handleProductAmount = (num: any) => {
@@ -187,32 +169,8 @@ const CategoryPage = () => {
         }
     }
 
-    const handleSelectSubCategory = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
-        navigate("/sub-category", {
-            state: {
-                category_id: category_id,
-                category_name: category_title,
-                sub_category_id: sub_category_id,
-                sub_category_name: sub_category_title
-            }
-        })
-    }
-
-    const handleSelectCategory = (category_id: number, category_title: string) => {
-        setActiveCategory({
-            ...activeCategory, id: category_id, name: category_title
-        });
-    }
-
-    const fetchSubCategory = async (category_id: number) => {
-        let response: ISubCategory[] = await getSubCategoryByCategory(+category_id);
-        if (response) {
-            setSubCategoryList(response);
-        }
-    }
-
-    const fetchProductsByCategory = async (category_id: number) => {
-        let response: IData = await getProductsByCategory(+category_id, +currentPage);
+    const fetchProductsBySubCategory = async (sub_category_id: number) => {
+        let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage);
         if (response) {
             setProductList(response.product_list);
             setTotalPages(response.page_total);
@@ -220,19 +178,26 @@ const CategoryPage = () => {
         }
     }
 
+    const handleCategoryNavigation = (category_id: number, category_title: string) => {
+        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+    }
+
     React.useEffect(() => {
-        let { category_id, category_name } = location.state;
+        let { category_id, category_name, sub_category_id, sub_category_name } = location.state;
 
         setActiveCategory({
             ...activeCategory, id: category_id, name: category_name
         });
 
-        fetchSubCategory(category_id);
-        fetchProductsByCategory(category_id);
+        setActiveSubCategory({
+            ...activeSubCategory, id: sub_category_id ? sub_category_id : 0, title: sub_category_name ? sub_category_name : ""
+        });
+
+        fetchProductsBySubCategory(sub_category_id);
     }, []);
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0 });
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
         setTimeout(() => {
             setDataLoading(false);
@@ -244,8 +209,8 @@ const CategoryPage = () => {
     }, [])
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0 });
-        fetchProductsByCategory(activeCategory.id);
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        fetchProductsBySubCategory(activeSubCategory.id);
     }, [currentPage])
 
     return (
@@ -270,26 +235,14 @@ const CategoryPage = () => {
                             <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                                 <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                 <MdOutlineArrowForwardIos />
-                                <div className="font-medium cursor-pointer hover:underline" onClick={() => handleSelectCategory(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
+                                <div className="cursor-pointer hover:underline" onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
+                                <MdOutlineArrowForwardIos />
+                                <div className="font-medium cursor-pointer hover:underline">{activeSubCategory.title}</div>
                             </div>
                         </div>
                         <div className="category__content mt-4 mb-24">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
                                 <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
-                                    <div className="section">
-                                        <div className="section__title text-lg mb-3">Danh mục sản phẩm</div>
-                                        {subCategoryList.map((item, index) => {
-                                            return (
-                                                <div
-                                                    key={`sub-category-item-${item.id}`}
-                                                    className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
-                                                    onClick={() => handleSelectSubCategory(activeCategory.id, activeCategory.name, item.id, item.title)}
-                                                >{item.title}</div>
-                                            )
-                                        })}
-                                        <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
-                                    </div>
-                                    <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Thương hiệu</div>
                                         {filterItems.map((item, index) => {
@@ -384,7 +337,7 @@ const CategoryPage = () => {
                                 <div className="main__item-list flex-1">
                                     <div className="box">
                                         <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
-                                            <div className="text-2xl my-2">{activeCategory.name}</div>
+                                            <div className="text-2xl my-2">{activeSubCategory.id !== 0 ? activeSubCategory.title : activeCategory.name}</div>
                                             <div className="flex items-center gap-x-1 mb-5">
                                                 <span className="font-medium">299</span>
                                                 <span className="text-gray-500">sản phẩm được tìm thấy trong Điện thoại/ Phụ kiện</span>
@@ -469,7 +422,7 @@ const CategoryPage = () => {
 
                                                                         :
                                                                         <>
-                                                                            {productList.length > 0 && productList.map((item, index) => {
+                                                                            {productList && productList.length > 0 && productList.map((item, index) => {
                                                                                 return (
                                                                                     <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => navigate("/product-detail")}>
                                                                                         <div className="product__image flex items-center justify-center">
@@ -533,7 +486,6 @@ const CategoryPage = () => {
                                                                 }
                                                             </>
                                                         }
-
                                                     </div>
                                                     :
                                                     <div className="text-lg flex items-center justify-center h-4 text-black w-full my-6">
@@ -628,10 +580,10 @@ const CategoryPage = () => {
                                             />
                                         </div>
                                     }
-
                                 </div>
                             </div>
                         </div>
+
                     </div>
             }
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize">
@@ -695,4 +647,4 @@ const CategoryPage = () => {
     )
 }
 
-export default CategoryPage;
+export default SubCategoryPage;
