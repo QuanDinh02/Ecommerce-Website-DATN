@@ -1,13 +1,11 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { MdKeyboardArrowRight } from "react-icons/md";
 import _ from 'lodash';
 import { IoIosSearch } from "react-icons/io";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { BsHeart, BsPerson } from "react-icons/bs";
 import { FiMenu } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
-import { menuCategoryItems } from '@/data/homepage';
 import classNames from 'classnames';
 import Item from '../assets/img/homepage/item.svg';
 import Item2 from '../assets/img/homepage/item2.svg';
@@ -16,10 +14,18 @@ import Item6 from '../assets/img/homepage/item6.svg';
 import { CurrencyFormat } from '@/utils/numberFormat';
 
 import CategoryMenu from "@/components/CategoryMenu";
+import { getSearchProducts } from '@/services/productService';
+import { CiSearch } from 'react-icons/ci';
 export interface IAccount {
     id: number
     username: string
     role: string
+}
+
+export interface ISearchProduct {
+    id: number
+    name: string
+    selected: boolean
 }
 
 const Header = () => {
@@ -33,6 +39,13 @@ const Header = () => {
     const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
     const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
     const [showMiniShoppingCart, setShowMiniShoppingCart] = React.useState<boolean>(false);
+
+    const [productSearch, setProductSearch] = React.useState<string>("");
+    const [productSearchList, setProductSearchList] = React.useState<ISearchProduct[]>([]);
+    const [showSearchList, setShowSearchList] = React.useState(true);
+
+    const [productSearchRecommend, setProductSearchRecommend] = React.useState("");
+    const [currentSelect, setCurrentSelect] = React.useState(-1);
 
     const [shoppingCartItems, setShoppingCartItems] = React.useState([
         {
@@ -57,6 +70,118 @@ const Header = () => {
             price: 199000
         }
     ]);
+
+    const fProductSearch = React.useCallback(_.debounce(async (value) => {
+        let result = await getSearchProducts(value);
+        if (result) {
+            
+            let products = result.map(item => {
+                return {
+                    ...item, selected: false
+                }
+            });
+            setProductSearchList(products);
+        }
+    }, 500), []);
+
+    React.useEffect(() => {
+        if(productSearchList.length === 0 || productSearchRecommend === "") {
+            setCurrentSelect(-1);
+        }
+    },[productSearchList]);
+
+    const handleSearchOnChange = (search: string) => {
+        setProductSearchRecommend("");
+        setProductSearch(search);
+    }
+
+    const handleSelectRecommendedProduct = (item: ISearchProduct) => {
+        setProductSearch(item.name);
+        setProductSearchRecommend("");
+        setProductSearchList([]);
+        setShowSearchList(false);
+    }
+
+    const handleKeyPress = (event) => {
+
+        if (productSearchList.length > 0) {
+            let _productSearchList = _.cloneDeep(productSearchList);
+            if (event.key === 'Enter') {
+                //handleSearchButtonOnClick();
+            }
+
+            if (event.key === 'ArrowDown') {
+                if (currentSelect === -1) {
+                    setCurrentSelect(0);
+                    _productSearchList = _productSearchList.map((item, index) => {
+                        if (index === 0) {
+                            setProductSearchRecommend(item.name);
+                            item.selected = true;
+                            return item;
+                        } else {
+                            item.selected = false;
+                            return item;
+                        }
+                    })
+                } else {
+                    if (currentSelect + 1 <= productSearchList.length - 1) {
+                        setCurrentSelect(currentSelect + 1);
+                        _productSearchList = _productSearchList.map((item, index) => {
+                            if (index === currentSelect + 1) {
+                                setProductSearchRecommend(item.name);
+                                item.selected = true;
+                                return item;
+                            } else {
+                                item.selected = false;
+                                return item;
+                            }
+                        })
+                    }
+                }
+            }
+
+            if (event.key === 'ArrowUp') {
+                if (currentSelect === -1) {
+                    setCurrentSelect(productSearchList.length - 1);
+                    _productSearchList = _productSearchList.map((item, index) => {
+                        if (index === productSearchList.length - 1) {
+                            setProductSearchRecommend(item.name)
+                            item.selected = true;
+                            return item;
+                        } else {
+                            item.selected = false;
+                            return item;
+                        }
+                    })
+                } else {
+                    if (currentSelect - 1 >= 0) {
+                        setCurrentSelect(currentSelect - 1);
+                        _productSearchList = _productSearchList.map((item, index) => {
+                            if (index === currentSelect - 1) {
+                                setProductSearchRecommend(item.name);
+                                item.selected = true;
+                                return item;
+                            } else {
+                                item.selected = false;
+                                return item;
+                            }
+                        })
+                    }
+                }
+            }
+
+            setProductSearchList(_productSearchList);
+        }
+    }
+
+    React.useEffect(() => {
+        if (productSearch) {
+            fProductSearch(productSearch);
+        } else {
+            setProductSearchList([]);
+            fProductSearch.cancel();
+        }
+    }, [productSearch]);
 
     const handleScroll = () => {
         const position = window.pageYOffset;
@@ -114,8 +239,35 @@ const Header = () => {
                     <div className='search-bar'>
                         <div className='search-bar__text'>
                             <IoIosSearch className="w-6 h-6 text-gray-500" />
-                            <input type="text" className='text-black font-normal px-2 w-full outline-none' />
+                            <input
+                                type="text"
+                                className='text-black font-normal px-2 w-full outline-none'
+                                value={productSearchRecommend ? productSearchRecommend : productSearch}
+                                placeholder='Tên sản phẩm tìm kiếm ...'
+                                onClick={() => setShowSearchList(true)}
+                                onChange={(event) => handleSearchOnChange(event.target.value)}
+                                onKeyDown={(event) => handleKeyPress(event)}
+                            />
                         </div>
+                        {showSearchList && productSearch && productSearchList && productSearchList.length > 0 &&
+                            <div className='search-bar__search-list'>
+                                {
+                                    productSearchList.map(item => {
+                                        return (
+                                            <div
+                                                key={`search-item-${item.id}`}
+                                                className={item.selected ? 'search-item selected' : 'search-item'}
+                                                onClick={()=> handleSelectRecommendedProduct(item)}
+                                                //onClick={() => handleSearchBookDetail(item.id, item.name)}
+                                            >
+                                                <CiSearch className='w-5 h-5' />
+                                                <span className='item-name'>{item.name}</span>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        }
                         <div className='search-bar__btn'>Tìm kiếm</div>
                     </div>
                     <div className="navigation">

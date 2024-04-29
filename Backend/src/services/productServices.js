@@ -254,8 +254,34 @@ const putUpdateProductImage = async (data) => {
     }
 }
 
+const getSearchProducts = async (product_name) => {
+    try {
+        const productList = await db.Product.findAll({
+            where: {
+                name: {
+                    [Op.substring]: `${product_name}`
+                }
+            },
+            limit: 25,
+            attributes: ['id', 'name'],
+            raw: true
+        })
 
+        return {
+            EC: 0,
+            DT: productList,
+            EM: 'Search products successfully'
+        }
+
+    } catch (error) {
+        return {
+            EC: -2,
+            EM: 'Something is wrong on services !',
+            DT: ''
+        }
+    }
+}
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
-    putUpdateProductImage
+    putUpdateProductImage, getSearchProducts
 }

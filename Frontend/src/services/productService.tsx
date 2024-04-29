@@ -16,3 +16,11 @@ export const getProductsBySubCategory = async (sub_category_id: number, page: nu
     }
     return null;
 }
+
+export const getSearchProducts = async (product_name: string) => {
+    let result: APIResponse = await axios.get(`/api/products/search?name=${product_name}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

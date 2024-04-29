@@ -70,7 +70,29 @@ const handleUpdateProductImage = async (req, res) => {
     }
 }
 
+const handleGetSearchProducts = async (req, res) => {
+    try {
+        let { name } = req.query;
+
+        let result = await productServices.getSearchProducts(name);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
-    handleUpdateProductImage
+    handleUpdateProductImage, handleGetSearchProducts
 }

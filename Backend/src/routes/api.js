@@ -1,5 +1,6 @@
 import express from 'express';
 import apiController from '../controller/apiController';
+import userController from '../controller/userController';
 import categoryController from '../controller/categoryController';
 import productController from '../controller/productController';
 import subCategoryController from '../controller/subCategoryController';
@@ -13,6 +14,9 @@ const ApiRoute = (app) => {
 
     //router.get('/testAPI', apiController.testAPI);
 
+    router.post('/user/register', userController.handleUserRegister);
+    router.post('/user/login', userController.handleUserLogin);
+
     // router.post('/staff/login', apiController.handleStaffLogin);
     // router.get('/staff/logout', apiController.handleStaffLogout);
     
@@ -23,6 +27,8 @@ const ApiRoute = (app) => {
     router.get('/products/category', productController.getProductsByCategory);
 
     router.get('/products/sub-category', productController.getProductsBySubCategory);
+
+    router.get('/products/search', productController.handleGetSearchProducts);
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
 
