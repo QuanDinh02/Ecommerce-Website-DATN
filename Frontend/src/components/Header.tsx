@@ -16,6 +16,11 @@ import { CurrencyFormat } from '@/utils/numberFormat';
 import CategoryMenu from "@/components/CategoryMenu";
 import { getSearchProducts } from '@/services/productService';
 import { CiSearch } from 'react-icons/ci';
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from '@/redux/reducer/rootReducer';
+import { fetchAccount, userLogout } from '@/services/userService';
+import { successToast1 } from './Toast/Toast';
+import { UserLogin } from '@/redux/actions/action';
 export interface IAccount {
     id: number
     username: string
@@ -32,6 +37,10 @@ const Header = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
@@ -39,6 +48,7 @@ const Header = () => {
     const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
     const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
     const [showMiniShoppingCart, setShowMiniShoppingCart] = React.useState<boolean>(false);
+    const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
 
     const [productSearch, setProductSearch] = React.useState<string>("");
     const [productSearchList, setProductSearchList] = React.useState<ISearchProduct[]>([]);
@@ -74,7 +84,7 @@ const Header = () => {
     const fProductSearch = React.useCallback(_.debounce(async (value) => {
         let result = await getSearchProducts(value);
         if (result) {
-            
+
             let products = result.map(item => {
                 return {
                     ...item, selected: false
@@ -85,10 +95,10 @@ const Header = () => {
     }, 500), []);
 
     React.useEffect(() => {
-        if(productSearchList.length === 0 || productSearchRecommend === "") {
+        if (productSearchList.length === 0 || productSearchRecommend === "") {
             setCurrentSelect(-1);
         }
-    },[productSearchList]);
+    }, [productSearchList]);
 
     const handleSearchOnChange = (search: string) => {
         setProductSearchRecommend("");
@@ -211,6 +221,45 @@ const Header = () => {
         }
     }
 
+    const handleShowWidgetInfo = () => {
+        if (account && isAuthenticated) {
+            setShowInfoSettingBox(true);
+        } else {
+            setShowInfoSettingBox(false);
+        }
+    }
+
+    const handleUserLogout = async () => {
+        let result: any = await userLogout();
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            setShowInfoSettingBox(false);
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        }
+    }
+
+    const fetchAccountInfo = async () => {
+        let result: any = await fetchAccount();
+        if (result && !_.isEmpty(result.DT)) {
+            let userData = result.DT;
+            let data = {
+                isAuthenticated: userData.isAuthenticated,
+                account: {
+                    id: userData.id,
+                    username: userData.username,
+                    role: userData.role
+                }
+            }
+            dispatch(UserLogin(data));
+        }
+    }
+
+    React.useEffect(() => {
+        fetchAccountInfo();
+    }, []);
+
     return (
         <>
             <div className={headerStickyStyle}>
@@ -257,8 +306,8 @@ const Header = () => {
                                             <div
                                                 key={`search-item-${item.id}`}
                                                 className={item.selected ? 'search-item selected' : 'search-item'}
-                                                onClick={()=> handleSelectRecommendedProduct(item)}
-                                                //onClick={() => handleSearchBookDetail(item.id, item.name)}
+                                                onClick={() => handleSelectRecommendedProduct(item)}
+                                            //onClick={() => handleSearchBookDetail(item.id, item.name)}
                                             >
                                                 <CiSearch className='w-5 h-5' />
                                                 <span className='item-name'>{item.name}</span>
@@ -281,7 +330,10 @@ const Header = () => {
                             {
                                 showMiniShoppingCart &&
                                 <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
-                                    onMouseEnter={() => setShowMiniShoppingCart(true)}
+                                    onMouseEnter={() => {
+                                        setShowMiniShoppingCart(true)
+                                        setShowInfoSettingBox(false)
+                                    }}
                                     onMouseLeave={() => setShowMiniShoppingCart(false)}
                                 >
                                     {shoppingCartItems && shoppingCartItems.length > 0 &&
@@ -317,10 +369,36 @@ const Header = () => {
                                 </div>
                             }
                         </div>
-                        <div className='authentication'>
-                            <BsPerson className="icon" />
-                            <Link className="nav-item" to="/login">Đăng nhập&nbsp;/&nbsp;</Link>
-                            <Link className="nav-item" to="/register"> Đăng ký</Link>
+                        <div className='authentication relative z-50 cursor-pointer'
+                            onMouseEnter={() => {
+                                handleShowWidgetInfo()
+                                setShowMiniShoppingCart(false)
+                            }}
+                        >
+
+                            {
+                                (!account || !isAuthenticated) ?
+                                    <>
+                                        <Link className="nav-item" to="/login">Đăng nhập&nbsp;/&nbsp;</Link>
+                                        <Link className="nav-item" to="/register"> Đăng ký</Link>
+                                    </>
+                                    :
+                                    <>
+                                        <BsPerson className="icon" />
+                                        <span className='hover:opacity-70 cursor-pointer'>{account.username}</span>
+                                        {
+                                            showInfoSettingBox &&
+                                            <div className='widget-info absolute bg-white top-[50px] w-[12rem] right-[-50px] z-50 border border-gray-400'
+                                                onMouseEnter={() => handleShowWidgetInfo()}
+                                                onMouseLeave={() => handleShowWidgetInfo()}
+                                            >
+                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full'>Thông Tin Tài Khoản</div>
+                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
+                                            </div>
+                                        }
+                                    </>
+                            }
+
                         </div>
                     </div>
                 </div>

@@ -95,6 +95,21 @@
                 .icon {
                     @apply w-9 h-9 mr-2;
                 }
+
+                .widget-info {
+                    animation: appearAnimation 0.3s ease-in;
+                    cursor: auto;
+                    &::before {
+                        content     : "";
+                        position    : absolute;
+                        top         : -19px;
+                        left        : 60%;
+                        margin-left : -5px;
+                        border-width: 10px;
+                        border-style: solid;
+                        border-color: transparent transparent white transparent;
+                    }
+                }
             }
     
             .nav-item {

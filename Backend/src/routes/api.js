@@ -16,11 +16,9 @@ const ApiRoute = (app) => {
 
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
-
-    // router.post('/staff/login', apiController.handleStaffLogin);
-    // router.get('/staff/logout', apiController.handleStaffLogout);
-    
-    // router.get('/fetch/account', checkUserJWT, apiController.handleFetchAccount);
+    router.get('/user/logout', userController.handleUserLogout);
+ 
+    router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
 
     router.get('/categories', categoryController.getCategoryList);
 

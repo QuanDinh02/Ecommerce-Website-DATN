@@ -6,6 +6,10 @@ import { useImmer } from 'use-immer';
 import { GoMail } from "react-icons/go";
 import { BsFacebook } from "react-icons/bs";
 import Google_Icon from '../assets/img/login_page/google_icon.svg';
+import { fetchAccount } from '@/services/userService';
+import { useDispatch } from 'react-redux';
+import { UserLogin } from '@/redux/actions/action';
+import _ from 'lodash';
 interface INewShopAccount {
     name: string
     shop_name: string
@@ -33,6 +37,7 @@ enum PATH {
 const RegisterPage = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
     const [isCustomer, setIsCustomer] = React.useState<boolean>(true);
@@ -75,10 +80,32 @@ const RegisterPage = () => {
         )
     }
 
+    const fetchAccountInfo = async () => {
+        let result: any = await fetchAccount();
+        if (result && !_.isEmpty(result.DT)) {
+            let userData = result.DT;
+            let data = {
+                isAuthenticated: userData.isAuthenticated,
+                account: {
+                    id: userData.id,
+                    username: userData.username,
+                    role: userData.role
+                }
+            }
+            dispatch(UserLogin(data));
+            if (userData.isAuthenticated === true) {
+                navigate('/');
+            }
+        }
+    }
+
     React.useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
 
+    React.useEffect(() => {
+        fetchAccountInfo();
+    }, []);
 
     return (
         <div className='signin-container'>
