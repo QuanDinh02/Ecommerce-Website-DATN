@@ -1,5 +1,5 @@
 import { MdOutlineArrowForwardIos } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Product01 from '../../assets/img/product_detail/product_01.svg';
 import Product02 from '../../assets/img/product_detail/product_02.svg';
@@ -29,22 +29,112 @@ import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
 import { FiPlus, FiMinus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
-import { successToast1 } from "@/components/Toast/Toast";
 import { useImmer } from "use-immer";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { TbMinusVertical } from "react-icons/tb";
+
 import Modal from "@/components/Modal";
+import { successToast1 } from "@/components/Toast/Toast";
+import Rating from "@/components/Rating";
+import { getProductDetailInfo } from "@/services/productService";
+
+import { dateFormat } from "@/utils/dateFormat";
+interface IProductActive {
+    id: number
+    name: string
+}
+interface ISubCategoryActive {
+    id: number
+    title: string
+}
+interface ICategoryActive {
+    id: number
+    name: string
+}
+
+interface IProductReview {
+    id: number
+    comment: string
+    rating: number
+    createdAt: Date
+    customer_name: string
+}
+
+interface IProductType {
+    type: string
+    typeName: string
+    quantity: number
+    size: string
+    color: string
+    currentPrice: number
+    price: number
+}
+
+interface IProductTypeGroup {
+    color: string[]
+    size: string[]
+}
+interface IProductDetail {
+    id: number
+    name: string
+    currentPrice: number
+    price: number
+    description: string
+    comment_count: number
+    rating_average: number
+    product_image: string
+    inventory_count: number
+    reviews: IProductReview[]
+    product_type_list: IProductType[]
+    product_type_group: IProductTypeGroup
+}
 
 const ProductDetailPage = () => {
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
+
+    const [productAmount, setProductAmount] = React.useState<number>(0);
+
+    const [productDetailInfo, setProductDetailInfo] = useImmer<IProductDetail>({
+        id: 0,
+        name: "",
+        currentPrice: 0,
+        price: 0,
+        description: "",
+        comment_count: 0,
+        rating_average: 0,
+        product_image: "",
+        inventory_count: 0,
+        reviews: [],
+        product_type_list: [],
+        product_type_group: {
+            color: [],
+            size: []
+        }
+    });
 
     const [selectedImage, setSelectedImage] = React.useState({
         id: 1,
         image: Product01
+    });
+
+    const [activeCategory, setActiveCategory] = React.useState<ICategoryActive>({
+        id: 0,
+        name: ""
+    });
+
+    const [activeSubCategory, setActiveSubCategory] = React.useState<ISubCategoryActive>({
+        id: 0,
+        title: ""
+    });
+
+    const [activeProduct, setActiveProduct] = React.useState<IProductActive>({
+        id: 0,
+        name: ""
     });
 
     const [images, setImages] = React.useState([
@@ -133,6 +223,43 @@ const ProductDetailPage = () => {
     const hanldeAddShoppingCart = () => {
         successToast1("Thêm vào giỏ hàng thành công");
     }
+
+    const fetchProductsBySubCategory = async (product_id: number) => {
+        let response: IProductDetail = await getProductDetailInfo(+product_id);
+        if (response) {
+            //console.log(response);
+            setProductDetailInfo(draft => {
+                draft.id = response.id;
+                draft.name = response.name;
+                draft.currentPrice = response.currentPrice;
+                draft.price = response.price;
+                draft.description = response.description;
+                draft.comment_count = response.comment_count;
+                draft.rating_average = response.rating_average;
+                draft.product_image = response.product_image;
+                draft.inventory_count = response.inventory_count;
+                draft.reviews = response.reviews;
+                draft.product_type_list = response.product_type_list;
+                draft.product_type_group = response.product_type_group;
+            })
+
+            setProductAmount(response.inventory_count);
+        }
+    }
+
+    const handleCategoryNavigation = (category_id: number, category_title: string) => {
+        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+    }
+
+    const handleSubCategoryNavigation = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
+        navigate("/sub-category", {
+            state: {
+                category_id: category_id, category_name: category_title,
+                sub_category_id: sub_category_id, sub_category_name: sub_category_title,
+            }
+        })
+    }
+
 
     const swiperSlides = () => {
         return (
@@ -748,6 +875,32 @@ const ProductDetailPage = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
 
+    React.useEffect(() => {
+        if (location.state) {
+            let {
+                category_id, category_name,
+                sub_category_id, sub_category_name,
+                product_id, product_name
+            } = location.state;
+
+            setActiveCategory({
+                ...activeCategory, id: category_id ? category_id : 0, name: category_name ? category_name : ""
+            });
+
+            setActiveSubCategory({
+                ...activeSubCategory, id: sub_category_id ? sub_category_id : 0, title: sub_category_name ? sub_category_name : ""
+            });
+
+            setActiveProduct({
+                ...activeProduct, id: product_id ? product_id : 0, name: product_name ? product_name : ""
+            });
+
+            if (product_id) {
+                fetchProductsBySubCategory(product_id);
+            }
+        }
+    }, []);
+
     return (
         <>
 
@@ -756,17 +909,34 @@ const ProductDetailPage = () => {
                     <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                         <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                         <MdOutlineArrowForwardIos />
-                        <div className="cursor-pointer hover:underline">Điện thoại/ Thiết bị</div>
+                        <div
+                            className="cursor-pointer hover:underline"
+                            onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.name)}
+                        >
+                            {activeCategory.name}
+                        </div>
                         <MdOutlineArrowForwardIos />
-                        <div className="font-medium cursor-pointer hover:underline">Điện Thoại Di Động Apple iPhone Retina 6s Plus 64GB</div>
+                        <div
+                            className="cursor-pointer hover:underline"
+                            onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.name, activeSubCategory.id, activeSubCategory.title)}
+                        >
+                            {activeSubCategory.title}
+                        </div>
+                        <MdOutlineArrowForwardIos />
+                        <div className="font-medium cursor-pointer hover:underline">{activeProduct.name}</div>
                     </div>
                 </div>
                 <div className="product-detail__content mt-16 mb-24">
                     <div className="main w-[80rem] mx-auto px-[30px]">
                         <div className="flex">
                             <div className="product__images mr-16">
-                                <div className="w-80 h-80">
-                                    <img src={selectedImage.image} className="select-none" />
+                                <div className="w-80 h-80 flex items-center justify-center">
+                                    {/* <img src={selectedImage.image} className="select-none" /> */}
+                                    {productDetailInfo.product_image !== "" ?
+                                        <img src={`data:image/jpeg;base64,${productDetailInfo.product_image}`} alt='' />
+                                        :
+                                        <img src={Product01} />
+                                    }
                                 </div>
                                 <div className="swiper-list w-80 mt-2 mb-5">
                                     <Swiper
@@ -793,22 +963,16 @@ const ProductDetailPage = () => {
                                 </div>
                             </div>
                             <div className="product__informations flex-1">
-                                <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
+                                <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
                                 <div className="product__rating-stars flex items-center gap-x-3 mt-1">
                                     <div className="flex items-center gap-x-0.5">
-                                        {
-                                            [...Array(5)].map((item, index) => {
-                                                return (
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                )
-                                            })
-                                        }
-                                        <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
+                                        <Rating rating={productDetailInfo.rating_average} />
+                                        <span className="ml-1 text-[#FCB800] font-medium">{productDetailInfo.rating_average}</span>
                                     </div>
                                     <GoDotFill className="text-gray-300 w-3 h-3" />
                                     <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                         <MdOutlineMessage className="w-5 h-5" />
-                                        <span>101 đánh giá</span>
+                                        <span>{productDetailInfo.comment_count} đánh giá</span>
                                     </div>
                                     <GoDotFill className="text-gray-300 w-3 h-3" />
                                     <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
@@ -816,28 +980,70 @@ const ProductDetailPage = () => {
                                         <span>Đã bán 2k2</span>
                                     </div>
                                 </div>
-                                <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
+                                <div className="flex items-center gap-x-2">
+                                    <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
+                                    <div className="product__price text-xl text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
+                                </div>
                                 <div className="shop flex items-center gap-x-4">
                                     <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
                                     <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
                                 </div>
                                 <div className="border-t border-gray-300 w-full my-4"></div>
-                                <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
-                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
-                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
-                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
-                                    <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
-                                </div>
-                                <div className="border-t border-gray-300 w-full my-4"></div>
-                                <div className="flex items-end gap-x-4">
-                                    <div>
-                                        <div className="mb-1">Số lượng</div>
-                                        <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
-                                            <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
-                                            <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
-                                            <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
-                                        </div>
+                                <div className="product__type-selection">
+                                    <div className="group">
+                                        {productDetailInfo.product_type_group.color &&
+                                            <div>
+                                                <div className="text-gray-500 mb-2">Màu Sắc</div>
+                                                <div className="flex gap-x-2">
+                                                    {
+                                                        productDetailInfo.product_type_group.color && productDetailInfo.product_type_group.color.length > 0 &&
+                                                        productDetailInfo.product_type_group.color.map((item, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={`color-item-${index}`}
+                                                                    className="px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer"
+                                                                >
+                                                                    {item}
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        {productDetailInfo.product_type_group.size &&
+                                            <div className="mt-4 mb-6">
+                                                <div className="text-gray-500 mb-2">Size</div>
+                                                <div className="flex gap-x-2">
+                                                    {
+                                                        productDetailInfo.product_type_group.size && productDetailInfo.product_type_group.size.length > 0 &&
+                                                        productDetailInfo.product_type_group.size.map((item, index) => {
+                                                            return (
+                                                                <div
+                                                                    key={`color-item-${index}`}
+                                                                    className="px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer"
+                                                                >
+                                                                    {item}
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+
                                     </div>
+                                </div>
+                                <div className="flex items-center gap-x-4 mt-6">
+                                    <div className="mb-1">Số lượng</div>
+                                    <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                        <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                        <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
+                                        <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                    </div>
+                                    <div className="text-gray-500">{productAmount} sản phẩm có sẵn</div>
+                                </div>
+                                <div className="flex items-center gap-x-4 mt-4">
                                     <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
                                     <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
                                 </div>
@@ -867,10 +1073,7 @@ const ProductDetailPage = () => {
                             {
                                 productDetail[0].selected &&
                                 <>
-                                    <div className="product__info-description w-[50rem] text-gray-500 text-justify mb-5">
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.  Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                        Quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                    </div>
+                                    <div className="product__info-description w-[50rem] text-gray-500 text-justify mb-5">{productDetailInfo.description}</div>
                                     <div className="w-[37rem] flex border boder-gray-400 mb-16">
                                         <table className='w-1/3'>
                                             <tbody>
@@ -939,38 +1142,22 @@ const ProductDetailPage = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        {commentList && commentList.length > 0 &&
-                                            commentList.map((item, index) => {
+                                        {productDetailInfo.reviews && productDetailInfo.reviews.length > 0 &&
+                                            productDetailInfo.reviews.map((item, index) => {
                                                 return (
                                                     <div key={`customer-comment-${item.id}`} className="mb-10">
                                                         <div className="flex gap-x-2 mb-3">
-                                                            <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">MN</div>
+                                                            <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">CS</div>
                                                             <div className="flex flex-col">
                                                                 <div className="flex items-center gap-x-2">
                                                                     <div className="font-medium">{item.customer_name}</div>
-                                                                    <div className="flex items-center gap-x-1">
-                                                                        {
-                                                                            [...Array(Math.floor(item.ratings))].map((item, index) => {
-                                                                                return (
-                                                                                    <GoStarFill className="text-[#FCB800] w-4 h-4" />
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                        {
-                                                                            [...Array(5 - Math.floor(item.ratings))].map((item, index) => {
-                                                                                return (
-                                                                                    <GoStarFill className="text-gray-300 w-4 h-4" />
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </div>
+                                                                    <Rating rating={item.rating} />
                                                                 </div>
-
-                                                                <div className="text-gray-600">{item.date}</div>
+                                                                <div className="text-gray-600">{dateFormat(`${item.createdAt}`)}</div>
                                                             </div>
 
                                                         </div>
-                                                        <div className="w-[50rem] text-gray-500">{item.content}</div>
+                                                        <div className="w-[50rem] text-gray-500">{item.comment}</div>
                                                     </div>
                                                 )
                                             })
@@ -1002,16 +1189,10 @@ const ProductDetailPage = () => {
                         <img src={Product01} alt="" className="w-[26.875rem] h-[26.875rem]" />
                     </div>
                     <div className="product-quick-view__info w-3/5">
-                        <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
+                        <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
                         <div className="product__rating-stars flex items-center gap-x-3 mt-1">
                             <div className="flex items-center gap-x-0.5">
-                                {
-                                    [...Array(5)].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
+                                <Rating rating={5} />
                                 <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
                             </div>
                             <GoDotFill className="text-gray-300 w-3 h-3" />

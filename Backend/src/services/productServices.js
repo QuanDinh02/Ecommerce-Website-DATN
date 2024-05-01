@@ -2,6 +2,141 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
+const getProductDetail = async (product_id) => {
+    try {
+
+        let productInfo = await db.Product.findOne({
+            raw: true,
+            attributes: ['id', 'name','summary'],
+            where: {
+                id: {
+                    [Op.eq]: product_id,
+                },
+            },
+        });
+
+        let productTypesList = await db.ProductType.findAll({
+            raw: true,
+            attributes: ['id', 'type', 'typeName', 'quantity', 'size', 'color', 'currentPrice', 'price'],
+            where: {
+                productID: {
+                    [Op.eq]: product_id,
+                },
+            }
+        });
+
+        let productImage = await db.Image.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'image'],
+            where: {
+                productID: {
+                    [Op.eq]: product_id
+                }
+            }
+        });
+
+        const colors = _.chain(productTypesList).map('color').uniq().value();
+        const sizes = _.chain(productTypesList).map('size').uniq().value();
+
+        let { currentPrice } = _.minBy(productTypesList, (o) => {
+            return o.currentPrice;
+        })
+
+        let { price } = _.minBy(productTypesList, (o) => {
+            return o.price;
+        })
+
+        let commentList = await Promise.all(productTypesList.map(async item => {
+
+            let productReviews = await db.ProductReview.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'comment', 'rating', 'createdAt'],
+                include: {
+                    model: db.Customer,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    productTypeID: {
+                        [Op.eq]: item.id
+                    }
+                }
+            });
+
+            // let productReviewRebuildData = productReviews.map(item => {
+            //     let customer_info = item.Customer;
+            //     delete item.Customer;
+
+            //     return {
+            //         ...item, customer_name: customer_info.name
+            //     }
+            // })
+
+            // return {
+            //     product_type_id: item.id,
+            //     reviews: productReviewRebuildData
+            // }
+
+            let productReviewRebuildData = await productReviews.map(item => {
+                let customer_info = item.Customer;
+                delete item.Customer;
+
+                return {
+                    ...item, customer_name: customer_info.name
+                }
+            })
+
+            return {
+                product_type_id: item.id,
+                reviews: productReviewRebuildData
+            }
+        }));
+
+        let allProductsReview = [];
+
+        commentList.forEach(item => {
+            allProductsReview = [...allProductsReview, ...item.reviews]
+        });
+        
+        let comment_count = allProductsReview.length;
+        let sum_rating = _.sumBy(allProductsReview, function (o) { return o.rating; });
+        let inventoryCount = _.sumBy(productTypesList, function (o) { return o.quantity; });
+
+        let finalData = {
+            id: product_id,
+            name: productInfo.name,
+            currentPrice: currentPrice,
+            price: price,
+            description: productInfo.summary,
+            comment_count: comment_count,
+            rating_average: Math.round(parseFloat(sum_rating / comment_count) * 10) / 10,
+            product_image: productImage.image,
+            inventory_count: inventoryCount,
+            reviews: allProductsReview,
+            product_type_list: productTypesList,
+            product_type_group: {
+                color: colors,
+                size: sizes
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: finalData,
+            EM: 'Product Detail Info !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductsByCategory = async (category_id, item_limit, page) => {
     try {
         if (item_limit > 0) {
@@ -283,5 +418,6 @@ const getSearchProducts = async (product_name) => {
 }
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
-    putUpdateProductImage, getSearchProducts
+    putUpdateProductImage, getSearchProducts,
+    getProductDetail
 }

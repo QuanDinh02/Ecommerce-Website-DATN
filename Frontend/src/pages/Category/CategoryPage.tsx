@@ -290,7 +290,7 @@ const CategoryPage = () => {
                                         <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
-                                    <div className="section">
+                                    {/* <div className="section">
                                         <div className="section__title text-lg mb-3">Thương hiệu</div>
                                         {filterItems.map((item, index) => {
                                             return (
@@ -312,7 +312,7 @@ const CategoryPage = () => {
                                         })}
                                         <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
                                     </div>
-                                    <div className="section-breakline border-t border-gray-300 my-4"></div>
+                                    <div className="section-breakline border-t border-gray-300 my-4"></div> */}
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
@@ -525,6 +525,7 @@ const CategoryPage = () => {
                                                                                             ratings_count={123}
                                                                                             selling_count={123}
                                                                                             key={`item-rating-${item.id}`}
+                                                                                            item_grid={true}
                                                                                         />
                                                                                     </div>
                                                                                 )
@@ -544,42 +545,30 @@ const CategoryPage = () => {
 
                                         :
                                         <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
-                                            {productsByCategory && productsByCategory.length > 0 && productsByCategory.map((item, index) => {
+                                            {productList && productList.length > 0 && productList.map((item, index) => {
                                                 return (
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
-                                                        key={`category-item-${index}`}
+                                                        key={`category-column-item-${index}`}
                                                         onClick={() => navigate("/product-detail")}
                                                     >
-                                                        <div className="product__image w-44 mx-auto mb-12"><img src={item.image} alt="" /></div>
+                                                        <div className="product__image w-44 mx-auto mb-12">
+                                                            {item.image ?
+                                                                <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
+                                                                :
+                                                                <img src={Product01} className="w-40 h-60" />
+                                                            }
+                                                        </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
-                                                                <div className="product__name text-blue-600 mb-3 line-clamp-2 duration-300 hover:text-[#FCB800]">{item.name}</div>
-                                                                <div className="flex items-center gap-x-2 mb-1">
-                                                                    <div className="product__rating-stars flex items-center gap-x-1">
-                                                                        {
-                                                                            [...Array(Math.floor(item.ratings))].map((item, index) => {
-                                                                                return (
-                                                                                    <GoStarFill className="text-[#FCB800]" />
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                        {
-                                                                            [...Array(5 - Math.floor(item.ratings))].map((item, index) => {
-                                                                                return (
-                                                                                    <GoStarFill className="text-gray-400" />
-                                                                                )
-                                                                            })
-                                                                        }
-                                                                    </div>
-                                                                    <div className="product_ratings flex items-center text-sm ">
-                                                                        <div className="font-bold">{item.ratings}</div>
-                                                                        <div>/5.0</div>
-                                                                        <div>&nbsp;({item.ratings_count})</div>
-                                                                    </div>
-                                                                    <div className="text-sm">Đã bán {numberKFormat(item.selling_count)}</div>
-                                                                </div>
-                                                                <div className="text-sm mb-2">Shop: <span className="font-medium">Shop Pro</span></div>
-                                                                <div className="product__benefit text-sm text-gray-400 flex flex-col gap-1">
+                                                                <div className="product__name text-blue-600 mb-2 line-clamp-2 duration-300 hover:text-[#FCB800]">{item.name}</div>
+                                                                <ProductRating
+                                                                    ratings={4.9}
+                                                                    ratings_count={123}
+                                                                    selling_count={123}
+                                                                    key={`item-rating-${item.id}`}
+                                                                    item_grid={false}
+                                                                />
+                                                                <div className="product__benefit text-sm text-gray-400 flex flex-col gap-1 mt-4">
                                                                     <div>Unrestrained and portable active stereo speaker</div>
                                                                     <div>Free from the confines of wires and chords</div>
                                                                     <div>20 hours of portable capabilities</div>
@@ -587,7 +576,11 @@ const CategoryPage = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="product__right-content w-60">
-                                                                <div className="product__price font-medium text-xl mb-2 tracking-wide mb-2">{CurrencyFormat(item.price)}</div>
+                                                                {/* <div className="product__price font-medium text-xl mb-2 tracking-wide mb-2">{CurrencyFormat(item.current_price)}</div> */}
+                                                                <div className="flex items-center gap-2 mb-2">
+                                                                    <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
+                                                                    <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
+                                                                </div>
                                                                 <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     hanldeAddShoppingCart();
