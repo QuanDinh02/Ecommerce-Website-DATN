@@ -4,7 +4,7 @@ import { SiVercel } from 'react-icons/si';
 
 const Technologies = () => {
     return (
-        <div className="technologies-container min-h-screen bg-slate-800 p-5 flex items-center justify-center">
+        <div className="technologies-container min-h-screen bg-gray-100 text-black p-5 flex items-center justify-center">
             <div className="flex flex-col items-center">
                 <div className='flex items-center space-x-5 mb-10'>
                     <a href="https://react.dev/" target="_blank" className="w-20 h-20 rounded-full">
@@ -23,12 +23,12 @@ const Technologies = () => {
                         <img src="/src/assets/static/vite.svg" alt="" className='w-full h-full vite-logo' />
                     </a>
                     <div className='plus'> + </div>
-                    <div><AiOutlineGithub color={"white"} className='w-20 h-20 rounded-full' /></div>
+                    <div><AiOutlineGithub color={"black"} className='w-20 h-20 rounded-full' /></div>
                     <div className='plus'> + </div>
                     <a href="https://vercel.com/" target="_blank" className='w-20 h-20 rounded-full border border-black rounded-full flex items-center justify-center p-4 bg-black pb-6'><SiVercel color={"white"} className='w-16 h-16' /></a>
                 </div>
                 <div className='flex items-center space-x-5 group'>
-                    <div className="text-5xl font-semibold group-hover:text-cyan-400 brand text-white transition duration-700 group-hover:scale-105">INSURANCE-WEBSITE</div>
+                    <div className="text-5xl font-semibold group-hover:text-cyan-400 brand text-black transition duration-700 group-hover:scale-105">ECOMMERCE-WEBSITE</div>
                 </div>
             </div>
         </div>

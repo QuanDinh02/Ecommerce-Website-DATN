@@ -111,8 +111,8 @@ module.exports = {
                 quantity: 100,
                 size: "",
                 color: "",
-                currentPrice: 200000,
-                price: 250000,
+                currentPrice: 149000,
+                price: 278000,
                 productID: 2,
             },
             //----------------------------------------------------------
@@ -123,8 +123,8 @@ module.exports = {
                 quantity: 100,
                 size: "",
                 color: "",
-                currentPrice: 200000,
-                price: 250000,
+                currentPrice: 172000,
+                price: 240000,
                 productID: 3,
             },
             //----------------------------------------------------------
@@ -135,8 +135,8 @@ module.exports = {
                 quantity: 100,
                 size: "",
                 color: "",
-                currentPrice: 200000,
-                price: 250000,
+                currentPrice: 158000,
+                price: 240000,
                 productID: 4,
             },
             //----------------------------------------------------------
@@ -147,8 +147,8 @@ module.exports = {
                 quantity: 100,
                 size: "",
                 color: "",
-                currentPrice: 200000,
-                price: 250000,
+                currentPrice: 5000,
+                price: 10000,
                 productID: 5,
             },
             //----------------------------------------------------------
@@ -159,9 +159,81 @@ module.exports = {
                 quantity: 100,
                 size: "",
                 color: "",
-                currentPrice: 200000,
-                price: 250000,
+                currentPrice: 116620,
+                price: 119000,
                 productID: 6,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 15
+                type: "",
+                typeName: "",
+                quantity: 100,
+                size: "",
+                color: "",
+                currentPrice: 19000,
+                price: 20000,
+                productID: 7,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 16
+                type: "",
+                typeName: "",
+                quantity: 100,
+                size: "",
+                color: "",
+                currentPrice: 379000,
+                price: 450000,
+                productID: 8,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 17
+                type: "",
+                typeName: "",
+                quantity: 100,
+                size: "",
+                color: "",
+                currentPrice: 155000,
+                price: 240000,
+                productID: 9,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 18
+                type: "",
+                typeName: "",
+                quantity: 0,
+                size: "",
+                color: "",
+                currentPrice: 179000,
+                price: 300000,
+                productID: 10,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 18
+                type: "",
+                typeName: "",
+                quantity: 100,
+                size: "",
+                color: "",
+                currentPrice: 4900,
+                price: 17000,
+                productID: 11,
+            },
+            //----------------------------------------------------------
+            {
+                //id: 18
+                type: "",
+                typeName: "",
+                quantity: 0,
+                size: "",
+                color: "",
+                currentPrice: 10000,
+                price: 15000,
+                productID: 12,
             },
             //----------------------------------------------------------
         ], {});

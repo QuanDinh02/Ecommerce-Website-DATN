@@ -18,7 +18,7 @@ module.exports = {
             },
             {
                 //id: 4
-                title: "Nội thất, Vườn & Bếp",
+                title: "Nhà cửa & Đời sống",
             },
             {
                 //id: 5
@@ -26,11 +26,11 @@ module.exports = {
             },
             {
                 //id: 6
-                title: "Trang sức",
+                title: "Phụ kiên & Trang sức",
             },
             {
                 //id: 7
-                title: "Máy tính & Công nghệ",
+                title: "Máy tính & Laptop",
             },
             {
                 //id: 8
@@ -38,11 +38,11 @@ module.exports = {
             },
             {
                 //id: 9
-                title: "Thể thao",
+                title: "Thể thao & Du lịch",
             },
             {
                 //id: 10
-                title: "Điện thoại/ Thiết bị",
+                title: "Điện thoại & Phụ kiện",
             },
             {
                 //id: 11
