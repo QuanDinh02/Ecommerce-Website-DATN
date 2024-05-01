@@ -191,8 +191,8 @@ const SubCategoryPage = () => {
         navigate("/category", { state: { category_id: category_id, category_name: category_title } })
     }
 
-    const handleProductDetailNavigation = (info: IProductDetailNavigatedInfo) => {
-        navigate("/product-detail", { state: info });
+    const handleProductDetailNavigation = (product_id: number) => {
+        navigate("/product-detail", { state: { product_id: product_id } });
     }
 
     React.useEffect(() => {
@@ -441,14 +441,7 @@ const SubCategoryPage = () => {
                                                                                         className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group"
                                                                                         key={`category-item-${index}`}
                                                                                         onClick={() => {
-                                                                                            handleProductDetailNavigation({
-                                                                                                category_id: activeCategory.id,
-                                                                                                category_name: activeCategory.name,
-                                                                                                sub_category_id: activeSubCategory.id,
-                                                                                                sub_category_name: activeSubCategory.title,
-                                                                                                product_id: item.id,
-                                                                                                product_name: item.name
-                                                                                            });
+                                                                                            handleProductDetailNavigation(item.id);
                                                                                         }}
                                                                                     >
                                                                                         <div className="product__image flex items-center justify-center">
@@ -528,14 +521,7 @@ const SubCategoryPage = () => {
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`category-column-item-${index}`}
                                                         onClick={() => {
-                                                            handleProductDetailNavigation({
-                                                                category_id: activeCategory.id,
-                                                                category_name: activeCategory.name,
-                                                                sub_category_id: activeSubCategory.id,
-                                                                sub_category_name: activeSubCategory.title,
-                                                                product_id: item.id,
-                                                                product_name: item.name
-                                                            });
+                                                            handleProductDetailNavigation(item.id);
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">

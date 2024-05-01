@@ -88,7 +88,7 @@ const Homepage = () => {
             <div className="homepage-container w-full bg-[#EEEEEE]">
                 <div className='px-[30px] w-[80rem] mx-auto  py-8'>
                     <div className="section flex">
-                        <CategoryMenu/>
+                        <CategoryMenu />
                         <div className="banner flex-1 border border-gray-300 ml-[50px]">
                             <img src={Banner} alt="" className="w-full h-full" />
                         </div>
@@ -420,7 +420,7 @@ const Homepage = () => {
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) =>{ 
+                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                     e.stopPropagation();
                                                                     hanldeFavoriteItem()
                                                                 }}>
@@ -506,6 +506,78 @@ const Homepage = () => {
                                     <span className="flex items-center hover:text-[#FCB800] duration-300 cursor-pointer">Xem thêm <MdKeyboardArrowRight className="w-5 h-5" /></span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div className="header px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-50">GỢI Ý DÀNH CHO BẠN</div>
+                    <div className="section customer-recommendation bg-white mb-8">
+                        <div className="px-5 py-6 bg-[#EEEEEE]">
+                            <div className="product-list grid grid-cols-6 gap-y-6 gap-x-2">
+                                {
+                                    imageList1 && imageList1.length > 0 &&
+                                    imageList1.map((item, index) => {
+                                        return (
+                                            <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => navigate("/product-detail")}>
+                                                <div className="relative">
+                                                    <div className="product__image w-40 mx-auto mb-6"><img src={item} alt="" /></div>
+                                                    <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            hanldeAddShoppingCart();
+                                                        }}>
+                                                            <PiShoppingCartLight className="w-6 h-6 " />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setShowQuickView(true);
+                                                        }}>
+                                                            <IoEyeOutline className="w-6 h-6" />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Xem nhanh</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            hanldeFavoriteItem();
+                                                        }}>
+                                                            <IoMdHeartEmpty className="w-6 h-6" />
+                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                    <span className="text-sm">Yêu thích</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
+                                                <div className="product__price flex items-center gap-2 mb-2.5">
+                                                    <div className="price text-[#1A732E] font-medium">768,000 đ</div>
+                                                    <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
+                                                </div>
+                                                <div className="product__ratings flex items-center gap-2">
+                                                    <div className="stars-rating flex items-center">
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                        <GoStarFill className="text-[#FCB800]" />
+                                                    </div>
+                                                    <div className="rating-counts">123</div>
+                                                </div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className="w-full flex items-center justify-center bg-[#EEEEEE]">
+                            <div className="w-1/3 bg-white flex items-center justify-center py-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">Xem Thêm</div>
                         </div>
                     </div>
                 </div>

@@ -220,6 +220,10 @@ const CategoryPage = () => {
         }
     }
 
+    const handleProductDetailNavigation = (product_id: number) => {
+        navigate("/product-detail", { state: { product_id: product_id } });
+    }
+
     React.useEffect(() => {
         let { category_id, category_name } = location.state;
 
@@ -471,7 +475,7 @@ const CategoryPage = () => {
                                                                         <>
                                                                             {productList.length > 0 && productList.map((item, index) => {
                                                                                 return (
-                                                                                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => navigate("/product-detail")}>
+                                                                                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
                                                                                         <div className="product__image flex items-center justify-center">
                                                                                             {item.image ?
                                                                                                 <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
@@ -549,7 +553,7 @@ const CategoryPage = () => {
                                                 return (
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`category-column-item-${index}`}
-                                                        onClick={() => navigate("/product-detail")}
+                                                        onClick={() => handleProductDetailNavigation(item.id)}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             {item.image ?

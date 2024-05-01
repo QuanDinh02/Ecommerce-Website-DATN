@@ -7,10 +7,28 @@ const getProductDetail = async (product_id) => {
 
         let productInfo = await db.Product.findOne({
             raw: true,
+            nest: true,
             attributes: ['id', 'name','summary'],
+            include: {
+                model: db.SubCategory,
+                attributes: ['id', 'title'],
+                through: { attributes: [] },
+            },
             where: {
                 id: {
                     [Op.eq]: product_id,
+                },
+            },
+        });
+
+        let sub_category = productInfo.SubCategories;
+
+        let category = await db.Category.findOne({
+            raw: true,
+            attributes: ['id', 'title'],
+            where: {
+                id: {
+                    [Op.eq]: sub_category.id,
                 },
             },
         });
@@ -118,7 +136,9 @@ const getProductDetail = async (product_id) => {
             product_type_group: {
                 color: colors,
                 size: sizes
-            }
+            },
+            sub_category: sub_category,
+            category: category
         }
 
         return {
@@ -160,7 +180,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
             let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
                 raw: true,
                 nest: true,
-                attributes: [],
+                attributes: ['id','title'],
                 include: {
                     model: db.Product,
                     attributes: ['id', 'name'],
@@ -181,7 +201,18 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
             let productListFinal = [];
 
             await productListRaw.forEach(item => {
-                let product = item.Products;
+                //let product = item.Products;
+                let sub_category = {
+                    id: item.id,
+                    name: item.title
+                }
+
+                let product = {
+                    id: item.Products.id,
+                    name: item.Products.name,
+                    sub_category: sub_category
+                }
+                
                 if (product.id != null) {
                     productListFinal = [...productListFinal, product];
                 }

@@ -50,7 +50,7 @@ interface ISubCategoryActive {
 }
 interface ICategoryActive {
     id: number
-    name: string
+    title: string
 }
 
 interface IProductReview {
@@ -88,6 +88,8 @@ interface IProductDetail {
     reviews: IProductReview[]
     product_type_list: IProductType[]
     product_type_group: IProductTypeGroup
+    sub_category: ISubCategoryActive,
+    category: ICategoryActive
 }
 
 const ProductDetailPage = () => {
@@ -114,7 +116,15 @@ const ProductDetailPage = () => {
         product_type_group: {
             color: [],
             size: []
-        }
+        },
+        sub_category: {
+            id: 0,
+            title: ""
+        },
+        category: {
+            id: 0,
+            title: ""
+        },
     });
 
     const [selectedImage, setSelectedImage] = React.useState({
@@ -124,7 +134,7 @@ const ProductDetailPage = () => {
 
     const [activeCategory, setActiveCategory] = React.useState<ICategoryActive>({
         id: 0,
-        name: ""
+        title: ""
     });
 
     const [activeSubCategory, setActiveSubCategory] = React.useState<ISubCategoryActive>({
@@ -181,23 +191,6 @@ const ProductDetailPage = () => {
 
     const [ratingFilter, setRatingFilter] = React.useState<number>(0);
 
-    const [commentList, setCommentList] = React.useState([
-        {
-            id: 1,
-            customer_name: "Minh Nhựt",
-            ratings: 5,
-            date: "01/03/2023",
-            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-        },
-        {
-            id: 2,
-            customer_name: "Thiên Bảo",
-            ratings: 4,
-            date: "01/03/2023",
-            content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. "
-        },
-    ]);
-
     const handleProductAmount = (num: any) => {
         if (!isNaN(num) && num > 0) {
             setAmount(num);
@@ -241,9 +234,22 @@ const ProductDetailPage = () => {
                 draft.reviews = response.reviews;
                 draft.product_type_list = response.product_type_list;
                 draft.product_type_group = response.product_type_group;
+                draft.sub_category = response.sub_category;
+                draft.category = response.category;
             })
 
             setProductAmount(response.inventory_count);
+            setActiveCategory({
+                ...activeCategory, id: response.category.id, title: response.category.title
+            });
+
+            setActiveSubCategory({
+                ...activeSubCategory, id: response.sub_category.id, title: response.sub_category.title
+            });
+
+            setActiveProduct({
+                ...activeProduct, id: product_id ? product_id : 0, name: response.name
+            });
         }
     }
 
@@ -877,24 +883,7 @@ const ProductDetailPage = () => {
 
     React.useEffect(() => {
         if (location.state) {
-            let {
-                category_id, category_name,
-                sub_category_id, sub_category_name,
-                product_id, product_name
-            } = location.state;
-
-            setActiveCategory({
-                ...activeCategory, id: category_id ? category_id : 0, name: category_name ? category_name : ""
-            });
-
-            setActiveSubCategory({
-                ...activeSubCategory, id: sub_category_id ? sub_category_id : 0, title: sub_category_name ? sub_category_name : ""
-            });
-
-            setActiveProduct({
-                ...activeProduct, id: product_id ? product_id : 0, name: product_name ? product_name : ""
-            });
-
+            let { product_id } = location.state;
             if (product_id) {
                 fetchProductsBySubCategory(product_id);
             }
@@ -911,14 +900,14 @@ const ProductDetailPage = () => {
                         <MdOutlineArrowForwardIos />
                         <div
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.name)}
+                            onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.title)}
                         >
-                            {activeCategory.name}
+                            {activeCategory.title}
                         </div>
                         <MdOutlineArrowForwardIos />
                         <div
                             className="cursor-pointer hover:underline"
-                            onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.name, activeSubCategory.id, activeSubCategory.title)}
+                            onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.title, activeSubCategory.id, activeSubCategory.title)}
                         >
                             {activeSubCategory.title}
                         </div>
