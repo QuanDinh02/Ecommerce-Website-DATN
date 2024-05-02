@@ -101,6 +101,7 @@ const LoginPage = () => {
 
                     setTimeout(() => {
                         dispatch(UserLogin(data));
+                        window.location.reload();
                         navigate('/');
                     }, 2000);
                 }

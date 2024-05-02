@@ -81,9 +81,43 @@ const userLogin = async (userData) => {
                     password: userExist.password,
                     role: role
                 }
-                
-                if (checkPassword(userData.password, user.password)) {
+                //checkPassword(userData.password, user.password)
+                if (userData.password === user.password) {
 
+                    let customer_id = 0;
+
+                    if(role === "customer") {
+                        let customerInfo = await db.Customer.findOne({
+                            raw: true,
+                            attributes: ['id'],
+                            where: {
+                                userID: {
+                                    [Op.eq]: user.id
+                                }
+                            }
+                        })
+
+                        customer_id = customerInfo.id;
+
+                        let payload = {
+                            customer_id: customer_id,
+                            username: user.username,
+                            role: user.role,
+                            isAuthenticated: true,
+                        }
+    
+                        let accessToken = createToken(payload);
+                        return {
+                            EC: 0,
+                            DT: {
+                                accessToken: accessToken,
+                                username: user.username,
+                                role: user.role,
+                                customer_id: customer_id
+                            },
+                            EM: 'Login success !'
+                        }
+                    }
                     let payload = {
                         username: user.username,
                         role: user.role,
@@ -96,7 +130,7 @@ const userLogin = async (userData) => {
                         DT: {
                             accessToken: accessToken,
                             username: user.username,
-                            role: user.role
+                            role: user.role,
                         },
                         EM: 'Login success !'
                     }

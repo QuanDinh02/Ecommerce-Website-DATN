@@ -888,7 +888,7 @@ const ProductDetailPage = () => {
                 fetchProductsBySubCategory(product_id);
             }
         }
-    }, []);
+    }, [location.state]);
 
     return (
         <>

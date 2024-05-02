@@ -6,6 +6,8 @@ import { PiShoppingCartLight } from "react-icons/pi";
 import { BsHeart, BsPerson } from "react-icons/bs";
 import { FiMenu } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
+import { PiImageThin } from "react-icons/pi";
+
 import classNames from 'classnames';
 import Item from '../assets/img/homepage/item.svg';
 import Item2 from '../assets/img/homepage/item2.svg';
@@ -14,23 +16,40 @@ import Item6 from '../assets/img/homepage/item6.svg';
 import { CurrencyFormat } from '@/utils/numberFormat';
 
 import CategoryMenu from "@/components/CategoryMenu";
-import { getSearchProducts } from '@/services/productService';
 import { CiSearch } from 'react-icons/ci';
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from '@/redux/reducer/rootReducer';
-import { fetchAccount, userLogout } from '@/services/userService';
+
 import { successToast1 } from './Toast/Toast';
-import { UserLogin } from '@/redux/actions/action';
-export interface IAccount {
+
+import { UserLogin, AddCartItem } from '@/redux/actions/action';
+import { RootState } from '@/redux/reducer/rootReducer';
+
+import { getSearchProducts } from '@/services/productService';
+import { fetchAccount, userLogout } from '@/services/userService';
+import { fetchCartItem } from '@/services/cartItemService';
+import { useImmer } from 'use-immer';
+interface IAccount {
     id: number
     username: string
     role: string
 }
 
-export interface ISearchProduct {
+interface ISearchProduct {
     id: number
     name: string
     selected: boolean
+}
+
+interface ICartItemInfo {
+    id: number
+    name: string
+    image: string
+}
+interface ICartItem {
+    id: number
+    quantity: number
+    price: number
+    product_info: ICartItemInfo
 }
 
 const Header = () => {
@@ -41,6 +60,9 @@ const Header = () => {
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
+    const cartItemList: ICartItem[] = useSelector<RootState, ICartItem[]>(state => state.cartItem.cart_item_list);
+    const cartItemCount: number = useSelector<RootState, number>(state => state.cartItem.cart_item_count);
 
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
@@ -57,29 +79,8 @@ const Header = () => {
     const [productSearchRecommend, setProductSearchRecommend] = React.useState("");
     const [currentSelect, setCurrentSelect] = React.useState(-1);
 
-    const [shoppingCartItems, setShoppingCartItems] = React.useState([
-        {
-            id: 1,
-            name: "MVMTH Classical Leather Watch In Black",
-            image: Item,
-            amount: 1,
-            price: 199000
-        },
-        {
-            id: 2,
-            name: "MVMTH Classical Leather Watch In Black",
-            image: Item2,
-            amount: 1,
-            price: 199000
-        },
-        {
-            id: 3,
-            name: "MVMTH Classical Leather Watch In Black",
-            image: Item3,
-            amount: 1,
-            price: 199000
-        }
-    ]);
+    const [cartItems, setCartItems] = useImmer<ICartItem[]>([]);
+    const [cartItemTotal, setCartItemTotal] = React.useState<number>(0);
 
     const fProductSearch = React.useCallback(_.debounce(async (value) => {
         let result = await getSearchProducts(value);
@@ -243,17 +244,53 @@ const Header = () => {
     const fetchAccountInfo = async () => {
         let result: any = await fetchAccount();
         if (result && !_.isEmpty(result.DT)) {
+
             let userData = result.DT;
-            let data = {
-                isAuthenticated: userData.isAuthenticated,
-                account: {
-                    id: userData.id,
-                    username: userData.username,
-                    role: userData.role
+
+            if (userData.role === "customer") {
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role,
+                        customer_id: userData.customer_id
+                    }
                 }
+
+                dispatch(UserLogin(data));
+
+                let cartItemsData: any = await fetchCartItem(userData.customer_id);
+                if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+                    let cart_item_data: ICartItem[] = cartItemsData.DT;
+                    //setCartItems(cart_item_data);
+                    let count = cart_item_data.length;
+
+                    dispatch(AddCartItem({
+                        cart_items: cart_item_data,
+                        count: count
+                    }));
+
+                    let cartItemValueSum = _.sumBy(cart_item_data, function (o: ICartItem) { return o.price * o.quantity; });
+                    setCartItemTotal(cartItemValueSum);
+                }
+
+            } else {
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role
+                    }
+                }
+                dispatch(UserLogin(data));
             }
-            dispatch(UserLogin(data));
         }
+    }
+
+    const handleProductDetailNavigation = (product_id: number) => {
+        navigate("/product-detail", { state: { product_id: product_id } });
     }
 
     React.useEffect(() => {
@@ -326,7 +363,9 @@ const Header = () => {
                         </div>
                         <div className='shopping-cart relative z-50' onMouseEnter={() => setShowMiniShoppingCart(true)} onClick={() => navigate("/cart")}>
                             <PiShoppingCartLight className="icon" />
-                            <div className='count absolute right-[-5px] top-[16px]'>3</div>
+                            {cartItemCount > 0 &&
+                                <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
+                            }
                             {
                                 showMiniShoppingCart &&
                                 <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
@@ -336,36 +375,58 @@ const Header = () => {
                                     }}
                                     onMouseLeave={() => setShowMiniShoppingCart(false)}
                                 >
-                                    {shoppingCartItems && shoppingCartItems.length > 0 &&
-                                        shoppingCartItems.map((item, index) => {
-                                            return (
-                                                <div key={`shopping-cart-item-${index}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                    <div className='w-12 h-12 cursor-pointer'><img src={item.image} alt="" /></div>
-                                                    <div className='flex items-center'>
-                                                        <div>
-                                                            <div className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'>{item.name}</div>
-                                                            <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
-                                                                <span>{item.amount}</span>
-                                                                <span>x</span>
-                                                                <span>{CurrencyFormat(item.price)}</span>
+                                    {
+                                        cartItemCount > 0 ?
+                                            <>
+                                                {
+                                                    cartItemList.map((item, index) => {
+                                                        return (
+                                                            <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
+                                                                {item.product_info.image ?
+                                                                    <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
+                                                                    :
+                                                                    <PiImageThin className="w-12 h-12 cursor-pointer" />
+                                                                }
+                                                                <div className='flex items-center'>
+                                                                    <div>
+                                                                        <div
+                                                                            className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleProductDetailNavigation(item.product_info.id)}
+                                                                            }
+                                                                        >
+                                                                            {item.product_info.name}
+                                                                        </div>
+                                                                        <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
+                                                                            <span>{item.quantity}</span>
+                                                                            <span>x</span>
+                                                                            <span>{CurrencyFormat(item.price)}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer'>&#128473;</div>
+                                                                </div>
+
                                                             </div>
-                                                        </div>
-                                                        <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer'>&#128473;</div>
-                                                    </div>
+                                                        )
+                                                    })
+                                                }
+                                                <div className='shopping-cart-total flex items-center justify-between mb-8'>
+                                                    <div className='font-medium text-black text-lg'>Tổng cộng</div>
+                                                    <div className='font-bold text-red-500 text-lg'>{CurrencyFormat(cartItemTotal)}</div>
+                                                </div>
+                                                <div className='flex items-center justify-between gap-x-6'>
+                                                    <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/cart")}>Xem giỏ hàng</div>
+                                                    <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer'>Thanh toán</div>
 
                                                 </div>
-                                            )
-                                        })
+                                            </>
+                                            :
+                                            <>
+                                                <div className='text-black font-normal text-center py-4'>Chưa có sản phẩm</div>
+                                            </>
                                     }
-                                    <div className='shopping-cart-total flex items-center justify-between mb-8'>
-                                        <div className='font-medium text-black text-lg'>Tổng cộng</div>
-                                        <div className='font-bold text-red-500 text-lg'>{CurrencyFormat(597000)}</div>
-                                    </div>
-                                    <div className='flex items-center justify-between gap-x-6'>
-                                        <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/cart")}>Xem giỏ hàng</div>
-                                        <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer'>Thanh toán</div>
 
-                                    </div>
                                 </div>
                             }
                         </div>

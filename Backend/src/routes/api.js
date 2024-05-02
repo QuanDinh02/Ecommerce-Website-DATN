@@ -4,6 +4,7 @@ import userController from '../controller/userController';
 import categoryController from '../controller/categoryController';
 import productController from '../controller/productController';
 import subCategoryController from '../controller/subCategoryController';
+import cartItemController from '../controller/cartItemController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
@@ -33,6 +34,8 @@ const ApiRoute = (app) => {
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
 
     router.put('/product',upload.single('image'),productController.handleUpdateProductImage);
+
+    router.get('/cart-item', cartItemController.getQuickCartItems);
 
     return app.use('/api', router);
 }
