@@ -12,10 +12,16 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 raw: true,
                 nest: true,
                 model: db.ProductType,
-                attributes: ['id', 'currentPrice', 'productID'],
+                attributes: ['id', 'currentPrice', 'productID', 'size','color'],
                 include: {
                     model: db.Product,
                     attributes: ['id', 'name'],
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName'],
+                    },
                 },
             },
             where: {
@@ -28,6 +34,7 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
         let cartItemData = await Promise.all(cartItemList.map(async item => {
             let productType = item.ProductType;
             let product = productType.Product;
+            let shopInfo = product.Seller;
 
             let productImage = await db.Image.findOne({
                 raw: true,
@@ -43,10 +50,16 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 id: item.id,
                 quantity: item.quantity,
                 price: productType.currentPrice,
+                color: productType.color,
+                size: productType.size,
                 product_info: {
                     id: product.id,
                     name: product.name,
                     image: productImage.image
+                },
+                shop_info: {
+                    id: shopInfo.id,
+                    name: shopInfo.shopName
                 }
             }
         }));

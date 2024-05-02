@@ -210,7 +210,9 @@ const SubCategoryPage = () => {
     }, []);
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
 
         setTimeout(() => {
             setDataLoading(false);
@@ -222,7 +224,9 @@ const SubCategoryPage = () => {
     }, [])
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
         fetchProductsBySubCategory(activeSubCategory.id);
     }, [currentPage])
 

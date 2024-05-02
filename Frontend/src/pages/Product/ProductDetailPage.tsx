@@ -882,6 +882,7 @@ const ProductDetailPage = () => {
     }, []);
 
     React.useEffect(() => {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         if (location.state) {
             let { product_id } = location.state;
             if (product_id) {

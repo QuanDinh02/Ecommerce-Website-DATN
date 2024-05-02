@@ -13,15 +13,8 @@ const Modal = (props: MProps) => {
     const { show, setShow, children, size: type } = props;
 
     const sizes = {
-        'sm': 'w-2/5 h-3/6',
-        'sm-md': 'w-2/5 h-4/6',
-        'md': 'w-2/5 h-5/6',
-        'md-lg': 'w-5/12 h-5/6',
-        'md-lg-h-fit': 'w-5/12',
-        'lg': 'w-7/12 h-5/6',
-        'full': 'w-full h-full',
         'customize': 'w-[72.25rem] h-4/5',
-        'customize_2': 'w-[72.25rem] h-5/6',
+        'delete-confirmation-box': 'w-[40rem] h-[180px]',
     };
 
     const handleCloseModal = () => {

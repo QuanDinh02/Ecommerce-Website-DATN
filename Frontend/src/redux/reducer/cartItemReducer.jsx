@@ -7,10 +7,16 @@ const INITIAL_STATE = {
             id: 0,
             quantity: 0,
             price: 0,
+            color: "",
+            size: "",
             product_info: {
                 id: 0,
                 name: "",
                 image: "",
+            },
+            shop_info: {
+                id: 0,
+                name: ""
             }
         }
     ]

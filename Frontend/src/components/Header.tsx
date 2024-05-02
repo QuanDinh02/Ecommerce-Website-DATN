@@ -45,11 +45,19 @@ interface ICartItemInfo {
     name: string
     image: string
 }
+
+interface ICartItemShopInfo {
+    id: number
+    name: string
+}
 interface ICartItem {
     id: number
     quantity: number
     price: number
+    color: string
+    size: string
     product_info: ICartItemInfo
+    shop_info: ICartItemShopInfo
 }
 
 const Header = () => {
@@ -67,7 +75,6 @@ const Header = () => {
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
     const [showMenu, setShowMenu] = React.useState<boolean>(false);
-    const [showSubmenu, setShowSubmenu] = React.useState<boolean>(false);
     const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
     const [showMiniShoppingCart, setShowMiniShoppingCart] = React.useState<boolean>(false);
     const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
@@ -263,7 +270,6 @@ const Header = () => {
                 let cartItemsData: any = await fetchCartItem(userData.customer_id);
                 if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
                     let cart_item_data: ICartItem[] = cartItemsData.DT;
-                    //setCartItems(cart_item_data);
                     let count = cart_item_data.length;
 
                     dispatch(AddCartItem({
@@ -361,8 +367,8 @@ const Header = () => {
                             <BsHeart className="icon" />
                             <div className='count absolute right-[-5px] top-[16px]'>2</div>
                         </div>
-                        <div className='shopping-cart relative z-50' onMouseEnter={() => setShowMiniShoppingCart(true)} onClick={() => navigate("/cart")}>
-                            <PiShoppingCartLight className="icon" />
+                        <div className='shopping-cart relative z-50' onMouseEnter={() => setShowMiniShoppingCart(true)}>
+                            <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")}/>
                             {cartItemCount > 0 &&
                                 <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
                             }

@@ -236,7 +236,9 @@ const CategoryPage = () => {
     }, []);
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0 });
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
 
         setTimeout(() => {
             setDataLoading(false);
@@ -248,7 +250,9 @@ const CategoryPage = () => {
     }, [])
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0 });
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
         fetchProductsByCategory(activeCategory.id);
     }, [currentPage])
 
