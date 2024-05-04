@@ -21,13 +21,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { successToast1 } from './Toast/Toast';
 
-import { UserLogin, AddCartItem } from '@/redux/actions/action';
+import { UserLogin, AddCartItem, DeleteCartItem } from '@/redux/actions/action';
 import { RootState } from '@/redux/reducer/rootReducer';
 
 import { getSearchProducts } from '@/services/productService';
 import { fetchAccount, userLogout } from '@/services/userService';
-import { fetchCartItem } from '@/services/cartItemService';
+import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { useImmer } from 'use-immer';
+
 interface IAccount {
     id: number
     username: string
@@ -299,6 +300,20 @@ const Header = () => {
         navigate("/product-detail", { state: { product_id: product_id } });
     }
 
+    const handleDeleteCartItem = async (id: number) => {
+
+        let result = await deleteCartItem(id);
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            dispatch(DeleteCartItem({ id: id }));
+        }
+    }
+
+    React.useEffect(() => {
+        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        setCartItemTotal(cartItemValueSum);
+    }, [cartItemList]);
+
     React.useEffect(() => {
         fetchAccountInfo();
     }, []);
@@ -368,7 +383,7 @@ const Header = () => {
                             <div className='count absolute right-[-5px] top-[16px]'>2</div>
                         </div>
                         <div className='shopping-cart relative z-50' onMouseEnter={() => setShowMiniShoppingCart(true)}>
-                            <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")}/>
+                            <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")} />
                             {cartItemCount > 0 &&
                                 <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
                             }
@@ -393,13 +408,14 @@ const Header = () => {
                                                                     :
                                                                     <PiImageThin className="w-12 h-12 cursor-pointer" />
                                                                 }
-                                                                <div className='flex items-center'>
+                                                                <div className='flex items-center justify-between w-full'>
                                                                     <div>
                                                                         <div
                                                                             className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
-                                                                                handleProductDetailNavigation(item.product_info.id)}
+                                                                                handleProductDetailNavigation(item.product_info.id)
+                                                                            }
                                                                             }
                                                                         >
                                                                             {item.product_info.name}
@@ -410,7 +426,7 @@ const Header = () => {
                                                                             <span>{CurrencyFormat(item.price)}</span>
                                                                         </div>
                                                                     </div>
-                                                                    <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer'>&#128473;</div>
+                                                                    <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer' onClick={() => handleDeleteCartItem(+item.id)}>&#128473;</div>
                                                                 </div>
 
                                                             </div>

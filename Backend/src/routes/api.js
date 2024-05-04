@@ -36,6 +36,9 @@ const ApiRoute = (app) => {
     router.put('/product',upload.single('image'),productController.handleUpdateProductImage);
 
     router.get('/cart-item', cartItemController.getQuickCartItems);
+    router.post('/cart-item', cartItemController.addCartItem);
+    router.put('/cart-item', cartItemController.updateCartItem);
+    router.delete('/cart-item/:id', cartItemController.deleteCartItem);
 
     return app.use('/api', router);
 }

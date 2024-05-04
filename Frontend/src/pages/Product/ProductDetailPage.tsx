@@ -38,8 +38,9 @@ import Modal from "@/components/Modal";
 import { successToast1 } from "@/components/Toast/Toast";
 import Rating from "@/components/Rating";
 import { getProductDetailInfo } from "@/services/productService";
-
+import { LiaCartPlusSolid } from "react-icons/lia";
 import { dateFormat } from "@/utils/dateFormat";
+import classNames from "classnames";
 interface IProductActive {
     id: number
     name: string
@@ -92,6 +93,12 @@ interface IProductDetail {
     category: ICategoryActive
 }
 
+interface ISelectType {
+    id: number
+    label: string
+    select: boolean
+}
+
 const ProductDetailPage = () => {
 
     const navigate = useNavigate();
@@ -100,6 +107,9 @@ const ProductDetailPage = () => {
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
     const [productAmount, setProductAmount] = React.useState<number>(0);
+
+    const [colors, setColors] = useImmer<ISelectType[]>([]);
+    const [sizes, setSizes] = useImmer<ISelectType[]>([]);
 
     const [productDetailInfo, setProductDetailInfo] = useImmer<IProductDetail>({
         id: 0,
@@ -191,6 +201,23 @@ const ProductDetailPage = () => {
 
     const [ratingFilter, setRatingFilter] = React.useState<number>(0);
 
+    const [selectTypeNotice, setSelectTypeNotice] = React.useState<boolean>(false);
+
+    const selectTypeNoticeClassname = classNames(
+        "w-full p-4",
+        {
+            'bg-red-100': selectTypeNotice,
+        }
+    );
+
+    const selectProductTypeClassname = (IsSelected: boolean) => classNames(
+        "px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer",
+        {
+            'border-red-500 text-red-500': IsSelected,
+            'bg-white': !IsSelected,
+        }
+    );
+
     const handleProductAmount = (num: any) => {
         if (!isNaN(num) && num > 0) {
             setAmount(num);
@@ -210,17 +237,68 @@ const ProductDetailPage = () => {
     }
 
     const hanldeFavoriteItem = () => {
-        successToast1("Thêm vào sản phẩm yêu thích thành công");
+        successToast1("Thêm vào sản phẩm yêu thích !");
     }
 
+    const handleSelectProductType = (id: number, type: string) => {
+        if (type === "COLORS") {
+            setColors(draft => {
+                draft.forEach(item => {
+                    if (item.id === +id) {
+                        item.select = !item.select;
+                    } else {
+                        item.select = false;
+                    }
+                })
+            })
+        }
+
+        if (type === "SIZES") {
+            setSizes(draft => {
+                draft.forEach(item => {
+                    if (item.id === +id) {
+                        item.select = !item.select;
+                    } else {
+                        item.select = false;
+                    }
+                })
+            })
+        }
+    }
+
+    React.useEffect(() => {
+        if (selectTypeNotice) {
+            let selectColor = colors.some(item => item.select === true);
+            let selectSize = sizes.some(item => item.select === true);
+            if (selectColor && selectSize) {
+                setSelectTypeNotice(false);
+            }
+        }
+    }, [colors, sizes]);
+
     const hanldeAddShoppingCart = () => {
-        successToast1("Thêm vào giỏ hàng thành công");
+        if (colors.length > 0) {
+            let IsSelected = colors.some(item => item.select === true);
+            if (!IsSelected) {
+                setSelectTypeNotice(true);
+                return;
+            }
+        }
+        if (sizes.length > 0) {
+            let IsSelected = sizes.some(item => item.select === true);
+            if (!IsSelected) {
+                setSelectTypeNotice(true);
+                return;
+            }
+        }
+        setSelectTypeNotice(false);
+        successToast1("Thêm vào giỏ hàng !");
     }
 
     const fetchProductsBySubCategory = async (product_id: number) => {
         let response: IProductDetail = await getProductDetailInfo(+product_id);
         if (response) {
-            //console.log(response);
+
             setProductDetailInfo(draft => {
                 draft.id = response.id;
                 draft.name = response.name;
@@ -239,6 +317,29 @@ const ProductDetailPage = () => {
             })
 
             setProductAmount(response.inventory_count);
+
+            if (response.product_type_group.color.length > 0) {
+                let result: ISelectType[] = response.product_type_group.color.map((item, index) => {
+                    return {
+                        id: +index,
+                        label: item,
+                        select: false
+                    }
+                });
+                setColors(result);
+            }
+
+            if (response.product_type_group.size.length > 0) {
+                let result: ISelectType[] = response.product_type_group.size.map((item, index) => {
+                    return {
+                        id: +index,
+                        label: item,
+                        select: false
+                    }
+                });
+                setSizes(result);
+            }
+
             setActiveCategory({
                 ...activeCategory, id: response.category.id, title: response.category.title
             });
@@ -265,7 +366,6 @@ const ProductDetailPage = () => {
             }
         })
     }
-
 
     const swiperSlides = () => {
         return (
@@ -970,71 +1070,78 @@ const ProductDetailPage = () => {
                                         <span>Đã bán 2k2</span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-x-2">
-                                    <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
-                                    <div className="product__price text-xl text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
+                                <div className="flex items-center gap-x-3">
+                                    <div className="product__price text-3xl font-medium my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
+                                    <div className="product__price text-lg text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
                                 </div>
                                 <div className="shop flex items-center gap-x-4">
                                     <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
                                     <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
                                 </div>
                                 <div className="border-t border-gray-300 w-full my-4"></div>
-                                <div className="product__type-selection">
-                                    <div className="group">
-                                        {productDetailInfo.product_type_group.color &&
-                                            <div>
-                                                <div className="text-gray-500 mb-2">Màu Sắc</div>
-                                                <div className="flex gap-x-2">
-                                                    {
-                                                        productDetailInfo.product_type_group.color && productDetailInfo.product_type_group.color.length > 0 &&
-                                                        productDetailInfo.product_type_group.color.map((item, index) => {
-                                                            return (
-                                                                <div
-                                                                    key={`color-item-${index}`}
-                                                                    className="px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer"
-                                                                >
-                                                                    {item}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
+                                <div className={selectTypeNoticeClassname}>
+                                    <div className="product__type-selection">
+                                        <div className="group">
+                                            {colors &&
+                                                <div>
+                                                    <div className="text-gray-500 mb-2">Màu Sắc</div>
+                                                    <div className="flex gap-x-2">
+                                                        {
+                                                            colors && colors.length > 0 &&
+                                                            colors.map((item, index) => {
+                                                                return (
+                                                                    <div
+                                                                        key={`color-item-${item.id}`}
+                                                                        className={selectProductTypeClassname(item.select)}
+                                                                        onClick={() => handleSelectProductType(item.id, "COLORS")}
+                                                                    >
+                                                                        {item.label}
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
-                                        {productDetailInfo.product_type_group.size &&
-                                            <div className="mt-4 mb-6">
-                                                <div className="text-gray-500 mb-2">Size</div>
-                                                <div className="flex gap-x-2">
-                                                    {
-                                                        productDetailInfo.product_type_group.size && productDetailInfo.product_type_group.size.length > 0 &&
-                                                        productDetailInfo.product_type_group.size.map((item, index) => {
-                                                            return (
-                                                                <div
-                                                                    key={`color-item-${index}`}
-                                                                    className="px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer"
-                                                                >
-                                                                    {item}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
+                                            }
+                                            {sizes &&
+                                                <div className="mt-4 mb-6">
+                                                    <div className="text-gray-500 mb-2">Size</div>
+                                                    <div className="flex gap-x-2">
+                                                        {
+                                                            sizes && sizes.length > 0 &&
+                                                            sizes.map((item, index) => {
+                                                                return (
+                                                                    <div
+                                                                        key={`size-item-${item.id}`}
+                                                                        className={selectProductTypeClassname(item.select)}
+                                                                        onClick={() => handleSelectProductType(item.id, "SIZES")}
+                                                                    >
+                                                                        {item.label}
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        }
+                                            }
 
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="flex items-center gap-x-4 mt-6">
-                                    <div className="mb-1">Số lượng</div>
-                                    <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
-                                        <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
-                                        <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
-                                        <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                    <div className="flex items-center gap-x-4 mt-6">
+                                        <div className="mb-1">Số lượng</div>
+                                        <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-white">
+                                            <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                            <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(+e.target.value)} />
+                                            <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                        </div>
+                                        <div className="text-gray-500">{productAmount} sản phẩm có sẵn</div>
                                     </div>
-                                    <div className="text-gray-500">{productAmount} sản phẩm có sẵn</div>
+                                    {
+                                        selectTypeNotice && <div className="text-red-500 mt-4">Vui lòng chọn phân loại hàng</div>
+                                    }
                                 </div>
-                                <div className="flex items-center gap-x-4 mt-4">
-                                    <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
+                                <div className="flex items-center gap-x-4 mt-6 mb-4">
+                                    <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer flex items-center justify-center gap-x-2" onClick={() => hanldeAddShoppingCart()}><LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng</div>
                                     <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
                                 </div>
                             </div>

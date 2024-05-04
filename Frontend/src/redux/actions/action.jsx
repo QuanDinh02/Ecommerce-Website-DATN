@@ -1,7 +1,7 @@
 import { 
     INCREMENT, DECREMENT, 
     USER_LOGIN, USER_LOGOUT,
-    ADD_CART_ITEM, DELETE_CART_ITEM 
+    ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM 
 } from './type';
 
 export const increaseCounter = () => {
@@ -37,8 +37,17 @@ export const AddCartItem = (data) => {
     };
 };
 
+export const UpdateCartItem = (data) => {
+    return {
+        type: UPDATE_CART_ITEM,
+        cart_item_id: +data.id,
+        cart_item_quantity: +data.quantity
+    };
+};
+
 export const DeleteCartItem = (data) => {
     return {
-        type: DELETE_CART_ITEM
+        type: DELETE_CART_ITEM,
+        cart_item_id: +data.id
     };
 };

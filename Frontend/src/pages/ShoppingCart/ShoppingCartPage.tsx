@@ -2,12 +2,8 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { VscTrash } from "react-icons/vsc";
-import Item7 from '../../assets/img/homepage/item7.svg';
-import Item8 from '../../assets/img/homepage/item8.svg';
-import Item9 from '../../assets/img/homepage/item9.svg';
-import { useImmer } from "use-immer";
 import { FiMinus, FiPlus } from "react-icons/fi";
-import { successToast1 } from "@/components/Toast/Toast";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from '@/redux/reducer/rootReducer';
@@ -16,6 +12,9 @@ import { TailSpin } from "react-loader-spinner";
 import _ from 'lodash';
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
+import { useDispatch } from "react-redux";
+import { DeleteCartItem, UpdateCartItem } from "@/redux/actions/action";
+import { deleteCartItem, updateCartItem } from "@/services/cartItemService";
 interface ICartItemInfo {
     id: number
     name: string
@@ -44,6 +43,8 @@ const tableHeaders = [
 const ShoppingCartPage = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
     const cartItemList: ICartItem[] = useSelector<RootState, ICartItem[]>(state => state.cartItem.cart_item_list);
@@ -55,51 +56,42 @@ const ShoppingCartPage = () => {
     const [discountValue, setDiscountValue] = React.useState<number>(0);
 
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
+    const [deleteCartItemId, setDeleteCartItemId] = React.useState<number>(0);
 
-    const [cartItems, setCartItems] = useImmer([
-        {
-            id: 1,
-            image: Item7,
-            name: "Xbox One Wireless Controller Black Color",
-            shop_name: "Shop Pro",
-            price: 199000,
-            amount: 1
-        },
-        {
-            id: 2,
-            image: Item8,
-            name: "Sound Intone I65 Earphone White Version",
-            shop_name: "Shop Pro",
-            price: 199000,
-            amount: 1
-        },
-        {
-            id: 3,
-            image: Item9,
-            name: "Samsung Gear VR Virtual Reality Headset",
-            shop_name: "Shop Pro",
-            price: 199000,
-            amount: 1
+    const handleDeleteCartItem = async () => {
+        let delete_id = deleteCartItemId;
+        let result = await deleteCartItem(delete_id);
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            dispatch(DeleteCartItem({ id: delete_id }));
+            setDeleteCartItemId(0);
+            setShowDeleteBox(false);
         }
-    ]);
-
-    const handleProductAmount = (num: any, id: number) => {
-        setCartItems(draft => {
-            draft.forEach(item => {
-                if (item.id === id && !isNaN(num) && num > 0) {
-                    item.amount = +num;
-                }
-            })
-        })
-
-    }
-
-    const handleDeleteCartItem = (cart_item_id: number) => {
-        successToast1("Xóa thành công");
     }
 
     const handleProductDetailNavigation = (product_id: number) => {
         navigate("/product-detail", { state: { product_id: product_id } });
+    }
+
+    const handleUpdateCartItem = async (id: number, quantity: number) => {
+        if (quantity > 0) {
+            let result = await updateCartItem({
+                id: id,
+                quantity: quantity
+            });
+
+            if (result) {
+                if (result.EC === 0) {
+                    successToast1(result.EM);
+                    dispatch(UpdateCartItem({
+                        id: id,
+                        quantity: quantity
+                    }))
+                } else {
+                    errorToast1(result.EM);
+                }
+            }
+        }
     }
 
     React.useEffect(() => {
@@ -117,6 +109,12 @@ const ShoppingCartPage = () => {
         }, 1000);
 
     }, []);
+
+    React.useEffect(() => {
+        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        setCartItemTotal(cartItemValueSum);
+        setOrderCost(cartItemValueSum + transportedFee);
+    }, [cartItemList]);
 
     return (
 
@@ -166,11 +164,13 @@ const ShoppingCartPage = () => {
                                                             cartItemList.map((item, index) => {
                                                                 return (
                                                                     <tr key={`cart-item-${index}`} className="border-b border-gray-300">
-                                                                        {item.product_info.image ?
-                                                                            <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
-                                                                            :
-                                                                            <PiImageThin className="w-32 h-32 cursor-pointer" />
-                                                                        }
+                                                                        <td>
+                                                                            {item.product_info.image ?
+                                                                                <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
+                                                                                :
+                                                                                <PiImageThin className="w-32 h-32 cursor-pointer" />
+                                                                            }
+                                                                        </td>
                                                                         <td className="py-3 px-2">
                                                                             <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
                                                                             <div className="flex items-center gap-x-2 text-sm mt-1 mb-4">
@@ -182,13 +182,16 @@ const ShoppingCartPage = () => {
                                                                         <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
                                                                         <td className="py-3 px-2">
                                                                             <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
-                                                                                <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(item.quantity - 1, item.id)} />
-                                                                                <input type="text" className="w-1/2 text-center outline-none select-none" value={item.quantity} onChange={(e) => handleProductAmount(e.target.value, item.id)} />
-                                                                                <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(item.quantity + 1, item.id)} />
+                                                                                <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity - 1)} />
+                                                                                <input type="text" className="w-1/2 text-center outline-none select-none" value={item.quantity} onChange={(e) => handleUpdateCartItem(item.id, +e.target.value)} />
+                                                                                <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity + 1)} />
                                                                             </div>
                                                                         </td>
                                                                         <td className="py-3 px-2">{CurrencyFormat(item.price * item.quantity)}</td>
-                                                                        <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => setShowDeleteBox(true)} /></td>
+                                                                        <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
+                                                                            setDeleteCartItemId(item.id);
+                                                                            setShowDeleteBox(true);
+                                                                        }} /></td>
                                                                     </tr>
                                                                 )
                                                             })
@@ -243,7 +246,7 @@ const ShoppingCartPage = () => {
                     <div className="text-xl mt-2">Bạn muốn xóa sản phẩm này khỏi giỏ hàng ?</div>
                     <div className="flex items-center justify-end gap-x-2">
                         <Button styles="rounded-[4px] px-8 py-2 text-black bg-gray-200 hover:bg-gray-300 cursor-pointer" OnClick={() => setShowDeleteBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer">Xóa</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer" OnClick={() => handleDeleteCartItem()}>Xóa</Button>
                     </div>
                 </div>
             </Modal>
