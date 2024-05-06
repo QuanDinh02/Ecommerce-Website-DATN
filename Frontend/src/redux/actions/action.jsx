@@ -1,7 +1,8 @@
 import { 
     INCREMENT, DECREMENT, 
     USER_LOGIN, USER_LOGOUT,
-    ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM 
+    ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM,
+    ADD_WISHLIST_ITEM, DELETE_WISHLIST_ITEM
 } from './type';
 
 export const increaseCounter = () => {
@@ -49,5 +50,20 @@ export const DeleteCartItem = (data) => {
     return {
         type: DELETE_CART_ITEM,
         cart_item_id: +data.id
+    };
+};
+
+export const AddWishListItem = (data) => {
+    return {
+        type: ADD_WISHLIST_ITEM,
+        wish_list_item: data.wish_list_item,
+        wish_list_count: data.wish_list_count
+    };
+};
+
+export const DeleteWishListItem = (data) => {
+    return {
+        type: DELETE_WISHLIST_ITEM,
+        wish_list_item_id: data.id
     };
 };

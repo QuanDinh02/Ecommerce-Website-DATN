@@ -5,6 +5,7 @@ import categoryController from '../controller/categoryController';
 import productController from '../controller/productController';
 import subCategoryController from '../controller/subCategoryController';
 import cartItemController from '../controller/cartItemController';
+import wishListController from '../controller/wishListController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
@@ -39,6 +40,8 @@ const ApiRoute = (app) => {
     router.post('/cart-item', cartItemController.addCartItem);
     router.put('/cart-item', cartItemController.updateCartItem);
     router.delete('/cart-item/:id', cartItemController.deleteCartItem);
+
+    router.get('/wish-list', wishListController.getWishListByCustomer);
 
     return app.use('/api', router);
 }

@@ -21,14 +21,14 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { successToast1 } from './Toast/Toast';
 
-import { UserLogin, AddCartItem, DeleteCartItem } from '@/redux/actions/action';
+import { UserLogin, AddCartItem, DeleteCartItem, AddWishListItem } from '@/redux/actions/action';
 import { RootState } from '@/redux/reducer/rootReducer';
 
 import { getSearchProducts } from '@/services/productService';
 import { fetchAccount, userLogout } from '@/services/userService';
 import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { useImmer } from 'use-immer';
-
+import { fetchWishList } from "@/services/wishListService";
 interface IAccount {
     customer_id: number
     username: string
@@ -61,6 +61,24 @@ interface ICartItem {
     shop_info: ICartItemShopInfo
 }
 
+interface IProductInfo {
+    id: number
+    name: string
+    image: string
+}
+
+interface IShopInfo {
+    id: number
+    name: string
+}
+
+interface IWishList {
+    id: number
+    price: number
+    product_info: IProductInfo
+    shop_info: IShopInfo
+}
+
 const Header = () => {
 
     const navigate = useNavigate();
@@ -72,6 +90,8 @@ const Header = () => {
 
     const cartItemList: ICartItem[] = useSelector<RootState, ICartItem[]>(state => state.cartItem.cart_item_list);
     const cartItemCount: number = useSelector<RootState, number>(state => state.cartItem.cart_item_count);
+
+    const wishListCount: number = useSelector<RootState, number>(state => state.wishList.wish_list_count);
 
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
@@ -281,6 +301,17 @@ const Header = () => {
                     setCartItemTotal(cartItemValueSum);
                 }
 
+                let wishListData: any = await fetchWishList(userData.customer_id);
+                if (wishListData && !_.isEmpty(wishListData.DT)) {
+                    let wish_list_data: IWishList[] = wishListData.DT;
+                    let count = wish_list_data.length;
+
+                    dispatch(AddWishListItem({
+                        wish_list_item: wish_list_data,
+                        wish_list_count: count
+                    }));
+                }
+
             } else {
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
@@ -379,7 +410,7 @@ const Header = () => {
                     <div className="navigation">
                         <div className='favorite-items relative' onClick={() => navigate("/favorite-products")}>
                             <BsHeart className="icon" />
-                            <div className='count absolute right-[-5px] top-[16px]'>2</div>
+                            <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
                         </div>
                         <div className='shopping-cart relative z-50' onMouseEnter={() => {
                             setShowMiniShoppingCart(true);
