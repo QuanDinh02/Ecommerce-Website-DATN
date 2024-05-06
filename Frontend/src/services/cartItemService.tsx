@@ -1,7 +1,7 @@
 import axios from '../customization/axiosCustomization';
 import { APIResponse, LIMIT } from './common';
 
-interface INewCartItem {
+export interface INewCartItem {
     quantity: number
     customerID: number
     productTypeID: number

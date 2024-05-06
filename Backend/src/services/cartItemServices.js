@@ -97,10 +97,11 @@ const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
         if (cartItemList.length > 0) {
 
             let cart_item = cartItemList[0];
-            let update_quantity = cart_item.quantity + 1;
+            let update_quantity = cart_item.quantity + quantity;
 
             await db.CartItem.update({
-                quantity: update_quantity
+                quantity: update_quantity,
+                updatedAt: new Date()
             }, {
                 where: {
                     id: +cart_item.id
@@ -110,7 +111,7 @@ const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
             return {
                 EC: 0,
                 DT: '',
-                EM: 'Update cart item successfully!'
+                EM: 'Đã thêm vào giỏ hàng !'
             }
         } else {
             await db.CartItem.create({
@@ -124,7 +125,7 @@ const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
             return {
                 EC: 0,
                 DT: '',
-                EM: 'Add cart item successfully !'
+                EM: 'Đã thêm vào giỏ hàng !'
             }
         }
 

@@ -31,12 +31,12 @@ const cartItemReducer = (state = INITIAL_STATE, action) => {
             return {
                 ...state,
                 cart_item_list: [...action.cart_item],
-                cart_item_count: state.cart_item_count + action.cart_item_count
+                cart_item_count: action.cart_item_count
             };
 
         case UPDATE_CART_ITEM:
             let updateCartItemList = state.cart_item_list.map(item => {
-                if(item.id === +action.cart_item_id) {
+                if (item.id === +action.cart_item_id) {
                     return {
                         ...item, quantity: action.cart_item_quantity
                     }

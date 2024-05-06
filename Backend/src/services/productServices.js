@@ -8,12 +8,25 @@ const getProductDetail = async (product_id) => {
         let productInfo = await db.Product.findOne({
             raw: true,
             nest: true,
-            attributes: ['id', 'name','summary'],
-            include: {
-                model: db.SubCategory,
-                attributes: ['id', 'title'],
-                through: { attributes: [] },
-            },
+            attributes: ['id', 'name', 'summary'],
+            include: [
+                {
+                    raw: true,
+                    nest: true,
+                    model: db.SubCategory,
+                    attributes: ['id', 'title'],
+                    through: { attributes: [] },
+                    include: {
+                        raw: true,
+                        model: db.Category,
+                        attributes: ['id', 'title'],
+                    }
+                },
+                {
+                    model: db.Seller,
+                    attributes: ['id', 'shopName'],
+                },
+            ],
             where: {
                 id: {
                     [Op.eq]: product_id,
@@ -22,16 +35,10 @@ const getProductDetail = async (product_id) => {
         });
 
         let sub_category = productInfo.SubCategories;
+        let category = sub_category.Category;
+        let shopInfo = productInfo.Seller;
 
-        let category = await db.Category.findOne({
-            raw: true,
-            attributes: ['id', 'title'],
-            where: {
-                id: {
-                    [Op.eq]: sub_category.id,
-                },
-            },
-        });
+        delete sub_category.Category;
 
         let productTypesList = await db.ProductType.findAll({
             raw: true,
@@ -54,8 +61,8 @@ const getProductDetail = async (product_id) => {
             }
         });
 
-        const colors = _.chain(productTypesList).map('color').uniq().value();
-        const sizes = _.chain(productTypesList).map('size').uniq().value();
+        let colors = _.chain(productTypesList).map('color').uniq().value();
+        let sizes = _.chain(productTypesList).map('size').uniq().value();
 
         let { currentPrice } = _.minBy(productTypesList, (o) => {
             return o.currentPrice;
@@ -116,7 +123,7 @@ const getProductDetail = async (product_id) => {
         commentList.forEach(item => {
             allProductsReview = [...allProductsReview, ...item.reviews]
         });
-        
+
         let comment_count = allProductsReview.length;
         let sum_rating = _.sumBy(allProductsReview, function (o) { return o.rating; });
         let inventoryCount = _.sumBy(productTypesList, function (o) { return o.quantity; });
@@ -134,11 +141,15 @@ const getProductDetail = async (product_id) => {
             reviews: allProductsReview,
             product_type_list: productTypesList,
             product_type_group: {
-                color: colors,
-                size: sizes
+                color: colors.length === 1 && colors[0] === '' ? [] : colors,
+                size: sizes.length === 1 && sizes[0] === '' ? [] : sizes
             },
             sub_category: sub_category,
-            category: category
+            category: category,
+            shop_info: {
+                id: shopInfo.id,
+                name: shopInfo.shopName
+            }
         }
 
         return {
@@ -180,7 +191,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
             let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
                 raw: true,
                 nest: true,
-                attributes: ['id','title'],
+                attributes: ['id', 'title'],
                 include: {
                     model: db.Product,
                     attributes: ['id', 'name'],
@@ -212,7 +223,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     name: item.Products.name,
                     sub_category: sub_category
                 }
-                
+
                 if (product.id != null) {
                     productListFinal = [...productListFinal, product];
                 }

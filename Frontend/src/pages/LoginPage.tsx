@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Button from '@/components/Button';
 import { useImmer } from 'use-immer';
 import { useDispatch, useSelector } from "react-redux";
@@ -11,9 +11,10 @@ import Google_Icon from '../assets/img/login_page/google_icon.svg';
 import { IoCheckmark } from "react-icons/io5";
 import { PiEyeLight, PiEyeSlash } from "react-icons/pi";
 import { FaSpinner } from "react-icons/fa";
-import { UserLogin } from '@/redux/actions/action';
+import { AddCartItem, UserLogin } from '@/redux/actions/action';
 import { successToast1 } from '@/components/Toast/Toast';
 import { fetchAccount, userLogin } from '@/services/userService';
+import { fetchCartItem } from '@/services/cartItemService';
 
 enum PATH {
     Register = "/register",
@@ -31,6 +32,26 @@ interface APIReponse {
     EM: string
 }
 
+interface ICartItemInfo {
+    id: number
+    name: string
+    image: string
+}
+
+interface ICartItemShopInfo {
+    id: number
+    name: string
+}
+interface ICartItem {
+    id: number
+    quantity: number
+    price: number
+    color: string
+    size: string
+    product_info: ICartItemInfo
+    shop_info: ICartItemShopInfo
+}
+
 const LoginPage = () => {
 
     const dispatch = useDispatch();
@@ -46,6 +67,7 @@ const LoginPage = () => {
     const [user, setUser] = useImmer(USER);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     const redirectPage = (path: string) => {
         navigate(path);
@@ -100,9 +122,10 @@ const LoginPage = () => {
                     setShowLoadingIcon(false);
 
                     setTimeout(() => {
-                        dispatch(UserLogin(data));
+                        fetchAccountInfo();
                         window.location.reload();
-                        navigate('/');
+                        //navigate('/');
+                        navigate(-1);
                     }, 2000);
                 }
             }
@@ -112,18 +135,43 @@ const LoginPage = () => {
     const fetchAccountInfo = async () => {
         let result: any = await fetchAccount();
         if (result && !_.isEmpty(result.DT)) {
+
             let userData = result.DT;
-            let data = {
-                isAuthenticated: userData.isAuthenticated,
-                account: {
-                    id: userData.id,
-                    username: userData.username,
-                    role: userData.role
+
+            if (userData.role === "customer") {
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role,
+                        customer_id: userData.customer_id
+                    }
                 }
-            }
-            dispatch(UserLogin(data));
-            if (userData.isAuthenticated === true) {
-                navigate('/');
+
+                dispatch(UserLogin(data));
+
+                let cartItemsData: any = await fetchCartItem(userData.customer_id);
+                if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+                    let cart_item_data: ICartItem[] = cartItemsData.DT;
+                    let count = cart_item_data.length;
+
+                    dispatch(AddCartItem({
+                        cart_items: cart_item_data,
+                        count: count
+                    }));
+                }
+
+            } else {
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role
+                    }
+                }
+                dispatch(UserLogin(data));
             }
         }
     }

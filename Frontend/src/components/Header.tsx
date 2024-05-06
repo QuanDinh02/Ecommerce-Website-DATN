@@ -30,7 +30,7 @@ import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { useImmer } from 'use-immer';
 
 interface IAccount {
-    id: number
+    customer_id: number
     username: string
     role: string
 }
@@ -87,7 +87,6 @@ const Header = () => {
     const [productSearchRecommend, setProductSearchRecommend] = React.useState("");
     const [currentSelect, setCurrentSelect] = React.useState(-1);
 
-    const [cartItems, setCartItems] = useImmer<ICartItem[]>([]);
     const [cartItemTotal, setCartItemTotal] = React.useState<number>(0);
 
     const fProductSearch = React.useCallback(_.debounce(async (value) => {
@@ -382,7 +381,10 @@ const Header = () => {
                             <BsHeart className="icon" />
                             <div className='count absolute right-[-5px] top-[16px]'>2</div>
                         </div>
-                        <div className='shopping-cart relative z-50' onMouseEnter={() => setShowMiniShoppingCart(true)}>
+                        <div className='shopping-cart relative z-50' onMouseEnter={() => {
+                            setShowMiniShoppingCart(true);
+                            setShowInfoSettingBox(false);
+                        }}>
                             <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")} />
                             {cartItemCount > 0 &&
                                 <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
@@ -392,7 +394,6 @@ const Header = () => {
                                 <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
                                     onMouseEnter={() => {
                                         setShowMiniShoppingCart(true)
-                                        setShowInfoSettingBox(false)
                                     }}
                                     onMouseLeave={() => setShowMiniShoppingCart(false)}
                                 >
