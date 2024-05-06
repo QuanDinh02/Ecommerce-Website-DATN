@@ -19,6 +19,9 @@ const getWishListByCustomer = async (customer_id) => {
                     attributes: ['id', 'shopName'],
                 },
             },
+            order: [
+                ['id', 'DESC'],
+            ],
             where: {
                 customerID: {
                     [Op.eq]: customer_id,
@@ -84,54 +87,75 @@ const getWishListByCustomer = async (customer_id) => {
     }
 }
 
-const addWishListItem = async (quantity, customerID, productTypeID) => {
+const addWishListItem = async (productID, customerID) => {
     try {
 
-        let cartItemList = await db.CartItem.findAll({
+        let wishListItem = await db.WishList.findOne({
             raw: true,
-            attributes: ['id', 'quantity'],
+            attributes: ['id'],
             where: {
                 [Op.and]: [
                     { customerID: customerID },
-                    { productTypeID: productTypeID }
+                    { productID: productID }
                 ],
             },
         });
 
-        if (cartItemList.length > 0) {
-
-            let cart_item = cartItemList[0];
-            let update_quantity = cart_item.quantity + quantity;
-
-            await db.CartItem.update({
-                quantity: update_quantity,
-                updatedAt: new Date()
-            }, {
-                where: {
-                    id: +cart_item.id
-                }
-            });
+        if (wishListItem) {
 
             return {
                 EC: 0,
                 DT: '',
-                EM: 'Đã thêm vào giỏ hàng !'
+                EM: 'Đã thêm sản phẩm yêu thích !'
             }
         } else {
-            await db.CartItem.create({
-                quantity: quantity,
+            await db.WishList.create({
+                productID: productID,
                 customerID: customerID,
-                productTypeID: productTypeID,
-                createdAt: new Date(),
-                updatedAt: null,
+                addedAt: new Date(),
             })
 
             return {
                 EC: 0,
                 DT: '',
-                EM: 'Đã thêm vào giỏ hàng !'
+                EM: 'Đã thêm sản phẩm yêu thích !'
             }
         }
+
+        // if (cartItemList.length > 0) {
+
+        //     let cart_item = cartItemList[0];
+        //     let update_quantity = cart_item.quantity + quantity;
+
+        //     await db.CartItem.update({
+        //         quantity: update_quantity,
+        //         updatedAt: new Date()
+        //     }, {
+        //         where: {
+        //             id: +cart_item.id
+        //         }
+        //     });
+
+        //     return {
+        //         EC: 0,
+        //         DT: '',
+        //         EM: 'Đã thêm vào giỏ hàng !'
+        //     }
+        // } else {
+        // await db.CartItem.create({
+        //     quantity: quantity,
+        //     customerID: customerID,
+        //     productTypeID: productTypeID,
+        //     createdAt: new Date(),
+        //     updatedAt: null,
+        // })
+
+        //     return {
+        //         EC: 0,
+        //         DT: '',
+        //         EM: 'Đã thêm vào giỏ hàng !'
+        //     }
+        // }
 
     } catch (error) {
         console.log(error);
@@ -146,7 +170,7 @@ const addWishListItem = async (quantity, customerID, productTypeID) => {
 const deleteWishListItem = async (id) => {
     try {
 
-        let cart_item = await db.CartItem.findOne({
+        let wish_list_item = await db.WishList.findOne({
             raw: true,
             attributes: ['id'],
             where: {
@@ -156,14 +180,14 @@ const deleteWishListItem = async (id) => {
             }
         });
 
-        if (_.isEmpty(cart_item)) {
+        if (_.isEmpty(wish_list_item)) {
             return {
                 EC: -1,
                 DT: '',
-                EM: 'Cart item is not existed !'
+                EM: 'Wish List item is not existed !'
             }
         } else {
-            await db.CartItem.destroy({
+            await db.WishList.destroy({
                 where: {
                     id: +id,
                 },
@@ -172,7 +196,7 @@ const deleteWishListItem = async (id) => {
             return {
                 EC: 0,
                 DT: '',
-                EM: 'Xóa sản phẩm khỏi giỏ hàng !'
+                EM: 'Xóa sản phẩm yêu thích !'
             }
         }
 

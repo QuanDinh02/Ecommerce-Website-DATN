@@ -48,98 +48,15 @@ import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItem
 import _ from "lodash";
 import Button from "@/components/Button";
 import { useDispatch } from "react-redux";
-import { AddCartItem } from "@/redux/actions/action";
+import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
 import { TailSpin } from "react-loader-spinner";
-interface IProductActive {
-    id: number
-    name: string
-}
-interface ISubCategoryActive {
-    id: number
-    title: string
-}
-interface ICategoryActive {
-    id: number
-    title: string
-}
-
-interface IProductReview {
-    id: number
-    comment: string
-    rating: number
-    createdAt: Date
-    customer_name: string
-}
-
-interface IProductType {
-    id: number
-    type: string
-    typeName: string
-    quantity: number
-    size: string
-    color: string
-    currentPrice: number
-    price: number
-}
-
-interface IProductTypeGroup {
-    color: string[]
-    size: string[]
-}
-
-interface IShop {
-    id: number
-    name: string
-}
-interface IProductDetail {
-    id: number
-    name: string
-    currentPrice: number
-    price: number
-    description: string
-    comment_count: number
-    rating_average: number
-    product_image: string
-    inventory_count: number
-    reviews: IProductReview[]
-    product_type_list: IProductType[]
-    product_type_group: IProductTypeGroup
-    sub_category: ISubCategoryActive
-    category: ICategoryActive
-    shop_info: IShop
-}
-
-interface ISelectType {
-    id: number
-    label: string
-    select: boolean
-}
-
-interface IAccount {
-    customer_id: number
-    username: string
-    role: string
-}
-
-interface ICartItemInfo {
-    id: number
-    name: string
-    image: string
-}
-
-interface ICartItemShopInfo {
-    id: number
-    name: string
-}
-interface ICartItem {
-    id: number
-    quantity: number
-    price: number
-    color: string
-    size: string
-    product_info: ICartItemInfo
-    shop_info: ICartItemShopInfo
-}
+import {
+    IProductActive, ISubCategoryActive, ICategoryActive,
+    IProductType, IProductDetail, ISelectType,
+    IAccount, ICartItem
+} from "./ProductDetailPage_types";
+import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
+import { createWishListItem, fetchWishList } from "@/services/wishListService";
 
 const ProductDetailPage = () => {
 
@@ -360,6 +277,19 @@ const ProductDetailPage = () => {
         }
     }
 
+    const refetchWishList = async () => {
+        let wishListData: any = await fetchWishList(account.customer_id);
+        if (wishListData && !_.isEmpty(wishListData.DT)) {
+            let wish_list_data: IWishList[] = wishListData.DT;
+            let count = wish_list_data.length;
+
+            dispatch(AddWishListItem({
+                wish_list_item: wish_list_data,
+                wish_list_count: count
+            }));
+        }
+    }
+
     const hanldeAddShoppingCart = () => {
         if (colors.length > 0) {
             let IsSelected = colors.some(item => item.select === true);
@@ -467,6 +397,19 @@ const ProductDetailPage = () => {
         let result = await createCartItem(data);
         if (result && result.EC === 0) {
             refetchCartItem();
+            successToast1(result.EM);
+        }
+    }
+
+    const handleAddFavouriteItem = async (product_id: number, customer_id: number) => {
+        let data: INewWishListItem = {
+            productID: product_id,
+            customerID: customer_id
+        }
+
+        let result = await createWishListItem(data);
+        if (result && result.EC === 0) {
+            refetchWishList();
             successToast1(result.EM);
         }
     }
@@ -1304,7 +1247,12 @@ const ProductDetailPage = () => {
                                                 >
                                                     <LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng
                                                 </Button>
-                                                <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
+                                                <Button
+                                                    styles="text-gray-600 hover:text-red-500 duration-300 cursor-pointer"
+                                                    OnClick={() => handleAddFavouriteItem(productDetailInfo.id, account.customer_id)}
+                                                >
+                                                    <FaRegHeart className="w-7 h-7" />
+                                                </Button>
                                             </div>
                                         </div>
                                     </div>

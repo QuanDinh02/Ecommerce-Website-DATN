@@ -2,10 +2,6 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { VscTrash } from "react-icons/vsc";
-import Item7 from '../../assets/img/homepage/item7.svg';
-import Item8 from '../../assets/img/homepage/item8.svg';
-import Item9 from '../../assets/img/homepage/item9.svg';
-import { useImmer } from "use-immer";
 import { IoBagHandleOutline } from "react-icons/io5";
 import { successToast1 } from "@/components/Toast/Toast";
 import React from "react";
@@ -16,24 +12,9 @@ import { TailSpin } from "react-loader-spinner";
 import { PiImageThin } from "react-icons/pi";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
-
-interface IProductInfo {
-    id: number
-    name: string
-    image: string
-}
-
-interface IShopInfo {
-    id: number
-    name: string
-}
-
-interface IWishList {
-    id: number
-    price: number
-    product_info: IProductInfo
-    shop_info: IShopInfo
-}
+import { IWishList } from "./FavoriteProductPage_types";
+import { deleteWishListItem } from "@/services/wishListService";
+import { DeleteWishListItem } from "@/redux/actions/action";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -47,38 +28,27 @@ const FavoriteProductPage = () => {
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
 
-    const wishListData: IWishList[] = useSelector<RootState, IWishList[]>(state => state.wishList.wish_list_list);
+    const [deleteWishListId, setDeleteWishListId] = React.useState<number>(0);
 
-    const [cartItems, setCartItems] = useImmer([
-        {
-            id: 1,
-            image: Item7,
-            name: "Xbox One Wireless Controller Black Color",
-            shop_name: "Shop Pro",
-            price: 199000
-        },
-        {
-            id: 2,
-            image: Item8,
-            name: "Sound Intone I65 Earphone White Version",
-            shop_name: "Shop Pro",
-            price: 199000
-        },
-        {
-            id: 3,
-            image: Item9,
-            name: "Samsung Gear VR Virtual Reality Headset",
-            shop_name: "Shop Pro",
-            price: 199000
-        }
-    ]);
+    const wishListData: IWishList[] = useSelector<RootState, IWishList[]>(state => state.wishList.wish_list_list);
 
     const hanldeAddShoppingCart = () => {
         successToast1("Thêm vào giỏ hàng thành công");
     }
 
-    const hanldeRemoveFavoriteItem = () => {
-        successToast1("Xóa thành công");
+    const handleDeleteFavoriteItem = async () => {
+        let delete_id = deleteWishListId;
+        let result = await deleteWishListItem(delete_id);
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            dispatch(DeleteWishListItem({ id: delete_id }));
+            setDeleteWishListId(0);
+            setShowDeleteBox(false);
+        }
+    }
+
+    const handleProductDetailNavigation = (product_id: number) => {
+        navigate("/product-detail", { state: { product_id: product_id } });
     }
 
     React.useEffect(() => {
@@ -134,7 +104,7 @@ const FavoriteProductPage = () => {
                                             {wishListData && wishListData.length > 0 &&
                                                 wishListData.map((item, index) => {
                                                     return (
-                                                        <tr key={`cart-item-${index}`} className="border-b border-gray-300">
+                                                        <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                             <td>
                                                                 {item.product_info.image ?
                                                                     <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
@@ -143,7 +113,10 @@ const FavoriteProductPage = () => {
                                                                 }
                                                             </td>
                                                             <td className="py-3 px-2">
-                                                                <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2">{item.product_info.name}</div>
+                                                                <div
+                                                                    className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2"
+                                                                    onClick={() => handleProductDetailNavigation(+item.product_info.id)}
+                                                                >{item.product_info.name}</div>
                                                                 <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
                                                             </td>
                                                             <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
@@ -156,7 +129,10 @@ const FavoriteProductPage = () => {
                                                                     <span>Thêm vào giỏ hàng</span>
                                                                 </div>
                                                             </td>
-                                                            <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => setShowDeleteBox(true)} /></td>
+                                                            <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
+                                                                setDeleteWishListId(item.id);
+                                                                setShowDeleteBox(true);
+                                                            }} /></td>
                                                         </tr>
                                                     )
                                                 })
@@ -173,7 +149,7 @@ const FavoriteProductPage = () => {
                     <div className="text-xl mt-2">Bạn muốn xóa sản phẩm yêu thích này ?</div>
                     <div className="flex items-center justify-end gap-x-2">
                         <Button styles="rounded-[4px] px-8 py-2 text-black bg-gray-200 hover:bg-gray-300 cursor-pointer" OnClick={() => setShowDeleteBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer">Xóa</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer" OnClick={() => handleDeleteFavoriteItem()}>Xóa</Button>
                     </div>
                 </div>
             </Modal>

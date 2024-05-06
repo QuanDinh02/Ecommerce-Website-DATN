@@ -27,7 +27,6 @@ import { RootState } from '@/redux/reducer/rootReducer';
 import { getSearchProducts } from '@/services/productService';
 import { fetchAccount, userLogout } from '@/services/userService';
 import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
-import { useImmer } from 'use-immer';
 import { fetchWishList } from "@/services/wishListService";
 interface IAccount {
     customer_id: number
@@ -410,7 +409,9 @@ const Header = () => {
                     <div className="navigation">
                         <div className='favorite-items relative' onClick={() => navigate("/favorite-products")}>
                             <BsHeart className="icon" />
-                            <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
+                            {wishListCount > 0 &&
+                                <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
+                            }
                         </div>
                         <div className='shopping-cart relative z-50' onMouseEnter={() => {
                             setShowMiniShoppingCart(true);

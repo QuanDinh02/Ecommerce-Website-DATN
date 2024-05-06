@@ -42,7 +42,9 @@ const ApiRoute = (app) => {
     router.delete('/cart-item/:id', cartItemController.deleteCartItem);
 
     router.get('/wish-list', wishListController.getWishListByCustomer);
-
+    router.post('/wish-list', wishListController.addWishListItem);
+    router.delete('/wish-list/:id', wishListController.deleteWishListItem);
+    
     return app.use('/api', router);
 }
 

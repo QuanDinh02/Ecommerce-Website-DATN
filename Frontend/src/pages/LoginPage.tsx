@@ -11,10 +11,11 @@ import Google_Icon from '../assets/img/login_page/google_icon.svg';
 import { IoCheckmark } from "react-icons/io5";
 import { PiEyeLight, PiEyeSlash } from "react-icons/pi";
 import { FaSpinner } from "react-icons/fa";
-import { AddCartItem, UserLogin } from '@/redux/actions/action';
+import { AddCartItem, AddWishListItem, UserLogin } from '@/redux/actions/action';
 import { successToast1 } from '@/components/Toast/Toast';
 import { fetchAccount, userLogin } from '@/services/userService';
 import { fetchCartItem } from '@/services/cartItemService';
+import { fetchWishList } from '@/services/wishListService';
 
 enum PATH {
     Register = "/register",
@@ -50,6 +51,24 @@ interface ICartItem {
     size: string
     product_info: ICartItemInfo
     shop_info: ICartItemShopInfo
+}
+
+interface IProductInfo {
+    id: number
+    name: string
+    image: string
+}
+
+interface IShopInfo {
+    id: number
+    name: string
+}
+
+interface IWishList {
+    id: number
+    price: number
+    product_info: IProductInfo
+    shop_info: IShopInfo
 }
 
 const LoginPage = () => {
@@ -124,7 +143,6 @@ const LoginPage = () => {
                     setTimeout(() => {
                         fetchAccountInfo();
                         window.location.reload();
-                        //navigate('/');
                         navigate(-1);
                     }, 2000);
                 }
@@ -159,6 +177,17 @@ const LoginPage = () => {
                     dispatch(AddCartItem({
                         cart_items: cart_item_data,
                         count: count
+                    }));
+                }
+
+                let wishListData: any = await fetchWishList(userData.customer_id);
+                if (wishListData && !_.isEmpty(wishListData.DT)) {
+                    let wish_list_data: IWishList[] = wishListData.DT;
+                    let count = wish_list_data.length;
+
+                    dispatch(AddWishListItem({
+                        wish_list_item: wish_list_data,
+                        wish_list_count: count
                     }));
                 }
 

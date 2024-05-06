@@ -25,16 +25,20 @@ const wishListReducer = (state = INITIAL_STATE, action) => {
 
         case ADD_WISHLIST_ITEM:
 
-        return {
-            ...state,
-            wish_list_list: [...action.wish_list_item],
-            wish_list_count: action.wish_list_count
-        };
+            return {
+                ...state,
+                wish_list_list: [...action.wish_list_item],
+                wish_list_count: action.wish_list_count
+            };
 
         case DELETE_WISHLIST_ITEM:
-            
+
+            let newWishList = state.wish_list_list.filter(item => item.id !== action.wish_list_item_id);
+
             return {
-                ...state
+                ...state,
+                wish_list_count: state.wish_list_count - 1,
+                wish_list_list: [...newWishList]
             };
 
         default: return state;
