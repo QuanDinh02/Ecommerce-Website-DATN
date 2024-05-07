@@ -16,6 +16,7 @@ import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
 import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
+import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -26,7 +27,14 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-
+import CustomerAccount from './pages/CustomerInfo/CustomerAccount/CustomerAccount.tsx';
+import PasswordModification from './pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
+import CustomerNotification from './pages/CustomerInfo/CustomerNotification.tsx';
+import NotificationSetting from './pages/CustomerInfo/CustomerAccount/NotificationSetting.tsx';
+import CustomerAddress from './pages/CustomerInfo/CustomerAddress.tsx';
+import CustomerOrder from './pages/CustomerInfo/CustomerOrder.tsx';
+import VoucherPage from './pages/CustomerInfo/VoucherPage.tsx';
+import CustomerSupport from './pages/CustomerInfo/CustomerSupport.tsx';
 
 const router = createBrowserRouter(
   [
@@ -52,12 +60,50 @@ const router = createBrowserRouter(
           ]
         },
         {
+          path: "customer-info",
+          element: <CustomerInfo />,
+          children: [
+            {
+              path: "account",
+              element: <CustomerAccount />
+            },
+            {
+              path: "password",
+              element: <PasswordModification/>
+            },
+            {
+              path: "notification",
+              element: <CustomerNotification/>
+            },
+            {
+              path: "notification-setting",
+              element: <NotificationSetting/>
+            },
+            {
+              path: "address",
+              element: <CustomerAddress/>
+            },
+            {
+              path: "order",
+              element: <CustomerOrder/>
+            },
+            {
+              path: "voucher",
+              element: <VoucherPage/>
+            },
+            {
+              path: "supports",
+              element: <CustomerSupport/>
+            },
+          ]
+        },
+        {
           path: "category",
           element: <CategoryPage />
         },
         {
           path: "sub-category",
-          element: <SubCategoryPage/>
+          element: <SubCategoryPage />
         },
         {
           path: "product-detail",

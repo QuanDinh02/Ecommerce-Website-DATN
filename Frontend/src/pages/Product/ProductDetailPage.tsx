@@ -388,29 +388,37 @@ const ProductDetailPage = () => {
     }
 
     const handleAddCartItem = async (quantity: number, customer_id: number, product_type_id: number) => {
-        let data: INewCartItem = {
-            quantity: quantity,
-            customerID: customer_id,
-            productTypeID: product_type_id
-        }
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: customer_id,
+                productTypeID: product_type_id
+            }
 
-        let result = await createCartItem(data);
-        if (result && result.EC === 0) {
-            refetchCartItem();
-            successToast1(result.EM);
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
         }
     }
 
     const handleAddFavouriteItem = async (product_id: number, customer_id: number) => {
-        let data: INewWishListItem = {
-            productID: product_id,
-            customerID: customer_id
-        }
+        if (account && isAuthenticated) {
+            let data: INewWishListItem = {
+                productID: product_id,
+                customerID: customer_id
+            }
 
-        let result = await createWishListItem(data);
-        if (result && result.EC === 0) {
-            refetchWishList();
-            successToast1(result.EM);
+            let result = await createWishListItem(data);
+            if (result && result.EC === 0) {
+                refetchWishList();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
         }
     }
 

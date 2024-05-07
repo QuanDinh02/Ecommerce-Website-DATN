@@ -2,12 +2,10 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdCancel, MdOutlineMessage } from "react-icons/md";
 import { useImmer } from "use-immer";
-import { FaCheck } from "react-icons/fa6";
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { BsGrid3X3 } from "react-icons/bs";
 import { TfiViewListAlt } from "react-icons/tfi";
-import { productsByCategory } from "@/data/category";
-import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
+import { CurrencyFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { PiShoppingCartLight } from "react-icons/pi";
@@ -21,7 +19,13 @@ import { getSubCategoryByCategory } from "@/services/subCategoryService";
 import { getProductsByCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
 import { TailSpin } from 'react-loader-spinner';
-
+import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
+import { createWishListItem, fetchWishList } from "@/services/wishListService";
+import { useDispatch, useSelector } from "react-redux";
+import { AddWishListItem } from "@/redux/actions/action";
+import { IAccount } from "../Product/ProductDetailPage_types";
+import { RootState } from "@/redux/reducer/rootReducer";
+import _ from 'lodash';
 interface ISubCategory {
     id: number
     title: string
@@ -51,6 +55,11 @@ const CategoryPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
+
+    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
 
@@ -170,6 +179,36 @@ const CategoryPage = () => {
 
     const hanldeFavoriteItem = () => {
         successToast1("Thêm vào sản phẩm yêu thích thành công");
+    }
+
+    const refetchWishList = async () => {
+        let wishListData: any = await fetchWishList(account.customer_id);
+        if (wishListData && !_.isEmpty(wishListData.DT)) {
+            let wish_list_data: IWishList[] = wishListData.DT;
+            let count = wish_list_data.length;
+
+            dispatch(AddWishListItem({
+                wish_list_item: wish_list_data,
+                wish_list_count: count
+            }));
+        }
+    }
+
+    const handleAddFavouriteItem = async (product_id: number, customer_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewWishListItem = {
+                productID: product_id,
+                customerID: customer_id
+            }
+
+            let result = await createWishListItem(data);
+            if (result && result.EC === 0) {
+                refetchWishList();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
     }
 
     const hanldeAddShoppingCart = () => {
@@ -479,7 +518,7 @@ const CategoryPage = () => {
                                                                         <>
                                                                             {productList.length > 0 && productList.map((item, index) => {
                                                                                 return (
-                                                                                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
+                                                                                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id)}>
                                                                                         <div className="product__image flex items-center justify-center">
                                                                                             {item.image ?
                                                                                                 <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
@@ -512,7 +551,7 @@ const CategoryPage = () => {
                                                                                             </div>
                                                                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                 e.stopPropagation();
-                                                                                                hanldeFavoriteItem();
+                                                                                                handleAddFavouriteItem(item.id, account.customer_id);
                                                                                             }}>
                                                                                                 <IoMdHeartEmpty className="w-6 h-6" />
                                                                                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -595,7 +634,7 @@ const CategoryPage = () => {
                                                                 }}>Thêm vào giỏ hàng</div>
                                                                 <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    hanldeFavoriteItem()
+                                                                    handleAddFavouriteItem(item.id, account.customer_id);
                                                                 }}><FaRegHeart /> Yêu thích</div>
                                                             </div>
                                                         </div>
