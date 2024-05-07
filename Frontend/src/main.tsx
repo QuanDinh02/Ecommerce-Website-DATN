@@ -35,6 +35,7 @@ import CustomerAddress from './pages/CustomerInfo/CustomerAddress.tsx';
 import CustomerOrder from './pages/CustomerInfo/CustomerOrder.tsx';
 import VoucherPage from './pages/CustomerInfo/VoucherPage.tsx';
 import CustomerSupport from './pages/CustomerInfo/CustomerSupport.tsx';
+import CustomerRoute from './components/CustomerRoute.tsx';
 
 const router = createBrowserRouter(
   [
@@ -61,7 +62,10 @@ const router = createBrowserRouter(
         },
         {
           path: "customer-info",
-          element: <CustomerInfo />,
+          element:
+            <CustomerRoute>
+              <CustomerInfo />
+            </CustomerRoute>,
           children: [
             {
               path: "account",
@@ -69,31 +73,31 @@ const router = createBrowserRouter(
             },
             {
               path: "password",
-              element: <PasswordModification/>
+              element: <PasswordModification />
             },
             {
               path: "notification",
-              element: <CustomerNotification/>
+              element: <CustomerNotification />
             },
             {
               path: "notification-setting",
-              element: <NotificationSetting/>
+              element: <NotificationSetting />
             },
             {
               path: "address",
-              element: <CustomerAddress/>
+              element: <CustomerAddress />
             },
             {
               path: "order",
-              element: <CustomerOrder/>
+              element: <CustomerOrder />
             },
             {
               path: "voucher",
-              element: <VoucherPage/>
+              element: <VoucherPage />
             },
             {
               path: "supports",
-              element: <CustomerSupport/>
+              element: <CustomerSupport />
             },
           ]
         },

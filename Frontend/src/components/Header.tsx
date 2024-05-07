@@ -413,7 +413,7 @@ const Header = () => {
                                 <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
                             }
                         </div>
-                        <div className='shopping-cart relative z-50' onMouseEnter={() => {
+                        <div className='shopping-cart relative z-40' onMouseEnter={() => {
                             setShowMiniShoppingCart(true);
                             setShowInfoSettingBox(false);
                         }}>
@@ -508,7 +508,7 @@ const Header = () => {
                                                 onMouseEnter={() => handleShowWidgetInfo()}
                                                 onMouseLeave={() => handleShowWidgetInfo()}
                                             >
-                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={() => navigate("/customer-info")}>Thông Tin Tài Khoản</div>
+                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={() => navigate("/customer-info/account")}>Thông Tin Tài Khoản</div>
                                                 <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
                                             </div>
                                         }

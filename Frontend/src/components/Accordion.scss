@@ -1,0 +1,46 @@
+.container {
+    width: 100%;
+
+    .accordion-wrapper {
+        overflow: hidden;
+
+        .menu-container {
+            width          : 100%;
+            text-align     : left;
+            display        : flex;
+            align-items    : center;
+            justify-content: space-between;
+            background     : transparent;
+            border         : none;
+            cursor         : pointer;
+            border-left    : 3px solid transparent;
+
+            &:hover {
+                background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+            }
+        }
+
+        .menu-container.active {
+            color           : black;
+            font-weight     : 500;
+            background-color: white !important;
+            border-left     : 3px solid #FCB800;
+
+            .side-bar-icon {
+                color: #FCB800;
+            }
+        }
+
+        .sub-menu-container {
+            transition: height .4s ease-in-out;
+
+            .sub-menu-content {
+                background-color: white;
+            }
+        }
+
+        .sub-menu-container.active {
+            color: #FCB800;
+        }
+    }
+}

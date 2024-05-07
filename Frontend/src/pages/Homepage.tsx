@@ -508,7 +508,7 @@ const Homepage = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="header px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-50">GỢI Ý DÀNH CHO BẠN</div>
+                    <div className="header px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
                     <div className="section customer-recommendation bg-white mb-8">
                         <div className="px-5 py-6 bg-[#EEEEEE]">
                             <div className="product-list grid grid-cols-6 gap-y-6 gap-x-2">
