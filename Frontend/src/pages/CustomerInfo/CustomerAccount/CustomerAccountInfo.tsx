@@ -58,7 +58,7 @@ const Dropdown = ({ data, style }) => {
     )
 }
 
-const CustomerAccount = () => {
+const CustomerAccountInfo = () => {
 
     const [gender, setGender] = React.useState<number>(0);
 
@@ -131,4 +131,4 @@ const CustomerAccount = () => {
     )
 }
 
-export default CustomerAccount;
+export default CustomerAccountInfo;

@@ -508,7 +508,7 @@ const Header = () => {
                                                 onMouseEnter={() => handleShowWidgetInfo()}
                                                 onMouseLeave={() => handleShowWidgetInfo()}
                                             >
-                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={() => navigate("/customer-info/account")}>Thông Tin Tài Khoản</div>
+                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={() => navigate("/customer-info/account/info")}>Thông Tin Tài Khoản</div>
                                                 <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
                                             </div>
                                         }

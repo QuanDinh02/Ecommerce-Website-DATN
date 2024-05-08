@@ -12,6 +12,7 @@ import Accordion from "@/components/Accordion";
 import { IAccount } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
+import classNames from "classnames";
 
 interface ISideBarChild {
     path: string
@@ -23,6 +24,7 @@ interface ISideBarItem {
     name: string
     icon: any
     children: ISideBarChild[]
+    skip: boolean
 }
 
 const SideBar: ISideBarItem[] = [
@@ -30,9 +32,10 @@ const SideBar: ISideBarItem[] = [
         path: "/account",
         name: "Tài Khoản Của Tôi",
         icon: <RiErrorWarningLine className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: true,
         children: [
             {
-                path: "/account",
+                path: "/info",
                 name: "Thông tin tài khoản",
             },
             {
@@ -49,36 +52,71 @@ const SideBar: ISideBarItem[] = [
         path: "/address",
         name: "Địa chỉ",
         icon: <TfiLocationPin className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
         children: []
     },
     {
         path: "/order",
         name: "Đơn hàng",
         icon: <TfiReceipt className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        children: []
+        skip: true,
+        children: [
+            {
+                path: "/all",
+                name: "Tất Cả",
+            },
+            {
+                path: "/pending-payment",
+                name: "Chờ thanh toán",
+            },
+            {
+                path: "/shipping",
+                name: "Vận chuyển",
+            },
+            {
+                path: "/pending-shipping",
+                name: "Chờ giao hàng",
+            },
+            {
+                path: "/completed-shipping",
+                name: "Đã giao hàng",
+            },
+            {
+                path: "/cancel",
+                name: "Đã hủy",
+            },
+            {
+                path: "/return",
+                name: "Trả hàng/ Hoàn tiền",
+            },
+        ]
     },
     {
         path: "/notification",
         name: "Thông báo",
         icon: <GoBell className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
         children: []
     },
     {
         path: "/voucher",
         name: "Kho Voucher",
         icon: <PiTicket className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
         children: []
     },
     {
         path: "/supports",
         name: "Hỗ trợ",
         icon: <GoQuestion className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
         children: []
     },
     {
         path: "",
         name: "Đăng xuất",
         icon: "",
+        skip: false,
         children: []
     },
 ]
@@ -88,10 +126,6 @@ const CustomerInfo = () => {
     const navigate = useNavigate();
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
 
-    const sideBarNavigation = (path: string) => {
-        navigate(`/customer-info${path}`)
-    }
-
     return (
         <div className="customer-info-container w-full bg-[#EEEEEE]">
             <div className="px-[30px] w-[80rem] mx-auto py-8 flex">
@@ -99,11 +133,11 @@ const CustomerInfo = () => {
                     <div className="p-3 flex items-center gap-x-2 mb-2 bg-gray-200">
                         <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
                         <div>
-                            <div className="user_name font-bold" onClick={() => sideBarNavigation("/account")}>{account.username}</div>
+                            <div className="user_name font-bold" onClick={() => navigate("/customer-info/account")}>{account.username}</div>
                             <div className="text-gray-500 flex items-center cursor-pointer hover:underline gap-x-1"><MdModeEdit /> Sửa hồ sơ</div>
                         </div>
                     </div>
-                    <Accordion data={SideBar} navigate={sideBarNavigation}/>
+                    <Accordion data={SideBar} />
                 </div>
                 <div className="customer-info__content w-2/3 flex-1 py-5 px-10 bg-white">
                     <Outlet />

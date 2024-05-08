@@ -1,6 +1,6 @@
 import React from "react";
 import './Accordion.scss';
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 interface ISideBarChild {
     path: string
@@ -12,17 +12,18 @@ interface ISideBarItem {
     name: string
     icon: any
     children: ISideBarChild[]
+    skip: boolean
 }
 
 interface IProps {
     data: ISideBarItem[]
-    navigate: any
 }
 
 
-const AccordionItem = ({ item, isOpen, onClick, navigate }) => {
+const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
 
     const location = useLocation();
+    const navigate = useNavigate();
 
     const sideBarItem: ISideBarItem = item;
 
@@ -30,8 +31,16 @@ const AccordionItem = ({ item, isOpen, onClick, navigate }) => {
 
     const handleOnClick = () => {
         onClick();
-        navigate(sideBarItem.path);
+        if (item.skip === true) {
+            navigate(`${parent_path}${sideBarItem.path}${sideBarItem.children[0].path}`);
+        } else {
+            navigate(`${parent_path}${sideBarItem.path}`);
+        }
     }
+
+    React.useEffect(() => {
+        console.log(parent_path);
+    }, []);
 
     return (
         <div className="accordion-wrapper">
@@ -56,7 +65,9 @@ const AccordionItem = ({ item, isOpen, onClick, navigate }) => {
                         sideBarItem.children && sideBarItem.children.length > 0 &&
                         sideBarItem.children.map(child_item => {
                             return (
-                                <div className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer text-[#FCB800]" : "py-3 pl-10 pr-4 cursor-pointer hover:text-[#FCB800] duration-200"} onClick={() => navigate(child_item.path)}>{child_item.name}</div>
+                                <div className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer text-[#FCB800]" : "py-3 pl-10 pr-4 cursor-pointer hover:text-[#FCB800] duration-200"} onClick={() => navigate(`${parent_path}${sideBarItem.path}${child_item.path}`)}>
+                                    {child_item.name}
+                                </div>
                             )
                         })
                     }
@@ -68,8 +79,8 @@ const AccordionItem = ({ item, isOpen, onClick, navigate }) => {
 
 const Accordion = (props: IProps) => {
 
-    let { data, navigate } = props;
-
+    let { data } = props;
+    ;
     const [activeIndex, setActiveIndex] = React.useState<number>(0);
 
     const handleItemClick = (index) => {
@@ -84,7 +95,7 @@ const Accordion = (props: IProps) => {
                     item={side_bar_item}
                     isOpen={activeIndex === index}
                     onClick={() => handleItemClick(index)}
-                    navigate={navigate}
+                    parent_path={"/customer-info"}
                 />
             ))}
         </div>

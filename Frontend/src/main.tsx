@@ -27,7 +27,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import CustomerAccount from './pages/CustomerInfo/CustomerAccount/CustomerAccount.tsx';
+import CustomerAccount from './pages/CustomerInfo/CustomerAccount.tsx';
 import PasswordModification from './pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
 import CustomerNotification from './pages/CustomerInfo/CustomerNotification.tsx';
 import NotificationSetting from './pages/CustomerInfo/CustomerAccount/NotificationSetting.tsx';
@@ -36,6 +36,14 @@ import CustomerOrder from './pages/CustomerInfo/CustomerOrder.tsx';
 import VoucherPage from './pages/CustomerInfo/VoucherPage.tsx';
 import CustomerSupport from './pages/CustomerInfo/CustomerSupport.tsx';
 import CustomerRoute from './components/CustomerRoute.tsx';
+import AllOrder from './pages/CustomerInfo/CustomerOrder/AllOrder.tsx';
+import PendingPaymentOrder from './pages/CustomerInfo/CustomerOrder/PendingPaymentOrder.tsx';
+import PendingShippingOrder from './pages/CustomerInfo/CustomerOrder/PendingShippingOrder.tsx';
+import CompletedShippingOrder from './pages/CustomerInfo/CustomerOrder/CompletedShippingOrder.tsx';
+import CancelOrder from './pages/CustomerInfo/CustomerOrder/CancelOrder.tsx';
+import ReturnOrder from './pages/CustomerInfo/CustomerOrder/ReturnOrder.tsx';
+import ShippingOrder from './pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx';
+import CustomerAccountInfo from './pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
 
 const router = createBrowserRouter(
   [
@@ -69,19 +77,25 @@ const router = createBrowserRouter(
           children: [
             {
               path: "account",
-              element: <CustomerAccount />
-            },
-            {
-              path: "password",
-              element: <PasswordModification />
+              element: <CustomerAccount />,
+              children: [
+                {
+                  path: "info",
+                  element: <CustomerAccountInfo />
+                },
+                {
+                  path: "password",
+                  element: <PasswordModification />
+                },
+                {
+                  path: "notification-setting",
+                  element: <NotificationSetting />
+                },
+              ]
             },
             {
               path: "notification",
               element: <CustomerNotification />
-            },
-            {
-              path: "notification-setting",
-              element: <NotificationSetting />
             },
             {
               path: "address",
@@ -89,7 +103,37 @@ const router = createBrowserRouter(
             },
             {
               path: "order",
-              element: <CustomerOrder />
+              element: <CustomerOrder />,
+              children: [
+                {
+                  path: "all",
+                  element: <AllOrder />,
+                },
+                {
+                  path: "pending-payment",
+                  element: <PendingPaymentOrder />,
+                },
+                {
+                  path: "shipping",
+                  element: <ShippingOrder />,
+                },
+                {
+                  path: "pending-shipping",
+                  element: <PendingShippingOrder />,
+                },
+                {
+                  path: "completed-shipping",
+                  element: <CompletedShippingOrder />,
+                },
+                {
+                  path: "cancel",
+                  element: <CancelOrder />,
+                },
+                {
+                  path: "return",
+                  element: <ReturnOrder />,
+                },
+              ]
             },
             {
               path: "voucher",
