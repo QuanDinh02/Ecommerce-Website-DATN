@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.scss';
@@ -17,6 +16,23 @@ import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
+import CustomerAccount from '@/pages/CustomerInfo/CustomerAccount.tsx';
+import PasswordModification from '@/pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
+import CustomerNotification from '@/pages/CustomerInfo/CustomerNotification.tsx';
+import NotificationSetting from '@/pages/CustomerInfo/CustomerAccount/NotificationSetting.tsx';
+import CustomerAddress from '@/pages/CustomerInfo/CustomerAddress.tsx';
+import CustomerOrder from '@/pages/CustomerInfo/CustomerOrder.tsx';
+import VoucherPage from '@/pages/CustomerInfo/VoucherPage.tsx';
+import CustomerSupport from '@/pages/CustomerInfo/CustomerSupport.tsx';
+import CustomerRoute from './components/CustomerRoute.tsx';
+import AllOrder from '@/pages/CustomerInfo/CustomerOrder/AllOrder.tsx';
+import PendingPaymentOrder from '@/pages/CustomerInfo/CustomerOrder/PendingPaymentOrder.tsx';
+import PendingShippingOrder from '@/pages/CustomerInfo/CustomerOrder/PendingShippingOrder.tsx';
+import CompletedShippingOrder from '@/pages/CustomerInfo/CustomerOrder/CompletedShippingOrder.tsx';
+import CancelOrder from '@/pages/CustomerInfo/CustomerOrder/CancelOrder.tsx';
+import ReturnOrder from '@/pages/CustomerInfo/CustomerOrder/ReturnOrder.tsx';
+import ShippingOrder from '@/pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx';
+import CustomerAccountInfo from '@/pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -27,23 +43,8 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import CustomerAccount from './pages/CustomerInfo/CustomerAccount.tsx';
-import PasswordModification from './pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
-import CustomerNotification from './pages/CustomerInfo/CustomerNotification.tsx';
-import NotificationSetting from './pages/CustomerInfo/CustomerAccount/NotificationSetting.tsx';
-import CustomerAddress from './pages/CustomerInfo/CustomerAddress.tsx';
-import CustomerOrder from './pages/CustomerInfo/CustomerOrder.tsx';
-import VoucherPage from './pages/CustomerInfo/VoucherPage.tsx';
-import CustomerSupport from './pages/CustomerInfo/CustomerSupport.tsx';
-import CustomerRoute from './components/CustomerRoute.tsx';
-import AllOrder from './pages/CustomerInfo/CustomerOrder/AllOrder.tsx';
-import PendingPaymentOrder from './pages/CustomerInfo/CustomerOrder/PendingPaymentOrder.tsx';
-import PendingShippingOrder from './pages/CustomerInfo/CustomerOrder/PendingShippingOrder.tsx';
-import CompletedShippingOrder from './pages/CustomerInfo/CustomerOrder/CompletedShippingOrder.tsx';
-import CancelOrder from './pages/CustomerInfo/CustomerOrder/CancelOrder.tsx';
-import ReturnOrder from './pages/CustomerInfo/CustomerOrder/ReturnOrder.tsx';
-import ShippingOrder from './pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx';
-import CustomerAccountInfo from './pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
+import VoucherAll from './pages/CustomerInfo/Voucher/VoucherAll.tsx';
+import VoucherHistory from './pages/CustomerInfo/Voucher/VoucherHistory.tsx';
 
 const router = createBrowserRouter(
   [
@@ -137,7 +138,17 @@ const router = createBrowserRouter(
             },
             {
               path: "voucher",
-              element: <VoucherPage />
+              element: <VoucherPage />,
+              children: [
+                {
+                  path: "info",
+                  element: <VoucherAll/>,
+                },
+                {
+                  path: "history",
+                  element: <VoucherHistory/>,
+                },
+              ]
             },
             {
               path: "supports",

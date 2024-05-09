@@ -1,5 +1,5 @@
 import Button from "@/components/Button";
-import React from "react";
+import React, { useRef } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
@@ -26,13 +26,24 @@ const Dropdown = ({ data, style }) => {
 
     const [value, setValue] = React.useState<number>(0);
     const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
+    const ref = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
         setValue(data[0]);
+
+        const closeDropdown = (e) => {
+            if (!ref.current?.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        }
+
+        document.body.addEventListener("mousedown", closeDropdown);
+
+        return () => document.body.removeEventListener('mousedown', closeDropdown);
     }, []);
 
     return (
-        <div className={`dropdown-container ${style} flex items-center relative cursor-pointer`} onClick={() => setShowDropdown(!showDropdown)}>
+        <div ref={ref} className={`dropdown-container ${style} flex items-center relative cursor-pointer`} onClick={() => setShowDropdown(!showDropdown)}>
             <div className="w-full px-2">{value}</div>
             {
                 showDropdown ?

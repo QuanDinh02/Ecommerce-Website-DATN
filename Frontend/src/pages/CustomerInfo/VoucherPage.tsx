@@ -1,7 +1,8 @@
+import { Outlet } from "react-router-dom";
 
 const VoucherPage = () => {
     return (
-        <div>VoucherPage</div>
+        <Outlet />
     )
 }
 

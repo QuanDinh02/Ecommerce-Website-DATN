@@ -19,7 +19,6 @@ interface IProps {
     data: ISideBarItem[]
 }
 
-
 const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
 
     const location = useLocation();
@@ -37,10 +36,6 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
             navigate(`${parent_path}${sideBarItem.path}`);
         }
     }
-
-    React.useEffect(() => {
-        console.log(parent_path);
-    }, []);
 
     return (
         <div className="accordion-wrapper">
@@ -80,12 +75,22 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
 const Accordion = (props: IProps) => {
 
     let { data } = props;
-    ;
+    const location = useLocation();
+
     const [activeIndex, setActiveIndex] = React.useState<number>(0);
 
     const handleItemClick = (index) => {
         setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
     };
+
+    React.useEffect(() => {
+        if(location.pathname.includes("/customer-info")) {
+            let idx = data.findIndex(item => location.pathname.includes(item.path));
+            if(idx > 0) {
+                setActiveIndex(idx);
+            }
+        }
+    },[]);
 
     return (
         <div className="container">

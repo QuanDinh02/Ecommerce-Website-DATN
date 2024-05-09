@@ -31,6 +31,7 @@ const FavoriteProductPage = () => {
     const [deleteWishListId, setDeleteWishListId] = React.useState<number>(0);
 
     const wishListData: IWishList[] = useSelector<RootState, IWishList[]>(state => state.wishList.wish_list_list);
+    const wishListCount: number = useSelector<RootState, number>(state => state.wishList.wish_list_count);
 
     const hanldeAddShoppingCart = () => {
         successToast1("Thêm vào giỏ hàng thành công");
@@ -90,55 +91,65 @@ const FavoriteProductPage = () => {
                             <div className="main main w-[80rem] mx-auto px-[30px]">
                                 <div className="title text-4xl text-center font-medium mb-20">Sản phẩm yêu thích</div>
                                 <div className="w-full">
-                                    <table className="table-auto w-full bg-white">
-                                        <thead>
-                                            <tr className="bg-[#F2F2F2]">
-                                                {tableHeaders && tableHeaders.map((item, index) => {
-                                                    return (
-                                                        <th className="text-left py-3 px-2 font-medium text-sm" key={`header-field-${index}`}>{item}</th>
-                                                    )
-                                                })}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {wishListData && wishListData.length > 0 &&
-                                                wishListData.map((item, index) => {
-                                                    return (
-                                                        <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
-                                                            <td>
-                                                                {item.product_info.image ?
-                                                                    <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
-                                                                    :
-                                                                    <PiImageThin className="w-32 h-32 cursor-pointer" />
-                                                                }
-                                                            </td>
-                                                            <td className="py-3 px-2">
-                                                                <div
-                                                                    className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2"
-                                                                    onClick={() => handleProductDetailNavigation(+item.product_info.id)}
-                                                                >{item.product_info.name}</div>
-                                                                <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
-                                                            </td>
-                                                            <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
-                                                            <td className="py-3 px-2">
-                                                                <div
-                                                                    className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 hover:opacity-80 cursor-pointer"
-                                                                    onClick={() => hanldeAddShoppingCart()}
-                                                                >
-                                                                    <IoBagHandleOutline className="w-5 h-5" />
-                                                                    <span>Thêm vào giỏ hàng</span>
-                                                                </div>
-                                                            </td>
-                                                            <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
-                                                                setDeleteWishListId(item.id);
-                                                                setShowDeleteBox(true);
-                                                            }} /></td>
-                                                        </tr>
-                                                    )
-                                                })
-                                            }
-                                        </tbody>
-                                    </table>
+                                    {
+                                        wishListCount > 0 && wishListData && wishListData.length > 0 ?
+                                            <table className="table-auto w-full bg-white">
+                                                <thead>
+                                                    <tr className="bg-[#F2F2F2]">
+                                                        {tableHeaders && tableHeaders.map((item, index) => {
+                                                            return (
+                                                                <th className="text-left py-3 px-2 font-medium text-sm" key={`header-field-${index}`}>{item}</th>
+                                                            )
+                                                        })}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {wishListData && wishListData.length > 0 &&
+                                                        wishListData.map((item, index) => {
+                                                            return (
+                                                                <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
+                                                                    <td>
+                                                                        {item.product_info.image ?
+                                                                            <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
+                                                                            :
+                                                                            <PiImageThin className="w-32 h-32 cursor-pointer" />
+                                                                        }
+                                                                    </td>
+                                                                    <td className="py-3 px-2">
+                                                                        <div
+                                                                            className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2"
+                                                                            onClick={() => handleProductDetailNavigation(+item.product_info.id)}
+                                                                        >{item.product_info.name}</div>
+                                                                        <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
+                                                                    </td>
+                                                                    <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
+                                                                    <td className="py-3 px-2">
+                                                                        <div
+                                                                            className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 hover:opacity-80 cursor-pointer"
+                                                                            onClick={() => hanldeAddShoppingCart()}
+                                                                        >
+                                                                            <IoBagHandleOutline className="w-5 h-5" />
+                                                                            <span>Thêm vào giỏ hàng</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
+                                                                        setDeleteWishListId(item.id);
+                                                                        setShowDeleteBox(true);
+                                                                    }} /></td>
+                                                                </tr>
+                                                            )
+                                                        })
+                                                    }
+                                                </tbody>
+                                            </table>
+                                            :
+                                            <>
+                                                <div className="w-full text-gray-500 text-center text-lg border border-gray-300 bg-gray-100 py-2">Chưa có sản phẩm yêu thích !</div>
+                                            </>
+
+
+                                    }
+
                                 </div>
                             </div>
                         </div>

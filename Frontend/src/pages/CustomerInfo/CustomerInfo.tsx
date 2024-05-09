@@ -12,7 +12,7 @@ import Accordion from "@/components/Accordion";
 import { IAccount } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
-import classNames from "classnames";
+import { IoExitOutline } from "react-icons/io5";
 
 interface ISideBarChild {
     path: string
@@ -102,8 +102,17 @@ const SideBar: ISideBarItem[] = [
         path: "/voucher",
         name: "Kho Voucher",
         icon: <PiTicket className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
+        skip: true,
+        children: [
+            {
+                path: "/info",
+                name: "Voucher",
+            },
+            {
+                path: "/history",
+                name: "Lịch sử",
+            },
+        ]
     },
     {
         path: "/supports",
@@ -115,7 +124,7 @@ const SideBar: ISideBarItem[] = [
     {
         path: "",
         name: "Đăng xuất",
-        icon: "",
+        icon: <IoExitOutline className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
