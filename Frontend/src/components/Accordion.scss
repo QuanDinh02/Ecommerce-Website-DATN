@@ -42,5 +42,14 @@
         .sub-menu-container.active {
             color: #FCB800;
         }
+
+        .arrow {
+            font-size : 1.5rem;
+            transition: .5s ease-in-out;
+
+            &.active {
+                rotate: 180deg;
+            }
+        }
     }
 }

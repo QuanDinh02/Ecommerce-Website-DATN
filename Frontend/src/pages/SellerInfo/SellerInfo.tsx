@@ -1,17 +1,15 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
-import { MdModeEdit } from "react-icons/md";
-import { RiErrorWarningLine } from "react-icons/ri";
-import { TfiLocationPin } from "react-icons/tfi";
-import { TfiReceipt } from "react-icons/tfi";
+import { BsBoxSeam } from "react-icons/bs";
 import { GoBell } from "react-icons/go";
-import { PiTicket } from "react-icons/pi";
+import { CiViewList } from "react-icons/ci";
 import { GoQuestion } from "react-icons/go";
 import Accordion from "@/components/Accordion";
-import { IAccount } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
 import { IoExitOutline } from "react-icons/io5";
+import { RxDashboard } from "react-icons/rx";
+import { CgUserList } from "react-icons/cg";
 
 interface ISideBarChild {
     path: string
@@ -26,38 +24,24 @@ interface ISideBarItem {
     skip: boolean
 }
 
+export interface ISellerAccount {
+    customer_id: number
+    username: string
+    role: string
+}
+
 const SideBar: ISideBarItem[] = [
     {
-        path: "/account",
-        name: "Tài Khoản Của Tôi",
-        icon: <RiErrorWarningLine className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: true,
-        children: [
-            {
-                path: "/info",
-                name: "Thông tin tài khoản",
-            },
-            {
-                path: "/password",
-                name: "Đổi mật khẩu"
-            },
-            {
-                path: "/notification-setting",
-                name: "Cài đặt thông báo"
-            },
-        ]
-    },
-    {
-        path: "/address",
-        name: "Địa chỉ",
-        icon: <TfiLocationPin className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        path: "/dashboard",
+        name: "Dashboard",
+        icon: <RxDashboard className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
         path: "/order",
         name: "Đơn hàng",
-        icon: <TfiReceipt className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        icon: <CiViewList className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: true,
         children: [
             {
@@ -65,30 +49,37 @@ const SideBar: ISideBarItem[] = [
                 name: "Tất Cả",
             },
             {
-                path: "/pending-payment",
-                name: "Chờ thanh toán",
-            },
-            {
-                path: "/shipping",
-                name: "Vận chuyển",
-            },
-            {
-                path: "/pending-shipping",
-                name: "Chờ giao hàng",
-            },
-            {
-                path: "/completed-shipping",
-                name: "Đã giao hàng",
-            },
-            {
                 path: "/cancel",
-                name: "Đã hủy",
+                name: "Đơn hủy",
             },
             {
                 path: "/return",
                 name: "Trả hàng/ Hoàn tiền",
             },
         ]
+    },
+    {
+        path: "/product",
+        name: "Quản Lý Sản Phẩm",
+        icon: <BsBoxSeam className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: true,
+        children: [
+            {
+                path: "/all",
+                name: "Tất Cả Sản Phẩm",
+            },
+            {
+                path: "/new",
+                name: "Thêm Sản Phẩm",
+            },
+        ]
+    },
+    {
+        path: "/profile",
+        name: "Thông tin người bán",
+        icon: <CgUserList className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
+        children: []
     },
     {
         path: "/notification",
@@ -98,22 +89,6 @@ const SideBar: ISideBarItem[] = [
         children: []
     },
     {
-        path: "/voucher",
-        name: "Kho Voucher",
-        icon: <PiTicket className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: true,
-        children: [
-            {
-                path: "/info",
-                name: "Voucher",
-            },
-            {
-                path: "/history",
-                name: "Lịch sử",
-            },
-        ]
-    },
-    {
         path: "/supports",
         name: "Hỗ trợ",
         icon: <GoQuestion className="w-5 h-5 text-gray-500 side-bar-icon" />,
@@ -121,7 +96,7 @@ const SideBar: ISideBarItem[] = [
         children: []
     },
     {
-        path: "",
+        path: "/exit",
         name: "Đăng xuất",
         icon: <IoExitOutline className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
@@ -129,10 +104,10 @@ const SideBar: ISideBarItem[] = [
     },
 ]
 
-const CustomerInfo = () => {
+const SellerInfo = () => {
 
     const navigate = useNavigate();
-    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
+    const account: ISellerAccount = useSelector<RootState, ISellerAccount>(state => state.user.account);
 
     return (
         <div className="customer-info-container w-full bg-[#EEEEEE]">
@@ -142,10 +117,10 @@ const CustomerInfo = () => {
                         <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
                         <div>
                             <div className="user_name font-bold" onClick={() => navigate("/customer-info/account")}>{account.username}</div>
-                            <div className="text-gray-500 flex items-center cursor-pointer hover:underline gap-x-1"><MdModeEdit /> Sửa hồ sơ</div>
+                            <div className="text-black opacity-80"> NGƯỜI BÁN</div>
                         </div>
                     </div>
-                    <Accordion data={SideBar} user_type="customer"/>
+                    <Accordion data={SideBar} user_type="seller"/>
                 </div>
                 <div className="customer-info__content w-2/3 flex-1 py-5 px-10 bg-white">
                     <Outlet />
@@ -155,4 +130,4 @@ const CustomerInfo = () => {
     )
 }
 
-export default CustomerInfo;
+export default SellerInfo;

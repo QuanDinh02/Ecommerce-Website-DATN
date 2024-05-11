@@ -28,8 +28,14 @@ import { getSearchProducts } from '@/services/productService';
 import { fetchAccount, userLogout } from '@/services/userService';
 import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { fetchWishList } from "@/services/wishListService";
-interface IAccount {
+interface ICustomerAccount {
     customer_id: number
+    username: string
+    role: string
+}
+
+interface ISellerAccount {
+    seller_id: number
     username: string
     role: string
 }
@@ -84,8 +90,9 @@ const Header = () => {
     const location = useLocation();
     const dispatch = useDispatch();
 
-    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
+    const account: ICustomerAccount = useSelector<RootState, ICustomerAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+    const userRole = useSelector<RootState, string>(state => state.user.role);
 
     const cartItemList: ICartItem[] = useSelector<RootState, ICartItem[]>(state => state.cartItem.cart_item_list);
     const cartItemCount: number = useSelector<RootState, number>(state => state.cartItem.cart_item_count);
@@ -98,6 +105,8 @@ const Header = () => {
     const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
     const [showMiniShoppingCart, setShowMiniShoppingCart] = React.useState<boolean>(false);
     const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
+
+    const infoSettingBox = React.useRef<HTMLDivElement>(null);
 
     const [productSearch, setProductSearch] = React.useState<string>("");
     const [productSearchList, setProductSearchList] = React.useState<ISearchProduct[]>([]);
@@ -251,16 +260,30 @@ const Header = () => {
     const handleShowWidgetInfo = () => {
         if (account && isAuthenticated) {
             setShowInfoSettingBox(true);
-        } else {
-            setShowInfoSettingBox(false);
         }
     }
+
+    React.useEffect(() => {
+
+        const closeInfoSettingBox = (e) => {
+            if (!infoSettingBox.current?.contains(e.target)) {
+                setShowInfoSettingBox(false);
+            }
+        }
+
+        document.body.addEventListener("mousedown", closeInfoSettingBox);
+
+        return () => {
+            document.body.removeEventListener('mousedown', closeInfoSettingBox);
+        };
+    }, []);
 
     const handleUserLogout = async () => {
         let result: any = await userLogout();
         if (result && result.EC === 0) {
             successToast1(result.EM);
             setShowInfoSettingBox(false);
+
             setTimeout(() => {
                 window.location.reload();
             }, 1500);
@@ -274,6 +297,7 @@ const Header = () => {
             let userData = result.DT;
 
             if (userData.role === "customer") {
+
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
                     account: {
@@ -281,7 +305,8 @@ const Header = () => {
                         username: userData.username,
                         role: userData.role,
                         customer_id: userData.customer_id
-                    }
+                    },
+                    role: "customer"
                 }
 
                 dispatch(UserLogin(data));
@@ -311,7 +336,23 @@ const Header = () => {
                     }));
                 }
 
-            } else {
+            }
+            else if (userData.role === "seller") {
+
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role,
+                        seller_id: userData.seller_id
+                    },
+                    role: "seller"
+                }
+
+                dispatch(UserLogin(data));
+            }
+            else {
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
                     account: {
@@ -407,86 +448,91 @@ const Header = () => {
                         <div className='search-bar__btn'>Tìm kiếm</div>
                     </div>
                     <div className="navigation">
-                        <div className='favorite-items relative' onClick={() => navigate("/favorite-products")}>
-                            <BsHeart className="icon" />
-                            {wishListCount > 0 &&
-                                <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
-                            }
-                        </div>
-                        <div className='shopping-cart relative z-40' onMouseEnter={() => {
-                            setShowMiniShoppingCart(true);
-                            setShowInfoSettingBox(false);
-                        }}>
-                            <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")} />
-                            {cartItemCount > 0 &&
-                                <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
-                            }
-                            {
-                                showMiniShoppingCart &&
-                                <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
-                                    onMouseEnter={() => {
-                                        setShowMiniShoppingCart(true)
-                                    }}
-                                    onMouseLeave={() => setShowMiniShoppingCart(false)}
-                                >
-                                    {
-                                        cartItemCount > 0 ?
-                                            <>
-                                                {
-                                                    cartItemList.map((item, index) => {
-                                                        return (
-                                                            <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                {item.product_info.image ?
-                                                                    <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
-                                                                    :
-                                                                    <PiImageThin className="w-12 h-12 cursor-pointer" />
-                                                                }
-                                                                <div className='flex items-center justify-between w-full'>
-                                                                    <div>
-                                                                        <div
-                                                                            className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleProductDetailNavigation(item.product_info.id)
-                                                                            }
-                                                                            }
-                                                                        >
-                                                                            {item.product_info.name}
-                                                                        </div>
-                                                                        <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
-                                                                            <span>{item.quantity}</span>
-                                                                            <span>x</span>
-                                                                            <span>{CurrencyFormat(item.price)}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer' onClick={() => handleDeleteCartItem(+item.id)}>&#128473;</div>
-                                                                </div>
-
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                                <div className='shopping-cart-total flex items-center justify-between mb-8'>
-                                                    <div className='font-medium text-black text-lg'>Tổng cộng</div>
-                                                    <div className='font-bold text-red-500 text-lg'>{CurrencyFormat(cartItemTotal)}</div>
-                                                </div>
-                                                <div className='flex items-center justify-between gap-x-6'>
-                                                    <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/cart")}>Xem giỏ hàng</div>
-                                                    <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer'>Thanh toán</div>
-
-                                                </div>
-                                            </>
-                                            :
-                                            <>
-                                                <div className='text-black font-normal text-center py-4'>Chưa có sản phẩm</div>
-                                            </>
+                        {
+                            userRole === "customer" &&
+                            <>
+                                <div className='favorite-items relative' onClick={() => navigate("/favorite-products")}>
+                                    <BsHeart className="icon" />
+                                    {wishListCount > 0 &&
+                                        <div className='count absolute right-[-5px] top-[16px]'>{wishListCount}</div>
                                     }
-
                                 </div>
-                            }
-                        </div>
+                                <div className='shopping-cart relative z-40' onMouseEnter={() => {
+                                    setShowMiniShoppingCart(true);
+                                    setShowInfoSettingBox(false);
+                                }}>
+                                    <PiShoppingCartLight className="icon" onClick={() => navigate("/cart")} />
+                                    {cartItemCount > 0 &&
+                                        <div className='count absolute right-[-5px] top-[16px]'>{cartItemCount}</div>
+                                    }
+                                    {
+                                        showMiniShoppingCart &&
+                                        <div className='widget-shopping-cart absolute bg-white top-[50px] w-[23rem] right-[-160px] z-50 px-5 py-4 border border-gray-400'
+                                            onMouseEnter={() => {
+                                                setShowMiniShoppingCart(true)
+                                            }}
+                                            onMouseLeave={() => setShowMiniShoppingCart(false)}
+                                        >
+                                            {
+                                                cartItemCount > 0 ?
+                                                    <>
+                                                        {
+                                                            cartItemList.map((item, index) => {
+                                                                return (
+                                                                    <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
+                                                                        {item.product_info.image ?
+                                                                            <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
+                                                                            :
+                                                                            <PiImageThin className="w-12 h-12 cursor-pointer" />
+                                                                        }
+                                                                        <div className='flex items-center justify-between w-full'>
+                                                                            <div>
+                                                                                <div
+                                                                                    className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleProductDetailNavigation(item.product_info.id)
+                                                                                    }
+                                                                                    }
+                                                                                >
+                                                                                    {item.product_info.name}
+                                                                                </div>
+                                                                                <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
+                                                                                    <span>{item.quantity}</span>
+                                                                                    <span>x</span>
+                                                                                    <span>{CurrencyFormat(item.price)}</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer' onClick={() => handleDeleteCartItem(+item.id)}>&#128473;</div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                )
+                                                            })
+                                                        }
+                                                        <div className='shopping-cart-total flex items-center justify-between mb-8'>
+                                                            <div className='font-medium text-black text-lg'>Tổng cộng</div>
+                                                            <div className='font-bold text-red-500 text-lg'>{CurrencyFormat(cartItemTotal)}</div>
+                                                        </div>
+                                                        <div className='flex items-center justify-between gap-x-6'>
+                                                            <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/cart")}>Xem giỏ hàng</div>
+                                                            <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer'>Thanh toán</div>
+
+                                                        </div>
+                                                    </>
+                                                    :
+                                                    <>
+                                                        <div className='text-black font-normal text-center py-4'>Chưa có sản phẩm</div>
+                                                    </>
+                                            }
+
+                                        </div>
+                                    }
+                                </div>
+                            </>
+                        }
                         <div className='authentication relative z-50 cursor-pointer'
-                            onMouseEnter={() => {
+                            onClick={() => {
                                 handleShowWidgetInfo()
                                 setShowMiniShoppingCart(false)
                             }}
@@ -505,10 +551,25 @@ const Header = () => {
                                         {
                                             showInfoSettingBox &&
                                             <div className='widget-info absolute bg-white top-[50px] w-[12rem] right-[-50px] z-50 border border-gray-400'
-                                                onMouseEnter={() => handleShowWidgetInfo()}
-                                                onMouseLeave={() => handleShowWidgetInfo()}
+                                                onClick={() => handleShowWidgetInfo()} 
+                                                ref={infoSettingBox}
                                             >
-                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={() => navigate("/customer-info/account/info")}>Thông Tin Tài Khoản</div>
+                                                {
+                                                    userRole === "customer" &&
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) =>{ 
+                                                        e.stopPropagation();
+                                                        setShowInfoSettingBox(false);
+                                                        navigate("/customer-info/account/info");
+                                                    }}>Thông Tin Tài Khoản</div>
+                                                }
+                                                {
+                                                    userRole === "seller" &&
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowInfoSettingBox(false);
+                                                        navigate("/seller-info/dashboard");
+                                                    }}>Thông Tin Người Bán</div>
+                                                }
                                                 <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
                                             </div>
                                         }

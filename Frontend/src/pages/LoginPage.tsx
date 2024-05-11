@@ -125,18 +125,6 @@ const LoginPage = () => {
                     setShowErrorMsg(true);
                     setShowLoadingIcon(false);
                 } else {
-                    let userData = result.DT;
-                    console.log(userData);
-
-                    let data = {
-                        isAuthenticated: true,
-                        account: {
-                            id: userData.id,
-                            username: userData.username,
-                            role: userData.role
-                        }
-                    }
-                    
                     successToast1("Đăng nhập thành công !");
                     setShowLoadingIcon(false);
 
@@ -191,7 +179,21 @@ const LoginPage = () => {
                     }));
                 }
 
-            } else {
+            }
+            else if (userData.role === "seller") {
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        id: userData.id,
+                        username: userData.username,
+                        role: userData.role,
+                        seller_id: userData.seller_id
+                    }
+                }
+
+                dispatch(UserLogin(data));
+            }
+            else {
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
                     account: {
@@ -243,9 +245,9 @@ const LoginPage = () => {
                             <div className="text-orange-400 cursor-pointer hover:underline text-sm" onClick={() => redirectPage(PATH.ResetPassword)}>Quên mật khẩu ?</div>
                         </div>
                         <div className='mt-6 w-full'>
-                            <Button 
-                            styles={checkFullField() ? 'form_button_valid' : 'form_button'}
-                            OnClick={() => handleLogin()}>
+                            <Button
+                                styles={checkFullField() ? 'form_button_valid' : 'form_button'}
+                                OnClick={() => handleLogin()}>
                                 {showLoadingIcon ? <FaSpinner className='animate-spin' /> : "ĐĂNG NHẬP"}
                             </Button>
                         </div>

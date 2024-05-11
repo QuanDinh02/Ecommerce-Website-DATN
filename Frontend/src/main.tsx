@@ -1,10 +1,13 @@
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.scss';
+
 import Technologies from '@/pages/Reference/Technologies.tsx';
 import ReduxTesting from '@/pages/Reference/ReduxTesting.tsx';
-import ErrorPage from '@/pages/ErrorPage.tsx';
 import ReferencePage from '@/pages/Reference.tsx';
+
+import ErrorPage from '@/pages/ErrorPage.tsx';
+
 import Homepage from '@/pages/Homepage.tsx';
 import RegisterPage from '@/pages/RegisterPage.tsx';
 import LoginPage from '@/pages/LoginPage.tsx';
@@ -15,6 +18,7 @@ import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
 import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
+
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
 import CustomerAccount from '@/pages/CustomerInfo/CustomerAccount.tsx';
 import PasswordModification from '@/pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
@@ -24,7 +28,6 @@ import CustomerAddress from '@/pages/CustomerInfo/CustomerAddress.tsx';
 import CustomerOrder from '@/pages/CustomerInfo/CustomerOrder.tsx';
 import VoucherPage from '@/pages/CustomerInfo/VoucherPage.tsx';
 import CustomerSupport from '@/pages/CustomerInfo/CustomerSupport.tsx';
-import CustomerRoute from './components/CustomerRoute.tsx';
 import AllOrder from '@/pages/CustomerInfo/CustomerOrder/AllOrder.tsx';
 import PendingPaymentOrder from '@/pages/CustomerInfo/CustomerOrder/PendingPaymentOrder.tsx';
 import PendingShippingOrder from '@/pages/CustomerInfo/CustomerOrder/PendingShippingOrder.tsx';
@@ -33,6 +36,26 @@ import CancelOrder from '@/pages/CustomerInfo/CustomerOrder/CancelOrder.tsx';
 import ReturnOrder from '@/pages/CustomerInfo/CustomerOrder/ReturnOrder.tsx';
 import ShippingOrder from '@/pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx';
 import CustomerAccountInfo from '@/pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
+import VoucherAll from '@/pages/CustomerInfo/Voucher/VoucherAll.tsx';
+import VoucherHistory from '@/pages/CustomerInfo/Voucher/VoucherHistory.tsx';
+
+import SellerInfo from '@/pages/SellerInfo/SellerInfo.tsx';
+import SellerAllOrder from '@/pages/SellerInfo/SellerOrder/AllOrder.tsx';
+import SellerPendingPaymentOrder from '@/pages/SellerInfo/SellerOrder/PendingPaymentOrder.tsx';
+import SellerPendingShippingOrder from '@/pages/SellerInfo/SellerOrder/PendingShippingOrder.tsx';
+import SellerCompletedShippingOrder from '@/pages/SellerInfo/SellerOrder/CompletedShippingOrder.tsx';
+import SellerCancelOrder from '@/pages/SellerInfo/SellerOrder/CancelOrder.tsx';
+import SellerReturnOrder from '@/pages/SellerInfo/SellerOrder/ReturnOrder.tsx';
+import SellerShippingOrder from '@/pages/SellerInfo/SellerOrder/ShippingOrder.tsx';
+import SellerOrder from '@/pages/SellerInfo/SellerOrder.tsx';
+import SellerDashboard from '@/pages/SellerInfo/SellerDashboard.tsx';
+import SellerProduct from '@/pages/SellerInfo/SellerProduct.tsx';
+import SellerProductAll from '@/pages/SellerInfo/SellerProduct/SellerProductAll.tsx';
+import SellerAddNewProduct from '@/pages/SellerInfo/SellerProduct/SellerAddNewProduct.tsx';
+import SellerProfile from '@/pages/SellerInfo/SellerProfile.tsx';
+
+import SellerRoute from '@/components/SellerRoute.tsx';
+import CustomerRoute from '@/components/CustomerRoute.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -43,8 +66,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import VoucherAll from './pages/CustomerInfo/Voucher/VoucherAll.tsx';
-import VoucherHistory from './pages/CustomerInfo/Voucher/VoucherHistory.tsx';
 
 const router = createBrowserRouter(
   [
@@ -66,6 +87,65 @@ const router = createBrowserRouter(
             {
               path: "redux-testing",
               element: <ReduxTesting />
+            },
+          ]
+        },
+        {
+          path: "seller-info",
+          element:
+            <SellerRoute>
+              <SellerInfo />
+            </SellerRoute>,
+          children: [
+            { path: "dashboard", element: <SellerDashboard /> },
+            {
+              path: "order",
+              element: <SellerOrder />,
+              children: [
+                {
+                  path: "all",
+                  element: <SellerAllOrder />,
+                },
+                {
+                  path: "pending-payment",
+                  element: <SellerPendingPaymentOrder />,
+                },
+                {
+                  path: "shipping",
+                  element: <SellerShippingOrder />,
+                },
+                {
+                  path: "pending-shipping",
+                  element: <SellerPendingShippingOrder />,
+                },
+                {
+                  path: "completed-shipping",
+                  element: <SellerCompletedShippingOrder />,
+                },
+                {
+                  path: "cancel",
+                  element: <SellerCancelOrder />,
+                },
+                {
+                  path: "return",
+                  element: <SellerReturnOrder />,
+                },
+              ]
+            },
+            { path: "profile", element: <SellerProfile/>},
+            {
+              path: "product",
+              element: <SellerProduct/>,
+              children: [
+                {
+                  path: "all",
+                  element: <SellerProductAll/>,
+                },
+                {
+                  path: "new",
+                  element: <SellerAddNewProduct/>,
+                }
+              ]
             },
           ]
         },
@@ -142,11 +222,11 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: "info",
-                  element: <VoucherAll/>,
+                  element: <VoucherAll />,
                 },
                 {
                   path: "history",
-                  element: <VoucherHistory/>,
+                  element: <VoucherHistory />,
                 },
               ]
             },
@@ -170,7 +250,10 @@ const router = createBrowserRouter(
         },
         {
           path: "cart",
-          element: <ShoppingCartPage />
+          element:
+            <CustomerRoute>
+              <ShoppingCartPage />
+            </CustomerRoute>
         },
         {
           path: "payment",
@@ -178,7 +261,10 @@ const router = createBrowserRouter(
         },
         {
           path: "favorite-products",
-          element: <FavoriteProductPage />
+          element:
+            <CustomerRoute>
+              <FavoriteProductPage />
+            </CustomerRoute>
         },
         {
           path: "register",

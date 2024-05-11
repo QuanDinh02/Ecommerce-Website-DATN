@@ -85,6 +85,7 @@ const userLogin = async (userData) => {
                 if (userData.password === user.password) {
 
                     let customer_id = 0;
+                    let seller_id = 0;
 
                     if(role === "customer") {
                         let customerInfo = await db.Customer.findOne({
@@ -118,6 +119,40 @@ const userLogin = async (userData) => {
                             EM: 'Login success !'
                         }
                     }
+
+                    if(role === "seller") {
+                        let sellerInfo = await db.Seller.findOne({
+                            raw: true,
+                            attributes: ['id','name'],
+                            where: {
+                                userID: {
+                                    [Op.eq]: user.id
+                                }
+                            }
+                        })
+
+                        seller_id = sellerInfo.id;
+
+                        let payload = {
+                            seller_id: seller_id,
+                            username: sellerInfo.name,
+                            role: user.role,
+                            isAuthenticated: true,
+                        }
+    
+                        let accessToken = createToken(payload);
+                        return {
+                            EC: 0,
+                            DT: {
+                                accessToken: accessToken,
+                                username: sellerInfo.name,
+                                role: user.role,
+                                seller_id: seller_id
+                            },
+                            EM: 'Login success !'
+                        }
+                    }
+
                     let payload = {
                         username: user.username,
                         role: user.role,

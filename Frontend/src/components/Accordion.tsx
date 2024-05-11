@@ -1,6 +1,7 @@
 import React from "react";
 import './Accordion.scss';
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { RiArrowDropDownLine } from "react-icons/ri";
 
 interface ISideBarChild {
     path: string
@@ -16,7 +17,8 @@ interface ISideBarItem {
 }
 
 interface IProps {
-    data: ISideBarItem[]
+    data: ISideBarItem[],
+    user_type: string
 }
 
 const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
@@ -27,6 +29,10 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
     const sideBarItem: ISideBarItem = item;
 
     const contentHeight = React.useRef<HTMLDivElement>(null);
+
+    if (isOpen) {
+        console.log(item);
+    }
 
     const handleOnClick = () => {
         onClick();
@@ -44,6 +50,10 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
                 onClick={() => handleOnClick()}
             >
                 <p className="menu-content flex items-center gap-x-3">{sideBarItem.icon} {sideBarItem.name}</p>
+                {
+                    (parent_path === "/seller-info" && sideBarItem.children.length > 0) &&
+                    <RiArrowDropDownLine className={`arrow ${isOpen ? "active" : ""}`} />
+                }
             </button>
 
             <div
@@ -74,7 +84,7 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
 
 const Accordion = (props: IProps) => {
 
-    let { data } = props;
+    let { data, user_type } = props;
     const location = useLocation();
 
     const [activeIndex, setActiveIndex] = React.useState<number>(0);
@@ -84,13 +94,14 @@ const Accordion = (props: IProps) => {
     };
 
     React.useEffect(() => {
-        if(location.pathname.includes("/customer-info")) {
+        if (location.pathname.includes(`/${user_type}-info`)) {
             let idx = data.findIndex(item => location.pathname.includes(item.path));
-            if(idx > 0) {
+
+            if (idx > 0) {
                 setActiveIndex(idx);
             }
         }
-    },[]);
+    }, []);
 
     return (
         <div className="container">
@@ -100,7 +111,7 @@ const Accordion = (props: IProps) => {
                     item={side_bar_item}
                     isOpen={activeIndex === index}
                     onClick={() => handleItemClick(index)}
-                    parent_path={"/customer-info"}
+                    parent_path={`/${user_type}-info`}
                 />
             ))}
         </div>

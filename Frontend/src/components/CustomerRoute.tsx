@@ -56,15 +56,7 @@ const CustomerRoute = ({ children }) => {
                 }
 
             } else {
-                let data = {
-                    isAuthenticated: userData.isAuthenticated,
-                    account: {
-                        id: userData.id,
-                        username: userData.username,
-                        role: userData.role
-                    }
-                }
-                dispatch(UserLogin(data));
+                navigate("/");
             }
         } else {
             navigate("/login");
