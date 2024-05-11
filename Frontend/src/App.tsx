@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from 'react-hot-toast';
 import 'swiper/css';
+import "react-datepicker/dist/react-datepicker.css";
 
 function App() {
   return (

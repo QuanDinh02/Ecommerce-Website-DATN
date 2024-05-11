@@ -30,10 +30,6 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
 
     const contentHeight = React.useRef<HTMLDivElement>(null);
 
-    if (isOpen) {
-        console.log(item);
-    }
-
     const handleOnClick = () => {
         onClick();
         if (item.skip === true) {

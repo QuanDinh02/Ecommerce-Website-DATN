@@ -22,7 +22,7 @@ const DAYS = [1, 2, 3, 4, 5];
 const MONTHS = [1, 2, 3, 4, 5];
 const YEARS = [2024, 2023, 2022, 2021, 2020];
 
-const Dropdown = ({ data, style }) => {
+export const Dropdown = ({ data, style }) => {
 
     const [value, setValue] = React.useState<number>(0);
     const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
