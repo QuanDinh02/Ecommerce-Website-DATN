@@ -5,7 +5,7 @@ import { useImmer } from "use-immer";
 import { Dropdown } from "../CustomerInfo/CustomerAccount/CustomerAccountInfo";
 import Button from "@/components/Button";
 import DatePicker from "react-datepicker";
-
+import './SellerOrder/SellerOrder.scss';
 const SEARCH_TYPE = ["Mã đơn hàng", "Mã khách hàng", "Tên khách hàng"];
 
 const SellerOrder = () => {
@@ -115,7 +115,7 @@ const SellerOrder = () => {
                 </div>
                 <Button styles="text-black font-medium bg-[#FCB800] w-28 rounded-[4px] text-sm hover:opacity-80">Tìm kiếm</Button>
             </div>
-            <div className="order-managment__order-date-search flex items-center gap-x-2 justify-end">
+            <div className="order-managment__order-date-search flex items-center gap-x-2 justify-end mb-10">
                 <div className="text-sm">Ngày đặt hàng</div>
                 <DatePicker
                     showIcon

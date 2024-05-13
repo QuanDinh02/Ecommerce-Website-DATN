@@ -1,8 +1,6 @@
-import { ORDER_SAMPLE_DATA } from "./OrderDataSample";
-import { MdStorefront } from "react-icons/md";
+import { ORDER_LIST_SAMPLE_DATA } from "./OrderDataSample";
+import { BiUserCircle } from "react-icons/bi";
 import { CurrencyFormat } from "@/utils/numberFormat";
-import Button from "@/components/Button";
-import React from "react";
 
 export const STATUS_STYLE = {
     'ĐANG XỬ LÝ': {
@@ -49,76 +47,91 @@ export const STATUS_STYLE = {
     }
 }
 
+const tableHeaders = [
+    {
+        name: "Sản phẩm",
+        size: 2
+    },
+    {
+        name: "Tổng đơn hàng",
+        size: 1
+    },
+    {
+        name: "Trạng thái",
+        size: 1
+    },
+    {
+        name: "Đơn vị vận chuyển",
+        size: 1
+    },
+    {
+        name: "Thao tác",
+        size: 1
+    }
+];
+
 const AllOrder = () => {
 
-    const [orderList, setOrderList] = React.useState<any>([]);
-
-    React.useEffect(() => {
-        setOrderList(ORDER_SAMPLE_DATA);
-    }, []);
-
     return (
-        <div className="all-order-container">
-            <div className="text-xl pb-4 border-b border-gray-300 mb-4">Tất cả đơn hàng</div>
-            {
-                (orderList && orderList.length > 0) ?
-                    <>
-                        {
-                            orderList.map((item, index) => {
+        <>
+            <div className="text-xl pb-4 border-b border-gray-300 mb-4">Tất cả đơn hàng ({ORDER_LIST_SAMPLE_DATA.length})</div>
+            <table className="table-fixed w-full mb-8">
+                <thead>
+                    <tr className='bg-gray-100 border-b-10 border-white'>
+                        {tableHeaders && tableHeaders.length > 0 &&
+                            tableHeaders.map((item, index) => {
                                 return (
-                                    <div className="order-item rounded-[4px] shadow-lg mb-12" key={`order-item-${index}`}>
-                                        <div className="order-item__header px-3 py-2 flex items-center justify-between border-b border-gray-200 bg-[#F2F3F7]">
-                                            <div className="shop-name flex items-center gap-x-4">
-                                                <div className="shop-name__title font-bold">{item.shop_info.name}</div>
-                                                <div className="shop-name__link flex items-center justify-center gap-x-1 py-1 px-3 border border-gray-300 bg-white text-gray-500 cursor-pointer"><MdStorefront /> Xem shop</div>
-                                                <div className="tracking-wide font-medium">17-05-2024</div>
-                                            </div>
-                                            <div className={`order-status font-medium ${STATUS_STYLE[item.status].style}`}>{item.status}</div>
-                                        </div>
-                                        <div className="order-item__product-list px-5 py-3 bg-[#F2F3F7]">
-                                            {
-                                                item.order_items.map((product, product_index) => {
-                                                    return (
-                                                        <div className="order-product flex items-center justify-between pb-4 mb-4 border-b border-gray-300" key={`order-product-${index}-${product_index}`}>
-                                                            <div className="order-product__info flex gap-x-4">
-                                                                <div className="w-24 h-24"><img src={product.image} alt="" /></div>
-                                                                <div className="flex flex-col gap-y-1">
-                                                                    <div className="font-medium">{product.name}</div>
-                                                                    <div>x{product.quantity}</div>
-                                                                    <div className="px-2 py-1 border border-green-500 text-green-500 w-fit">{product.label}</div>
-                                                                </div>
-                                                            </div>
-                                                            <div className="order-product__price flex items-center gap-x-2">
-                                                                <div className="current_price text-lg text-[#FCB800] font-medium">{CurrencyFormat(product.current_price)}</div>
-                                                                <div className="price line-through text-gray-500">{CurrencyFormat(product.price)}</div>
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                        <div className="order-item__bottom bg-[#FFFEFA] px-3 py-2">
-                                            <div className="my-6 text-end w-full">Thành tiền: <span className="text-xl text-[#FCB800] font-medium">{CurrencyFormat(item.total)}</span></div>
-                                            <div className="flex items-center justify-between py-3">
-                                                <div className="text-sm text-gray-500 tracking-wide w-[30rem]">{item.note}</div>
-                                                <div className="flex items-center gap-x-3 transition-all">
-                                                    <Button styles="px-3 py-2 rounded-[4px] bg-[#FCB800] text-black hover:opacity-80">{STATUS_STYLE[item.status].actions[0].title}</Button>
-                                                    <Button styles="px-3 py-2 rounded-[4px] bg-white text-black border-gray-300 border hover:bg-gray-200">{STATUS_STYLE[item.status].actions[1].title}</Button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <th key={`header-${index}`} className="text-left py-3 px-2 font-normal" colSpan={item.size}>{item.name}</th>
                                 )
                             })
                         }
-                    </>
-                    :
-                    <div className="w-full text-gray-500 text-center border border-gray-100 bg-gray-100 py-2">Chưa có đơn hàng nào !</div>
-            }
-
-
-
-        </div>
+                    </tr>
+                </thead>
+                {
+                    ORDER_LIST_SAMPLE_DATA.map((item, index) => {
+                        return (
+                            <tbody key={`order-${item.id}`}>
+                                <tr>
+                                    <td colSpan={6} className="bg-gray-100 px-2 py-1 rounded-t-lg">
+                                        <div className="flex items-center justify-between text-gray-500">
+                                            <div className="flex items-center gap-x-1"><BiUserCircle className="w-5 h-5" />{item.username}</div>
+                                            <div>ID Đơn hàng {item.id}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr className="border border-gray-200">
+                                    <td className="py-2 px-2" colSpan={2}>
+                                        <div className="flex gap-x-2 items-center">
+                                            <div className="w-14 h-14 w-1/5"><img src={item.image} alt="" /></div>
+                                            <div className="text-sm w-3/5">
+                                                <div className="line-clamp-1 mb-1 font-medium">{item.product.name}</div>
+                                                <div className="text-gray-600">{item.product.product_type_name}</div>
+                                            </div>
+                                            <div className="w-1/5 text-end">x {item.product.quantity}</div>
+                                        </div>
+                                    </td>
+                                    <td className="py-2 px-2" colSpan={1}>
+                                        <div>
+                                            <div className="font-medium">{CurrencyFormat(item.product.price * (item.product.quantity))}</div>
+                                            <div className="text-gray-600 text-sm">Thanh toán khi nhận hàng</div>
+                                        </div>
+                                    </td>
+                                    <td className="py-2 px-2" colSpan={1}>
+                                        <div className="font-bold">{item.status}</div>
+                                        <div className="text-sm text-gray-600">Đã nhận: {item.status_date}</div>
+                                    </td>
+                                    <td className="py-2 px-2 font-medium text-green-500 text-sm" colSpan={1}>{item.shipping_unit.name}</td>
+                                    <td className="py-2 px-2 text-sm" colSpan={1}>
+                                        <div className="text-blue-500 hover:underline cursor-pointer">Thông tin vận chuyển</div>
+                                        <div className="text-blue-500 hover:underline cursor-pointer">Chi tiết đơn hàng</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        )
+                    })
+                }
+            </table>
+        </>
     )
 }
 

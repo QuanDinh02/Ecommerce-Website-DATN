@@ -1,0 +1,13 @@
+.order-managment__list {
+
+    tbody {
+        &:before {
+
+            content    : "-";
+            display    : block;
+            line-height: 1em;
+            color      : transparent;
+        }
+
+    }
+}

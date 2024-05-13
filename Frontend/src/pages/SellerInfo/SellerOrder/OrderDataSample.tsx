@@ -1,3 +1,4 @@
+import Item from '../../../assets/img/homepage/recommend_items/item7.svg';
 import Item1 from '../../../assets/img/homepage/recommend_items/item7.svg';
 import Item2 from '../../../assets/img/homepage/recommend_items/item8.svg';
 import Item3 from '../../../assets/img/homepage/recommend_items/item9.svg';
@@ -129,5 +130,42 @@ export const ORDER_SAMPLE_DATA = [
             }
         ],
         total: 10847000
+    }
+]
+
+export const ORDER_LIST_SAMPLE_DATA = [
+    {
+        id: "04234AB445GFFA",
+        username: "Customer",
+        status: "Chờ lấy hàng",
+        status_date: "05-05-2024",
+        image: Item,
+        shipping_unit: {
+            id: 1,
+            name: "Giao hàng tiết kiệm"
+        },
+        product: {
+            name: "Bánh tráng Củ Chi bao dẻo bao ngon",
+            product_type_name: "Phân loại: 100gr",
+            price: 50000,
+            quantity: 5
+        }
+    },
+    {
+        id: "09234RF445GFFA",
+        username: "Customer",
+        status: "Chờ lấy hàng",
+        status_date: "05-05-2024",
+        image: Item,
+        shipping_unit: {
+            id: 2,
+            name: "Giao hàng nhanh"
+        },
+        product: {
+            name: "Bánh tráng Củ Chi bao dẻo bao ngon",
+            product_type_name: "Phân loại: 100gr",
+            price: 50000,
+            quantity: 2
+        }
     }
 ]
