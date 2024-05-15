@@ -14,7 +14,7 @@ const upload = multer();
 
 const ApiRoute = (app) => {
 
-    //router.get('/testAPI', apiController.testAPI);
+    router.get('/testAPI', apiController.testAPI);
 
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
