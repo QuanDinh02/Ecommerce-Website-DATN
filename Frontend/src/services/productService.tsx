@@ -10,7 +10,7 @@ export const getProductsByCategory = async (category_id: number, page: number) =
 }
 
 export const getProductsBySubCategory = async (sub_category_id: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${2}&id=${sub_category_id}&page=${page}`);
+    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}`);
     if (result && result?.DT) {
         return result.DT;
     }

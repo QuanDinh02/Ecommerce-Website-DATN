@@ -253,7 +253,9 @@ const SubCategoryPage = () => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
         }
-        fetchProductsBySubCategory(activeSubCategory.id);
+        if (activeSubCategory.id !== 0) {
+            fetchProductsBySubCategory(activeSubCategory.id);
+        }
     }, [currentPage])
 
     return (
@@ -382,8 +384,8 @@ const SubCategoryPage = () => {
                                         <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
                                             <div className="text-2xl my-2">{activeSubCategory.id !== 0 ? activeSubCategory.title : activeCategory.name}</div>
                                             <div className="flex items-center gap-x-1 mb-5">
-                                                <span className="font-medium">299</span>
-                                                <span className="text-gray-500">sản phẩm được tìm thấy trong Điện thoại/ Phụ kiện</span>
+                                                <span className="font-medium">{totalItems}</span>
+                                                <span className="text-gray-500">sản phẩm được tìm thấy trong {activeSubCategory.title}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">

@@ -119,17 +119,19 @@ const CategoryMenu = () => {
                 <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px] border border-gray-400 bg-white px-8 py-6 flex gap-10">
                     <div className="sub-menu-category">
                         <div className="title font-bold mb-3">{hoverCategory.title}</div>
-                        {subMenuData && subMenuData.length > 0 &&
-                            subMenuData.map((item, index) => {
-                                return (
-                                    <div
-                                        className="item mb-2 hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300"
-                                        key={`sub-category-${item.id}`}
-                                        onClick={() => handleSubCategoryNavigation(hoverCategory.id, hoverCategory.title, item.id, item.title)}
-                                    >{item.title}</div>
-                                )
-                            })
-                        }
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-2">
+                            {subMenuData && subMenuData.length > 0 &&
+                                subMenuData.map((item, index) => {
+                                    return (
+                                        <div
+                                            className="item hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300 line-clamp-1"
+                                            key={`sub-category-${item.id}`}
+                                            onClick={() => handleSubCategoryNavigation(hoverCategory.id, hoverCategory.title, item.id, item.title)}
+                                        >{item.title}</div>
+                                    )
+                                })
+                            }
+                        </div>
                     </div>
                 </div>
             }

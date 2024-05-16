@@ -5,7 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class ProductReview extends Model {
     static associate(models) {
-        ProductReview.belongsTo(models.ProductType, { foreignKey: 'productTypeID' });
+        //ProductReview.belongsTo(models.Product, { foreignKey: 'productID' });
         ProductReview.belongsTo(models.Customer, { foreignKey: 'customerID' });
         ProductReview.belongsTo(models.Seller, { foreignKey: 'shopID' });
         ProductReview.hasMany(models.Image, { foreignKey: 'productReviewID' });
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   ProductReview.init({
     comment: DataTypes.TEXT("medium"),
     rating: DataTypes.TINYINT,
-    productTypeID: DataTypes.BIGINT,
+    productID: DataTypes.BIGINT,
     parentID: DataTypes.BIGINT,
     customerID: DataTypes.BIGINT,
     shopID: DataTypes.BIGINT,

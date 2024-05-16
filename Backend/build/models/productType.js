@@ -31,9 +31,6 @@ module.exports = function (sequelize, DataTypes) {
         ProductType.hasMany(models.Image, {
           foreignKey: 'productTypeID'
         });
-        ProductType.hasMany(models.ProductReview, {
-          foreignKey: 'productTypeID'
-        });
         ProductType.hasMany(models.CartItem, {
           foreignKey: 'productTypeID'
         });

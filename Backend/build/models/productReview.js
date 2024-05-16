@@ -25,8 +25,8 @@ module.exports = function (sequelize, DataTypes) {
     return _createClass(ProductReview, null, [{
       key: "associate",
       value: function associate(models) {
-        ProductReview.belongsTo(models.ProductType, {
-          foreignKey: 'productTypeID'
+        ProductReview.belongsTo(models.Product, {
+          foreignKey: 'productID'
         });
         ProductReview.belongsTo(models.Customer, {
           foreignKey: 'customerID'
@@ -43,7 +43,7 @@ module.exports = function (sequelize, DataTypes) {
   ProductReview.init({
     comment: DataTypes.TEXT("medium"),
     rating: DataTypes.TINYINT,
-    productTypeID: DataTypes.BIGINT,
+    productID: DataTypes.BIGINT,
     parentID: DataTypes.BIGINT,
     customerID: DataTypes.BIGINT,
     shopID: DataTypes.BIGINT,

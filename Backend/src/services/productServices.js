@@ -74,20 +74,22 @@ const getProductDetail = async (product_id) => {
 
         let commentList = await Promise.all(productTypesList.map(async item => {
 
-            let productReviews = await db.ProductReview.findAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'comment', 'rating', 'createdAt'],
-                include: {
-                    model: db.Customer,
-                    attributes: ['id', 'name'],
-                },
-                where: {
-                    productTypeID: {
-                        [Op.eq]: item.id
-                    }
-                }
-            });
+            // let productReviews = await db.ProductReview.findAll({
+            //     raw: true,
+            //     nest: true,
+            //     attributes: ['id', 'comment', 'rating', 'createdAt'],
+            //     include: {
+            //         model: db.Customer,
+            //         attributes: ['id', 'name'],
+            //     },
+            //     where: {
+            //         productTypeID: {
+            //             [Op.eq]: item.id
+            //         }
+            //     }
+            // });
+
+            let productReviews = [];
 
             // let productReviewRebuildData = productReviews.map(item => {
             //     let customer_info = item.Customer;
@@ -103,18 +105,18 @@ const getProductDetail = async (product_id) => {
             //     reviews: productReviewRebuildData
             // }
 
-            let productReviewRebuildData = await productReviews.map(item => {
-                let customer_info = item.Customer;
-                delete item.Customer;
+            // let productReviewRebuildData = await productReviews.map(item => {
+            //     let customer_info = item.Customer;
+            //     delete item.Customer;
 
-                return {
-                    ...item, customer_name: customer_info.name
-                }
-            })
+            //     return {
+            //         ...item, customer_name: customer_info.name
+            //     }
+            // })
 
             return {
                 product_type_id: item.id,
-                reviews: productReviewRebuildData
+                reviews: productReviews
             }
         }));
 
@@ -188,50 +190,49 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 return item.id;
             })
 
-            let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
+            let productListRaw = await db.ProductSubCategory.findAll({
                 raw: true,
                 nest: true,
-                attributes: ['id', 'title'],
-                include: {
-                    model: db.Product,
-                    attributes: ['id', 'name'],
-                    through: { attributes: [] },
-                },
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    },
+                    {
+                        model: db.SubCategory,
+                        attributes: ['id', 'title'],
+                    }
+                ],
                 where: {
-                    id: {
+                    subCategoryID: {
                         [Op.in]: subCategoryIdList,
                     },
                 }
             });
 
-            const pageTotal = Math.ceil(productListRaw.length / item_limit);
+            const listLength = productListRaw.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
 
             productListRaw.reverse();
             productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-            let productListFinal = [];
+            let productListFinal = await productListRaw.map(item => {
 
-            await productListRaw.forEach(item => {
-                //let product = item.Products;
                 let sub_category = {
-                    id: item.id,
-                    name: item.title
+                    id: item.SubCategory.id,
+                    name: item.SubCategory.title
                 }
 
-                let product = {
-                    id: item.Products.id,
-                    name: item.Products.name,
+                return {
+                    id: item.Product.id,
+                    name: item.Product.name,
                     sub_category: sub_category
-                }
-
-                if (product.id != null) {
-                    productListFinal = [...productListFinal, product];
                 }
             });
 
             let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
-                let productTypes = await db.ProductType.findAll({
+                let productType = await db.ProductType.findOne({
                     raw: true,
                     attributes: ['id', 'currentPrice', 'price'],
                     where: {
@@ -241,15 +242,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     }
                 });
 
-                let { currentPrice } = _.minBy(productTypes, (o) => {
-                    return o.currentPrice;
-                })
-
-                let { price } = _.minBy(productTypes, (o) => {
-                    return o.price;
-                })
-
-                let productImages = await db.Image.findOne({
+                let productImage = await db.Image.findOne({
                     raw: true,
                     nest: true,
                     attributes: ['id', 'image'],
@@ -259,11 +252,12 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                         }
                     }
                 });
+
                 return {
                     ...item,
-                    image: productImages.image,
-                    current_price: currentPrice,
-                    price: price
+                    image: productImage?.image ? productImage?.image : "",
+                    current_price: productType.currentPrice,
+                    price: productType.price
                 }
             }));
 
@@ -272,7 +266,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 DT: {
                     page: page,
                     page_total: pageTotal,
-                    total_items: count,
+                    total_items: listLength,
                     product_list: productListFinalWithImage
                 },
                 EM: 'Get products by category !'
@@ -299,39 +293,49 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
             let offSet = (page - 1) * item_limit;
 
-            let { count, rows: productListRaw } = await db.SubCategory.findAndCountAll({
+            let productListRaw = await db.ProductSubCategory.findAll({
                 raw: true,
                 nest: true,
-                attributes: [],
-                include: {
-                    model: db.Product,
-                    attributes: ['id', 'name'],
-                    through: { attributes: [] }
-                },
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    },
+                    {
+                        model: db.SubCategory,
+                        attributes: ['id', 'title'],
+                    }
+                ],
                 where: {
-                    id: {
+                    subCategoryID: {
                         [Op.eq]: sub_category_id,
                     },
                 }
             });
 
-            const pageTotal = Math.ceil(productListRaw.length / item_limit);
+            const listLength = productListRaw.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
 
             productListRaw.reverse();
             productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-            let productListFinal = [];
+            let productListFinal = await productListRaw.map(item => {
 
-            await productListRaw.forEach(item => {
-                let product = item.Products;
-                if (product.id != null) {
-                    productListFinal = [...productListFinal, product];
+                let sub_category = {
+                    id: item.SubCategory.id,
+                    name: item.SubCategory.title
+                }
+
+                return {
+                    id: item.Product.id,
+                    name: item.Product.name,
+                    sub_category: sub_category
                 }
             });
 
             let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
-                let productTypes = await db.ProductType.findAll({
+                let productType = await db.ProductType.findOne({
                     raw: true,
                     attributes: ['id', 'currentPrice', 'price'],
                     where: {
@@ -341,15 +345,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     }
                 });
 
-                let { currentPrice } = _.minBy(productTypes, (o) => {
-                    return o.currentPrice;
-                })
-
-                let { price } = _.minBy(productTypes, (o) => {
-                    return o.price;
-                })
-
-                let productImages = await db.Image.findOne({
+                let productImage = await db.Image.findOne({
                     raw: true,
                     nest: true,
                     attributes: ['id', 'image'],
@@ -359,11 +355,12 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                         }
                     }
                 });
+
                 return {
                     ...item,
-                    image: productImages.image,
-                    current_price: currentPrice,
-                    price: price
+                    image: productImage?.image ? productImage?.image : "",
+                    current_price: productType.currentPrice,
+                    price: productType.price
                 }
             }));
 
@@ -372,7 +369,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                 DT: {
                     page: page,
                     page_total: pageTotal,
-                    total_items: count,
+                    total_items: listLength,
                     product_list: productListFinalWithImage
                 },
                 EM: 'Get products by sub-category !'
@@ -458,8 +455,91 @@ const getSearchProducts = async (product_name) => {
         }
     }
 }
+
+const getProductReviews = async (product_id, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'comment', 'rating'],
+                include: {
+                    model: db.Customer,
+                    attributes: ['id', 'name']
+                },
+                where: {
+                    productID: {
+                        [Op.eq]: product_id,
+                    },
+                }
+            });
+
+            let star_ratings = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
+                '5': 0,
+            }
+
+            await productReviewList.forEach(item => {
+                star_ratings[`${item.rating}`] += 1;
+            });
+
+            const pageTotal = Math.ceil(productReviewList.length / item_limit);
+
+            let productListRaw = [];
+
+            productListRaw = productReviewList.reverse();
+            productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+            let finalData = productListRaw.map(item => {
+                let customer = item.Customer;
+                if (!customer.id) {
+                    delete item.Customer;
+
+                    return {
+                        ...item, customer: null
+                    }
+                } else {
+                    return {
+                        ...item, customer: customer
+                    }
+                }
+            })
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: count,
+                    ratings: star_ratings,
+                    product_reviews: finalData
+                },
+                EM: 'Get product reviews !'
+            }
+        }
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
-    getProductDetail
+    getProductDetail, getProductReviews
 }

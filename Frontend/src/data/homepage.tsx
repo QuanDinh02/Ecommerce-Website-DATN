@@ -13,6 +13,8 @@ import { LiaExchangeAltSolid } from "react-icons/lia";
 import { CiCreditCard1 } from "react-icons/ci";
 import { PiWechatLogoLight } from "react-icons/pi";
 import { CiSpeaker } from "react-icons/ci";
+import { MdOutlineElectricalServices } from "react-icons/md";
+import { TbBabyBottle } from "react-icons/tb";
 
 export const menuCategoryItems = [
     {
@@ -115,34 +117,25 @@ export const clientBenefits = [
 
 export const categoryIcon = [
     {
-        icon: <CiStar className="w-5 h-5" />,
+        icon: <CiMobile4 className="w-5 h-5" />,
     },
     {
         icon: <CiSpeaker className="w-5 h-5" />,
     },
     {
-        icon: <PiTShirtLight className="w-5 h-5" />,
+        icon: <HiOutlineComputerDesktop className="w-5 h-5" />,
+    },
+    {
+        icon: <MdOutlineElectricalServices className="w-5 h-5" />,
     },
     {
         icon: <TbToolsKitchen className="w-5 h-5" />,
     },
     {
-        icon: <PiHeartbeatLight className="w-5 h-5" />,
-    },
-    {
-        icon: <IoDiamondOutline className="w-5 h-5" />,
-    },
-    {
-        icon: <HiOutlineComputerDesktop className="w-5 h-5" />,
-    },
-    {
-        icon: <LiaBabyCarriageSolid className="w-5 h-5" />,
-    },
-    {
         icon: <IoTennisballOutline className="w-5 h-5" />,
     },
     {
-        icon: <CiMobile4 className="w-5 h-5" />,
+        icon: <TbBabyBottle className="w-5 h-5" />,
     },
     {
         icon: <IoBookOutline className="w-5 h-5" />,

@@ -25,7 +25,7 @@ module.exports = {
               rating: {
                 type: Sequelize.TINYINT
               },
-              productTypeID: {
+              productID: {
                 type: Sequelize.BIGINT
               },
               parentID: {

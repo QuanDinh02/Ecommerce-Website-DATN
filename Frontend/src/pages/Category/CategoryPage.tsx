@@ -292,7 +292,9 @@ const CategoryPage = () => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
         }
-        fetchProductsByCategory(activeCategory.id);
+        if (activeCategory.id !== 0) {
+            fetchProductsByCategory(activeCategory.id);
+        }
     }, [currentPage])
 
     return (
@@ -433,8 +435,8 @@ const CategoryPage = () => {
                                         <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
                                             <div className="text-2xl my-2">{activeCategory.name}</div>
                                             <div className="flex items-center gap-x-1 mb-5">
-                                                <span className="font-medium">299</span>
-                                                <span className="text-gray-500">sản phẩm được tìm thấy trong Điện thoại/ Phụ kiện</span>
+                                                <span className="font-medium">{totalItems}</span>
+                                                <span className="text-gray-500">sản phẩm được tìm thấy trong {activeCategory.name}</span>
                                             </div>
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">

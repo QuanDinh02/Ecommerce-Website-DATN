@@ -1,5 +1,6 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
+const _ = require("lodash");
 
 const getAllCategories = async () => {
     try {
@@ -10,7 +11,7 @@ const getAllCategories = async () => {
 
         let data = await Promise.all(categoryData.map(async item => {
             let category_id = +item.id;
-            let categoryList = await db.SubCategory.findAll({
+            let subCategoryList = await db.SubCategory.findAll({
                 raw: true,
                 attributes: ['id', 'title'],
                 where: {
@@ -20,10 +21,12 @@ const getAllCategories = async () => {
                 },
             });
 
+            let subCategoryData = _(subCategoryList).take(20).value();
+
             return {
                 id: category_id,
                 title: item.title,
-                sub_category_list: categoryList
+                sub_category_list: subCategoryData
             }
         }));
 

@@ -25,7 +25,7 @@ module.exports = function (sequelize, DataTypes) {
     return _createClass(Product, null, [{
       key: "associate",
       value: function associate(models) {
-        Product.hasMany(models.ProductType, {
+        Product.hasOne(models.ProductType, {
           foreignKey: 'productID'
         });
         Product.hasMany(models.WishList, {
@@ -45,6 +45,9 @@ module.exports = function (sequelize, DataTypes) {
           foreignKey: 'productID'
         });
         Product.hasMany(models.PromotionProduct, {
+          foreignKey: 'productID'
+        });
+        Product.hasMany(models.ProductPreview, {
           foreignKey: 'productID'
         });
         Product.belongsTo(models.Seller, {
