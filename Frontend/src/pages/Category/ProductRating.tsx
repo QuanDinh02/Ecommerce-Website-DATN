@@ -5,7 +5,6 @@ import { TbMinusVertical } from "react-icons/tb";
 interface IProps {
     ratings: number
     selling_count: number
-    ratings_count: number
     item_grid: boolean
 }
 
@@ -35,11 +34,6 @@ const ProductRating = (props: IProps) => {
                         <TbMinusVertical className="text-gray-300" />
                         <div className="text-sm">Đã bán {numberKFormat(props.selling_count)}</div>
                     </div>
-                    <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                        <div className="font-bold">{props.ratings}</div>
-                        <div>/5.0</div>
-                        <div>({props.ratings_count})</div>
-                    </div>
                 </>
                 :
                 <>
@@ -59,11 +53,6 @@ const ProductRating = (props: IProps) => {
                                     )
                                 })
                             }
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">{props.ratings}</div>
-                            <div>/5.0</div>
-                            <div>({props.ratings_count})</div>
                         </div>
                         <div className="text-sm">Đã bán {numberKFormat(props.selling_count)}</div>
                     </div>

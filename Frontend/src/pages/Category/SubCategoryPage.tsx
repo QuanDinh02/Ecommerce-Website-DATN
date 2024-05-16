@@ -40,6 +40,8 @@ interface ICateogryProduct {
     price: number
     image: string
     name: string
+    rating: number
+    sold: number
 }
 
 interface IData {
@@ -525,9 +527,8 @@ const SubCategoryPage = () => {
                                                                                         </div>
 
                                                                                         <ProductRating
-                                                                                            ratings={4.9}
-                                                                                            ratings_count={123}
-                                                                                            selling_count={123}
+                                                                                            ratings={item.rating}
+                                                                                            selling_count={item.sold}
                                                                                             key={`item-rating-${item.id}`}
                                                                                             item_grid={true}
                                                                                         />
@@ -567,9 +568,8 @@ const SubCategoryPage = () => {
                                                             <div className="product__left-content w-80">
                                                                 <div className="product__name text-blue-600 mb-2 line-clamp-2 duration-300 hover:text-[#FCB800]">{item.name}</div>
                                                                 <ProductRating
-                                                                    ratings={4.9}
-                                                                    ratings_count={123}
-                                                                    selling_count={123}
+                                                                    ratings={item.rating}
+                                                                    selling_count={item.sold}
                                                                     key={`item-rating-${item.id}`}
                                                                     item_grid={false}
                                                                 />

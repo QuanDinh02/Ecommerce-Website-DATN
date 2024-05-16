@@ -5,10 +5,16 @@ export const numberWithDotFormater = (num: number) => {
 
 export const numberKFormat = (num: number) => {
     if(num >= 1000000) {
-        return`${num/1000000}tr`;
+        let value = Math.round((num/1000000) * 10) / 10;
+        return`${value}tr`;
     }
     if(num >= 1000) {
-        return`${num/1000}k`;
+        let value = Math.round((num/1000) * 10) / 10;
+        return`${value}k`;
+    }
+
+    if(num >= 100) {
+        return `${num}`;
     }
     return `${num}`;
 }

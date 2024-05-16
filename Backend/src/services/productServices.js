@@ -169,7 +169,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
 
                 let productType = await db.ProductType.findOne({
                     raw: true,
-                    attributes: ['id', 'currentPrice', 'price'],
+                    attributes: ['id', 'currentPrice', 'price', 'sold'],
                     where: {
                         productID: {
                             [Op.eq]: item.id
@@ -188,11 +188,38 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     }
                 });
 
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'rating'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id,
+                        },
+                    }
+                });
+
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
                 return {
                     ...item,
                     image: productImage?.image ? productImage?.image : "",
                     current_price: productType.currentPrice,
-                    price: productType.price
+                    price: productType.price,
+                    sold: productType.sold,
+                    rating: rating_average
                 }
             }));
 
@@ -272,7 +299,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
                 let productType = await db.ProductType.findOne({
                     raw: true,
-                    attributes: ['id', 'currentPrice', 'price'],
+                    attributes: ['id', 'currentPrice', 'price', 'sold'],
                     where: {
                         productID: {
                             [Op.eq]: item.id
@@ -291,11 +318,38 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     }
                 });
 
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'rating'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id,
+                        },
+                    }
+                });
+
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
                 return {
                     ...item,
                     image: productImage?.image ? productImage?.image : "",
                     current_price: productType.currentPrice,
-                    price: productType.price
+                    price: productType.price,
+                    sold: productType.sold,
+                    rating: rating_average
                 }
             }));
 
@@ -424,7 +478,7 @@ const getProductReviews = async (product_id, item_limit, page) => {
                 star_ratings[`${item.rating}`] += 1;
             });
 
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2']*2 + star_ratings['3']*3 + star_ratings['4']*4 + star_ratings['5']*5) / count) * 10) / 10;
+            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
 
             const pageTotal = Math.ceil(productReviewList.length / item_limit);
 
