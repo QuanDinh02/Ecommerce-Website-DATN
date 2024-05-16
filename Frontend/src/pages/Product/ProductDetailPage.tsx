@@ -37,10 +37,9 @@ import { TbMinusVertical } from "react-icons/tb";
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Rating from "@/components/Rating";
-import { getProductDetailInfo } from "@/services/productService";
+import { getProductDetailInfo, getProductReview } from "@/services/productService";
 import { LiaCartPlusSolid } from "react-icons/lia";
-import { dateFormat } from "@/utils/dateFormat";
-import classNames from "classnames";
+
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
 import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItemService";
@@ -52,11 +51,13 @@ import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
 import { TailSpin } from "react-loader-spinner";
 import {
     IProductActive, ISubCategoryActive, ICategoryActive,
-    IProductType, IProductDetail, ISelectType,
+    IProductDetail, IProductReview, IReviewData, IRatings,
     IAccount, ICartItem
 } from "./ProductDetailPage_types";
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
+import ReactPaginate from "react-paginate";
+import { dateFormat } from "@/utils/dateFormat";
 
 const ProductDetailPage = () => {
 
@@ -73,25 +74,15 @@ const ProductDetailPage = () => {
 
     const [productAmount, setProductAmount] = React.useState<number>(0);
 
-    const [colors, setColors] = useImmer<ISelectType[]>([]);
-    const [sizes, setSizes] = useImmer<ISelectType[]>([]);
-
     const [productDetailInfo, setProductDetailInfo] = useImmer<IProductDetail>({
         id: 0,
         name: "",
         currentPrice: 0,
         price: 0,
+        sold: 0,
         description: "",
-        comment_count: 0,
-        rating_average: 0,
         product_image: "",
         inventory_count: 0,
-        reviews: [],
-        product_type_list: [],
-        product_type_group: {
-            color: [],
-            size: []
-        },
         sub_category: {
             id: 0,
             title: ""
@@ -105,6 +96,13 @@ const ProductDetailPage = () => {
             name: ""
         },
     });
+
+    const [productReviews, setProductReviews] = React.useState<IProductReview[]>([]);
+    const [currentPage, setCurrentPage] = React.useState<number>(1);
+    const [totalPages, setTotalPages] = React.useState<number>(20);
+    const [totalRatings, setTotalRatings] = React.useState<number>(0);
+    const [ratings, setRatings] = React.useState<IRatings>();
+    const [ratingAverage, setRatingAverage] = React.useState<number>(0);
 
     const [selectedImage, setSelectedImage] = React.useState({
         id: 1,
@@ -170,23 +168,6 @@ const ProductDetailPage = () => {
 
     const [ratingFilter, setRatingFilter] = React.useState<number>(0);
 
-    const [selectTypeNotice, setSelectTypeNotice] = React.useState<boolean>(false);
-
-    const selectTypeNoticeClassname = classNames(
-        "w-full p-4",
-        {
-            'bg-red-100': selectTypeNotice,
-        }
-    );
-
-    const selectProductTypeClassname = (IsSelected: boolean) => classNames(
-        "px-3 py-1.5 border border-gray-300 flex items-center justify-center w-fit hover:border-red-500 hover:text-red-500 cursor-pointer",
-        {
-            'border-red-500 text-red-500': IsSelected,
-            'bg-white': !IsSelected,
-        }
-    );
-
     const handleProductAmount = (num: any) => {
         if (!isNaN(num) && num > 0) {
             if (productAmount > 0 && num > productAmount) {
@@ -212,57 +193,6 @@ const ProductDetailPage = () => {
     const hanldeFavoriteItem = () => {
         successToast1("Thêm vào sản phẩm yêu thích !");
     }
-
-    const handleSelectProductType = (id: number, type: string) => {
-        if (type === "COLORS") {
-            setColors(draft => {
-                draft.forEach(item => {
-                    if (item.id === +id) {
-                        item.select = !item.select;
-                    } else {
-                        item.select = false;
-                    }
-                })
-            })
-        }
-
-        if (type === "SIZES") {
-            setSizes(draft => {
-                draft.forEach(item => {
-                    if (item.id === +id) {
-                        item.select = !item.select;
-                    } else {
-                        item.select = false;
-                    }
-                })
-            })
-        }
-    }
-
-    React.useEffect(() => {
-        if (selectTypeNotice) {
-            let selectColor = colors.some(item => item.select === true);
-            let selectSize = sizes.some(item => item.select === true);
-            if (selectColor && selectSize) {
-                setSelectTypeNotice(false);
-            }
-        }
-    }, [colors, sizes]);
-
-    React.useEffect(() => {
-        let selectColor = colors.filter(item => item.select === true)[0];
-        let selectSize = sizes.filter(item => item.select === true)[0];
-
-        if (!_.isEmpty(selectColor) && !_.isEmpty(selectSize)) {
-            productDetailInfo.product_type_list.forEach(item => {
-                if (item.color === selectColor.label && item.size === selectSize.label) {
-                    setProductAmount(item.quantity);
-                }
-            });
-        } else {
-            setProductAmount(productDetailInfo.inventory_count);
-        }
-    }, [colors, sizes]);
 
     const refetchCartItem = async () => {
         let cartItemsData: any = await fetchCartItem(account.customer_id);
@@ -291,37 +221,13 @@ const ProductDetailPage = () => {
     }
 
     const hanldeAddShoppingCart = () => {
-        if (colors.length > 0) {
-            let IsSelected = colors.some(item => item.select === true);
-            if (!IsSelected) {
-                setSelectTypeNotice(true);
-                return;
-            }
-        }
-        if (sizes.length > 0) {
-            let IsSelected = sizes.some(item => item.select === true);
-            if (!IsSelected) {
-                setSelectTypeNotice(true);
-                return;
-            }
-        }
-        setSelectTypeNotice(false);
+
         if (productAmount === 0) {
             errorToast1("Sản phẩm hết hàng !");
             return;
         }
         if (!_.isEmpty(account) && isAuthenticated) {
-            if (colors.length === 0 && sizes.length === 0) {
-                let productTypeItem: IProductType = productDetailInfo.product_type_list[0];
-                handleAddCartItem(amount, account.customer_id, productTypeItem.id);
-            } else {
-
-                let selectColor = colors.filter(item => item.select === true)[0];
-                let selectSize = sizes.filter(item => item.select === true)[0];
-
-                let productTypeItem: IProductType = productDetailInfo.product_type_list.filter(item => item.color === selectColor.label && item.size === selectSize.label)[0];
-                handleAddCartItem(amount, account.customer_id, productTypeItem.id);
-            }
+            //handleAddCartItem(amount, account.customer_id, productTypeItem.id);
         } else {
             navigate("/login");
         }
@@ -337,41 +243,15 @@ const ProductDetailPage = () => {
                 draft.currentPrice = response.currentPrice;
                 draft.price = response.price;
                 draft.description = response.description;
-                draft.comment_count = response.comment_count;
-                draft.rating_average = response.rating_average;
                 draft.product_image = response.product_image;
                 draft.inventory_count = response.inventory_count;
-                draft.reviews = response.reviews;
-                draft.product_type_list = response.product_type_list;
-                draft.product_type_group = response.product_type_group;
+                draft.sold = response.sold;
                 draft.sub_category = response.sub_category;
                 draft.category = response.category;
                 draft.shop_info = response.shop_info;
             })
 
             setProductAmount(response.inventory_count);
-
-            if (response.product_type_group.color.length > 0) {
-                let result: ISelectType[] = response.product_type_group.color.map((item, index) => {
-                    return {
-                        id: +index,
-                        label: item,
-                        select: false
-                    }
-                });
-                setColors(result);
-            }
-
-            if (response.product_type_group.size.length > 0) {
-                let result: ISelectType[] = response.product_type_group.size.map((item, index) => {
-                    return {
-                        id: +index,
-                        label: item,
-                        select: false
-                    }
-                });
-                setSizes(result);
-            }
 
             setActiveCategory({
                 ...activeCategory, id: response.category.id, title: response.category.title
@@ -384,6 +264,17 @@ const ProductDetailPage = () => {
             setActiveProduct({
                 ...activeProduct, id: product_id ? product_id : 0, name: response.name
             });
+        }
+    }
+
+    const fetchProductReviews = async (product_id: number) => {
+        let response: IReviewData = await getProductReview(+product_id, +currentPage);
+        if (response) {
+            setProductReviews(response.product_reviews);
+            setTotalPages(response.page_total);
+            setTotalRatings(response.total_ratings);
+            setRatings(response.ratings);
+            setRatingAverage(response.rating_average)
         }
     }
 
@@ -433,6 +324,11 @@ const ProductDetailPage = () => {
                 sub_category_id: sub_category_id, sub_category_name: sub_category_title,
             }
         })
+    }
+
+    const handlePageClick = (event) => {
+        setCurrentPage(+event.selected + 1);
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 
     const swiperSlides = () => {
@@ -1059,13 +955,23 @@ const ProductDetailPage = () => {
             let { product_id } = location.state;
             if (product_id) {
                 fetchProductsBySubCategory(product_id);
+                fetchProductReviews(product_id);
             }
         }
     }, [location.state]);
 
+    React.useEffect(() => {
+        // 2876581
+        //fetchProductsBySubCategory(2876581);
+        //fetchProductReviews(2876581);
+
+        if (productDetailInfo.id !== 0) {
+            fetchProductReviews(productDetailInfo.id);
+        }
+    }, [currentPage])
+
     return (
         <>
-
             <div className="product-detail-container">
                 {
                     dataLoading ?
@@ -1084,7 +990,7 @@ const ProductDetailPage = () => {
                         :
                         <>
                             <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
-                                <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
+                                <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-1">
                                     <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                     <MdOutlineArrowForwardIos />
                                     <div
@@ -1101,7 +1007,7 @@ const ProductDetailPage = () => {
                                         {activeSubCategory.title}
                                     </div>
                                     <MdOutlineArrowForwardIos />
-                                    <div className="font-medium cursor-pointer hover:underline">{activeProduct.name}</div>
+                                    <div className="font-medium cursor-pointer hover:underline w-1/3 line-clamp-1">{activeProduct.name}</div>
                                 </div>
                             </div>
                             <div className="product-detail__content mt-16 mb-24">
@@ -1144,18 +1050,18 @@ const ProductDetailPage = () => {
                                             <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
                                             <div className="product__rating-stars flex items-center gap-x-3 mt-1">
                                                 <div className="flex items-center gap-x-0.5">
-                                                    <Rating rating={productDetailInfo.rating_average} />
-                                                    <span className="ml-1 text-[#FCB800] font-medium">{productDetailInfo.rating_average}</span>
+                                                    <Rating rating={ratingAverage} />
+                                                    <span className="ml-1 text-[#FCB800] font-medium">{ratingAverage ? ratingAverage : 0}</span>
                                                 </div>
                                                 <GoDotFill className="text-gray-300 w-3 h-3" />
                                                 <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                                     <MdOutlineMessage className="w-5 h-5" />
-                                                    <span>{productDetailInfo.comment_count} đánh giá</span>
+                                                    <span>{totalRatings} đánh giá</span>
                                                 </div>
                                                 <GoDotFill className="text-gray-300 w-3 h-3" />
                                                 <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                                     <IoBagCheckOutline className="w-5 h-5" />
-                                                    <span>Đã bán 2k2</span>
+                                                    <span>Đã bán {numberKFormat(productDetailInfo.sold)}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-x-3">
@@ -1163,7 +1069,10 @@ const ProductDetailPage = () => {
                                                 <div className="product__price text-lg text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
                                             </div>
                                             <div className="shop flex items-center gap-x-4">
-                                                <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productDetailInfo.shop_info.name}</span></div>
+                                                {
+                                                    productDetailInfo.shop_info.id &&
+                                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productDetailInfo.shop_info.name}</span></div>
+                                                }
                                                 <div>Tình trạng:&nbsp;
                                                     {
                                                         productDetailInfo.inventory_count > 0 ?
@@ -1174,79 +1083,29 @@ const ProductDetailPage = () => {
                                                 </div>
                                             </div>
                                             <div className="border-t border-gray-300 w-full my-4"></div>
-                                            <div className={selectTypeNoticeClassname}>
-                                                <div className="product__type-selection">
-                                                    <div className="group">
-                                                        {colors && colors.length > 0 &&
-                                                            <div>
-                                                                <div className="text-gray-500 mb-2">Màu Sắc</div>
-                                                                <div className="flex gap-x-2">
-                                                                    {
-                                                                        colors.map((item, index) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={`color-item-${item.id}`}
-                                                                                    className={selectProductTypeClassname(item.select)}
-                                                                                    onClick={() => handleSelectProductType(item.id, "COLORS")}
-                                                                                >
-                                                                                    {item.label}
-                                                                                </div>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                        {sizes && sizes.length > 0 &&
-                                                            <div className="mt-4 mb-6">
-                                                                <div className="text-gray-500 mb-2">Size</div>
-                                                                <div className="flex gap-x-2">
-                                                                    {
-                                                                        sizes.map((item, index) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={`size-item-${item.id}`}
-                                                                                    className={selectProductTypeClassname(item.select)}
-                                                                                    onClick={() => handleSelectProductType(item.id, "SIZES")}
-                                                                                >
-                                                                                    {item.label}
-                                                                                </div>
-                                                                            )
-                                                                        })
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        }
-
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-x-4 mt-6">
-                                                    <div className="mb-1">Số lượng</div>
-                                                    {
-                                                        productAmount > 0 ?
-                                                            <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-white">
-                                                                <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
-                                                                <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(+e.target.value)} />
-                                                                <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
-                                                            </div>
-                                                            :
-                                                            <>
-                                                                <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-gray-100">
-                                                                    <FiMinus className="w-6 h-6 text-gray-400" />
-                                                                    <input type="text" className="w-1/2 text-center outline-none select-none bg-gray-100" value={0} disabled />
-                                                                    <FiPlus className="w-6 h-6 text-gray-400" />
-                                                                </div>
-                                                            </>
-
-                                                    }
-                                                    <div className={productAmount > 0 ? "text-gray-500" : "text-red-500"}>
-                                                        {productAmount > 0 ? `${productAmount} sản phẩm có sẵn` : "Hết hàng !"}
-
-                                                    </div>
-                                                </div>
+                                            <div className="flex items-center gap-x-4 mt-6">
+                                                <div className="mb-1">Số lượng</div>
                                                 {
-                                                    selectTypeNotice && <div className="text-red-500 mt-4">Vui lòng chọn phân loại hàng</div>
+                                                    productAmount > 0 ?
+                                                        <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-white">
+                                                            <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                                            <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(+e.target.value)} />
+                                                            <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                                        </div>
+                                                        :
+                                                        <>
+                                                            <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-gray-100">
+                                                                <FiMinus className="w-6 h-6 text-gray-400" />
+                                                                <input type="text" className="w-1/2 text-center outline-none select-none bg-gray-100" value={0} disabled />
+                                                                <FiPlus className="w-6 h-6 text-gray-400" />
+                                                            </div>
+                                                        </>
+
                                                 }
+                                                <div className={productAmount > 0 ? "text-gray-500" : "text-red-500"}>
+                                                    {productAmount > 0 ? `${productAmount} sản phẩm có sẵn` : "Hết hàng !"}
+
+                                                </div>
                                             </div>
                                             <div className="flex items-center gap-x-4 mt-6 mb-4">
                                                 <Button
@@ -1287,61 +1146,28 @@ const ProductDetailPage = () => {
                                         </div>
                                         {
                                             productDetail[0].selected &&
-                                            <>
-                                                <div className="product__info-description w-[50rem] text-gray-500 text-justify mb-5">{productDetailInfo.description}</div>
-                                                <div className="w-[37rem] flex border boder-gray-400 mb-16">
-                                                    <table className='w-1/3'>
-                                                        <tbody>
-                                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                                <td className="text-gray-600 py-2 px-2">Model</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                                <td className="text-gray-600 py-2 px-2">Style</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                                <td className="text-gray-600 py-2 px-2">Certificate</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400 bg-[#EFF2F4]'>
-                                                                <td className="text-gray-600 py-2 px-2">Size</td>
-                                                            </tr>
-                                                            <tr className='bg-[#EFF2F4]'>
-                                                                <td className="text-gray-600 py-2 px-2">Memory</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                    <table className='w-2/3'>
-                                                        <tbody>
-                                                            <tr className='border-b boder-gray-400'>
-                                                                <td className="py-2 px-2">#8786867</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400'>
-                                                                <td className="py-2 px-2">Classic style</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400'>
-                                                                <td className="py-2 px-2">ISO-898921212</td>
-                                                            </tr>
-                                                            <tr className='border-b boder-gray-400'>
-                                                                <td className="py-2 px-2">34mm x 450mm x 19mm</td>
-                                                            </tr>
-                                                            <tr className=''>
-                                                                <td className="py-2 px-2">36GB RAM</td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </>
+                                            <div className="product__info-description text-gray-500 mb-5 w-2/3">
+                                                <span className="text-balance w-auto">{productDetailInfo.description}</span>
+                                            </div>
                                         }
                                         {
                                             productDetail[1].selected &&
                                             <>
                                                 <div className="border bg-gray-100 border-gray-300 p-5 mb-8">
                                                     <div className="product_ratings flex items-center gap-x-3 mb-4">
-                                                        <div className="text-3xl font-bold text-[#FCB800]">5.0</div>
+                                                        <div className="text-3xl font-bold text-[#FCB800]">{ratingAverage ? ratingAverage : 0}</div>
                                                         <div className="flex items-center">
                                                             {
-                                                                [...Array(5)].map((item, index) => {
+                                                                [...Array(Math.floor(ratingAverage))].map((item, index) => {
                                                                     return (
                                                                         <GoStarFill className="text-[#FCB800] w-5 h-5" />
+                                                                    )
+                                                                })
+                                                            }
+                                                            {
+                                                                [...Array(5 - Math.floor(ratingAverage))].map((item, index) => {
+                                                                    return (
+                                                                        <GoStarFill className="text-gray-300 w-5 h-5" />
                                                                     )
                                                                 })
                                                             }
@@ -1349,33 +1175,58 @@ const ProductDetailPage = () => {
                                                     </div>
                                                     <div className="product_rating_filter flex items-center gap-x-2">
                                                         <div className={ratingFilter === 0 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(0)}>Tất cả</div>
-                                                        <div className={ratingFilter === 5 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(5)}>5 sao (232)</div>
-                                                        <div className={ratingFilter === 4 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(4)}>4 sao (12)</div>
-                                                        <div className={ratingFilter === 3 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(3)}>3 sao (31)</div>
-                                                        <div className={ratingFilter === 2 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(2)}>2 sao (4)</div>
-                                                        <div className={ratingFilter === 1 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(1)}>1 sao (1)</div>
+                                                        <div className={ratingFilter === 5 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(5)}>5 sao ({ratings ? ratings["5"] : 0})</div>
+                                                        <div className={ratingFilter === 4 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(4)}>4 sao ({ratings ? ratings["4"] : 0})</div>
+                                                        <div className={ratingFilter === 3 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(3)}>3 sao ({ratings ? ratings["3"] : 0})</div>
+                                                        <div className={ratingFilter === 2 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(2)}>2 sao ({ratings ? ratings["2"] : 0})</div>
+                                                        <div className={ratingFilter === 1 ? "border border-[#FCB800] bg-white w-fit px-5 py-2 text-[#FCB800] font-medium cursor-pointer" : "border border-gray-300 bg-white w-fit px-5 py-2 cursor-pointer"} onClick={() => setRatingFilter(1)}>1 sao ({ratings ? ratings["1"] : 0})</div>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    {productDetailInfo.reviews && productDetailInfo.reviews.length > 0 &&
-                                                        productDetailInfo.reviews.map((item, index) => {
+                                                    {productReviews && productReviews.length > 0 &&
+                                                        productReviews.map((item, index) => {
                                                             return (
                                                                 <div key={`customer-comment-${item.id}`} className="mb-10">
                                                                     <div className="flex gap-x-2 mb-3">
                                                                         <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">CS</div>
                                                                         <div className="flex flex-col">
                                                                             <div className="flex items-center gap-x-2">
-                                                                                <div className="font-medium">{item.customer_name}</div>
+                                                                                <div className="font-medium">{item?.customer?.name ? item?.customer?.name : "Ẩn Danh"}</div>
                                                                                 <Rating rating={item.rating} />
                                                                             </div>
                                                                             <div className="text-gray-600">{dateFormat(`${item.createdAt}`)}</div>
                                                                         </div>
 
                                                                     </div>
-                                                                    <div className="w-[50rem] text-gray-500">{item.comment}</div>
+                                                                    <div className="w-full text-gray-500">{item.comment ? item.comment : <span className="w-full border border-gray-200 px-3 py-1 bg-gray-100">Không có nhận xét sản phẩm</span>}</div>
                                                                 </div>
                                                             )
                                                         })
+                                                    }
+                                                    {
+                                                        productReviews && productReviews.length > 0 &&
+                                                        <div className='pagination-container flex justify-center'>
+                                                            <ReactPaginate
+                                                                nextLabel=">"
+                                                                onPageChange={handlePageClick}
+                                                                pageRangeDisplayed={3}
+                                                                marginPagesDisplayed={3}
+                                                                pageCount={totalPages}
+                                                                previousLabel="<"
+                                                                pageClassName="page-item"
+                                                                pageLinkClassName="page-link page-background"
+                                                                previousClassName="page-item"
+                                                                previousLinkClassName="page-link pre-next"
+                                                                nextClassName="page-item"
+                                                                nextLinkClassName="page-link pre-next"
+                                                                breakLabel="..."
+                                                                breakClassName="page-item"
+                                                                breakLinkClassName="page-link"
+                                                                containerClassName="pagination flex items-center gap-2 "
+                                                                activeLinkClassName="page-active-background"
+                                                                renderOnZeroPageCount={null}
+                                                            />
+                                                        </div>
                                                     }
                                                 </div>
                                             </>

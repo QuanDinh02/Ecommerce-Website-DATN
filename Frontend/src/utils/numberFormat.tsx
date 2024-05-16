@@ -4,6 +4,9 @@ export const numberWithDotFormater = (num: number) => {
 }
 
 export const numberKFormat = (num: number) => {
+    if(num >= 1000000) {
+        return`${num/1000000}tr`;
+    }
     if(num >= 1000) {
         return`${num/1000}k`;
     }

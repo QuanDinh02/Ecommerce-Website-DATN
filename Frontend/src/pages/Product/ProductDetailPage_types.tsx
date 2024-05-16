@@ -1,3 +1,7 @@
+interface ICustomerInfo {
+    id: number
+    name: string
+}
 export interface IProductActive {
     id: number
     name: string
@@ -15,8 +19,24 @@ export interface IProductReview {
     id: number
     comment: string
     rating: number
+    customer: ICustomerInfo
     createdAt: Date
-    customer_name: string
+}
+
+export interface IRatings {
+    "1" : number
+    "2" : number
+    "3" : number
+    "4" : number
+    "5" : number
+}
+export interface IReviewData {
+    page: number
+    page_total: number
+    total_ratings: number
+    rating_average: number
+    ratings: IRatings
+    product_reviews: IProductReview[]
 }
 
 export interface IProductType {
@@ -30,11 +50,6 @@ export interface IProductType {
     price: number
 }
 
-export interface IProductTypeGroup {
-    color: string[]
-    size: string[]
-}
-
 export interface IShop {
     id: number
     name: string
@@ -44,14 +59,10 @@ export interface IProductDetail {
     name: string
     currentPrice: number
     price: number
+    sold: number
     description: string
-    comment_count: number
-    rating_average: number
     product_image: string
     inventory_count: number
-    reviews: IProductReview[]
-    product_type_list: IProductType[]
-    product_type_group: IProductTypeGroup
     sub_category: ISubCategoryActive
     category: ICategoryActive
     shop_info: IShop

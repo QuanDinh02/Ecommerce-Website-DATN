@@ -33,6 +33,9 @@ module.exports = {
             productID: {
                 type: Sequelize.BIGINT
             },
+            sold: {
+                type: Sequelize.INTEGER
+            },
         });
     },
     async down(queryInterface, Sequelize) {
