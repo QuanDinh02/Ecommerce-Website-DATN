@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   class CartItem extends Model {
     static associate(models) {
         CartItem.belongsTo(models.Customer, { foreignKey: 'customerID' });
-        CartItem.belongsTo(models.ProductType, { foreignKey: 'productTypeID' });
+        CartItem.belongsTo(models.Product, { foreignKey: 'productID' });
     }
   }
   CartItem.init({
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     createdAt: DataTypes.TIME,
     updatedAt: DataTypes.TIME,
     customerID: DataTypes.BIGINT,
-    productTypeID: DataTypes.BIGINT,
+    productID: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'CartItem',

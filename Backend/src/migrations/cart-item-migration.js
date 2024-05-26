@@ -21,7 +21,7 @@ module.exports = {
             customerID: {
                 type: Sequelize.BIGINT
             },
-            productTypeID: {
+            productID: {
                 type: Sequelize.BIGINT
             },
         });

@@ -27,6 +27,9 @@ module.exports = {
             address: {
                 type: Sequelize.STRING
             },
+            note: {
+                type: Sequelize.TEXT
+            },
             customerID: {
                 type: Sequelize.BIGINT
             },

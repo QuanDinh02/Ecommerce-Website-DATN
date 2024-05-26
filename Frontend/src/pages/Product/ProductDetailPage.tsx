@@ -227,7 +227,7 @@ const ProductDetailPage = () => {
             return;
         }
         if (!_.isEmpty(account) && isAuthenticated) {
-            //handleAddCartItem(amount, account.customer_id, productTypeItem.id);
+            handleAddCartItem(amount, account.customer_id, productDetailInfo.id);
         } else {
             navigate("/login");
         }
@@ -278,12 +278,12 @@ const ProductDetailPage = () => {
         }
     }
 
-    const handleAddCartItem = async (quantity: number, customer_id: number, product_type_id: number) => {
+    const handleAddCartItem = async (quantity: number, customer_id: number, product_id: number) => {
         if (account && isAuthenticated) {
             let data: INewCartItem = {
                 quantity: quantity,
                 customerID: customer_id,
-                productTypeID: product_type_id
+                productID: product_id
             }
 
             let result = await createCartItem(data);

@@ -9,9 +9,6 @@ import { IoIosArrowDown } from "react-icons/io";
 import { PiImageThin } from "react-icons/pi";
 
 import classNames from 'classnames';
-import Item from '../assets/img/homepage/item.svg';
-import Item2 from '../assets/img/homepage/item2.svg';
-import Item3 from '../assets/img/homepage/item3.svg';
 import Item6 from '../assets/img/homepage/item6.svg';
 import { CurrencyFormat } from '@/utils/numberFormat';
 
@@ -478,12 +475,13 @@ const Header = () => {
                                                     <>
                                                         {
                                                             cartItemList.map((item, index) => {
+
                                                                 return (
                                                                     <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                        {item.product_info.image ?
+                                                                        {(item.product_info.image !== "") ?
                                                                             <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
                                                                             :
-                                                                            <PiImageThin className="w-12 h-12 cursor-pointer" />
+                                                                            <PiImageThin className="w-12 h-12 cursor-pointer text-black" />                                                                          
                                                                         }
                                                                         <div className='flex items-center justify-between w-full'>
                                                                             <div>
@@ -516,7 +514,7 @@ const Header = () => {
                                                         </div>
                                                         <div className='flex items-center justify-between gap-x-6'>
                                                             <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/cart")}>Xem giỏ hàng</div>
-                                                            <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer'>Thanh toán</div>
+                                                            <div className='bg-[#FCB800] py-3 text-black rounded-[4px] font-medium w-1/2 text-center hover:opacity-80 cursor-pointer' onClick={() => navigate("/payment")}>Thanh toán</div>
 
                                                         </div>
                                                     </>
@@ -551,12 +549,12 @@ const Header = () => {
                                         {
                                             showInfoSettingBox &&
                                             <div className='widget-info absolute bg-white top-[50px] w-[12rem] right-[-50px] z-50 border border-gray-400'
-                                                onClick={() => handleShowWidgetInfo()} 
+                                                onClick={() => handleShowWidgetInfo()}
                                                 ref={infoSettingBox}
                                             >
                                                 {
                                                     userRole === "customer" &&
-                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) =>{ 
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowInfoSettingBox(false);
                                                         navigate("/customer-info/account/info");

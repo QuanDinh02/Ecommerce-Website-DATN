@@ -15,18 +15,18 @@ import Button from "@/components/Button";
 import { useDispatch } from "react-redux";
 import { DeleteCartItem, UpdateCartItem } from "@/redux/actions/action";
 import { deleteCartItem, updateCartItem } from "@/services/cartItemService";
-interface ICartItemInfo {
+export interface ICartItemInfo {
     id: number
     name: string
     image: string
 }
 
-interface ICartItemShopInfo {
+export interface ICartItemShopInfo {
     id: number
     name: string
 }
 
-interface ICartItem {
+export interface ICartItem {
     id: number
     quantity: number
     price: number
@@ -172,11 +172,7 @@ const ShoppingCartPage = () => {
                                                                             }
                                                                         </td>
                                                                         <td className="py-3 px-2">
-                                                                            <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
-                                                                            <div className="flex items-center gap-x-2 text-sm mt-1 mb-4">
-                                                                                <div>{item.color ? item.color : ""}</div>
-                                                                                <div>{item.size ? item.size : ""}</div>
-                                                                            </div>
+                                                                            <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
                                                                             <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
                                                                         </td>
                                                                         <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>

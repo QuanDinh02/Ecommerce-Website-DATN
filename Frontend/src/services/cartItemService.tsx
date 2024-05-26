@@ -4,7 +4,7 @@ import { APIResponse, LIMIT } from './common';
 export interface INewCartItem {
     quantity: number
     customerID: number
-    productTypeID: number
+    productID: number
 }
 
 interface IUpdateCartItem {

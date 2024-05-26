@@ -10,19 +10,13 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
             nest: true,
             attributes: ['id', 'quantity'],
             include: {
+                model: db.Product,
+                attributes: ['id', 'name'],
                 raw: true,
                 nest: true,
-                model: db.ProductType,
-                attributes: ['id', 'currentPrice', 'productID', 'size', 'color'],
                 include: {
-                    model: db.Product,
-                    attributes: ['id', 'name'],
-                    raw: true,
-                    nest: true,
-                    include: {
-                        model: db.Seller,
-                        attributes: ['id', 'shopName'],
-                    },
+                    model: db.Seller,
+                    attributes: ['id', 'shopName'],
                 },
             },
             where: {
@@ -33,8 +27,18 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
         });
 
         let cartItemData = await Promise.all(cartItemList.map(async item => {
-            let productType = item.ProductType;
-            let product = productType.Product;
+
+            let product = item.Product;
+
+            let productType = await db.ProductType.findOne({
+                raw: true,
+                attributes: ['id', 'currentPrice'],
+                where: {
+                    productID: {
+                        [Op.eq]: product.id,
+                    },
+                },
+            });
             let shopInfo = product.Seller;
 
             let productImage = await db.Image.findOne({
@@ -51,12 +55,10 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 id: item.id,
                 quantity: item.quantity,
                 price: productType.currentPrice,
-                color: productType.color,
-                size: productType.size,
                 product_info: {
                     id: product.id,
                     name: product.name,
-                    image: productImage.image
+                    image: productImage ? productImage?.image : "",
                 },
                 shop_info: {
                     id: shopInfo.id,
@@ -80,7 +82,7 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
     }
 }
 
-const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
+const addCustomerCartItem = async (quantity, customerID, productID) => {
     try {
 
         let cartItemList = await db.CartItem.findAll({
@@ -89,7 +91,7 @@ const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
             where: {
                 [Op.and]: [
                     { customerID: customerID },
-                    { productTypeID: productTypeID }
+                    { productID: productID }
                 ],
             },
         });
@@ -117,7 +119,7 @@ const addCustomerCartItem = async (quantity, customerID, productTypeID) => {
             await db.CartItem.create({
                 quantity: quantity,
                 customerID: customerID,
-                productTypeID: productTypeID,
+                productID: productID,
                 createdAt: new Date(),
                 updatedAt: null,
             })

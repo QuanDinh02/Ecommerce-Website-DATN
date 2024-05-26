@@ -33,19 +33,15 @@ const getWishListByCustomer = async (customer_id) => {
             let product = item.Product;
             let shopInfo = product.Seller;
 
-            let productTypesList = await db.ProductType.findAll({
+            let productDetail = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'type', 'typeName', 'quantity', 'size', 'color', 'currentPrice', 'price'],
+                attributes: ['id', 'quantity', 'currentPrice', 'price'],
                 where: {
                     productID: {
                         [Op.eq]: product.id,
                     },
                 }
             });
-
-            let { currentPrice } = _.minBy(productTypesList, (o) => {
-                return o.currentPrice;
-            })
 
             let productImage = await db.Image.findOne({
                 raw: true,
@@ -59,11 +55,11 @@ const getWishListByCustomer = async (customer_id) => {
 
             return {
                 id: item.id,
-                price: currentPrice,
+                price: productDetail ? productDetail.currentPrice : 0,
                 product_info: {
                     id: product.id,
                     name: product.name,
-                    image: productImage.image
+                    image: productImage  ? productImage?.image : "",
                 },
                 shop_info: {
                     id: shopInfo.id,

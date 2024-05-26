@@ -21,8 +21,8 @@ const getQuickCartItems = async (req, res) => {
 
 const addCartItem = async (req, res) => {
     try {
-        let { quantity, customerID, productTypeID } = req.body;
-        let result = await cartItemServices.addCustomerCartItem(quantity, customerID, productTypeID);
+        let { quantity, customerID, productID } = req.body;
+        let result = await cartItemServices.addCustomerCartItem(quantity, customerID, productID);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,

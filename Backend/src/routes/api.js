@@ -1,6 +1,7 @@
 import express from 'express';
 import apiController from '../controller/apiController';
 import userController from '../controller/userController';
+import customerController from '../controller/customerController';
 import categoryController from '../controller/categoryController';
 import productController from '../controller/productController';
 import subCategoryController from '../controller/subCategoryController';
@@ -21,6 +22,8 @@ const ApiRoute = (app) => {
     router.get('/user/logout', userController.handleUserLogout);
  
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
+
+    router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
 
     router.get('/categories', categoryController.getCategoryList);
 
