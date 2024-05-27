@@ -185,6 +185,10 @@ const SubCategoryPage = () => {
 
             let result = await createWishListItem(data);
             if (result && result.EC === 0) {
+                await saveCustomerActivity({
+                    product_id: product_id,
+                    type: 2
+                });
                 refetchWishList();
                 successToast1(result.EM);
             }

@@ -148,12 +148,13 @@ const Header = () => {
 
     const handleKeyPress = (event) => {
 
+        if (event.key === 'Enter') {
+            handleSaveSearch();
+        }
+        
         if (productSearchList.length > 0) {
             let _productSearchList = _.cloneDeep(productSearchList);
-            if (event.key === 'Enter') {
-                //handleSearchButtonOnClick();
-            }
-
+            
             if (event.key === 'ArrowDown') {
                 if (currentSelect === -1) {
                     setCurrentSelect(0);

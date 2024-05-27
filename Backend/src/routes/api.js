@@ -9,6 +9,7 @@ import cartItemController from '../controller/cartItemController';
 import wishListController from '../controller/wishListController';
 import searchController from '../controller/searchController';
 import sessionController from '../controller/sessionController';
+import orderController from '../controller/orderController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
@@ -26,7 +27,7 @@ const ApiRoute = (app) => {
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
 
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
-
+    
     router.get('/categories', categoryController.getCategoryList);
 
     router.get('/product/detail', productController.getProductDetail);
@@ -47,12 +48,16 @@ const ApiRoute = (app) => {
     router.put('/cart-item', cartItemController.updateCartItem);
     router.delete('/cart-item/:id', cartItemController.deleteCartItem);
 
+    router.delete('/cart-item/all/:id', cartItemController.deleteCartItemByCustomer);
+
     router.get('/wish-list', wishListController.getWishListByCustomer);
     router.post('/wish-list', wishListController.addWishListItem);
     router.delete('/wish-list/:id', wishListController.deleteWishListItem);
 
     router.post('/search-history', checkUserJWT, searchController.customerSearchRecord);
     router.post('/session-activity', checkUserJWT, sessionController.handleSavingSessionActivity);
+
+    router.post('/order', orderController.createNewOrder);
 
     return app.use('/api', router);
 }

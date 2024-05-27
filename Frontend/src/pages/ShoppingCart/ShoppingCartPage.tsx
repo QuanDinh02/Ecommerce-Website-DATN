@@ -30,8 +30,6 @@ export interface ICartItem {
     id: number
     quantity: number
     price: number
-    color: string
-    size: string
     product_info: ICartItemInfo
     shop_info: ICartItemShopInfo
 }

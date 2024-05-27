@@ -30,14 +30,14 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
 
             let product = item.Product;
 
-            let productType = await db.ProductType.findOne({
+            let productDetail = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice'],
+                attributes: ['id', 'quantity', 'currentPrice', 'price'],
                 where: {
                     productID: {
                         [Op.eq]: product.id,
                     },
-                },
+                }
             });
             let shopInfo = product.Seller;
 
@@ -54,7 +54,7 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
             return {
                 id: item.id,
                 quantity: item.quantity,
-                price: productType.currentPrice,
+                price: productDetail ? productDetail.currentPrice : 0,
                 product_info: {
                     id: product.id,
                     name: product.name,
@@ -239,7 +239,32 @@ const deleteCustomerCartItem = async (id) => {
     }
 }
 
+const deleteCartItemByCustomer = async (customer_id) => {
+    try {
+
+        await db.CartItem.destroy({
+            where: {
+                customerID: +customer_id,
+            },
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Xóa sản phẩm khỏi giỏ hàng !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getQuickCartItemsByCustomer, addCustomerCartItem, updateCustomerCartItem,
-    deleteCustomerCartItem
+    deleteCustomerCartItem, deleteCartItemByCustomer
 }

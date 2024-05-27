@@ -18,7 +18,7 @@ module.exports = {
             discount: {
                 type: Sequelize.INTEGER
             },
-            productTypeID: {
+            productID: {
                 type: Sequelize.BIGINT
             },
             orderID: {

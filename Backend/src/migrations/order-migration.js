@@ -9,9 +9,6 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.BIGINT
             },
-            status: {
-                type: Sequelize.SMALLINT
-            },
             orderDate: {
                 type: Sequelize.DATE
             },

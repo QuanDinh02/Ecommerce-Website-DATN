@@ -11,6 +11,10 @@ import { PiImageThin } from "react-icons/pi";
 import _ from 'lodash';
 import { useImmer } from "use-immer";
 import { getCustomerOrderAddress } from "@/services/customerService";
+import { createNewOrder } from "@/services/orderServices";
+import { successToast1 } from "@/components/Toast/Toast";
+import Button from "@/components/Button";
+import { deleteAllCartItem } from "@/services/cartItemService";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN"
@@ -81,6 +85,41 @@ const PaymentPage = () => {
                 draft.mobile = response.mobile;
                 draft.address = `${response.street}, Ward ${response.ward}, ${response.district} District, ${response.province}, ${response.country}`;
             });
+        }
+    }
+
+    const handlePayment = async () => {
+
+        let orderItems = cartItemList.map(item => {
+
+            let order_item = {
+                productID: item.product_info.id,
+                quantity: item.quantity,
+                price: item.price
+            }
+
+            return order_item;
+        })
+
+        let response: any = await createNewOrder({
+            status: 0,
+            shipFee: transportedFee,
+            totalPrice: orderCost,
+            shipMethod: 0,
+            address: orderAddress.other_address === "" ? orderAddress.address : orderAddress.other_address,
+            note: orderAddress.note,
+            customerID: account.customer_id,
+            order_items: orderItems
+        });
+
+        if (response && response.EC === 0) {
+            let result = await deleteAllCartItem(account.customer_id);
+            if (result && result.EC === 0) {
+                successToast1(response.EM);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            }
         }
     }
 
@@ -185,15 +224,15 @@ const PaymentPage = () => {
                                             <div className="text-lg tracking-wide font-medium mb-6">Thông tin giao hàng</div>
                                             <div className="mb-4">
                                                 <div className="mb-2">Họ và Tên {requiredTag()}</div>
-                                                <input onChange={(e) => handleOnChange('fullname', e.target.value)} type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập họ và tên" value={orderAddress.fullname} />
+                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.fullname} disabled />
                                             </div>
                                             <div className="mb-4">
                                                 <div className="mb-2">Số điện thoại {requiredTag()}</div>
-                                                <input onChange={(e) => handleOnChange('mobile', e.target.value)} type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập số điện thoại" value={orderAddress.mobile} />
+                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.mobile} disabled />
                                             </div>
                                             <div className="mb-4">
                                                 <div className="mb-2">Địa chỉ {requiredTag()}</div>
-                                                <input onChange={(e) => handleOnChange('address', e.target.value)} type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" placeholder="Nhập địa chỉ" value={orderAddress.address} />
+                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.address} disabled />
                                             </div>
                                             <div className="mb-4">
                                                 <div className="mb-2">Địa chỉ giao hàng (nếu khác với địa chỉ hiện có)</div>
@@ -216,7 +255,7 @@ const PaymentPage = () => {
                                                         cartItemList && cartItemList.length > 0 &&
                                                         cartItemList.map((item, index) => {
                                                             return (
-                                                                <div className="flex justify-between mb-2 text-sm">
+                                                                <div className="flex items-center justify-between mb-2 text-sm">
                                                                     <div className="flex items-center w-2/3">
                                                                         <div className="w-60 w-4/5">{item.product_info.name}</div>
                                                                         <div className="font-bold w-1/5">x{item.quantity}</div>
@@ -245,7 +284,7 @@ const PaymentPage = () => {
                                                     <div className="text-red-500 text-xl font-bold">{CurrencyFormat(orderCost)}</div>
                                                 </div>
                                             </div>
-                                            <div className="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold">Thanh toán</div>
+                                            <Button styles="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold" OnClick={() => handlePayment()}>Thanh toán</Button>
                                         </div>
                                     </div>
                                 </>

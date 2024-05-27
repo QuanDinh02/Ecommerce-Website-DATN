@@ -14,7 +14,10 @@ import Modal from "@/components/Modal";
 import Button from "@/components/Button";
 import { IWishList } from "./FavoriteProductPage_types";
 import { deleteWishListItem } from "@/services/wishListService";
-import { DeleteWishListItem } from "@/redux/actions/action";
+import { AddCartItem, DeleteWishListItem } from "@/redux/actions/action";
+import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
+import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItemService";
+import _ from 'lodash';
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -28,13 +31,47 @@ const FavoriteProductPage = () => {
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
 
+    const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
     const [deleteWishListId, setDeleteWishListId] = React.useState<number>(0);
 
     const wishListData: IWishList[] = useSelector<RootState, IWishList[]>(state => state.wishList.wish_list_list);
     const wishListCount: number = useSelector<RootState, number>(state => state.wishList.wish_list_count);
 
-    const hanldeAddShoppingCart = () => {
-        successToast1("Thêm vào giỏ hàng thành công");
+    const handleAddShoppingCart = (product_id: number) => {
+        handleAddCartItem(1, account.customer_id, product_id);
+    }
+
+    const handleAddCartItem = async (quantity: number, customer_id: number, product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: customer_id,
+                productID: product_id
+            }
+
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const refetchCartItem = async () => {
+        let cartItemsData: any = await fetchCartItem(account.customer_id);
+        if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+            let cart_item_data: ICartItem[] = cartItemsData.DT;
+            let count = cart_item_data.length;
+
+            dispatch(AddCartItem({
+                cart_items: cart_item_data,
+                count: count
+            }));
+        }
     }
 
     const handleDeleteFavoriteItem = async () => {
@@ -126,7 +163,7 @@ const FavoriteProductPage = () => {
                                                                     <td className="py-3 px-2">
                                                                         <div
                                                                             className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 hover:opacity-80 cursor-pointer"
-                                                                            onClick={() => hanldeAddShoppingCart()}
+                                                                            onClick={() => handleAddShoppingCart(item.product_info.id)}
                                                                         >
                                                                             <IoBagHandleOutline className="w-5 h-5" />
                                                                             <span>Thêm vào giỏ hàng</span>

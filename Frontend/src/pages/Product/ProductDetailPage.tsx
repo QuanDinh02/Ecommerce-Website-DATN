@@ -58,6 +58,7 @@ import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductP
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import ReactPaginate from "react-paginate";
 import { dateFormat } from "@/utils/dateFormat";
+import { saveCustomerActivity } from "@/services/customerService";
 
 const ProductDetailPage = () => {
 
@@ -304,7 +305,12 @@ const ProductDetailPage = () => {
             }
 
             let result = await createWishListItem(data);
+
             if (result && result.EC === 0) {
+                await saveCustomerActivity({
+                    product_id: product_id,
+                    type: 2
+                });
                 refetchWishList();
                 successToast1(result.EM);
             }
