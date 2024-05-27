@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddWishListItem } from "@/redux/actions/action";
 import { IAccount } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
+import { saveCustomerActivity } from "@/services/customerService";
 import _ from 'lodash';
 interface ISubCategory {
     id: number
@@ -261,7 +262,14 @@ const CategoryPage = () => {
         }
     }
 
-    const handleProductDetailNavigation = (product_id: number) => {
+    const handleProductDetailNavigation = async (product_id: number) => {
+        if(account && isAuthenticated) {
+            let result = await saveCustomerActivity({
+                product_id: product_id,
+                type: 0
+            });
+            navigate("/product-detail", { state: { product_id: product_id } });
+        }
         navigate("/product-detail", { state: { product_id: product_id } });
     }
 

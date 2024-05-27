@@ -9,6 +9,7 @@
         "freezeTableName": true,
         "timestamps": false
       },
+      "timezone": "+07:00",
       "logging": false
   },
   "test": {

@@ -25,6 +25,7 @@ import { getSearchProducts } from '@/services/productService';
 import { fetchAccount, userLogout } from '@/services/userService';
 import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { fetchWishList } from "@/services/wishListService";
+import { saveCustomerSearch } from '@/services/customerService';
 interface ICustomerAccount {
     customer_id: number
     username: string
@@ -376,6 +377,17 @@ const Header = () => {
         }
     }
 
+    const handleSaveSearch = async () => {
+        if (account && isAuthenticated) {
+            let result = await saveCustomerSearch(productSearch);
+            if (result && result.EC === 0) {
+                setProductSearch("");
+            }
+        } else {
+            setProductSearch("");
+        }
+    }
+
     React.useEffect(() => {
         let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
         setCartItemTotal(cartItemValueSum);
@@ -442,7 +454,7 @@ const Header = () => {
                                 }
                             </div>
                         }
-                        <div className='search-bar__btn'>Tìm kiếm</div>
+                        <div className='search-bar__btn' onClick={() => handleSaveSearch()}>Tìm kiếm</div>
                     </div>
                     <div className="navigation">
                         {
@@ -481,7 +493,7 @@ const Header = () => {
                                                                         {(item.product_info.image !== "") ?
                                                                             <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
                                                                             :
-                                                                            <PiImageThin className="w-12 h-12 cursor-pointer text-black" />                                                                          
+                                                                            <PiImageThin className="w-12 h-12 cursor-pointer text-black" />
                                                                         }
                                                                         <div className='flex items-center justify-between w-full'>
                                                                             <div>

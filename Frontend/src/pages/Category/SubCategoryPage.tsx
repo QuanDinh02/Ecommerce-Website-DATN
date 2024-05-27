@@ -25,6 +25,7 @@ import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import _ from 'lodash';
 import { AddWishListItem } from "@/redux/actions/action";
+import { saveCustomerActivity } from "@/services/customerService";
 interface ISubCategoryActive {
     id: number
     title: string
@@ -219,7 +220,14 @@ const SubCategoryPage = () => {
         navigate("/category", { state: { category_id: category_id, category_name: category_title } })
     }
 
-    const handleProductDetailNavigation = (product_id: number) => {
+    const handleProductDetailNavigation = async (product_id: number) => {
+        if (account && isAuthenticated) {
+            let result = await saveCustomerActivity({
+                product_id: product_id,
+                type: 0
+            });
+            navigate("/product-detail", { state: { product_id: product_id } });
+        }
         navigate("/product-detail", { state: { product_id: product_id } });
     }
 

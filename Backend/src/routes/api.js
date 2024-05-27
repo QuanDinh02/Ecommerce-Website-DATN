@@ -7,10 +7,12 @@ import productController from '../controller/productController';
 import subCategoryController from '../controller/subCategoryController';
 import cartItemController from '../controller/cartItemController';
 import wishListController from '../controller/wishListController';
+import searchController from '../controller/searchController';
+import sessionController from '../controller/sessionController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
-const multer  = require('multer')
+const multer = require('multer')
 const upload = multer();
 
 const ApiRoute = (app) => {
@@ -20,7 +22,7 @@ const ApiRoute = (app) => {
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
     router.get('/user/logout', userController.handleUserLogout);
- 
+
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
 
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
@@ -38,7 +40,7 @@ const ApiRoute = (app) => {
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
 
-    router.put('/product',upload.single('image'),productController.handleUpdateProductImage);
+    router.put('/product', upload.single('image'), productController.handleUpdateProductImage);
 
     router.get('/cart-item', cartItemController.getQuickCartItems);
     router.post('/cart-item', cartItemController.addCartItem);
@@ -48,7 +50,10 @@ const ApiRoute = (app) => {
     router.get('/wish-list', wishListController.getWishListByCustomer);
     router.post('/wish-list', wishListController.addWishListItem);
     router.delete('/wish-list/:id', wishListController.deleteWishListItem);
-    
+
+    router.post('/search-history', checkUserJWT, searchController.customerSearchRecord);
+    router.post('/session-activity', checkUserJWT, sessionController.handleSavingSessionActivity);
+
     return app.use('/api', router);
 }
 

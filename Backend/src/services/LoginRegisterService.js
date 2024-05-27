@@ -1,7 +1,8 @@
 import bcrypt from "bcryptjs";
-import db from '../models/index';
+import db, { sequelize } from '../models/index';
 const salt = bcrypt.genSaltSync(10);
 import { Op } from 'sequelize';
+import Sequelize from 'sequelize';
 import { createToken } from '../middleware/jwt';
 
 const hashPassword = (password) => {
@@ -87,7 +88,7 @@ const userLogin = async (userData) => {
                     let customer_id = 0;
                     let seller_id = 0;
 
-                    if(role === "customer") {
+                    if (role === "customer") {
                         let customerInfo = await db.Customer.findOne({
                             raw: true,
                             attributes: ['id'],
@@ -100,14 +101,32 @@ const userLogin = async (userData) => {
 
                         customer_id = customerInfo.id;
 
+                        let date = new Date();
+
+                        await db.Session.create({
+                            createdAt: date,
+                            expiredAt: date,
+                            customerID: customer_id
+                        });
+
+                        let sessionData = await db.Session.findAll({
+                            raw: true,
+                            attributes: ['id','createdAt'],
+                            order: [
+                                ['createdAt', 'DESC'],
+                            ],
+                        })
+
                         let payload = {
                             customer_id: customer_id,
                             username: user.username,
                             role: user.role,
-                            isAuthenticated: true,
+                            session: sessionData.length > 0 ? sessionData[0] : null,
+                            isAuthenticated: true
                         }
-    
+
                         let accessToken = createToken(payload);
+
                         return {
                             EC: 0,
                             DT: {
@@ -120,10 +139,10 @@ const userLogin = async (userData) => {
                         }
                     }
 
-                    if(role === "seller") {
+                    if (role === "seller") {
                         let sellerInfo = await db.Seller.findOne({
                             raw: true,
-                            attributes: ['id','name'],
+                            attributes: ['id', 'name'],
                             where: {
                                 userID: {
                                     [Op.eq]: user.id
@@ -139,7 +158,7 @@ const userLogin = async (userData) => {
                             role: user.role,
                             isAuthenticated: true,
                         }
-    
+
                         let accessToken = createToken(payload);
                         return {
                             EC: 0,
