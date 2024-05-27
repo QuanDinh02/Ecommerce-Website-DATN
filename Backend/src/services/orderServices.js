@@ -2,7 +2,7 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
-const addNewOrder = async (orderData) => {
+const addNewOrder = async (orderData, session_id) => {
     try {
 
         let newOrder = await db.Order.create({
@@ -28,6 +28,16 @@ const addNewOrder = async (orderData) => {
             
             await db.OrderItem.bulkCreate(orderItemBuild);
 
+            let buyItemsBuild = order_items.map(item => {
+                return {
+                    sessionID: session_id,
+                    productID: item.productID,
+                    type: 1
+                }
+            });
+
+            await db.SessionActivity.bulkCreate(buyItemsBuild);
+
             let shippingStatus = await db.Shipment.create({
                 status: "ĐANG XỬ LÝ",
                 updatedDate: orderInfo.orderDate,
@@ -35,6 +45,7 @@ const addNewOrder = async (orderData) => {
             });
 
             if (shippingStatus) {
+
                 return {
                     EC: 0,
                     DT: '',

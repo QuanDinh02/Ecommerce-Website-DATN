@@ -3,7 +3,11 @@ import orderServices from '../services/orderServices';
 const createNewOrder = async (req, res) => {
     try {
         let data = req.body;
-        let result = await orderServices.addNewOrder(data);
+        let { user } = req;
+
+        let session_id = user.session ? user.session.id : null;
+
+        let result = await orderServices.addNewOrder(data, session_id);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,

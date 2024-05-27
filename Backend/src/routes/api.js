@@ -27,7 +27,7 @@ const ApiRoute = (app) => {
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
 
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
-    
+
     router.get('/categories', categoryController.getCategoryList);
 
     router.get('/product/detail', productController.getProductDetail);
@@ -57,7 +57,7 @@ const ApiRoute = (app) => {
     router.post('/search-history', checkUserJWT, searchController.customerSearchRecord);
     router.post('/session-activity', checkUserJWT, sessionController.handleSavingSessionActivity);
 
-    router.post('/order', orderController.createNewOrder);
+    router.post('/order', checkUserJWT, orderController.createNewOrder);
 
     return app.use('/api', router);
 }
