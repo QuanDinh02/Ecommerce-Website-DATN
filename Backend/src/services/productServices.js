@@ -131,7 +131,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 include: [
                     {
                         model: db.Product,
-                        attributes: ['id', 'name'],
+                        attributes: ['id', 'name','summary'],
                     },
                     {
                         model: db.SubCategory,
@@ -161,6 +161,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 return {
                     id: item.Product.id,
                     name: item.Product.name,
+                    summary: item.Product.summary ? item.Product.summary : "",
                     sub_category: sub_category
                 }
             });
@@ -261,7 +262,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                 include: [
                     {
                         model: db.Product,
-                        attributes: ['id', 'name'],
+                        attributes: ['id', 'name','summary'],
                     },
                     {
                         model: db.SubCategory,
@@ -291,6 +292,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                 return {
                     id: item.Product.id,
                     name: item.Product.name,
+                    summary: item.Product.summary ? item.Product.summary : "",
                     sub_category: sub_category
                 }
             });

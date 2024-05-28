@@ -137,3 +137,41 @@ export const productsByCategory = [
         selling_count: 2200
     }
 ];
+
+export const PRODUCT_PRICE_SORT = {
+    "0": {
+        label: "Tất Cả",
+        value: ""
+    },
+    "1": {
+        label: "Giá: Thấp đến Cao",
+        value: "ASC"
+    },
+    "2": {
+        label: "Giá: Cao đến Thấp",
+        value: "DESC"
+    }
+}
+
+export const PRODUCT_PRICE_SORT_LIST = [
+    {
+        id: 0,
+        label: "Tất Cả",
+        value: ""
+    },
+    {
+        id: 1,
+        label: "Giá: Thấp đến Cao",
+        value: "ASC"
+    },
+    {
+        id: 2,
+        label: "Giá: Cao đến Thấp",
+        value: "DESC"
+    }
+]
+
+export const LOADING_ITEM_PAGE_CHANGE_TIME = 700;
+
+export const PRODUCT_PRICE_SORT_TIME = 500;
+

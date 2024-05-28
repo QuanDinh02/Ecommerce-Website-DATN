@@ -8,7 +8,7 @@ import { TfiViewListAlt } from "react-icons/tfi";
 import { CurrencyFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
-import { PiShoppingCartLight } from "react-icons/pi";
+import { PiImageThin, PiShoppingCartLight } from "react-icons/pi";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
@@ -18,14 +18,20 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { getProductsBySubCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
 import { TailSpin } from 'react-loader-spinner';
-import { IAccount } from "../Product/ProductDetailPage_types";
+import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import _ from 'lodash';
-import { AddWishListItem } from "@/redux/actions/action";
+import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
 import { saveCustomerActivity } from "@/services/customerService";
+import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
+import { 
+    PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST, 
+    LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
+} from "@/data/category";
+
 interface ISubCategoryActive {
     id: number
     title: string
@@ -43,6 +49,7 @@ interface ICateogryProduct {
     name: string
     rating: number
     sold: number
+    summary: string
 }
 
 interface IData {
@@ -128,7 +135,11 @@ const SubCategoryPage = () => {
         },
     ]);
 
-    const [priceArrangement, setPriceArrangement] = React.useState<string>("Giá");
+    const [priceArrangement, setPriceArrangement] = React.useState({
+        id: 0,
+        label: "Tất Cả",
+        value: ""
+    });
 
     const [itemGrid, setItemGrid] = React.useState<boolean>(true);
 
@@ -143,6 +154,26 @@ const SubCategoryPage = () => {
                 }
             })
         })
+    }
+
+    const handleProductPriceSort = (item_id: number) => {
+
+        let sort_item = PRODUCT_PRICE_SORT[`${item_id}`];
+        setPriceArrangement(sort_item);
+
+        let sortProductListRaw = _.cloneDeep(productList);
+
+        if (sort_item.value !== "") {
+
+            let sortProductList = _.orderBy(sortProductListRaw, 'current_price', sort_item.value.toLowerCase());
+            setProductList(sortProductList);
+
+            setProductListLoading(true);
+
+            setTimeout(() => {
+                setProductListLoading(false);
+            }, PRODUCT_PRICE_SORT_TIME);
+        }
     }
 
     const handleArrangement = (id: number) => {
@@ -160,7 +191,11 @@ const SubCategoryPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
+        setProductListLoading(true);
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        setTimeout(() => {
+            setProductListLoading(false);
+        }, LOADING_ITEM_PAGE_CHANGE_TIME);
     }
 
     const refetchWishList = async () => {
@@ -197,8 +232,35 @@ const SubCategoryPage = () => {
         }
     }
 
-    const hanldeAddShoppingCart = () => {
-        successToast1("Thêm vào giỏ hàng thành công");
+    const hanldeAddShoppingCart = async (quantity: number, customer_id: number, product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: customer_id,
+                productID: product_id
+            }
+
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const refetchCartItem = async () => {
+        let cartItemsData: any = await fetchCartItem(account.customer_id);
+        if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+            let cart_item_data: ICartItem[] = cartItemsData.DT;
+            let count = cart_item_data.length;
+
+            dispatch(AddCartItem({
+                cart_items: cart_item_data,
+                count: count
+            }));
+        }
     }
 
     const handleQuickView = () => {
@@ -214,9 +276,23 @@ const SubCategoryPage = () => {
     const fetchProductsBySubCategory = async (sub_category_id: number) => {
         let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage);
         if (response) {
-            setProductList(response.product_list);
-            setTotalPages(response.page_total);
-            setTotalItems(response.total_items);
+            if (priceArrangement.value === "") {
+                setProductList(response.product_list);
+                setTotalPages(response.page_total);
+                setTotalItems(response.total_items);
+            } else {
+                let product_list = response.product_list;
+                switch (priceArrangement.value) {
+                    case "ASC":
+                        let sortProductList1 = _.orderBy(product_list, 'current_price', "asc");
+                        setProductList(sortProductList1);
+                        return;
+                    case "DESC":
+                        let sortProductList2 = _.orderBy(product_list, 'current_price', "desc");
+                        setProductList(sortProductList2);
+                        return;
+                }
+            }
         }
     }
 
@@ -260,7 +336,7 @@ const SubCategoryPage = () => {
 
         setTimeout(() => {
             setProductListLoading(false);
-        }, 2500);
+        }, 2000);
     }, [])
 
     React.useEffect(() => {
@@ -420,11 +496,20 @@ const SubCategoryPage = () => {
                                                         }
                                                         <div className="relative group">
                                                             <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
-                                                                <span>{priceArrangement}</span> <MdKeyboardArrowDown className="w-6 h-6" />
+                                                                <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />
                                                             </div>
                                                             <div className="absolute top-100 border border-gray-300 hidden group-hover:block">
-                                                                <div className="px-2.5 py-2 w-52 bg-white cursor-pointer hover:text-[#FCB800]" onClick={() => setPriceArrangement("Giá: Thấp đến Cao")}>Giá: Thấp đến Cao</div>
-                                                                <div className="px-2.5 py-2 w-52 bg-white cursor-pointer hover:text-[#FCB800]" onClick={() => setPriceArrangement("Giá: Cao đến Thấp")}>Giá: Cao đến Thấp</div>
+                                                                {
+                                                                    PRODUCT_PRICE_SORT_LIST.map(item => {
+                                                                        return (
+                                                                            <div
+                                                                                key={`sort-price-sub-category-item-${item.id}`}
+                                                                                className="px-2.5 py-2 w-52 bg-white cursor-pointer hover:text-[#FCB800]"
+                                                                                onClick={() => handleProductPriceSort(item.id)}
+                                                                            >{item.label}</div>
+                                                                        )
+                                                                    })
+                                                                }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -433,22 +518,6 @@ const SubCategoryPage = () => {
                                                     <BsGrid3X3 className={itemGrid ? "w-5 h-5 text-black cursor-pointer" : "w-5 h-5 text-gray-400 cursor-pointer"} onClick={() => setItemGrid(true)} />
                                                     <TfiViewListAlt className={!itemGrid ? "w-5 h-5 text-black cursor-pointer" : "w-5 h-5 text-gray-400 cursor-pointer"} onClick={() => setItemGrid(false)} />
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div className="box__bottom rounded-b-[4px] bg-[#EEEEEE] px-4 py-2 mt-1">
-                                            <div className="content flex items-center gap-x-4">
-                                                <div>Lọc theo:</div>
-                                                <div className="filter-items flex items-center gap-x-2">
-                                                    <div className="flex items-center gap-x-2 px-4 py-2 rounded-full border border-[#FCB800] bg-orange-100">
-                                                        <span>từ 5 sao</span>
-                                                        <MdCancel className="text-[#FCB800] w-6 h-6 cursor-pointer" />
-                                                    </div>
-                                                    <div className="flex items-center gap-x-2 px-4 py-2 rounded-full border border-[#FCB800] bg-orange-100">
-                                                        <span>logitech</span>
-                                                        <MdCancel className="text-[#FCB800] w-6 h-6 cursor-pointer" />
-                                                    </div>
-                                                </div>
-                                                <div className="text-[#FCB800] font-bold hover:underline cursor-pointer">Xóa tất cả</div>
                                             </div>
                                         </div>
                                     </div>
@@ -494,13 +563,13 @@ const SubCategoryPage = () => {
                                                                                             {item.image ?
                                                                                                 <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
                                                                                                 :
-                                                                                                <img src={Product01} className="w-40 h-60" />
+                                                                                                <PiImageThin className="w-40 h-60 text-gray-300" />
                                                                                             }
                                                                                         </div>
                                                                                         <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                 e.stopPropagation();
-                                                                                                hanldeAddShoppingCart();
+                                                                                                hanldeAddShoppingCart(1, account.customer_id, item.id);
                                                                                             }}>
                                                                                                 <PiShoppingCartLight className="w-6 h-6 " />
                                                                                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -573,7 +642,7 @@ const SubCategoryPage = () => {
                                                             {item.image ?
                                                                 <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
                                                                 :
-                                                                <img src={Product01} className="w-40 h-60" />
+                                                                <PiImageThin className="w-40 h-60 text-gray-300" />
                                                             }
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
@@ -585,11 +654,8 @@ const SubCategoryPage = () => {
                                                                     key={`item-rating-${item.id}`}
                                                                     item_grid={false}
                                                                 />
-                                                                <div className="product__benefit text-sm text-gray-400 flex flex-col gap-1 mt-4">
-                                                                    <div>Unrestrained and portable active stereo speaker</div>
-                                                                    <div>Free from the confines of wires and chords</div>
-                                                                    <div>20 hours of portable capabilities</div>
-                                                                    <div>Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
+                                                                <div className="product__description text-sm text-gray-400 mt-4 line-clamp-3">
+                                                                    {item.summary}
                                                                 </div>
                                                             </div>
                                                             <div className="product__right-content w-60">
@@ -600,7 +666,7 @@ const SubCategoryPage = () => {
                                                                 </div>
                                                                 <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    hanldeAddShoppingCart();
+                                                                    hanldeAddShoppingCart(1, account.customer_id, item.id);
                                                                 }}>Thêm vào giỏ hàng</div>
                                                                 <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={(e) => {
                                                                     e.stopPropagation();
@@ -695,7 +761,7 @@ const SubCategoryPage = () => {
                                     <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
                                 </div>
                             </div>
-                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
+                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer">Thêm vào giỏ hàng</div>
                             <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer"><FaRegHeart className="w-7 h-7" /></div>
                         </div>
                     </div>
