@@ -59,6 +59,25 @@ const ApiRoute = (app) => {
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
 
+    router.post('/recommend', (req, res) => {
+        let data = JSON.parse(req.body.data);
+        console.log(">>> check data: ", data);
+        return res.status(200).send("Success !");
+    })
+
+    // >>> check data:  [
+    //     { product_id: '195797729', predict_rating: '4.436582809224318' },
+    //     { product_id: '21441058', predict_rating: '4.436582809224318' },
+    //     { product_id: '176598086', predict_rating: '4.330790847049378' },
+    //     { product_id: '58678598', predict_rating: '4.330790847049378' },
+    //     { product_id: '1025034', predict_rating: '4.2317216981132075' },
+    //     { product_id: '579949', predict_rating: '4.2317216981132075' },
+    //     { product_id: '68716608', predict_rating: '3.3717679944095043' },
+    //     { product_id: '11488924', predict_rating: '3.2317216981132075' },
+    //     { product_id: '56941526', predict_rating: '2.4365828092243182' },
+    //     { product_id: '25421010', predict_rating: '1' }
+    //   ]
+
     return app.use('/api', router);
 }
 
