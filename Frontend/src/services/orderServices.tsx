@@ -22,3 +22,8 @@ export const createNewOrder = async (data: IOrder) => {
     let result: APIResponse = await axios.post('/api/order', data);
     return result;
 }
+
+export const getAllOrderByCustomer = async (customer_id: number) => {
+    let result: APIResponse = await axios.get(`/api/order?id=${customer_id}`);
+    return result;
+}

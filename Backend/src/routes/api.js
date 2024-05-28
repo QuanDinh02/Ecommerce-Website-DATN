@@ -10,6 +10,7 @@ import wishListController from '../controller/wishListController';
 import searchController from '../controller/searchController';
 import sessionController from '../controller/sessionController';
 import orderController from '../controller/orderController';
+import recommendProductController from '../controller/recommendProductController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
@@ -58,25 +59,27 @@ const ApiRoute = (app) => {
     router.post('/session-activity', checkUserJWT, sessionController.handleSavingSessionActivity);
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
+    router.get('/order', orderController.getOrderByCustomer);
 
-    router.post('/recommend', (req, res) => {
-        let data = JSON.parse(req.body.data);
-        console.log(">>> check data: ", data);
-        return res.status(200).send("Success !");
-    })
+    router.post('/recommend', recommendProductController.createRecommendProducts);
 
-    // >>> check data:  [
-    //     { product_id: '195797729', predict_rating: '4.436582809224318' },
-    //     { product_id: '21441058', predict_rating: '4.436582809224318' },
-    //     { product_id: '176598086', predict_rating: '4.330790847049378' },
-    //     { product_id: '58678598', predict_rating: '4.330790847049378' },
-    //     { product_id: '1025034', predict_rating: '4.2317216981132075' },
-    //     { product_id: '579949', predict_rating: '4.2317216981132075' },
-    //     { product_id: '68716608', predict_rating: '3.3717679944095043' },
-    //     { product_id: '11488924', predict_rating: '3.2317216981132075' },
-    //     { product_id: '56941526', predict_rating: '2.4365828092243182' },
-    //     { product_id: '25421010', predict_rating: '1' }
-    //   ]
+    // >>> check data: 
+    // {
+    //     customer_id: 1,
+    //     list: 
+    //     [
+    //         { product_id: '195797729', predict_rating: '4.436582809224318' },
+    //         { product_id: '21441058', predict_rating: '4.436582809224318' },
+    //         { product_id: '176598086', predict_rating: '4.330790847049378' },
+    //         { product_id: '58678598', predict_rating: '4.330790847049378' },
+    //         { product_id: '1025034', predict_rating: '4.2317216981132075' },
+    //         { product_id: '579949', predict_rating: '4.2317216981132075' },
+    //         { product_id: '68716608', predict_rating: '3.3717679944095043' },
+    //         { product_id: '11488924', predict_rating: '3.2317216981132075' },
+    //         { product_id: '56941526', predict_rating: '2.4365828092243182' },
+    //         { product_id: '25421010', predict_rating: '1' }
+    //     ]
+    // } 
 
     return app.use('/api', router);
 }
