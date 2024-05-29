@@ -6,7 +6,7 @@ const createRecommendProducts = async (req, res) => {
         let data = JSON.parse(req.body.data);
 
         let customerID = data.customer_id;
-        let list = data.list;
+        let list = JSON.parse(data.list);
 
         let dataFormat = list.map(item => {
             return { 
