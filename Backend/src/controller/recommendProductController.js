@@ -9,8 +9,7 @@ const createRecommendProducts = async (req, res) => {
         let list = data.list;
 
         let dataFormat = list.map(item => {
-            return {
-                ...item, 
+            return { 
                 product_id: +item.product_id,
                 predict_rating: +item.predict_rating,
                 customerID: +customerID
