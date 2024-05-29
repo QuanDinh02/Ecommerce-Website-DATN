@@ -13,7 +13,7 @@ const createRecommendProducts = async (req, res) => {
         let list = JSON.parse(data.list);
 
         let dataFormat = list.map(item => {
-            return { 
+            return {
                 product_id: +item.product_id,
                 predict_rating: +item.predict_rating,
                 customerID: +customerID
@@ -37,7 +37,7 @@ const createRecommendProducts = async (req, res) => {
     }
 }
 
-const handleExecuteTrainingRecommendProduct = async (req,res) => {
+const handleExecuteTrainingRecommendProduct = async (req, res) => {
 
     var options = {
         scriptPath: process.env.RECOMMEND_ITEM_TRAINING_FILE_PATH,
@@ -46,9 +46,9 @@ const handleExecuteTrainingRecommendProduct = async (req,res) => {
 
     let result = await PythonShell.run('predict.py', options);
 
-    if(result) {
+    if (result) {
         let message = result[0];
-        if(message === "OK") {
+        if (message === "OK") {
             return res.status(200).json({
                 EC: 0,
                 DT: '',
