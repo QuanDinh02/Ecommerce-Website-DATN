@@ -10,7 +10,10 @@ const createRecommendProducts = async (req, res) => {
 
         let dataFormat = list.map(item => {
             return {
-                ...item, customerID: customerID
+                ...item, 
+                product_id: +item.product_id,
+                predict_rating: +item.predict_rating,
+                customerID: +customerID
             }
         })
 
