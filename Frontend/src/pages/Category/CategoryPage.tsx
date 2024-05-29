@@ -18,7 +18,7 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { getSubCategoryByCategory } from "@/services/subCategoryService";
 import { getProductsByCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
-import { TailSpin } from 'react-loader-spinner';
+import { TailSpin, ThreeDots } from 'react-loader-spinner';
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import { useDispatch, useSelector } from "react-redux";
@@ -28,8 +28,8 @@ import { RootState } from "@/redux/reducer/rootReducer";
 import { saveCustomerActivity } from "@/services/customerService";
 import _ from 'lodash';
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
-import { 
-    PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST, 
+import {
+    PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST,
     LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
 } from "@/data/category";
 interface ISubCategory {
@@ -70,7 +70,9 @@ const CategoryPage = () => {
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
+    const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
 
     const [previewImage, setPreviewImage] = React.useState("");
 
@@ -161,13 +163,13 @@ const CategoryPage = () => {
 
         let sortProductListRaw = _.cloneDeep(productList);
 
-        if(sort_item.value !== "") {
+        if (sort_item.value !== "") {
 
             let sortProductList = _.orderBy(sortProductListRaw, 'current_price', sort_item.value.toLowerCase());
             setProductList(sortProductList);
-    
+
             setProductListLoading(true);
-    
+
             setTimeout(() => {
                 setProductListLoading(false);
             }, PRODUCT_PRICE_SORT_TIME);
@@ -300,23 +302,34 @@ const CategoryPage = () => {
         }
     }
 
+    const setLoadingAnimation = () => {
+        setProductListFetch(false);
+        setProductListLoading(true);
+        setTimeout(() => {
+            setProductListLoading(false);
+        },1500);
+    }
+
     const fetchProductsByCategory = async (category_id: number) => {
-        let response: IData = await getProductsByCategory(+category_id, +currentPage);            
+        let response: IData = await getProductsByCategory(+category_id, +currentPage);
         if (response) {
-            if(priceArrangement.value === "") {
+            if (priceArrangement.value === "") {
                 setProductList(response.product_list);
                 setTotalPages(response.page_total);
                 setTotalItems(response.total_items);
+                setLoadingAnimation();
             } else {
                 let product_list = response.product_list;
-                switch(priceArrangement.value) {
+                switch (priceArrangement.value) {
                     case "ASC":
-                        let sortProductList1 = _.orderBy(product_list, 'current_price',"asc");
+                        let sortProductList1 = _.orderBy(product_list, 'current_price', "asc");
                         setProductList(sortProductList1);
+                        setLoadingAnimation();
                         return;
                     case "DESC":
-                        let sortProductList2 = _.orderBy(product_list, 'current_price',"desc");
+                        let sortProductList2 = _.orderBy(product_list, 'current_price', "desc");
                         setProductList(sortProductList2);
+                        setLoadingAnimation();
                         return;
                 }
             }
@@ -353,10 +366,6 @@ const CategoryPage = () => {
         setTimeout(() => {
             setDataLoading(false);
         }, 1000);
-
-        setTimeout(() => {
-            setProductListLoading(false);
-        }, 2000);
     }, [])
 
     React.useEffect(() => {
@@ -536,94 +545,108 @@ const CategoryPage = () => {
                                                 productList && productList.length > 0 ?
                                                     <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
                                                         {
-                                                            <>
-                                                                {
-                                                                    productListLoading ?
-                                                                        <>
-                                                                            {productList.length > 0 && productList.map((item, index) => {
-                                                                                return (
-                                                                                    <div className="product border border-white px-4 py-2" key={`category-loding-item-${index}`}>
-                                                                                        <div className="product__image flex items-center justify-center">
-                                                                                            <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
+                                                            productListFetch ?
+                                                                <>
+                                                                    <ThreeDots
+                                                                        height="80"
+                                                                        width="80"
+                                                                        color="#FCB800"
+                                                                        ariaLabel="three-dots-loading"
+                                                                        radius="1"
+                                                                        wrapperStyle={{}}
+                                                                        wrapperClass="flex items-center justify-center tail-spin"
+                                                                        visible={true}
+                                                                    />
+                                                                </>
+                                                                :
+                                                                <>
+                                                                    {
+                                                                        productListLoading ?
+                                                                            <>
+                                                                                {productList.length > 0 && productList.map((item, index) => {
+                                                                                    return (
+                                                                                        <div className="product border border-white px-4 py-2" key={`category-loding-item-${index}`}>
+                                                                                            <div className="product__image flex items-center justify-center">
+                                                                                                <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
+                                                                                            </div>
+                                                                                            <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-1 mt-3"></div>
+                                                                                            <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-2"></div>
+                                                                                            <div className="flex items-center gap-2 mb-2 w-full mb-2">
+                                                                                                <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse w-1/3"></div>
+                                                                                                <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse w-2/3"></div>
+                                                                                            </div>
                                                                                         </div>
-                                                                                        <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-1 mt-3"></div>
-                                                                                        <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-2"></div>
-                                                                                        <div className="flex items-center gap-2 mb-2 w-full mb-2">
-                                                                                            <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse w-1/3"></div>
-                                                                                            <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse w-2/3"></div>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                )
-                                                                            })}
-                                                                        </>
+                                                                                    )
+                                                                                })}
+                                                                            </>
 
-                                                                        :
-                                                                        <>
-                                                                            {productList.length > 0 && productList.map((item, index) => {
-                                                                                return (
-                                                                                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id)}>
-                                                                                        <div className="product__image flex items-center justify-center">
-                                                                                            {item.image ?
-                                                                                                <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
-                                                                                                :
-                                                                                                <PiImageThin className="w-40 h-60 text-gray-300" />
-                                                                                            }
-                                                                                        </div>
-                                                                                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                                                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                hanldeAddShoppingCart(1, account.customer_id, item.id);
-                                                                                            }}>
-                                                                                                <PiShoppingCartLight className="w-6 h-6 " />
-                                                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                            :
+                                                                            <>
+                                                                                {productList.length > 0 && productList.map((item, index) => {
+                                                                                    return (
+                                                                                        <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id)}>
+                                                                                            <div className="product__image flex items-center justify-center">
+                                                                                                {item.image ?
+                                                                                                    <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
+                                                                                                    :
+                                                                                                    <PiImageThin className="w-40 h-60 text-gray-300" />
+                                                                                                }
+                                                                                            </div>
+                                                                                            <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
+                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                    e.stopPropagation();
+                                                                                                    hanldeAddShoppingCart(1, account.customer_id, item.id);
+                                                                                                }}>
+                                                                                                    <PiShoppingCartLight className="w-6 h-6 " />
+                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                            <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                    e.stopPropagation();
+                                                                                                    handleQuickView();
+                                                                                                }}>
+                                                                                                    <IoEyeOutline className="w-6 h-6" />
+                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                            <span className="text-sm">Xem nhanh</span>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                    e.stopPropagation();
+                                                                                                    handleAddFavouriteItem(item.id, account.customer_id);
+                                                                                                }}>
+                                                                                                    <IoMdHeartEmpty className="w-6 h-6" />
+                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                            <span className="text-sm">Yêu thích</span>
+                                                                                                        </div>
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                handleQuickView();
-                                                                                            }}>
-                                                                                                <IoEyeOutline className="w-6 h-6" />
-                                                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                        <span className="text-sm">Xem nhanh</span>
-                                                                                                    </div>
-                                                                                                </div>
+                                                                                            <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                                                                            <div className="flex items-center gap-2 mb-2">
+                                                                                                <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
+                                                                                                <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
                                                                                             </div>
-                                                                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                e.stopPropagation();
-                                                                                                handleAddFavouriteItem(item.id, account.customer_id);
-                                                                                            }}>
-                                                                                                <IoMdHeartEmpty className="w-6 h-6" />
-                                                                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                        <span className="text-sm">Yêu thích</span>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
-                                                                                        </div>
-                                                                                        <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
-                                                                                        <div className="flex items-center gap-2 mb-2">
-                                                                                            <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
-                                                                                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
-                                                                                        </div>
 
-                                                                                        <ProductRating
-                                                                                            ratings={item.rating}
-                                                                                            selling_count={item.sold}
-                                                                                            key={`item-rating-${item.id}`}
-                                                                                            item_grid={true}
-                                                                                        />
-                                                                                    </div>
-                                                                                )
-                                                                            })}
-                                                                        </>
-                                                                }
-                                                            </>
+                                                                                            <ProductRating
+                                                                                                ratings={item.rating}
+                                                                                                selling_count={item.sold}
+                                                                                                key={`item-rating-${item.id}`}
+                                                                                                item_grid={true}
+                                                                                            />
+                                                                                        </div>
+                                                                                    )
+                                                                                })}
+                                                                            </>
+                                                                    }
+                                                                </>
+
                                                         }
-
                                                     </div>
                                                     :
                                                     <div className="text-lg flex items-center justify-center h-4 text-black w-full my-6">

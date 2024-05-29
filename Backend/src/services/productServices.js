@@ -178,16 +178,16 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     }
                 });
 
-                let productImage = await db.Image.findOne({
-                    raw: true,
-                    nest: true,
-                    attributes: ['id', 'image'],
-                    where: {
-                        productID: {
-                            [Op.eq]: item.id
-                        }
-                    }
-                });
+                // let productImage = await db.Image.findOne({
+                //     raw: true,
+                //     nest: true,
+                //     attributes: ['id', 'image'],
+                //     where: {
+                //         productID: {
+                //             [Op.eq]: item.id
+                //         }
+                //     }
+                // });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -216,7 +216,8 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    image: productImage?.image ? productImage?.image : "",
+                    //image: productImage?.image ? productImage?.image : "",
+                    image: "",
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -309,16 +310,16 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     }
                 });
 
-                let productImage = await db.Image.findOne({
-                    raw: true,
-                    nest: true,
-                    attributes: ['id', 'image'],
-                    where: {
-                        productID: {
-                            [Op.eq]: item.id
-                        }
-                    }
-                });
+                // let productImage = await db.Image.findOne({
+                //     raw: true,
+                //     nest: true,
+                //     attributes: ['id', 'image'],
+                //     where: {
+                //         productID: {
+                //             [Op.eq]: item.id
+                //         }
+                //     }
+                // });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -347,7 +348,8 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    image: productImage?.image ? productImage?.image : "",
+                    //image: productImage?.image ? productImage?.image : "",
+                    image: "",
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,

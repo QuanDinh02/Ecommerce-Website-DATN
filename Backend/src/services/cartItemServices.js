@@ -41,15 +41,15 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
             });
             let shopInfo = product.Seller;
 
-            let productImage = await db.Image.findOne({
-                raw: true,
-                attributes: ['id', 'image'],
-                where: {
-                    productID: {
-                        [Op.eq]: product.id
-                    }
-                }
-            });
+            // let productImage = await db.Image.findOne({
+            //     raw: true,
+            //     attributes: ['id', 'image'],
+            //     where: {
+            //         productID: {
+            //             [Op.eq]: product.id
+            //         }
+            //     }
+            // });
 
             return {
                 id: item.id,
@@ -58,7 +58,8 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 product_info: {
                     id: product.id,
                     name: product.name,
-                    image: productImage ? productImage?.image : "",
+                    //image: productImage ? productImage?.image : "",
+                    image: "",
                 },
                 shop_info: {
                     id: shopInfo.id,
