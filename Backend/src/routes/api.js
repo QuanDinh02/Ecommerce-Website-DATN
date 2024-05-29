@@ -63,6 +63,7 @@ const ApiRoute = (app) => {
 
     router.post('/recommend', recommendProductController.createRecommendProducts);
 
+    router.get('/training-recommend-item', recommendProductController.handleExecuteTrainingRecommendProduct);
     // >>> check data: 
     // {
     //     customer_id: 1,
