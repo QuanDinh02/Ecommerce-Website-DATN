@@ -61,16 +61,16 @@ const getProductDetail = async (product_id) => {
             }
         });
 
-        let productImage = await db.Image.findOne({
-            raw: true,
-            nest: true,
-            attributes: ['id', 'image'],
-            where: {
-                productID: {
-                    [Op.eq]: product_id
-                }
-            }
-        });
+        // let productImage = await db.Image.findOne({
+        //     raw: true,
+        //     nest: true,
+        //     attributes: ['id', 'image'],
+        //     where: {
+        //         productID: {
+        //             [Op.eq]: product_id
+        //         }
+        //     }
+        // });
 
         let finalData = {
             id: product_id,
@@ -79,7 +79,8 @@ const getProductDetail = async (product_id) => {
             price: productDetail.price,
             sold: productDetail.price,
             description: productInfo.summary,
-            product_image: productImage?.image ? productImage?.image : "",
+            //product_image: productImage?.image ? productImage?.image : "",
+            product_image: "",
             inventory_count: productDetail.quantity,
             sub_category: sub_category,
             category: category,
