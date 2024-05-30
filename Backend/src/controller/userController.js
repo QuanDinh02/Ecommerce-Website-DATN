@@ -1,4 +1,5 @@
 import LoginRegisterService from '../services/LoginRegisterService';
+import accountServices from '../services/accountServices';
 
 const handleUserLogin = async (req, res) => {
     try {
@@ -53,7 +54,7 @@ const handleUserLogout = async (req, res) => {
             DT: "",
             EM: 'Đăng xuất thành công !'
         })
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -72,6 +73,29 @@ const handleFetchUserAccount = async (req, res) => {
     })
 }
 
+const handleChangeUserPassword = async (req, res) => {
+    try {
+        let { password, id } = req.body;
+
+        let result = await accountServices.updateUserPassword(password, id);
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
-    handleUserLogin, handleUserRegister, handleUserLogout, handleFetchUserAccount
+    handleUserLogin, handleUserRegister, handleUserLogout, handleFetchUserAccount,
+    handleChangeUserPassword
 }

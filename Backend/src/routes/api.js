@@ -27,7 +27,11 @@ const ApiRoute = (app) => {
 
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
 
+    router.put('/user/password', userController.handleChangeUserPassword);
+
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
+    router.post('/customer/register/verification-code',customerController.sendVertificatedCode);
+    router.post('/customer/register/verify',customerController.handleCodeVertification);
 
     router.get('/categories', categoryController.getCategoryList);
 
@@ -64,6 +68,7 @@ const ApiRoute = (app) => {
     router.post('/recommend', recommendProductController.createRecommendProducts);
 
     router.get('/training-recommend-item', recommendProductController.handleExecuteTrainingRecommendProduct);
+
     // >>> check data: 
     // {
     //     customer_id: 1,

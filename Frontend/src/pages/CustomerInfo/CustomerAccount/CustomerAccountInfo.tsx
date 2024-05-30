@@ -97,6 +97,12 @@ const CustomerAccountInfo = () => {
                             <input type="text" placeholder="Số điện thoại" className="form_input" />
                         </div>
                     </div>
+                    <div className='w-4/5 mb-5'>
+                        <div className='input_label'>Email</div>
+                        <div className='relative'>
+                            <input type="text" placeholder="Email" className="form_input" />
+                        </div>
+                    </div>
                     <div className="mb-5">
                         <div className="title mb-1">Giới tính</div>
                         <div className="flex gap-x-4">

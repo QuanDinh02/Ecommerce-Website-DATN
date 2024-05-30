@@ -57,7 +57,7 @@ const ForgotPasswordPage = () => {
                                     <input type="text" className="form_input" placeholder='Nhập email của bạn' value={email} onChange={(e) => setEmail(e.target.value)} />
                                 </div>
                                 <div className='mt-6 w-full'>
-                                    <Button styles={checkEmail() ? 'form_button_valid' : 'form_button'} OnClick={() => handleEmail()}>Khôi phục mật khẩu</Button>
+                                    <Button styles={checkEmail() ? 'form_button_valid' : 'form_button'} OnClick={() => handleEmail()}>Tiếp tục</Button>
                                 </div>
 
                                 <div className='flex items-center justify-center gap-1 mt-4 text-black hover:text-orange-400'>

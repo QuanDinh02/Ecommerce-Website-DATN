@@ -83,7 +83,7 @@ const userLogin = async (userData) => {
                     role: role
                 }
                 //checkPassword(userData.password, user.password)
-                if (userData.password === user.password) {
+                if (checkPassword(userData.password, user.password)) {
 
                     let customer_id = 0;
                     let seller_id = 0;
@@ -210,4 +210,4 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin }
+module.exports = { userRegister, userLogin, hashPassword }

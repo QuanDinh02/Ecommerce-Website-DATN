@@ -5,11 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { useImmer } from 'use-immer';
 import { GoMail } from "react-icons/go";
 import { BsFacebook } from "react-icons/bs";
+import { IoAlertCircleOutline } from "react-icons/io5";
 import Google_Icon from '../assets/img/login_page/google_icon.svg';
 import { fetchAccount } from '@/services/userService';
 import { useDispatch } from 'react-redux';
 import { UserLogin } from '@/redux/actions/action';
+import { isValidEmail } from '@/utils/emailValidate';
 import _ from 'lodash';
+import classNames from 'classnames';
+import { errorToast1, successToast1 } from '@/components/Toast/Toast';
 interface INewShopAccount {
     name: string
     shop_name: string
@@ -21,7 +25,8 @@ interface INewShopAccount {
 interface INewCustomerAccount {
     phone: string
     password: string
-    email
+    username: string
+    confirm_password: string
 }
 
 interface APIReponse {
@@ -31,54 +36,228 @@ interface APIReponse {
 }
 
 enum PATH {
-    Login = "/login",
+    Login = "/login"
 }
+
+const RESEND_CODE_TIME = 30;
+interface IStep {
+    step: number
+    setStep: (step: number) => void
+}
+
+const EnterEmailRegister = (props: IStep) => {
+
+    const { setStep, step } = props;
+    const [email, setEmail] = React.useState<string>("");
+
+    const navigate = useNavigate();
+
+    const checkFullField = () => {
+        return isValidEmail(email);
+    }
+
+    const handleNextStep = () => {
+        setStep(step + 1);
+        // if (isValidEmail(email)) {
+        //     setStep(step + 1);
+        // } else {
+        //     return;
+        // }
+    }
+
+    return (
+        <>
+            <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Đăng ký</div>
+            <div className="signin-form__main flex flex-col gap-2 duration-800">
+                <div className='w-full'>
+                    <div className='input_label'>Email</div>
+                    <input type="text" className="form_input" placeholder='Nhập địa chỉ email' onChange={(e) => setEmail(e.target.value)} value={email} />
+                </div>
+                <div className='mt-6 w-full'>
+                    <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleNextStep()}>Tiếp theo</Button>
+                </div>
+                <div className='flex items-center my-2'>
+                    <div className='border-t border-gray-400 w-2/5'></div>
+                    <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
+                    <div className='border-t border-gray-400 w-2/5'></div>
+                </div>
+                <div className='others-login-method'>
+                    <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+                        <GoMail className="w-6 h-6" />
+                        <div>Đăng ký bằng email</div>
+                    </div>
+                    <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+                        <BsFacebook className="w-6 h-6 text-[#1877f2]" />
+                        <div>Tiếp tục với facebook</div>
+                    </div>
+                    <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer hover:shadow-md'>
+                        <img src={Google_Icon} alt="" className="w-6 h-6" />
+                        <div>Tiếp tục với Google</div>
+                    </div>
+                </div>
+                <div className='text-center mt-4'>
+                    <span className='text-gray-400'>Đã có tài khoản?</span>
+                    <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => navigate(PATH.Login)}>Đăng nhập tại đây</span>
+                </div>
+            </div>
+        </>
+    )
+}
+
+const EmailVertification = (props: IStep) => {
+
+    const { setStep, step } = props;
+    const [code, setCode] = React.useState<string>("");
+
+    const [resendCodeTime, setResendCodeTime] = React.useState<number>(RESEND_CODE_TIME);
+
+    const checkFullField = () => {
+        return code.length > 0;
+    }
+
+    const handleNextStep = () => {
+        if (checkFullField()) {
+            successToast1("MÃ XÁC MINH ĐÚNG");
+            setTimeout(() => {
+                setStep(step + 1);
+            }, 2000);
+        } else {
+            errorToast1("MÃ XÁC MINH SAI");
+            return;
+        }
+    }
+
+    const resendCodeStyle = classNames('text-xs font-medium my-2 text-end', {
+        'text-red-500 hover:underline cursor-pointer': resendCodeTime === 0,
+        'text-gray-400': resendCodeTime > 0,
+    });
+
+    React.useEffect(() => {
+        if (resendCodeTime > 0) {
+            const interval = setInterval(() => {
+                setResendCodeTime(resendCodeTime - 1);
+            }, 1000);
+
+            return () => clearInterval(interval);
+        }
+    }, [resendCodeTime]);
+
+    return (
+        <>
+            <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Xác minh</div>
+            <div className="signin-form__main flex flex-col gap-2 duration-800">
+                <div className='p-2 border border-gray-200 text-gray-500 text-sm bg-gray-100 mb-2 tracking-wide'>Vui lòng điền mã xác minh được gửi đến foxmart@gmail.com</div>
+                <div className='w-full'>
+                    <div className='input_label'>Mã xác nhận</div>
+                    <input type="text" className="form_input" placeholder='Nhập mã xác minh' onChange={(e) => setCode(e.target.value)} value={code} />
+                </div>
+                <div className={resendCodeStyle}><span>GỬI LẠI MÃ ({resendCodeTime})</span></div>
+                <div className='mt-6 w-full'>
+                    <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleNextStep()}>XÁC MINH</Button>
+                </div>
+            </div>
+        </>
+    )
+}
+
+const CustomerRegister = (props: IStep) => {
+    //const { setStep, step } = props;
+
+    const [showPassword, setShowPassword] = React.useState<boolean>(false);
+    const [errorField, setErrorField] = React.useState<number>(0);
+
+    const [errorPass, setErrorPass] = React.useState<boolean>(false);
+
+    const [newCustomerAccount, setNewCustomerAccount] = useImmer<INewCustomerAccount>({
+        phone: "",
+        password: "",
+        username: "",
+        confirm_password: ""
+    });
+
+    const handleOnChange = (field: string, value: string) => {
+        setNewCustomerAccount(draft => {
+            draft[field] = value;
+        });
+    }
+
+    const checkFullField = () => {
+        return newCustomerAccount.phone.length > 0
+            && newCustomerAccount.password.length > 0
+            && newCustomerAccount.username.length > 0
+            && newCustomerAccount.confirm_password.length > 0;
+    }
+
+
+    const handleCustomerRegister = () => {
+        if (newCustomerAccount.username.length === 0) {
+            setErrorField(1);
+            return;
+        }
+
+        if (newCustomerAccount.phone.length < 10) {
+            setErrorField(2);
+            return;
+        }
+
+        if (newCustomerAccount.password.length < 8) {
+            setErrorField(3);
+            setErrorPass(true);
+            return;
+        }
+
+        if (newCustomerAccount.confirm_password !== newCustomerAccount.password) {
+            setErrorField(4);
+            return;
+        }
+        setErrorField(0);
+    }
+
+    return (
+        <>
+            <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Đăng ký</div>
+            <div className="signin-form__main flex flex-col gap-2 duration-800">
+                <div className='w-full'>
+                    <div className='input_label'>Tên đăng nhập</div>
+                    <input type="text" className="form_input" onChange={(e) => handleOnChange('username', e.target.value)} />
+                    {errorField === 1 && <div className='my-2 text-sm text-red-500'>Tên đăng nhập đã tồn tại</div>}
+                </div>
+                <div className='w-full'>
+                    <div className='input_label'>Số điện thoại</div>
+                    <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
+                    {errorField === 2 && <div className='my-2 text-sm text-red-500'>Số điện thoại không đúng</div>}
+                </div>
+                <div className='w-full'>
+                    <div className='input_label'>Mật khẩu</div>
+                    <div className='relative'>
+                        <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} />
+                        <div className='absolute top-3 right-2 ' onClick={() => setShowPassword(!showPassword)}>
+                            {!showPassword ? <PiEyeSlash className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <PiEyeLight className="w-5 h-5 text-xl cursor-pointer" />}
+                        </div>
+                    </div>
+                    {!errorPass && <div className='my-2 text-sm text-gray-400 flex items-center gap-x-1'><IoAlertCircleOutline className='w-4 h-4' /> Mật khẩu tối thiểu 8 ký tự</div>}
+                    {errorField === 3 && <div className='my-2 text-sm text-red-500 flex items-center gap-x-1'>Mật khẩu tối thiểu 8 ký tự</div>}
+                </div>
+                <div className='w-full'>
+                    <div className='input_label'>Xác nhận mật khẩu</div>
+                    <input type="password" className="form_input" onChange={(e) => handleOnChange('confirm_password', e.target.value)} />
+                    {errorField === 4 && <div className='my-2 text-sm text-red-500'>Xác nhận mật khẩu không đúng</div>}
+                </div>
+                <div className='mt-6 w-full'>
+                    <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleCustomerRegister()}>Đăng ký</Button>
+                </div>
+            </div>
+        </>
+    )
+}
+
 
 const RegisterPage = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const [showPassword, setShowPassword] = React.useState<boolean>(false);
-    const [isCustomer, setIsCustomer] = React.useState<boolean>(true);
-
-    const [newCustomerAccount, setNewCustomerAccount] = useImmer<INewCustomerAccount>({
-        phone: "",
-        password: "",
-        email: ""
-    });
-
-    const [newShopAccount, setNewShopAccount] = useImmer<INewShopAccount>({
-        name: "",
-        shop_name: "",
-        email: "",
-        phone: "",
-        password: "",
-    });
-
-    const handleOnChange = (field: string, value: string) => {
-        if (isCustomer) {
-            setNewCustomerAccount(draft => {
-                draft[field] = value;
-            });
-        }
-        setNewShopAccount(draft => {
-            draft[field] = value;
-        });
-    }
-
-    const checkFullField = () => {
-        if (isCustomer) {
-            return newCustomerAccount.phone.length > 0 && newCustomerAccount.password.length > 0;
-        }
-        return newShopAccount.phone.length > 0 && newShopAccount.password.length > 0 && newShopAccount.name.length > 0 && newShopAccount.shop_name.length > 0;
-    }
-
-    const requiredTag = () => {
-        return (
-            <span className='text-red-500 font-medium'>(*)</span>
-        )
-    }
+    const [registerStep, setRegisterStep] = React.useState(1);
 
     const fetchAccountInfo = async () => {
         let result: any = await fetchAccount();
@@ -109,79 +288,20 @@ const RegisterPage = () => {
 
     return (
         <div className='signin-container'>
-            <div className="flex justify-center py-20 px-3 bg-[#EEEEEE] min-h-screen">
+            <div className="flex justify-center py-20 px-3 bg-[#EEEEEE]">
                 <div className="signin-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
-                    <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Đăng ký</div>
-                    <div className="signin-form__main flex flex-col gap-2 duration-800">
-                        <div className='w-full'>
-                            <div className='input_label'>Số điện thoại {requiredTag()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
-                        </div>
-                        <div className='w-full'>
-                            <div className='input_label'>Mật khẩu {requiredTag()}</div>
-                            <div className='relative'>
-                                <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} />
-                                <div className='absolute top-3 right-2 ' onClick={() => setShowPassword(!showPassword)}>
-                                    {!showPassword ? <PiEyeSlash className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <PiEyeLight className="w-5 h-5 text-xl cursor-pointer" />}
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full'>
-                            <div className='input_label'>Email {requiredTag()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleOnChange('email', e.target.value)} />
-                        </div>
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-2
-                        ${!isCustomer ? "h-44" : "h-0"}`}>
-                            <div className='w-full'>
-                                <div className='input_label'>Họ và tên {requiredTag()}</div>
-                                <input type="text" className="form_input" onChange={(e) => handleOnChange('name', e.target.value)} />
-                            </div>
-                            <div className='w-full'>
-                                <div className='input_label'>Tên shop {requiredTag()}</div>
-                                <input type="text" className="form_input" onChange={(e) => handleOnChange('shop_name', e.target.value)} />
-                            </div>
-                        </div>
-                        <div className='mt-2'>
-                            <div className='flex items-center gap-2 mb-2 cursor-pointer w-fit' onClick={() => setIsCustomer(true)}>
-                                <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
-                                    {isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
-                                </div>
-                                <div>Khách hàng</div>
-                            </div>
-                            <div className='flex items-center gap-2 cursor-pointer w-fit' onClick={() => setIsCustomer(false)}>
-                                <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
-                                    {!isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
-                                </div>
-                                <div>Người bán</div>
-                            </div>
-                        </div>
-                        <div className='mt-6 w-full'>
-                            <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'}>ĐĂNG KÝ</Button>
-                        </div>
-                        <div className='flex items-center my-2'>
-                            <div className='border-t border-gray-400 w-2/5'></div>
-                            <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
-                            <div className='border-t border-gray-400 w-2/5'></div>
-                        </div>
-                        <div className='others-login-method'>
-                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
-                                <GoMail className="w-6 h-6" />
-                                <div>Đăng ký bằng email</div>
-                            </div>
-                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
-                                <BsFacebook className="w-6 h-6 text-[#1877f2]" />
-                                <div>Tiếp tục với facebook</div>
-                            </div>
-                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer hover:shadow-md'>
-                                <img src={Google_Icon} alt="" className="w-6 h-6" />
-                                <div>Tiếp tục với Google</div>
-                            </div>
-                        </div>
-                        <div className='text-center mt-4'>
-                            <span className='text-gray-400'>Đã có tài khoản?</span>
-                            <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => navigate(PATH.Login)}>Đăng nhập tại đây</span>
-                        </div>
-                    </div>
+                    {
+                        registerStep === 1 &&
+                        <EnterEmailRegister step={registerStep} setStep={setRegisterStep} />
+                    }
+                    {
+                        registerStep === 2 &&
+                        <EmailVertification step={registerStep} setStep={setRegisterStep} />
+                    }
+                    {
+                        registerStep === 3 &&
+                        <CustomerRegister step={registerStep} setStep={setRegisterStep} />
+                    }
                 </div>
             </div>
 
@@ -190,3 +310,82 @@ const RegisterPage = () => {
 }
 
 export default RegisterPage;
+
+// const SAMPLE = () => {
+//     return (
+//         <>
+//             <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Đăng ký</div>
+//             <div className="signin-form__main flex flex-col gap-2 duration-800">
+//                 <div className='w-full'>
+//                     <div className='input_label'>Tên đăng nhập {requiredTag()}</div>
+//                     <input type="text" className="form_input" onChange={(e) => handleOnChange('username', e.target.value)} />
+//                 </div>
+//                 <div className='w-full'>
+//                     <div className='input_label'>Mật khẩu {requiredTag()}</div>
+//                     <div className='relative'>
+//                         <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} />
+//                         <div className='absolute top-3 right-2 ' onClick={() => setShowPassword(!showPassword)}>
+//                             {!showPassword ? <PiEyeSlash className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <PiEyeLight className="w-5 h-5 text-xl cursor-pointer" />}
+//                         </div>
+//                     </div>
+//                 </div>
+//                 <div className='w-full'>
+//                     <div className='input_label'>Số điện thoại {requiredTag()}</div>
+//                     <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
+//                 </div>
+//                 <div className={`overflow-hidden transition-all duration-500 ease-in-out flex flex-col gap-2
+//                         ${!isCustomer ? "h-44" : "h-0"}`}>
+//                     <div className='w-full'>
+//                         <div className='input_label'>Họ và tên {requiredTag()}</div>
+//                         <input type="text" className="form_input" onChange={(e) => handleOnChange('name', e.target.value)} />
+//                     </div>
+//                     <div className='w-full'>
+//                         <div className='input_label'>Tên shop {requiredTag()}</div>
+//                         <input type="text" className="form_input" onChange={(e) => handleOnChange('shop_name', e.target.value)} />
+//                     </div>
+//                 </div>
+//                 <div className='mt-2'>
+//                     <div className='flex items-center gap-2 mb-2 cursor-pointer w-fit' onClick={() => setIsCustomer(true)}>
+//                         <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
+//                             {isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
+//                         </div>
+//                         <div>Khách hàng</div>
+//                     </div>
+//                     <div className='flex items-center gap-2 cursor-pointer w-fit' onClick={() => setIsCustomer(false)}>
+//                         <div className='w-5 h-5 border border-black rounded-full flex items-center justify-center'>
+//                             {!isCustomer && <div className='w-3 h-3 bg-black rounded-full'></div>}
+//                         </div>
+//                         <div>Người bán</div>
+//                     </div>
+//                 </div>
+//                 <div className='mt-6 w-full'>
+//                     <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'}>ĐĂNG KÝ</Button>
+//                 </div>
+//                 <div className='flex items-center my-2'>
+//                     <div className='border-t border-gray-400 w-2/5'></div>
+//                     <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
+//                     <div className='border-t border-gray-400 w-2/5'></div>
+//                 </div>
+//                 <div className='others-login-method'>
+//                     <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+//                         <GoMail className="w-6 h-6" />
+//                         <div>Đăng ký bằng email</div>
+//                     </div>
+//                     <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
+//                         <BsFacebook className="w-6 h-6 text-[#1877f2]" />
+//                         <div>Tiếp tục với facebook</div>
+//                     </div>
+//                     <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer hover:shadow-md'>
+//                         <img src={Google_Icon} alt="" className="w-6 h-6" />
+//                         <div>Tiếp tục với Google</div>
+//                     </div>
+//                 </div>
+//                 <div className='text-center mt-4'>
+//                     <span className='text-gray-400'>Đã có tài khoản?</span>
+//                     <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => navigate(PATH.Login)}>Đăng nhập tại đây</span>
+//                 </div>
+//             </div>
+
+//         </>
+//     )
+// }
