@@ -47,7 +47,7 @@ const sendVertificatedCode = async (req, res) => {
 
         OTP = OTPGenerator(OTP_LIMIT);
 
-        await transporter.sendMail({
+        let email_res = await transporter.sendMail({
             from: '"FoxMart "', // sender address
             to: `${data.email}`, // list of receivers
             subject: "FoxMart Ecommerce Verification Code", // Subject line
@@ -58,11 +58,21 @@ const sendVertificatedCode = async (req, res) => {
             <p font-size: 16px;">The code will expired in 10 minutes</p>`
         });
 
-        return res.status(200).json({
-            EC: 0,
-            DT: '',
-            EM: `Send vertification code to ${data.email} successfully !`
-        })
+        if(email_res) {
+            let result = await customerServices.handleCreateVertificationCode({
+                code: OTP,
+                email: data.email
+            });
+    
+            if (result && result.EC === 0) {
+                return res.status(200).json({
+                    EC: 0,
+                    DT: '',
+                    EM: `Send OTP code successfully !`
+                });
+            }
+        }
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -75,21 +85,18 @@ const sendVertificatedCode = async (req, res) => {
 
 const handleCodeVertification = async (req, res) => {
     try {
-        let { otp } = req.body;
+        let data = req.body;
 
-        if (otp === OTP) {
+        let result = await customerServices.handleOTPVertification(data);
+
+        if (result) {
             return res.status(200).json({
-                EC: 0,
-                DT: '',
-                EM: `OTP is correct !`
-            })
-        } else {
-            return res.status(400).json({
-                EC: -1,
-                DT: '',
-                EM: `Incorrect OTP !`
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
             })
         }
+        
     } catch (error) {
         console.log(error);
         return res.status(500).json({
