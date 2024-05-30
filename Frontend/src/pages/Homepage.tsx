@@ -33,7 +33,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { FaFireAlt } from "react-icons/fa";
-import { PiShoppingCartLight, PiTShirtLight } from "react-icons/pi";
+import { PiImageThin, PiShoppingCartLight, PiTShirtLight } from "react-icons/pi";
 import { successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
@@ -42,8 +42,137 @@ import Modal from "@/components/Modal";
 import { CurrencyFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
-
+import { getRecommendItemByCustomer } from "@/services/recommendItemService";
 import CategoryMenu from "@/components/CategoryMenu";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/reducer/rootReducer";
+import ProductRating from "./Category/ProductRating";
+import { saveCustomerActivity } from "@/services/customerService";
+
+interface IRecommendProduct {
+    id: number
+    current_price: number
+    price: number
+    image: string
+    name: string
+    rating: number
+    sold: number
+    summary: string
+}
+
+interface ICustomerAccount {
+    customer_id: number
+    username: string
+    role: string
+}
+
+interface IData {
+    product_list: IRecommendProduct[]
+}
+
+const RecommendItem = () => {
+
+    const navigate = useNavigate();
+
+    const account: ICustomerAccount = useSelector<RootState, ICustomerAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
+    const [recommendItemList, setRecommendItemList] = React.useState<IRecommendProduct[]>([]);
+
+    const fetchRecommendItems = async (customer_id: number) => {
+        let response: IData = await getRecommendItemByCustomer(+customer_id);
+        if (response) {
+            console.log(response);
+            setRecommendItemList(response.product_list);
+        }
+    }
+
+    const handleProductDetailNavigation = async (product_id: number) => {
+        if (account && isAuthenticated) {
+            let result = await saveCustomerActivity({
+                product_id: product_id,
+                type: 0
+            });
+            navigate("/product-detail", { state: { product_id: product_id } });
+        }
+        navigate("/product-detail", { state: { product_id: product_id } });
+    }
+
+    React.useEffect(() => {
+        if (account && isAuthenticated) {
+            fetchRecommendItems(account.customer_id);
+        }
+    }, [isAuthenticated]);
+
+    return (
+        <>
+            {
+                recommendItemList && recommendItemList.length > 0 &&
+                recommendItemList.map((item, index) => {
+                    return (
+                        <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
+                            <div className="relative">
+                                <div className="product__image w-40 mx-auto mb-6">
+                                    {item.image ?
+                                        <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-40" />
+                                        :
+                                        <PiImageThin className="w-40 h-40 text-gray-300" />
+                                    }
+                                </div>
+                                <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        //hanldeAddShoppingCart();
+                                    }}>
+                                        <PiShoppingCartLight className="w-6 h-6 " />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Thêm vào giỏ hàng</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        //setShowQuickView(true);
+                                    }}>
+                                        <IoEyeOutline className="w-6 h-6" />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Xem nhanh</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        //hanldeFavoriteItem();
+                                    }}>
+                                        <IoMdHeartEmpty className="w-6 h-6" />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Yêu thích</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
+                            <div className="product__price flex items-center gap-2 mb-2.5">
+                                <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                            </div>
+                            <ProductRating
+                                ratings={item.rating}
+                                selling_count={item.sold}
+                                key={`item-rating-product-${item.id}`}
+                                item_grid={true}
+                            />
+                        </div>
+                    )
+                })
+            }
+        </>
+    )
+}
 
 const Homepage = () => {
 
@@ -80,7 +209,9 @@ const Homepage = () => {
     }
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        }
     }, []);
 
     return (
@@ -511,69 +642,8 @@ const Homepage = () => {
                     <div className="header px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
                     <div className="section customer-recommendation bg-white mb-8">
                         <div className="px-5 py-6 bg-[#EEEEEE]">
-                            <div className="product-list grid grid-cols-6 gap-y-6 gap-x-2">
-                                {
-                                    imageList1 && imageList1.length > 0 &&
-                                    imageList1.map((item, index) => {
-                                        return (
-                                            <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => navigate("/product-detail")}>
-                                                <div className="relative">
-                                                    <div className="product__image w-40 mx-auto mb-6"><img src={item} alt="" /></div>
-                                                    <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
-                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            hanldeAddShoppingCart();
-                                                        }}>
-                                                            <PiShoppingCartLight className="w-6 h-6 " />
-                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                    <span className="text-sm">Thêm vào giỏ hàng</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setShowQuickView(true);
-                                                        }}>
-                                                            <IoEyeOutline className="w-6 h-6" />
-                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                    <span className="text-sm">Xem nhanh</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            hanldeFavoriteItem();
-                                                        }}>
-                                                            <IoMdHeartEmpty className="w-6 h-6" />
-                                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                    <span className="text-sm">Yêu thích</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                                                <div className="product__price flex items-center gap-2 mb-2.5">
-                                                    <div className="price text-[#1A732E] font-medium">768,000 đ</div>
-                                                    <div className="old-price text-sm text-gray-500 line-through">968,000 đ</div>
-                                                </div>
-                                                <div className="product__ratings flex items-center gap-2">
-                                                    <div className="stars-rating flex items-center">
-                                                        <GoStarFill className="text-[#FCB800]" />
-                                                        <GoStarFill className="text-[#FCB800]" />
-                                                        <GoStarFill className="text-[#FCB800]" />
-                                                        <GoStarFill className="text-[#FCB800]" />
-                                                        <GoStarFill className="text-[#FCB800]" />
-                                                    </div>
-                                                    <div className="rating-counts">123</div>
-                                                </div>
-                                            </div>
-                                        )
-                                    })
-                                }
+                            <div className="product-list grid grid-cols-5 gap-y-6 gap-x-2">
+                                <RecommendItem />
                             </div>
                         </div>
                         <div className="w-full flex items-center justify-center bg-[#EEEEEE]">
