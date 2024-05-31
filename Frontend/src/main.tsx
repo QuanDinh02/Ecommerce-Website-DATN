@@ -9,9 +9,11 @@ import ReferencePage from '@/pages/Reference.tsx';
 import ErrorPage from '@/pages/ErrorPage.tsx';
 
 import Homepage from '@/pages/Homepage.tsx';
-import RegisterPage from '@/pages/RegisterPage.tsx';
 import LoginPage from '@/pages/LoginPage.tsx';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage.tsx';
+import SelectUserRolePage from '@/pages/Register/SelectUserRolePage.tsx';
+import CustomerSignUpPage from '@/pages/Register/CustomerSignUpPage.tsx';
+
 import CategoryPage from '@/pages/Category/CategoryPage.tsx';
 import ProductDetailPage from '@/pages/Product/ProductDetailPage.tsx';
 import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
@@ -66,6 +68,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import RegisterPage from './pages/RegisterPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -132,18 +135,18 @@ const router = createBrowserRouter(
                 },
               ]
             },
-            { path: "profile", element: <SellerProfile/>},
+            { path: "profile", element: <SellerProfile /> },
             {
               path: "product",
-              element: <SellerProduct/>,
+              element: <SellerProduct />,
               children: [
                 {
                   path: "all",
-                  element: <SellerProductAll/>,
+                  element: <SellerProductAll />,
                 },
                 {
                   path: "new",
-                  element: <SellerAddNewProduct/>,
+                  element: <SellerAddNewProduct />,
                 }
               ]
             },
@@ -269,6 +272,16 @@ const router = createBrowserRouter(
         {
           path: "register",
           element: <RegisterPage />,
+          children: [
+            {
+              index: true,
+              element: <SelectUserRolePage />
+            },
+            {
+              path: "customer",
+              element: <CustomerSignUpPage />
+            },
+          ]
         },
         {
           path: "login",
