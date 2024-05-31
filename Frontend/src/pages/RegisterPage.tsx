@@ -14,12 +14,23 @@ import { isValidEmail } from '@/utils/emailValidate';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { errorToast1, successToast1 } from '@/components/Toast/Toast';
+import { IoIosArrowRoundBack } from "react-icons/io";
+import { sendOTPCustomerSignUp, verifyOTPCustomerSignUp } from '@/services/otpServices';
+import { userRegister, checkCustomerEmailExist } from '@/services/userService';
 interface INewShopAccount {
     name: string
     shop_name: string
     email: string
     phone: string
     password: string
+}
+
+interface ICustomerRegisterInfo {
+    role: number
+    email: string
+    username: string
+    password: string
+    phone: string
 }
 
 interface INewCustomerAccount {
@@ -35,20 +46,32 @@ interface APIReponse {
     EM: string
 }
 
+interface IEnterEmailProp {
+    step: number
+    setStep: (step: number) => void
+    email: string
+    setEmail: (email: string) => void
+}
+
+interface IEmailVertification {
+    step: number
+    setStep: (step: number) => void
+    email: string
+}
+
 enum PATH {
     Login = "/login"
 }
 
-const RESEND_CODE_TIME = 30;
-interface IStep {
-    step: number
-    setStep: (step: number) => void
+interface IRegisterProp {
+    email: string
 }
 
-const EnterEmailRegister = (props: IStep) => {
+const RESEND_CODE_TIME = 30;
 
-    const { setStep, step } = props;
-    const [email, setEmail] = React.useState<string>("");
+const EnterEmailRegister = (props: IEnterEmailProp) => {
+
+    const { setStep, step, email, setEmail } = props;
 
     const navigate = useNavigate();
 
@@ -56,13 +79,25 @@ const EnterEmailRegister = (props: IStep) => {
         return isValidEmail(email);
     }
 
-    const handleNextStep = () => {
-        setStep(step + 1);
-        // if (isValidEmail(email)) {
-        //     setStep(step + 1);
-        // } else {
-        //     return;
-        // }
+    const handleNextStep = async () => {
+        if (isValidEmail(email)) {
+            let check = await checkCustomerEmailExist(email);
+            if(check) {
+                if(check.EC === 0) {
+                    errorToast1(check.EM);
+                    return;
+                } else if(check.EC === 0) {
+                    let result = await sendOTPCustomerSignUp(email);
+                    if (result && result.EC === 0) {
+                        setStep(step + 1);
+                    }
+                } else {
+                    return;
+                }
+            }
+        } else {
+            return;
+        }
     }
 
     return (
@@ -104,9 +139,9 @@ const EnterEmailRegister = (props: IStep) => {
     )
 }
 
-const EmailVertification = (props: IStep) => {
+const EmailVertification = (props: IEmailVertification) => {
 
-    const { setStep, step } = props;
+    const { setStep, step, email } = props;
     const [code, setCode] = React.useState<string>("");
 
     const [resendCodeTime, setResendCodeTime] = React.useState<number>(RESEND_CODE_TIME);
@@ -115,14 +150,35 @@ const EmailVertification = (props: IStep) => {
         return code.length > 0;
     }
 
-    const handleNextStep = () => {
+    const resendOTPCustomerSignUp = async () => {
+        if (resendCodeTime === 0) {
+            setResendCodeTime(RESEND_CODE_TIME);
+            let result = await sendOTPCustomerSignUp(email);
+            if (result) {
+                if (result.EC === 0) {
+                    successToast1("Đã gửi mã OTP");
+                } else {
+                    errorToast1("Gửi mã OTP thất bại");
+                }
+            }
+        }
+    }
+
+    const handleNextStep = async () => {
         if (checkFullField()) {
-            successToast1("MÃ XÁC MINH ĐÚNG");
-            setTimeout(() => {
-                setStep(step + 1);
-            }, 2000);
+            let result = await verifyOTPCustomerSignUp(email, code);
+            if (result) {
+                if (result.EC === 0) {
+                    successToast1(result.EM);
+                    setTimeout(() => {
+                        setStep(step + 1);
+                    }, 1000);
+                } else {
+                    errorToast1(result.EM);
+                    return;
+                }
+            }
         } else {
-            errorToast1("MÃ XÁC MINH SAI");
             return;
         }
     }
@@ -146,12 +202,12 @@ const EmailVertification = (props: IStep) => {
         <>
             <div className="signin-form__title text-black text-xl mb-5 text-center font-medium">Xác minh</div>
             <div className="signin-form__main flex flex-col gap-2 duration-800">
-                <div className='p-2 border border-gray-200 text-gray-500 text-sm bg-gray-100 mb-2 tracking-wide'>Vui lòng điền mã xác minh được gửi đến foxmart@gmail.com</div>
+                <div className='p-2 border border-gray-200 text-gray-500 text-sm bg-gray-100 mb-2 tracking-wide'>Vui lòng điền mã xác minh được gửi đến {email}</div>
                 <div className='w-full'>
                     <div className='input_label'>Mã xác nhận</div>
                     <input type="text" className="form_input" placeholder='Nhập mã xác minh' onChange={(e) => setCode(e.target.value)} value={code} />
                 </div>
-                <div className={resendCodeStyle}><span>GỬI LẠI MÃ ({resendCodeTime})</span></div>
+                <div className={resendCodeStyle} onClick={() => resendOTPCustomerSignUp()}><span>GỬI LẠI MÃ ({resendCodeTime})</span></div>
                 <div className='mt-6 w-full'>
                     <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleNextStep()}>XÁC MINH</Button>
                 </div>
@@ -160,8 +216,10 @@ const EmailVertification = (props: IStep) => {
     )
 }
 
-const CustomerRegister = (props: IStep) => {
-    //const { setStep, step } = props;
+const CustomerRegister = (props: IRegisterProp) => {
+
+    const navigate = useNavigate();
+    const { email } = props;
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
     const [errorField, setErrorField] = React.useState<number>(0);
@@ -189,7 +247,11 @@ const CustomerRegister = (props: IStep) => {
     }
 
 
-    const handleCustomerRegister = () => {
+    const handleCustomerRegister = async () => {
+        if (!checkFullField()) {
+            return;
+        }
+
         if (newCustomerAccount.username.length === 0) {
             setErrorField(1);
             return;
@@ -210,7 +272,30 @@ const CustomerRegister = (props: IStep) => {
             setErrorField(4);
             return;
         }
+
         setErrorField(0);
+
+        let register_customer_info: ICustomerRegisterInfo = {
+            phone: newCustomerAccount.phone,
+            password: newCustomerAccount.password,
+            username: newCustomerAccount.username,
+            role: 3,
+            email: email
+        }
+
+        let result = await userRegister(register_customer_info);
+        if(result) {
+            if(result.EC === 0) {
+                successToast1(result.EM);
+                setTimeout(() => {
+                    navigate("/login");
+                },1500);
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
+        }
+        return;
     }
 
     return (
@@ -251,13 +336,13 @@ const CustomerRegister = (props: IStep) => {
     )
 }
 
-
 const RegisterPage = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const [registerStep, setRegisterStep] = React.useState(1);
+    const [email, setEmail] = React.useState<string>("");
 
     const fetchAccountInfo = async () => {
         let result: any = await fetchAccount();
@@ -287,20 +372,31 @@ const RegisterPage = () => {
     }, []);
 
     return (
-        <div className='signin-container'>
-            <div className="flex justify-center py-20 px-3 bg-[#EEEEEE]">
+        <div className='signin-container bg-[#EEEEEE]'>
+            {registerStep > 1 &&
+                <div className='px-[30px] w-[80rem] mx-auto py-3'>
+                    <div className='cursor-pointer hover:underline flex items-center gap-x-1 w-fit text-lg hover:text-blue-600' onClick={() => setRegisterStep(registerStep - 1)}><IoIosArrowRoundBack className='w-10 h-10' /> Trở lại</div>
+                </div>
+            }
+            <div className="flex justify-center py-20 px-3">
+
                 <div className="signin-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
                     {
                         registerStep === 1 &&
-                        <EnterEmailRegister step={registerStep} setStep={setRegisterStep} />
+                        <EnterEmailRegister
+                            step={registerStep}
+                            setStep={setRegisterStep}
+                            email={email}
+                            setEmail={setEmail}
+                        />
                     }
                     {
                         registerStep === 2 &&
-                        <EmailVertification step={registerStep} setStep={setRegisterStep} />
+                        <EmailVertification step={registerStep} setStep={setRegisterStep} email={email} />
                     }
                     {
                         registerStep === 3 &&
-                        <CustomerRegister step={registerStep} setStep={setRegisterStep} />
+                        <CustomerRegister email={email} />
                     }
                 </div>
             </div>

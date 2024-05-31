@@ -80,7 +80,7 @@ const handleCreateVertificationCode = async (data) => {
             }
 
             return {
-                EC: 0,
+                EC: 1,
                 DT: '',
                 EM: 'Create new OTP code failed !'
             }
@@ -108,7 +108,7 @@ const handleCreateVertificationCode = async (data) => {
             }
 
             return {
-                EC: 0,
+                EC: 1,
                 DT: '',
                 EM: 'Create new OTP code failed !'
             }

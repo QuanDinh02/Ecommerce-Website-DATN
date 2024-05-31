@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
-import db, { sequelize } from '../models/index';
+import db from '../models/index';
 const salt = bcrypt.genSaltSync(10);
 import { Op } from 'sequelize';
-import Sequelize from 'sequelize';
 import { createToken } from '../middleware/jwt';
 
 const hashPassword = (password) => {
@@ -18,37 +17,87 @@ const checkPassword = (inputPassword, hashPass) => {
     return bcrypt.compareSync(inputPassword, hashPass);
 }
 
+const checkCustomerEmailExist = async (email) => {
+    try {
+        let check = await db.Customer.findOne({ where: { email: email } });
+        if(check) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: "Email đã tồn tại"
+            }
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: "Email không tồn tại"
+            }
+        }
+        
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: 2,
+            DT: '',
+            EM: "Some things is wrong at service!"
+        }
+    }
+
+}
+
 const userRegister = async (userData) => {
 
     try {
-        let checkUsername = await checkUserNameExist(userData.username);
-        if (checkUsername) {
-            return {
-                EC: 1,
-                EM: 'Username has already existed !',
-                DT: ''
+        let {role} = userData;
+        if(role === 3) {
+            let checkUsername = await checkUserNameExist(userData.username);
+    
+            if (checkUsername) {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Tên đăng nhập đã tồn tại !',
+                }
+            } else {
+                let hash_password = hashPassword(userData.password);
+    
+                let userInfo = await db.User.create({
+                    username: userData.username,
+                    password: hash_password,
+                    role: 3,
+                    registeredAt: new Date(),
+                    lastLogin: null,
+                })
+
+                if(userInfo) {
+                    let user_info = userInfo.dataValues;
+
+                    await db.Customer.create({
+                        mobile: userData.phone,
+                        email: userData.email,
+                        userID: user_info.id,
+                    })
+
+                    return {
+                        EC: 0,
+                        DT: '',
+                        EM: 'Đăng ký thành công !',
+                    }
+                }
             }
         }
 
-        let hash_password = hashPassword(userData.password);
-
-        await db.User.create({
-            username: userData.username,
-            password: hash_password,
-            role: userData.role,
-            registeredAt: new Date(),
-            lastLogin: null,
-        })
-
         return {
-            EC: 0,
-            EM: "Create new user successfully"
+            EC: 1,
+            DT: '',
+            EM: "Đăng ký không thành công"
         }
 
     } catch (error) {
         console.log(error);
         return {
             EC: 2,
+            DT: '',
             EM: "Some things is wrong at service!"
         }
     }
@@ -210,4 +259,4 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin, hashPassword }
+module.exports = { userRegister, userLogin, hashPassword, checkCustomerEmailExist }
