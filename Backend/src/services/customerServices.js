@@ -1,6 +1,7 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
+const { checkPassword, hashPassword } = require("./LoginRegisterService.js");
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -41,6 +42,122 @@ const getCustomerInfoForOrder = async (customer_id) => {
             EM: 'Something is wrong on services !',
         }
     }
+}
+
+const getCustomerInfo = async (customer_id) => {
+    try {
+        let customerInfo = await db.Customer.findOne({
+            raw: true,
+            attributes: ['id', 'name', 'mobile', 'gender', 'birth', 'email'],
+            where: {
+                id: {
+                    [Op.eq]: +customer_id
+                }
+            }
+        })
+
+        return {
+            EC: 0,
+            DT: customerInfo,
+            EM: 'Customer Info !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateCustomerInfo = async (data) => {
+    try {
+        await db.Customer.update({
+            name: data.name,
+            mobile: data.mobile,
+            gender: data.gender,
+            birth: data.birth
+        }, {
+            where: {
+                id: +data.id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Cập nhật thông tin thành công'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+
+}
+
+const changeCustomerPassword = async (data) => {
+    try {
+        let customerInfo = await db.Customer.findOne({
+            raw: true,
+            attributes: ['userID'],
+            where: {
+                id: {
+                    [Op.eq]: +data.id
+                }
+            }
+        });
+
+        if (customerInfo) {
+            let accountInfo = await db.User.findOne({
+                raw: true,
+                attributes: ['id','password'],
+                where: {
+                    id: {
+                        [Op.eq]: +customerInfo.userID
+                    }
+                }
+            });
+            if (checkPassword(data.old, accountInfo.password)) {
+                db.User.update({
+                    password: hashPassword(data.new)
+                }, {
+                    where: {
+                        id: {
+                            [Op.eq]: +accountInfo.id
+                        }
+                    }
+                });
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Thay đổi mật khẩu thành công'
+                }
+            } else {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Mật khẩu cũ không đúng'
+                }
+            }
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+
 }
 
 const handleCreateVertificationCode = async (data) => {
@@ -185,5 +302,5 @@ const handleOTPVertification = async (data) => {
 
 module.exports = {
     getCustomerInfoForOrder, handleCreateVertificationCode,
-    handleOTPVertification
+    handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword
 }

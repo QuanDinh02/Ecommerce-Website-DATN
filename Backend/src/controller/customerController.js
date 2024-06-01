@@ -41,6 +41,80 @@ const getCustomerInfoForOrder = async (req, res) => {
     }
 }
 
+const getCustomerInfo = async (req, res) => {
+    try {
+        let { id } = req.query;
+        let result = await customerServices.getCustomerInfo(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const updateCustomerInfo = async (req, res) => {
+    try {
+        let data = req.body;
+        let result = await customerServices.updateCustomerInfo(data);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const changeCustomerPassword = async (req, res) => {
+    try {
+        let { old_password, new_password } = req.body;
+        let { user } = req;
+
+        let data = {
+            id: user.customer_id,
+            old: old_password,
+            new: new_password
+        }
+
+        let result = await customerServices.changeCustomerPassword(data);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const sendVertificatedCode = async (req, res) => {
     try {
         let data = req.body;
@@ -58,12 +132,12 @@ const sendVertificatedCode = async (req, res) => {
             <p font-size: 16px;">The code will expired in 10 minutes</p>`
         });
 
-        if(email_res) {
+        if (email_res) {
             let result = await customerServices.handleCreateVertificationCode({
                 code: OTP,
                 email: data.email
             });
-    
+
             if (result && result.EC === 0) {
                 return res.status(200).json({
                     EC: 0,
@@ -96,7 +170,7 @@ const handleCodeVertification = async (req, res) => {
                 EM: result.EM
             })
         }
-        
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -109,5 +183,6 @@ const handleCodeVertification = async (req, res) => {
 
 module.exports = {
     getCustomerInfoForOrder, sendVertificatedCode,
-    handleCodeVertification
+    handleCodeVertification, getCustomerInfo, updateCustomerInfo,
+    changeCustomerPassword
 }

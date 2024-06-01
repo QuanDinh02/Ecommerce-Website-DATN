@@ -259,4 +259,4 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin, hashPassword, checkCustomerEmailExist }
+module.exports = { userRegister, userLogin, hashPassword, checkCustomerEmailExist, checkPassword }

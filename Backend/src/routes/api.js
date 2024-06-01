@@ -31,6 +31,10 @@ const ApiRoute = (app) => {
     router.put('/user/password', userController.handleChangeUserPassword);
 
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
+    router.get('/customer/info', customerController.getCustomerInfo);
+    router.put('/customer/info', customerController.updateCustomerInfo);
+    router.put('/customer/info/password',checkUserJWT, customerController.changeCustomerPassword);
+
     router.post('/customer/register/verification-code',customerController.sendVertificatedCode);
     router.post('/customer/register/verify',customerController.handleCodeVertification);
 

@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { IoSearch } from "react-icons/io5";
 import React from "react";
 import { useImmer } from "use-immer";
-import { Dropdown } from "../CustomerInfo/CustomerAccount/CustomerAccountInfo";
+import { Dropdown } from "@/components/Dropdown";
 import Button from "@/components/Button";
 import DatePicker from "react-datepicker";
 import './SellerOrder/SellerOrder.scss';
@@ -11,6 +11,7 @@ const SEARCH_TYPE = ["Mã đơn hàng", "Mã khách hàng", "Tên khách hàng"]
 const SellerOrder = () => {
 
     const [search, setSearch] = React.useState<string>("");
+    const [searchType, setSearchType] = React.useState<string>("");
 
     const [dateRange, setDateRange] = React.useState([null, null]);
     const [startDate, endDate] = dateRange;
@@ -102,7 +103,7 @@ const SellerOrder = () => {
                 </div>
             </div>
             <div className="order-managment__search-bar mb-10 flex">
-                <Dropdown data={SEARCH_TYPE} style={"border border-gray-300 h-10 w-[12rem] text-sm"} />
+                <Dropdown data={SEARCH_TYPE} style={"border border-gray-300 h-10 w-[12rem] text-sm"} value={searchType} setValue={setSearchType} />
                 <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 mr-2">
                     <input
                         value={search}
