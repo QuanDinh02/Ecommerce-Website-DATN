@@ -63,6 +63,28 @@ const getCustomerInfo = async (req, res) => {
     }
 }
 
+const getAllCustomerAddress = async (req, res) => {
+    try {
+        let { user } = req;
+        let result = await customerServices.getCustomerAddresses(+user.customer_id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const updateCustomerInfo = async (req, res) => {
     try {
         let data = req.body;
@@ -184,5 +206,5 @@ const handleCodeVertification = async (req, res) => {
 module.exports = {
     getCustomerInfoForOrder, sendVertificatedCode,
     handleCodeVertification, getCustomerInfo, updateCustomerInfo,
-    changeCustomerPassword
+    changeCustomerPassword, getAllCustomerAddress
 }

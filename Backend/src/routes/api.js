@@ -11,6 +11,7 @@ import searchController from '../controller/searchController';
 import sessionController from '../controller/sessionController';
 import orderController from '../controller/orderController';
 import recommendProductController from '../controller/recommendProductController';
+import locationController from '../controller/locationController';
 import { checkUserJWT } from '../middleware/jwt';
 
 const router = express.Router();
@@ -34,6 +35,8 @@ const ApiRoute = (app) => {
     router.get('/customer/info', customerController.getCustomerInfo);
     router.put('/customer/info', customerController.updateCustomerInfo);
     router.put('/customer/info/password',checkUserJWT, customerController.changeCustomerPassword);
+
+    router.get('/customer/info/address',checkUserJWT, customerController.getAllCustomerAddress);
 
     router.post('/customer/register/verification-code',customerController.sendVertificatedCode);
     router.post('/customer/register/verify',customerController.handleCodeVertification);
@@ -69,6 +72,10 @@ const ApiRoute = (app) => {
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
+
+    router.get('/provinces', locationController.getAllProvinces);
+    router.get('/districts/province', locationController.getDistrictsByProvince);
+    router.get('/wards/district', locationController.getWardsByDistrict);
 
     router.post('/recommend', recommendProductController.createRecommendProducts);
     router.get('/recommend', recommendProductController.getRecommendProducts);

@@ -45,6 +45,14 @@ export const getCustomerInfo = async (customer_id: number) => {
     return null;
 }
 
+export const getCustomerAddress = async () => {
+    let result: APIResponse = await axios.get('/api/customer/info/address');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
 export const updateCustomerInfo = async (data: IUpdateCustomerInfo) => {
     let result: APIResponse = await axios.put('/api/customer/info', data);
     return result;

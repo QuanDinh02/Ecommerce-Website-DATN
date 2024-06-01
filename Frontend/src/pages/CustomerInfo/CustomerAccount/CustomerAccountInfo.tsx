@@ -147,8 +147,7 @@ const CustomerAccountInfo = () => {
                 });
 
                 let { day: DAY, month: MONTH, year: YEAR } = getDayMonthYear(`${result.birth}`);
-
-                console.log(DAY, MONTH, YEAR);
+                
                 setDate(draft => {
                     draft.day = +DAY;
                     draft.month = +MONTH + 1;

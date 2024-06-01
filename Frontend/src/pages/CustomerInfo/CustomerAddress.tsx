@@ -6,32 +6,32 @@ import classNames from "classnames";
 import React from "react";
 import { FaCheck } from "react-icons/fa6";
 import { HiOutlinePlus } from "react-icons/hi";
-
-const Customer_Addresses: ICustomerAddress[] = [
-    {
-        name: "Minh Nhựt Home",
-        phone: "(+84) 123456789",
-        address: "123 Nguyễn Văn Cừ, Quận 5, TP. Hồ Chí Minh",
-        default: true
-    },
-    {
-        name: "Minh Nhựt HCMUS",
-        phone: "(+84) 123456789",
-        address: "123 Điện Biên Phủ, Quận 5, TP. Hồ Chí Minh",
-        default: false
-    }
-]
+import { getCustomerAddress } from "@/services/customerService";
 
 interface ICustomerAddress {
-    name: string
-    phone: string
-    address: string
-    default: boolean
+    id: number
+    fullname: string
+    mobile: string
+    street: string
+    ward: string
+    district: string
+    province: string
+    country: string
+    type: number
 }
 
 const AddressItem = ({ address, showUpdateModal, showDeleteModal }) => {
 
     let customer_address: ICustomerAddress = address;
+
+    const full_address = 
+    `
+    ${customer_address.street === "" ? "" : (customer_address.street + ", ")}
+    ${customer_address.ward === "" ? "" : (customer_address.ward + ", ")}
+    ${customer_address.district === "" ? "" : (customer_address.district + ", ")}
+    ${customer_address.province === "" ? "" : (customer_address.province + ", ")}
+    ${customer_address.country === "" ? "" : customer_address.country}
+    `;
 
     let handleShowUpdateModal = () => {
         showUpdateModal(true);
@@ -45,13 +45,13 @@ const AddressItem = ({ address, showUpdateModal, showDeleteModal }) => {
         <div className="customer-address flex items-center justify-between mb-10">
             <div className="address-info">
                 <div className="flex items-center gap-x-2 mb-2">
-                    <div className="address-name font-medium">{customer_address.name}</div>
+                    <div className="address-name font-medium">{customer_address.fullname}</div>
                     <div className="w-[2px] h-7 bg-gray-400"></div>
-                    <div className="address-phone text-gray-500">{customer_address.phone}</div>
+                    <div className="address-phone text-gray-500">{customer_address.mobile}</div>
                 </div>
-                <div className="address text-gray-500 w-[16rem] mb-2">{customer_address.address}</div>
+                <div className="address text-gray-500 w-[16rem] mb-2">{full_address}</div>
                 {
-                    customer_address.default && <div className="px-3 py-1.5 border border-red-500 text-red-500 w-fit font-medium">Địa chỉ mặc định</div>
+                    customer_address.type === 1 && <div className="px-3 py-1.5 border border-red-500 text-red-500 w-fit font-medium">Địa chỉ mặc định</div>
                 }
             </div>
             <div className="address-settings transition-all">
@@ -72,12 +72,24 @@ const CustomerAddress = () => {
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
 
     const [defaultAddress, setDefaultAddress] = React.useState<boolean>(false);
+    const [addressList, setAddressList] = React.useState<ICustomerAddress[]>([]);
 
     const defaultAddressStyle = () => classNames(
         'w-5 h-5 rounded-[2px] flex items-center justify-center', {
         'bg-[#FCB800] text-white': defaultAddress,
         'border border-gray-500': !defaultAddress,
     });
+
+    const fetchAllCustomerAddress = async () => {
+        let result = await getCustomerAddress();
+        if (result) {
+            setAddressList(result);
+        }
+    }
+
+    React.useEffect(() => {
+        fetchAllCustomerAddress();
+    }, []);
 
     return (
         <>
@@ -90,9 +102,9 @@ const CustomerAddress = () => {
                     <Button styles="px-5 py-2 bg-[#FCB800] font-medium flex items-center justify-center gap-x-2 hover:opacity-80 transition-all duration-200" OnClick={() => setShowAddNewModal(true)}><HiOutlinePlus /> Thêm địa chỉ mới</Button>
                 </div>
                 <div className="customer-address__main p-5">
-                    <div className="text-lg mb-8">Địa chỉ</div>
                     {
-                        Customer_Addresses.map((item, index) => {
+                        addressList && addressList.length > 0 &&
+                        addressList.map((item, index) => {
                             return (
                                 <AddressItem
                                     key={`customer-address-${index}`}
