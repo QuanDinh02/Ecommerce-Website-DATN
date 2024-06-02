@@ -106,19 +106,59 @@ const getCustomerAddresses = async (customer_id) => {
 
         let addressData = await db.Address.findAll({
             raw: true,
-            attributes: ['id','fullname', 'mobile', 'street', 'ward', 'district', 'province', 'country','type'],
+            attributes: ['id', 'fullname', 'mobile', 'street', 'ward', 'district', 'province', 'country', 'type'],
             where: {
                 customerID: {
                     [Op.eq]: customer_id
                 }
             }
         })
-        
+
         return {
             EC: 0,
             DT: addressData,
             EM: 'customer addresses !'
         }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateCustomerDefaultAddress = async (address_id) => {
+    try {
+
+        await db.Address.update({
+            type: 1
+        }, {
+            where: {
+                id: {
+                    [Op.eq]: address_id
+                }
+            }
+        });
+
+        await db.Address.update({
+            type: 0
+        }, {
+            where: {
+                id: {
+                    [Op.not]: address_id
+                }
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Cập nhật địa chỉ mặc định thành công'
+        }
+
+
     } catch (error) {
         console.log(error);
         return {
@@ -144,7 +184,7 @@ const changeCustomerPassword = async (data) => {
         if (customerInfo) {
             let accountInfo = await db.User.findOne({
                 raw: true,
-                attributes: ['id','password'],
+                attributes: ['id', 'password'],
                 where: {
                     id: {
                         [Op.eq]: +customerInfo.userID
@@ -331,5 +371,5 @@ const handleOTPVertification = async (data) => {
 module.exports = {
     getCustomerInfoForOrder, handleCreateVertificationCode,
     handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword,
-    getCustomerAddresses
+    getCustomerAddresses, updateCustomerDefaultAddress
 }

@@ -23,7 +23,7 @@ const getAllProvinces = async (req, res) => {
 
 const getDistrictsByProvince = async (req, res) => {
     try {
-        let { province_code } = req.query;
+        let { province_code } = req.params;
         let result = await locationServices.getDistrictsByProvince(province_code);
 
         if (result) {
@@ -45,7 +45,7 @@ const getDistrictsByProvince = async (req, res) => {
 
 const getWardsByDistrict = async (req, res) => {
     try {
-        let { district_code } = req.query;
+        let { district_code } = req.params;
         let result = await locationServices.getWardsByDistrict(district_code);
 
         if (result) {

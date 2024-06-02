@@ -13,6 +13,7 @@ import orderController from '../controller/orderController';
 import recommendProductController from '../controller/recommendProductController';
 import locationController from '../controller/locationController';
 import { checkUserJWT } from '../middleware/jwt';
+import { cacheMiddleware } from '../middleware/cache';
 
 const router = express.Router();
 const multer = require('multer')
@@ -34,14 +35,15 @@ const ApiRoute = (app) => {
     router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
     router.get('/customer/info', customerController.getCustomerInfo);
     router.put('/customer/info', customerController.updateCustomerInfo);
-    router.put('/customer/info/password',checkUserJWT, customerController.changeCustomerPassword);
+    router.put('/customer/info/password', checkUserJWT, customerController.changeCustomerPassword);
 
-    router.get('/customer/info/address',checkUserJWT, customerController.getAllCustomerAddress);
+    router.get('/customer/info/address', checkUserJWT, customerController.getAllCustomerAddress);
+    router.put('/customer/info/address', customerController.updateCustomerDefaultAddress);
 
-    router.post('/customer/register/verification-code',customerController.sendVertificatedCode);
-    router.post('/customer/register/verify',customerController.handleCodeVertification);
+    router.post('/customer/register/verification-code', customerController.sendVertificatedCode);
+    router.post('/customer/register/verify', customerController.handleCodeVertification);
 
-    router.get('/categories', categoryController.getCategoryList);
+    router.get('/categories', cacheMiddleware(300), categoryController.getCategoryList);
 
     router.get('/product/detail', productController.getProductDetail);
     router.get('/product/detail/review', productController.getProductReviews);
@@ -73,9 +75,9 @@ const ApiRoute = (app) => {
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
 
-    router.get('/provinces', locationController.getAllProvinces);
-    router.get('/districts/province', locationController.getDistrictsByProvince);
-    router.get('/wards/district', locationController.getWardsByDistrict);
+    router.get('/provinces', cacheMiddleware(300), locationController.getAllProvinces);
+    router.get('/districts/province/:province_code', cacheMiddleware(300), locationController.getDistrictsByProvince);
+    router.get('/wards/district/:district_code', cacheMiddleware(300), locationController.getWardsByDistrict);
 
     router.post('/recommend', recommendProductController.createRecommendProducts);
     router.get('/recommend', recommendProductController.getRecommendProducts);

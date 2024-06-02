@@ -6,7 +6,10 @@ import classNames from "classnames";
 import React from "react";
 import { FaCheck } from "react-icons/fa6";
 import { HiOutlinePlus } from "react-icons/hi";
-import { getCustomerAddress } from "@/services/customerService";
+import { getCustomerAddress, updateDefaultAddress } from "@/services/customerService";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
+import { ThreeDots } from "react-loader-spinner";
+import FloatingInputSelectLocation from "@/components/Floating/FloatingInputSelectLocation";
 
 interface ICustomerAddress {
     id: number
@@ -20,12 +23,12 @@ interface ICustomerAddress {
     type: number
 }
 
-const AddressItem = ({ address, showUpdateModal, showDeleteModal }) => {
+const AddressItem = ({ address, showUpdateModal, showDeleteModal, updateDefault }) => {
 
     let customer_address: ICustomerAddress = address;
 
-    const full_address = 
-    `
+    const full_address =
+        `
     ${customer_address.street === "" ? "" : (customer_address.street + ", ")}
     ${customer_address.ward === "" ? "" : (customer_address.ward + ", ")}
     ${customer_address.district === "" ? "" : (customer_address.district + ", ")}
@@ -59,7 +62,7 @@ const AddressItem = ({ address, showUpdateModal, showDeleteModal }) => {
                     <Button styles="border border-orange-500 text-orange-500 px-3 py-1.5 hover:text-white hover:bg-orange-500 duration-300" OnClick={() => handleShowUpdateModal()}>Cập nhật</Button>
                     <Button styles="border border-red-500 text-red-500 px-3 py-1.5 flex-1 hover:text-white hover:bg-red-500 duration-300" OnClick={() => handleShowDeleteModal()}>Xoá</Button>
                 </div>
-                <Button styles="border border-blue-500 text-blue-500 px-3 py-1.5 w-fit hover:text-white hover:bg-blue-500 duration-300">Thiết lập mặc định</Button>
+                <Button styles="border border-blue-500 text-blue-500 px-3 py-1.5 w-fit hover:text-white hover:bg-blue-500 duration-300" OnClick={() => updateDefault(customer_address.id)}>Thiết lập mặc định</Button>
             </div>
         </div>
     )
@@ -74,6 +77,8 @@ const CustomerAddress = () => {
     const [defaultAddress, setDefaultAddress] = React.useState<boolean>(false);
     const [addressList, setAddressList] = React.useState<ICustomerAddress[]>([]);
 
+    const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
     const defaultAddressStyle = () => classNames(
         'w-5 h-5 rounded-[2px] flex items-center justify-center', {
         'bg-[#FCB800] text-white': defaultAddress,
@@ -84,11 +89,36 @@ const CustomerAddress = () => {
         let result = await getCustomerAddress();
         if (result) {
             setAddressList(result);
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 1000);
+        }
+    }
+
+    const handleUpdateAddressDefault = async (id: number) => {
+        let result = await updateDefaultAddress(id);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+
+                setTimeout(() => {
+                    setDataLoading(true);
+                    fetchAllCustomerAddress();
+                }, 1000);
+
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
         }
     }
 
     React.useEffect(() => {
         fetchAllCustomerAddress();
+
+        setTimeout(() => {
+            setDataLoading(false);
+        }, 1000);
     }, []);
 
     return (
@@ -101,27 +131,45 @@ const CustomerAddress = () => {
                     </div>
                     <Button styles="px-5 py-2 bg-[#FCB800] font-medium flex items-center justify-center gap-x-2 hover:opacity-80 transition-all duration-200" OnClick={() => setShowAddNewModal(true)}><HiOutlinePlus /> Thêm địa chỉ mới</Button>
                 </div>
-                <div className="customer-address__main p-5">
-                    {
-                        addressList && addressList.length > 0 &&
-                        addressList.map((item, index) => {
-                            return (
-                                <AddressItem
-                                    key={`customer-address-${index}`}
-                                    address={item}
-                                    showUpdateModal={setShowUpdateModal}
-                                    showDeleteModal={setShowDeleteBox}
-                                />
-                            )
-                        })
-                    }
+                {
+                    dataLoading ?
+                        <div className="flex items-center justify-center w-full min-h-screen">
+                            <ThreeDots
+                                height="80"
+                                width="80"
+                                color="#FCB800"
+                                ariaLabel="three-dots-loading"
+                                radius="1"
+                                wrapperStyle={{}}
+                                wrapperClass="flex items-center justify-center tail-spin"
+                                visible={true}
+                            />
+                        </div>
+                        :
+                        <div className="customer-address__main p-5">
+                            {
+                                addressList && addressList.length > 0 &&
+                                addressList.map((item, index) => {
+                                    return (
+                                        <AddressItem
+                                            key={`customer-address-${index}`}
+                                            address={item}
+                                            showUpdateModal={setShowUpdateModal}
+                                            showDeleteModal={setShowDeleteBox}
+                                            updateDefault={handleUpdateAddressDefault}
+                                        />
+                                    )
+                                })
+                            }
 
-                </div>
+                        </div>
+                }
+
             </div>
-            <Modal show={showAddNewModal} setShow={setShowAddNewModal} size="form-box">
+            <Modal show={showAddNewModal} setShow={setShowAddNewModal} size="form-box-2">
                 <div>
                     <div className="text-xl font-medium mb-4">Địa chỉ mới</div>
-                    <div className="flex gap-x-4 mb-4">
+                    <div className="flex gap-x-4 mb-6">
                         <FloatingInput
                             label="Họ và Tên"
                             input_style="px-3 py-2 border-gray-300 w-full"
@@ -133,17 +181,24 @@ const CustomerAddress = () => {
                             block_style="flex-1"
                             id={'input-2'} />
                     </div>
+                    <div className="w-full mb-6">
+                        <FloatingInputSelectLocation
+                            label="Tỉnh/Thành phố, Quận/Huyện, Phường/Xã"
+                            input_style="px-3 py-2 border-gray-300 w-full"
+                            block_style="w-full"
+                            id={'input-3'} />
+                    </div>
                     <FloatingTextarea
                         label="Địa chỉ cụ thể"
                         input_style="outline-none border border-gray-400 px-3 py-2 w-full h-40"
                         block_style="w-full"
-                        id={'input-3'}
+                        id={'input-4'}
                     />
                     <div className="check_box flex items-center gap-x-2 cursor-pointer mt-3" onClick={() => setDefaultAddress(!defaultAddress)}>
                         <div className={defaultAddressStyle()}>{defaultAddress ? <FaCheck /> : ""}</div>
                         <div>Đặt làm địa chỉ mặc định</div>
                     </div>
-                    <div className="flex justify-end gap-x-2 transition-all">
+                    <div className="flex justify-end gap-x-2 transition-all h-full items-end">
                         <Button styles="hover:bg-gray-200 text-black font-medium px-6 py-2 duration-200" OnClick={() => setShowAddNewModal(false)}>Trở lại</Button>
                         <Button styles="bg-[#FCB800] text-black font-medium px-6 py-2 hover:opacity-80 duration-200">Hoàn thành</Button>
                     </div>
