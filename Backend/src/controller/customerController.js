@@ -114,6 +114,33 @@ const createNewCustomerAddress = async (req, res) => {
     }
 }
 
+const updateCustomerAddress = async (req, res) => {
+    try {
+        let data = req.body;
+
+        let new_data = {
+            ...data
+        }
+
+        let result = await customerServices.updateCustomerAddress(new_data);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const deleteCustomerAddress = async (req, res) => {
     try {
         let { id } = req.params;
@@ -283,5 +310,5 @@ module.exports = {
     getCustomerInfoForOrder, sendVertificatedCode,
     handleCodeVertification, getCustomerInfo, updateCustomerInfo,
     changeCustomerPassword, getAllCustomerAddress, updateCustomerDefaultAddress,
-    createNewCustomerAddress, deleteCustomerAddress
+    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress
 }

@@ -6,7 +6,11 @@ import classNames from "classnames";
 import React from "react";
 import { FaCheck } from "react-icons/fa6";
 import { HiOutlinePlus } from "react-icons/hi";
-import { getCustomerAddress, updateDefaultAddress, createNewAddress, removeCustomerAddress } from "@/services/customerService";
+import { 
+    getCustomerAddress, updateDefaultAddress, 
+    createNewAddress, removeCustomerAddress,
+    updateAddress
+} from "@/services/customerService";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import { ThreeDots } from "react-loader-spinner";
 import FloatingInputSelectLocation from "@/components/Floating/FloatingInputSelectLocation";
@@ -24,7 +28,7 @@ interface ICustomerAddress {
     type: number
 }
 
-const AddressItem = ({ address, showUpdateModal, showDeleteModal, updateDefault, setDelete }) => {
+const AddressItem = ({ address, showUpdateModal, showDeleteModal, updateDefault, setDelete, setUpdate }) => {
 
     let customer_address: ICustomerAddress = address;
 
@@ -39,6 +43,7 @@ const AddressItem = ({ address, showUpdateModal, showDeleteModal, updateDefault,
 
     let handleShowUpdateModal = () => {
         showUpdateModal(true);
+        setUpdate(customer_address);
     }
 
     let handleShowDeleteModal = (address_id: number) => {
@@ -94,7 +99,24 @@ const CustomerAddress = () => {
         province: ""
     })
 
+    const [updateAddressID, setUpdateAddressID] = React.useState<number>(0);
+    const [updateName, setUpdateName] = React.useState<string>("");
+    const [updatePhone, setUpdatePhone] = React.useState<string>("");
+    const [updateStreetAddress, setUpdateStreetAddress] = React.useState<string>("");
+
+    const [otherUpdateAddress, setOtherUpdateAddress] = useImmer<IOtherAddress>({
+        ward: "",
+        district: "",
+        province: ""
+    })
+
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
+    const handleUpdateOtherAddress = (field: string, value: string) => {
+        setOtherUpdateAddress(draft => {
+            draft[field] = value;
+        })
+    }
 
     const handleOnChangeOtherAddress = (field: string, value: string) => {
         setOtherAddress(draft => {
@@ -188,6 +210,57 @@ const CustomerAddress = () => {
         }
     }
 
+    const handleUpdateAddress = async () => {
+
+        if (updateName.length === 0) {
+            errorToast1("Họ và Tên không hợp lệ !");
+            return;
+        }
+
+        if (updatePhone.length !== 10) {
+            errorToast1("Số điện thoại không hợp lệ !");
+            return;
+        }
+
+        if (otherUpdateAddress.province === "") {
+            errorToast1("Vui lòng chọn Tỉnh/Thành phố !");
+            return;
+        }
+
+        if (otherUpdateAddress.district === "") {
+            errorToast1("Vui lòng chọn Quận/Huyện !");
+            return;
+        }
+
+        if (otherUpdateAddress.ward === "") {
+            errorToast1("Vui lòng chọn phường/xã !");
+            return;
+        }
+
+        if (updateStreetAddress === "") {
+            errorToast1("Vui lòng điền địa chỉ cụ thể !");
+            return;
+        }
+
+        let result = await updateAddress({
+            id: updateAddressID,
+            fullname: updateName,
+            mobile: updatePhone,
+            street: updateStreetAddress,
+            ward: otherUpdateAddress.ward,
+            district: otherUpdateAddress.district,
+            province: otherUpdateAddress.province,
+        });
+
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            handleCloseUpdateModal();
+            setTimeout(() => {
+                fetchAllCustomerAddress();
+            }, 1000);
+        }
+    }
+
     const handleCloseAddNewModal = () => {
         setNewAddressName("");
         setNewAddressPhone("");
@@ -201,6 +274,19 @@ const CustomerAddress = () => {
         setShowAddNewModal(false);
     }
 
+    const handleCloseUpdateModal = () => {
+        setUpdateAddressID(0);
+        setUpdateName("");
+        setUpdatePhone("");
+        setOtherUpdateAddress({
+            ward: "",
+            district: "",
+            province: ""
+        });
+        setUpdateStreetAddress("");
+        setShowUpdateModal(false);
+    }
+
     const handleRemoveCustomerAddress = async (address_id: number) => {
         let result = await removeCustomerAddress(address_id);
         if (result && result.EC === 0) {
@@ -212,6 +298,18 @@ const CustomerAddress = () => {
         } else {
             return;
         }
+    }
+
+    const handleSetUpdateAddress = (address: ICustomerAddress) => {
+        setUpdateAddressID(address.id);
+        setUpdateName(address.fullname);
+        setUpdatePhone(address.mobile);
+        setUpdateStreetAddress(address.street);
+        setOtherUpdateAddress(draft => {
+            draft.province = address.province;
+            draft.district = address.district;
+            draft.ward = address.ward;
+        })
     }
 
     React.useEffect(() => {
@@ -259,6 +357,7 @@ const CustomerAddress = () => {
                                             showDeleteModal={setShowDeleteBox}
                                             updateDefault={handleUpdateAddressDefault}
                                             setDelete={setDeleteAddress}
+                                            setUpdate={handleSetUpdateAddress}
                                         />
                                     )
                                 })
@@ -316,34 +415,49 @@ const CustomerAddress = () => {
                     </div>
                 </div>
             </Modal>
-            <Modal show={showUpdateModal} setShow={setShowUpdateModal} size="form-box">
-                <div>
-                    <div className="text-xl font-medium mb-4">Cập nhật địa chỉ</div>
-                    <div className="flex gap-x-4 mb-4">
-                        {/* <FloatingInput
-                            label="Họ và Tên"
-                            input_style="px-3 py-2 border-gray-300 w-full"
-                            block_style="flex-1"
-                            id={'input-1'} />
-                        <FloatingInput
-                            label="Số điện thoại"
-                            input_style="px-3 py-2 border-gray-300 w-full"
-                            block_style="flex-1"
-                            id={'input-2'} /> */}
+            <Modal show={showUpdateModal} setShow={setShowUpdateModal} size="form-box-2">
+                <div className="flex flex-col justify-between h-full">
+                    <div>
+                        <div className="text-xl font-medium mb-4">Cập nhật địa chỉ</div>
+                        <div className="flex gap-x-4 mb-6">
+                            <FloatingInput
+                                label="Họ và Tên"
+                                value={updateName}
+                                setValue={setUpdateName}
+                                input_style="px-3 py-2 border-gray-300 w-full"
+                                block_style="flex-1"
+                                id={'input-10'} />
+                            <FloatingInput
+                                label="Số điện thoại"
+                                value={updatePhone}
+                                setValue={setUpdatePhone}
+                                input_style="px-3 py-2 border-gray-300 w-full"
+                                block_style="flex-1"
+                                id={'input-20'} />
+                        </div>
+                        <div className="w-full mb-6">
+                            <FloatingInputSelectLocation
+                                label="Tỉnh/Thành phố, Quận/Huyện, Phường/Xã"
+                                value={otherUpdateAddress}
+                                setValue={handleUpdateOtherAddress}
+                                updateAddress={`${otherUpdateAddress.province}, ${otherUpdateAddress.district}, ${otherUpdateAddress.ward}`}
+                                input_style="px-3 py-2 border-gray-300 w-full"
+                                block_style="w-full"
+                                id={'input-30'}
+                            />
+                        </div>
+                        <FloatingTextarea
+                            label="Địa chỉ cụ thể"
+                            value={updateStreetAddress}
+                            setValue={setUpdateStreetAddress}
+                            input_style="outline-none border border-gray-400 px-3 py-2 w-full h-20"
+                            block_style="w-full"
+                            id={'input-40'}
+                        />
                     </div>
-                    {/* <FloatingTextarea
-                        label="Địa chỉ cụ thể"
-                        input_style="outline-none border border-gray-400 px-3 py-2 w-full h-40"
-                        block_style="w-full"
-                        id={'input-3'}
-                    /> */}
-                    <div className="check_box flex items-center gap-x-2 cursor-pointer mt-3" onClick={() => setDefaultAddress(!defaultAddress)}>
-                        <div className={defaultAddressStyle()}>{defaultAddress ? <FaCheck /> : ""}</div>
-                        <div>Đặt làm địa chỉ mặc định</div>
-                    </div>
-                    <div className="flex justify-end gap-x-2 transition-all">
-                        <Button styles="hover:bg-gray-200 text-black font-medium px-6 py-2 duration-200" OnClick={() => setShowUpdateModal(false)}>Trở lại</Button>
-                        <Button styles="bg-[#FCB800] text-black font-medium px-6 py-2 hover:opacity-80 duration-200">Hoàn thành</Button>
+                    <div className="transition-all flex justify-end items-center gap-x-1 mt-4">
+                        <Button styles="hover:bg-gray-200 text-black font-medium px-6 py-2 duration-200" OnClick={() => handleCloseUpdateModal()}>Trở lại</Button>
+                        <Button styles="bg-[#FCB800] text-black font-medium px-6 py-2 hover:opacity-80 duration-200" OnClick={() => handleUpdateAddress()}>Cập nhật</Button>
                     </div>
                 </div>
             </Modal>

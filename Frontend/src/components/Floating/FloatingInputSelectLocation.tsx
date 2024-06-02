@@ -16,6 +16,7 @@ interface IProps {
     id: string
     value: IOtherAddress
     setValue: (field: string, value: string) => void
+    updateAddress?: string
 }
 
 interface IProvince {
@@ -48,18 +49,17 @@ const TAB_SELECT = [
 
 const FloatingInputSelectLocation = (props: IProps) => {
 
-    const { setValue } = props;
+    const { setValue, updateAddress } = props;
     const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
     const [tab, setTab] = React.useState<number>(1);
     const [tabAllow, setTabAllow] = React.useState<number>(1);
 
-    const [finalAddress, setFinalAddress] = React.useState<string>("")
+    const [finalAddress, setFinalAddress] = React.useState<string>(updateAddress ? updateAddress : "");
 
     const [selectProvince, setSelectProvince] = React.useState<IProvince>({
         code: "",
         name: ""
     });
-
 
     const [selectDistrict, setSelectDistrict] = React.useState<IDistrictWard>({
         code: "",

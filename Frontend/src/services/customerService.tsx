@@ -30,6 +30,16 @@ interface INewAddress {
     type: number
 }
 
+interface IUpdateAddress {
+    id: number
+    fullname: string
+    mobile: string
+    street: string
+    ward: string
+    district: string
+    province: string
+}
+
 export const getCustomerOrderAddress = async (customer_id: number) => {
     let result: APIResponse = await axios.get(`/api/customer/order-info?id=${customer_id}`);
     if (result && result.EC === 0) {
@@ -71,6 +81,11 @@ export const createNewAddress = async (data: INewAddress) => {
 
 export const updateDefaultAddress = async (address_id: number) => {
     let result: APIResponse = await axios.put('/api/customer/info/address', { id: address_id });
+    return result;
+}
+
+export const updateAddress = async (data: IUpdateAddress) => {
+    let result: APIResponse = await axios.put('/api/customer/info/address/update', data);
     return result;
 }
 

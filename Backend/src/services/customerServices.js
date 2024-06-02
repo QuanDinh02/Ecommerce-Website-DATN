@@ -116,6 +116,39 @@ const createNewCustomerAddress = async (data) => {
     }
 }
 
+const updateCustomerAddress = async (data) => {
+    try {
+        let { id: address_id } = data;
+
+        let update_data = data;
+        delete update_data.id;
+
+        let result = await db.Address.update(update_data, {
+            where: {
+                id: {
+                    [Op.eq]: address_id
+                }
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Cập nhật địa chỉ thành công'
+        }
+
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const updateCustomerInfo = async (data) => {
     try {
         await db.Customer.update({
@@ -463,5 +496,5 @@ module.exports = {
     getCustomerInfoForOrder, handleCreateVertificationCode,
     handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword,
     getCustomerAddresses, updateCustomerDefaultAddress,
-    createNewCustomerAddress, deleteCustomerAddress
+    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress
 }
