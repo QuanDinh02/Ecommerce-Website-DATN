@@ -85,11 +85,64 @@ const getAllCustomerAddress = async (req, res) => {
     }
 }
 
+const createNewCustomerAddress = async (req, res) => {
+    try {
+        let { user } = req;
+        let data = req.body;
+
+        let new_data = {
+            ...data,
+            customerID: +user.customer_id
+        }
+
+        let result = await customerServices.createNewCustomerAddress(new_data);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const deleteCustomerAddress = async (req, res) => {
+    try {
+        let { id } = req.params;
+
+        let result = await customerServices.deleteCustomerAddress(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const updateCustomerDefaultAddress = async (req, res) => {
     try {
+        let { user } = req;
         let { id } = req.body;
 
-        let result = await customerServices.updateCustomerDefaultAddress(+id);
+        let result = await customerServices.updateCustomerDefaultAddress(+id, +user.customer_id);
 
         if (result) {
             return res.status(200).json({
@@ -229,5 +282,6 @@ const handleCodeVertification = async (req, res) => {
 module.exports = {
     getCustomerInfoForOrder, sendVertificatedCode,
     handleCodeVertification, getCustomerInfo, updateCustomerInfo,
-    changeCustomerPassword, getAllCustomerAddress, updateCustomerDefaultAddress
+    changeCustomerPassword, getAllCustomerAddress, updateCustomerDefaultAddress,
+    createNewCustomerAddress, deleteCustomerAddress
 }

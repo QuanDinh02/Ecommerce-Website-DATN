@@ -19,6 +19,17 @@ interface IUpdateCustomerPassword {
     new_password: string
 }
 
+interface INewAddress {
+    fullname: string
+    mobile: string
+    street: string
+    ward: string
+    district: string
+    province: string
+    country: string
+    type: number
+}
+
 export const getCustomerOrderAddress = async (customer_id: number) => {
     let result: APIResponse = await axios.get(`/api/customer/order-info?id=${customer_id}`);
     if (result && result.EC === 0) {
@@ -53,8 +64,18 @@ export const getCustomerAddress = async () => {
     return null;
 }
 
+export const createNewAddress = async (data: INewAddress) => {
+    let result: APIResponse = await axios.post('/api/customer/info/address', data);
+    return result;
+}
+
 export const updateDefaultAddress = async (address_id: number) => {
     let result: APIResponse = await axios.put('/api/customer/info/address', { id: address_id });
+    return result;
+}
+
+export const removeCustomerAddress = async (address_id: number) => {
+    let result: APIResponse = await axios.delete(`/api/customer/info/address/${address_id}`);
     return result;
 }
 

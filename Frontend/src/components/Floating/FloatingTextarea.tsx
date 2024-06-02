@@ -4,6 +4,8 @@ interface IProps {
     input_style: string
     block_style: string
     id: string
+    value: any
+    setValue: (value: any) => void
 }
 
 const FloatingTextarea = (props: IProps) => {
@@ -15,6 +17,8 @@ const FloatingTextarea = (props: IProps) => {
                 id={props.id}
                 className={`block outline-none border bg-transparent border-1 appearance-none focus:ring-0 focus:border-black peer ${props.input_style}`}
                 placeholder=" "
+                value={props.value}
+                onChange={(e) => props.setValue(e.target.value)}
             />
             <label
                 htmlFor={props.id}

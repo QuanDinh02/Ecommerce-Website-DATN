@@ -71,6 +71,51 @@ const getCustomerInfo = async (customer_id) => {
     }
 }
 
+const createNewCustomerAddress = async (data) => {
+    try {
+        let { type, customerID } = data;
+
+        if (type === 1) {
+            let result = await db.Address.update({
+                type: 0
+            }, {
+                where: {
+                    customerID: {
+                        [Op.eq]: customerID
+                    }
+                }
+            });
+
+            if (result) {
+                await db.Address.create(data);
+
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Tạo mới địa chỉ thành công'
+                }
+            }
+
+        } else {
+            await db.Address.create(data);
+
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Tạo mới địa chỉ thành công'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const updateCustomerInfo = async (data) => {
     try {
         await db.Customer.update({
@@ -101,6 +146,32 @@ const updateCustomerInfo = async (data) => {
 
 }
 
+const deleteCustomerAddress = async (address_id) => {
+    try {
+        await db.Address.destroy({
+            where: {
+                id: {
+                    [Op.eq]: +address_id
+                }
+            },
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Xóa địa chỉ thành công'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+
 const getCustomerAddresses = async (customer_id) => {
     try {
 
@@ -129,8 +200,28 @@ const getCustomerAddresses = async (customer_id) => {
     }
 }
 
-const updateCustomerDefaultAddress = async (address_id) => {
+const updateCustomerDefaultAddress = async (address_id, customer_id) => {
     try {
+
+        await db.Address.update({
+            type: 0
+        }, {
+            where: {
+                [Op.and]: [
+                    {
+                        id: {
+                            [Op.not]: address_id
+                        }
+                    },
+                    {
+                        customerID: {
+                            [Op.eq]: customer_id
+                        }
+                    }
+                ]
+
+            }
+        });
 
         await db.Address.update({
             type: 1
@@ -371,5 +462,6 @@ const handleOTPVertification = async (data) => {
 module.exports = {
     getCustomerInfoForOrder, handleCreateVertificationCode,
     handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword,
-    getCustomerAddresses, updateCustomerDefaultAddress
+    getCustomerAddresses, updateCustomerDefaultAddress,
+    createNewCustomerAddress, deleteCustomerAddress
 }

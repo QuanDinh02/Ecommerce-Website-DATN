@@ -38,7 +38,9 @@ const ApiRoute = (app) => {
     router.put('/customer/info/password', checkUserJWT, customerController.changeCustomerPassword);
 
     router.get('/customer/info/address', checkUserJWT, customerController.getAllCustomerAddress);
-    router.put('/customer/info/address', customerController.updateCustomerDefaultAddress);
+    router.post('/customer/info/address', checkUserJWT, customerController.createNewCustomerAddress);
+    router.put('/customer/info/address', checkUserJWT, customerController.updateCustomerDefaultAddress);
+    router.delete('/customer/info/address/:id', customerController.deleteCustomerAddress);
 
     router.post('/customer/register/verification-code', customerController.sendVertificatedCode);
     router.post('/customer/register/verify', customerController.handleCodeVertification);

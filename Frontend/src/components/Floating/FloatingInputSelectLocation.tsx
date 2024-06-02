@@ -3,11 +3,19 @@ import classNames from "classnames"
 import React from "react"
 import { MdCancel } from "react-icons/md";
 
+export interface IOtherAddress {
+    ward: string
+    district: string
+    province: string
+}
+
 interface IProps {
     label: string
     input_style: string
     block_style: string
     id: string
+    value: IOtherAddress
+    setValue: (field: string, value: string) => void
 }
 
 interface IProvince {
@@ -40,6 +48,7 @@ const TAB_SELECT = [
 
 const FloatingInputSelectLocation = (props: IProps) => {
 
+    const { setValue } = props;
     const [showDropdown, setShowDropdown] = React.useState<boolean>(false);
     const [tab, setTab] = React.useState<number>(1);
     const [tabAllow, setTabAllow] = React.useState<number>(1);
@@ -76,8 +85,6 @@ const FloatingInputSelectLocation = (props: IProps) => {
     })
 
     const handleSetTab = (tab_id: number) => {
-        console.log(">>> tab click: ", tab_id);
-        console.log(">>> tab allolw: ", tabAllow);
         if (tab_id <= tabAllow) {
             setTab(tab_id);
         }
@@ -95,6 +102,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
 
         setTabAllow(2);
         setFinalAddress(province.name);
+        setValue('province',province.name);
         handleFetchDistrictList(province.code);
     }
 
@@ -106,7 +114,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
         });
 
         setTabAllow(3);
-
+        setValue('district',district.full_name);
         setFinalAddress(selectProvince.name + ", " + district.full_name);
         handleFetchWardList(district.code);
     }
@@ -116,7 +124,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
             code: ward.code,
             full_name: ward.full_name
         });
-
+        setValue('ward',ward.full_name);
         setFinalAddress(selectProvince.name + ", " + selectDistrict.full_name + ", " + ward.full_name);
         setShowDropdown(false);
     }
@@ -137,7 +145,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
         }
     }
 
-    const hanldeResetFinalDistrict = () => {
+    const hanldeResetFinalAddress = () => {
         setFinalAddress("");
         setSelectProvince({
             code: "",
@@ -153,6 +161,11 @@ const FloatingInputSelectLocation = (props: IProps) => {
         });
         setDistrictList([]);
         setWardList([]);
+
+        setValue('province',"");
+        setValue('district',"");
+        setValue('ward',"");
+
         setTab(1);
         setTabAllow(1);
     }
@@ -186,7 +199,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
             <input
                 type="text"
                 id={props.id}
-                className={`block outline-none border bg-transparent border-1 appearance-none focus:ring-0 focus:border-black peer ${props.input_style}`}
+                className={`tracking-wide block outline-none border bg-transparent border-1 appearance-none focus:ring-0 focus:border-black peer ${props.input_style}`}
                 placeholder=" "
                 onFocus={() => setShowDropdown(true)}
                 value={finalAddress}
@@ -199,7 +212,7 @@ const FloatingInputSelectLocation = (props: IProps) => {
             {
                 showDropdown &&
                 <div ref={ref} >
-                    {showDropdown && finalAddress.length > 0 && <MdCancel className="w-5 h-5 text-gray-400 absolute right-3 top-3 cursor-pointer hover:text-gray-500" onClick={() => hanldeResetFinalDistrict()} />}
+                    {showDropdown && finalAddress.length > 0 && <MdCancel className="w-5 h-5 text-gray-400 absolute right-3 top-3 cursor-pointer hover:text-gray-500" onClick={() => hanldeResetFinalAddress()} />}
                     <div className={`dropdown-container shadow w-full z-[60] top-12 absolute border border-gray-300`}>
                         <div className="w-full flex items-center bg-white">
                             {TAB_SELECT.map((item) => {
