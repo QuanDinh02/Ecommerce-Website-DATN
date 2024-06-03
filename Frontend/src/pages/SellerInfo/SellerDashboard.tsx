@@ -1,3 +1,5 @@
+import React from 'react';
+import { ThreeDots } from 'react-loader-spinner';
 import {
     XAxis,
     YAxis,
@@ -96,79 +98,106 @@ const order_data = [
 ]
 
 const SellerDashboard = () => {
+
+    const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
+    React.useEffect(() => {
+        setTimeout(() => {
+            setDataLoading(false);
+        }, 800);
+    }, []);
+
     return (
-        <div>
-            <div className='mb-10'>
-                <div className="text-black text-lg font-bold">Danh sách cần làm</div>
-                <div className='text-gray-500 text-sm mb-4'>Những việc bạn sẽ phải làm</div>
-                <div className='grid grid-cols-4 gap-y-2 gap-x-2'>
-                    {
-                        order_data.map((item, index) => {
-                            return (
-                                <div className='flex flex-col gap-y-1 items-center justify-center border border-gray-20 py-2' key={`order-type-${index}`}>
-                                    <div className='text-blue-500 font-bold'>{item.value}</div>
-                                    <div className='text-sm text-center line-clamp-1'>{item.label}</div>
+        <>
+            {
+                dataLoading ?
+                    <div className="flex items-center justify-center w-full h-screen">
+                        <ThreeDots
+                            height="80"
+                            width="80"
+                            color="#FCB800"
+                            ariaLabel="three-dots-loading"
+                            radius="1"
+                            wrapperStyle={{}}
+                            wrapperClass="flex items-center justify-center tail-spin"
+                            visible={true}
+                        />
+                    </div>
+                    :
+                    <div>
+                        <div className='mb-10'>
+                            <div className="text-black text-lg font-bold">Danh sách cần làm</div>
+                            <div className='text-gray-500 text-sm mb-4'>Những việc bạn sẽ phải làm</div>
+                            <div className='grid grid-cols-4 gap-y-2 gap-x-2'>
+                                {
+                                    order_data.map((item, index) => {
+                                        return (
+                                            <div className='flex flex-col gap-y-1 items-center justify-center border border-gray-20 py-2' key={`order-type-${index}`}>
+                                                <div className='text-blue-500 font-bold'>{item.value}</div>
+                                                <div className='text-sm text-center line-clamp-1'>{item.label}</div>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+                        <div className='mb-4'>
+                            <div className='flex items-center gap-x-3'>
+                                <div className="text-black text-lg font-bold">Phân Tích Bán Hàng</div>
+                                <div className='text-gray-500 text-sm'>( Hôm nay 00:00 GMT +7 00:00 )</div>
+                            </div>
+                            <div className='text-gray-500 text-sm mb-4'>Tổng quan dữ liệu của shop đối với đơn hàng đã xác nhận</div>
+                            <div className='w-full flex'>
+                                <div className='w-1/2'>
+                                    <ResponsiveContainer width="100%" height={300}>
+                                        <AreaChart
+                                            width={500}
+                                            height={200}
+                                            data={data}
+                                            syncId="anyId"
+                                            margin={{
+                                                top: 0,
+                                                right: 50,
+                                                left: 10,
+                                                bottom: 10,
+                                            }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis dataKey="name">
+                                                <Label value="Tháng" offset={0} position="insideBottom" />
+                                            </XAxis>
+                                            <YAxis label={{ value: 'Doanh số', angle: -90, position: 'left' }} />
+                                            <Tooltip />
+                                            <Area type="monotone" dataKey="revenue" stroke="#82ca9d" fill="#82ca9d" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
                                 </div>
-                            )
-                        })
-                    }
-                </div>
-            </div>
-            <div className='mb-4'>
-                <div className='flex items-center gap-x-3'>
-                    <div className="text-black text-lg font-bold">Phân Tích Bán Hàng</div>
-                    <div className='text-gray-500 text-sm'>( Hôm nay 00:00 GMT +7 00:00 )</div>
-                </div>
-                <div className='text-gray-500 text-sm mb-4'>Tổng quan dữ liệu của shop đối với đơn hàng đã xác nhận</div>
-                <div className='w-full flex'>
-                    <div className='w-1/2'>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <AreaChart
-                                width={500}
-                                height={200}
-                                data={data}
-                                syncId="anyId"
-                                margin={{
-                                    top: 0,
-                                    right: 50,
-                                    left: 10,
-                                    bottom: 10,
-                                }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name">
-                                    <Label value="Tháng" offset={0} position="insideBottom" />
-                                </XAxis>
-                                <YAxis label={{ value: 'Doanh số', angle: -90, position: 'left' }} />
-                                <Tooltip />
-                                <Area type="monotone" dataKey="revenue" stroke="#82ca9d" fill="#82ca9d" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <div className='w-1/2'>
-                        <div className='flex items-center gap-x-16 mb-6 pb-6 border-b border-gray-400'>
-                            <div className='flex flex-col gap-y-1 w-fit'>
-                                <div>Lượt truy cập</div>
-                                <div className='text-xl font-bold'>0</div>
-                                <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
-                            </div>
-                            <div className='flex flex-col gap-y-1 w-fit'>
-                                <div>Lượt xem</div>
-                                <div className='text-xl font-bold'>0</div>
-                                <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
-                            </div>
-                        </div>
-                        <div className='flex items-center'>
-                            <div className='flex flex-col gap-y-1 w-fit'>
-                                <div>Đơn hàng</div>
-                                <div className='text-xl font-bold'>0</div>
-                                <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
+                                <div className='w-1/2'>
+                                    <div className='flex items-center gap-x-16 mb-6 pb-6 border-b border-gray-400'>
+                                        <div className='flex flex-col gap-y-1 w-fit'>
+                                            <div>Lượt truy cập</div>
+                                            <div className='text-xl font-bold'>0</div>
+                                            <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
+                                        </div>
+                                        <div className='flex flex-col gap-y-1 w-fit'>
+                                            <div>Lượt xem</div>
+                                            <div className='text-xl font-bold'>0</div>
+                                            <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
+                                        </div>
+                                    </div>
+                                    <div className='flex items-center'>
+                                        <div className='flex flex-col gap-y-1 w-fit'>
+                                            <div>Đơn hàng</div>
+                                            <div className='text-xl font-bold'>0</div>
+                                            <div className='text-sm text-gray-500'>Vs hôm qua 0,00%</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
+            }
+        </>
     )
 }
 

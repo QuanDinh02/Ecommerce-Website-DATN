@@ -151,10 +151,10 @@ const Header = () => {
         if (event.key === 'Enter') {
             handleSaveSearch();
         }
-        
+
         if (productSearchList.length > 0) {
             let _productSearchList = _.cloneDeep(productSearchList);
-            
+
             if (event.key === 'ArrowDown') {
                 if (currentSelect === -1) {
                     setCurrentSelect(0);
@@ -418,45 +418,63 @@ const Header = () => {
                                 }
                             </div>
                             :
-                            <div className='logo' onClick={() => navigate('/')}>
-                                <span className='text-black'>Fox</span>
-                                <span className='text-white'>Mart</span>
-                            </div>
-                    }
-                    <div className='search-bar'>
-                        <div className='search-bar__text'>
-                            <IoIosSearch className="w-6 h-6 text-gray-500" />
-                            <input
-                                type="text"
-                                className='text-black font-normal px-2 w-full outline-none'
-                                value={productSearchRecommend ? productSearchRecommend : productSearch}
-                                placeholder='Tên sản phẩm tìm kiếm ...'
-                                onClick={() => setShowSearchList(true)}
-                                onChange={(event) => handleSearchOnChange(event.target.value)}
-                                onKeyDown={(event) => handleKeyPress(event)}
-                            />
-                        </div>
-                        {showSearchList && productSearch && productSearchList && productSearchList.length > 0 &&
-                            <div className='search-bar__search-list'>
-                                {
-                                    productSearchList.map(item => {
-                                        return (
-                                            <div
-                                                key={`search-item-${item.id}`}
-                                                className={item.selected ? 'search-item selected' : 'search-item'}
-                                                onClick={() => handleSelectRecommendedProduct(item)}
-                                            //onClick={() => handleSearchBookDetail(item.id, item.name)}
-                                            >
-                                                <CiSearch className='w-5 h-5' />
-                                                <span className='item-name'>{item.name}</span>
-                                            </div>
-                                        )
-                                    })
+                            <>
+                                {userRole === "customer" ?
+                                    <div className='logo' onClick={() => navigate('/')}>
+                                        <span className='text-black'>Fox</span>
+                                        <span className='text-white'>Mart</span>
+                                    </div>
+                                    :
+                                    <div className='logo flex items-center gap-x-6'>
+                                        <div className='cursor-default'>
+                                            <span className='text-black'>Fox</span>
+                                            <span className='text-white'>Mart</span>
+                                        </div>
+                                        <div className='text-black font-normal cursor-default'>Người bán</div>
+                                    </div>
                                 }
+                            </>
+                    }
+                    {
+                        userRole !== "seller" &&
+                        <>
+                            <div className='search-bar'>
+                                <div className='search-bar__text'>
+                                    <IoIosSearch className="w-6 h-6 text-gray-500" />
+                                    <input
+                                        type="text"
+                                        className='text-black font-normal px-2 w-full outline-none'
+                                        value={productSearchRecommend ? productSearchRecommend : productSearch}
+                                        placeholder='Tên sản phẩm tìm kiếm ...'
+                                        onClick={() => setShowSearchList(true)}
+                                        onChange={(event) => handleSearchOnChange(event.target.value)}
+                                        onKeyDown={(event) => handleKeyPress(event)}
+                                    />
+                                </div>
+                                {showSearchList && productSearch && productSearchList && productSearchList.length > 0 &&
+                                    <div className='search-bar__search-list'>
+                                        {
+                                            productSearchList.map(item => {
+                                                return (
+                                                    <div
+                                                        key={`search-item-${item.id}`}
+                                                        className={item.selected ? 'search-item selected' : 'search-item'}
+                                                        onClick={() => handleSelectRecommendedProduct(item)}
+                                                    //onClick={() => handleSearchBookDetail(item.id, item.name)}
+                                                    >
+                                                        <CiSearch className='w-5 h-5' />
+                                                        <span className='item-name'>{item.name}</span>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                }
+                                <div className='search-bar__btn' onClick={() => handleSaveSearch()}>Tìm kiếm</div>
                             </div>
-                        }
-                        <div className='search-bar__btn' onClick={() => handleSaveSearch()}>Tìm kiếm</div>
-                    </div>
+
+                        </>
+                    }
                     <div className="navigation">
                         {
                             userRole === "customer" &&
@@ -591,45 +609,50 @@ const Header = () => {
                     </div>
                 </div>
             </div>
-            <div className='w-full border-t border-gray-600'></div>
-            <div className='header__bottom relative'>
-                <div className='section_bottom'>
-                    <div className='categories relative' onClick={() => {
-                        if (location.pathname !== "/") {
-                            setShowMenu(!showMenu)
-                        }
-                    }}>
-                        <div className='main'>
-                            <FiMenu className="w-6 h-6" />
-                            <span>Danh mục</span>
+            {
+                userRole !== "seller" &&
+                <>
+                    <div className='w-full border-t border-gray-600'></div>
+                    <div className='header__bottom relative'>
+                        <div className='section_bottom'>
+                            <div className='categories relative' onClick={() => {
+                                if (location.pathname !== "/") {
+                                    setShowMenu(!showMenu)
+                                }
+                            }}>
+                                <div className='main'>
+                                    <FiMenu className="w-6 h-6" />
+                                    <span>Danh mục</span>
+                                </div>
+                                {
+                                    showMenu &&
+                                    <div className='absolute top-[2.5rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
+                                        <CategoryMenu />
+                                    </div>
+                                }
+                            </div>
+                            <div className='recent-products font-normal' onMouseEnter={() => setShowViewProduct(true)}>
+                                <span>Sản phẩm xem gần đây</span>
+                                <IoIosArrowDown />
+                            </div>
                         </div>
                         {
-                            showMenu &&
-                            <div className='absolute top-[2.5rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
-                                <CategoryMenu />
+                            showViewProduct &&
+                            <div className='recently-viewed-products absolute top-[3.25rem] bg-white w-full px-12 py-5' onMouseLeave={() => setShowViewProduct(false)}>
+                                <div className='w-[80rem] mx-auto px-[30px] h-full flex flex-wrap'>
+                                    <div className='viewed-item border-2 border-white hover:border-[#FCB800] duration-500 cursor-pointer'>
+                                        <img src={Item6} alt="" className='w-24 h-24' />
+                                    </div>
+                                </div>
+                                <div className='text-black mt-10 text-center'>
+                                    <span className='cursor-pointer underline hover:text-[#FCB800] duration-300'>Xem tất cả các sản phẩm bạn đã xem</span>
+                                </div>
                             </div>
                         }
-                    </div>
-                    <div className='recent-products font-normal' onMouseEnter={() => setShowViewProduct(true)}>
-                        <span>Sản phẩm xem gần đây</span>
-                        <IoIosArrowDown />
-                    </div>
-                </div>
-                {
-                    showViewProduct &&
-                    <div className='recently-viewed-products absolute top-[3.25rem] bg-white w-full px-12 py-5' onMouseLeave={() => setShowViewProduct(false)}>
-                        <div className='w-[80rem] mx-auto px-[30px] h-full flex flex-wrap'>
-                            <div className='viewed-item border-2 border-white hover:border-[#FCB800] duration-500 cursor-pointer'>
-                                <img src={Item6} alt="" className='w-24 h-24' />
-                            </div>
-                        </div>
-                        <div className='text-black mt-10 text-center'>
-                            <span className='cursor-pointer underline hover:text-[#FCB800] duration-300'>Xem tất cả các sản phẩm bạn đã xem</span>
-                        </div>
-                    </div>
-                }
 
-            </div>
+                    </div>
+                </>
+            }
         </>
 
     )

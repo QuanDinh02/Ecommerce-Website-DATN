@@ -82,7 +82,6 @@ const RecommendItem = () => {
     const fetchRecommendItems = async (customer_id: number) => {
         let response: IData = await getRecommendItemByCustomer(+customer_id);
         if (response) {
-            console.log(response);
             setRecommendItemList(response.product_list);
         }
     }
@@ -177,6 +176,7 @@ const RecommendItem = () => {
 const Homepage = () => {
 
     const navigate = useNavigate();
+    const userRole = useSelector<RootState, string>(state => state.user.role);
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
@@ -212,7 +212,13 @@ const Homepage = () => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
         }
-    }, []);
+    },[]);
+
+    React.useEffect(() => {
+        if(userRole === "seller") {
+            navigate("/seller-info/dashboard");
+        }
+    }, [userRole]);
 
     return (
         <>

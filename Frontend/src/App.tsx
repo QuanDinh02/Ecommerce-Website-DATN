@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="app">
       <Header />
-        <Outlet />
+      <Outlet />
       <Footer />
       <Toaster
         position="top-center"
