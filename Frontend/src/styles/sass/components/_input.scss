@@ -2,6 +2,10 @@
     @apply rounded-[4px] px-4 py-3 text-sm outline-none border border-gray-300 w-full focus:border-black;
 }
 
+.form_system_input {
+    @apply rounded-[4px] px-4 py-3 text-sm outline-none border-2 border-gray-300 w-full focus:border-blue-600 focus:border-2 ;
+}
+
 .input_label {
     @apply mb-2 text-black;
 }

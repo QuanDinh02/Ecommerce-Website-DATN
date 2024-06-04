@@ -55,6 +55,18 @@ import SellerProduct from '@/pages/SellerInfo/SellerProduct.tsx';
 import SellerProductAll from '@/pages/SellerInfo/SellerProduct/SellerProductAll.tsx';
 import SellerAddNewProduct from '@/pages/SellerInfo/SellerProduct/SellerAddNewProduct.tsx';
 import SellerProfile from '@/pages/SellerInfo/SellerProfile.tsx';
+import RegisterPage from '@/pages/RegisterPage.tsx';
+
+// FoxMart Management System
+import System from '@/pages/Management/System.tsx';
+import SystemLogin from '@/pages/Management/SystemLogin.tsx';
+import SystemMain from '@/pages/Management/SystemMain.tsx';
+import SystemDashboard from '@/pages/Management/SystemDashboard.tsx';
+import EmployeeManagement from '@/pages/Management/EmployeeManagement.tsx';
+import CustomerManagement from '@/pages/Management/CustomerManagement.tsx';
+import SellerManagement from '@/pages/Management/SellerManagement.tsx';
+import DepartmentManagement from '@/pages/Management/DepartmentManagement.tsx';
+import SystemReport from '@/pages/Management/SystemReport.tsx';
 
 import SellerRoute from '@/components/SellerRoute.tsx';
 import CustomerRoute from '@/components/CustomerRoute.tsx';
@@ -68,7 +80,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import RegisterPage from './pages/RegisterPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -293,6 +304,48 @@ const router = createBrowserRouter(
         },
       ],
     },
+    {
+      path: "/fms",
+      element: <System/>,
+      errorElement: <ErrorPage />,
+      children: [
+        { 
+          path: "", 
+          element: <SystemMain/>,
+          children: [
+            {
+              path: "dashboard",
+              element: <SystemDashboard/>
+            },
+            {
+              path: "employee",
+              element: <EmployeeManagement/>
+            },
+            {
+              path: "customer",
+              element: <CustomerManagement/>
+            },
+            {
+              path: "seller",
+              element: <SellerManagement/>
+            },
+            {
+              path: "department",
+              element: <DepartmentManagement/>
+            },
+            {
+              path: "report",
+              element: <SystemReport/>
+            },
+          ]
+        },
+      ]
+    },
+    {
+      path: "/fms/login",
+      element: <SystemLogin/>,
+      errorElement: <ErrorPage />
+    }
   ], {
   basename: import.meta.env.VITE_BASE_URL
 });

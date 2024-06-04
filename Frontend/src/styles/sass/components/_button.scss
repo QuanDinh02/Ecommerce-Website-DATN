@@ -5,3 +5,7 @@
 .form_button_valid {
     @apply font-medium primary-color text-black px-9 py-3 cursor-pointer w-full rounded-[4px] hover:opacity-80 flex items-center justify-center;
 }
+
+.form_button_system_valid {
+    @apply font-medium bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-9 py-3 cursor-pointer w-full rounded-[4px] hover:opacity-80 flex items-center justify-center;
+}

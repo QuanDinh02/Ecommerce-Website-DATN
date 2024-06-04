@@ -1,0 +1,55 @@
+.sidebar-accordion-container {
+    width: 100%;
+
+    .accordion-wrapper {
+        overflow: hidden;
+
+        .menu-container {
+            width          : 100%;
+            text-align     : left;
+            display        : flex;
+            align-items    : center;
+            justify-content: space-between;
+            background     : transparent;
+            border         : none;
+            cursor         : pointer;
+            border-left    : 3px solid transparent;
+
+            &:hover {
+                background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+            }
+        }
+
+        .menu-container.active {
+            color           : rgb(59 130 246);
+            font-weight     : 500;
+            background-color: rgb(239 246 255) !important;
+            border-radius   : 6px;
+
+            .side-bar-icon {
+                color: rgb(59 130 246);
+            }
+        }
+
+        .sub-menu-container {
+            transition: height .4s ease-in-out;
+
+            .sub-menu-content {
+                background-color: white;
+            }
+        }
+
+        .sub-menu-container.active {
+            color: #FCB800;
+        }
+
+        .arrow {
+            font-size : 1.5rem;
+            transition: .5s ease-in-out;
+
+            &.active {
+                rotate: 180deg;
+            }
+        }
+    }
+}
