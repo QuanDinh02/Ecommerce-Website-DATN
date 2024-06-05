@@ -4,6 +4,14 @@ import { PythonShell } from 'python-shell';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const serverErrorMessage = () => {
+    return res.status(500).json({
+        EC: -2,
+        DT: '',
+        EM: "error from server !"
+    })
+}
+
 const createRecommendProducts = async (req, res) => {
     try {
 
@@ -68,13 +76,28 @@ const getRecommendProducts = async (req, res) => {
     try {
         let { id: customer_id } = req.query;
 
-        let result = await recommendProductServices.getRecommendProducts(+customer_id);
+        let training_status = await recommendProductServices.getTrainingRecommendItemStatus(+customer_id);
 
-        return res.status(200).json({
-            EC: result.EC,
-            DT: result.DT,
-            EM: result.EM
-        })
+        if (training_status && training_status.EC === 0) {
+            if (training_status.DT.active === 0) {
+                let result = await recommendProductServices.getRecommendProducts(+customer_id);
+
+                return res.status(200).json({
+                    EC: result.EC,
+                    DT: result.DT,
+                    EM: result.EM
+                })
+            } else {
+                let result = await recommendProductServices.getHistoryRecommendProducts(+customer_id);
+
+                return res.status(200).json({
+                    EC: result.EC,
+                    DT: result.DT,
+                    EM: result.EM
+                })
+            }
+        }
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -85,7 +108,126 @@ const getRecommendProducts = async (req, res) => {
     }
 }
 
+const simulatingCreateRecommendProducts = async (req, res) => {
+    try {
+
+        let data = {
+            customer_id: 1,
+            list:
+                [
+                    { product_id: '195797729', predict_rating: '4.436582809224318' },
+                    { product_id: '21441058', predict_rating: '4.436582809224318' },
+                    { product_id: '176598086', predict_rating: '4.330790847049378' },
+                    { product_id: '58678598', predict_rating: '4.330790847049378' },
+                    { product_id: '1025034', predict_rating: '4.2317216981132075' },
+                    { product_id: '579949', predict_rating: '4.2317216981132075' },
+                    { product_id: '68716608', predict_rating: '3.3717679944095043' },
+                    { product_id: '11488924', predict_rating: '3.2317216981132075' },
+                    { product_id: '56941526', predict_rating: '2.4365828092243182' },
+                    { product_id: '25421010', predict_rating: '1' }
+                ]
+        }
+
+        let customerID = data.customer_id;
+        let list = data.list;
+
+        let dataFormat = list.map(item => {
+            return {
+                product_id: +item.product_id,
+                predict_rating: +item.predict_rating,
+                customerID: +customerID
+            }
+        })
+
+        let result = await recommendProductServices.createRecommendProducts(dataFormat);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
+
+    try {
+        let { customer_id } = req.query;
+
+        let training_status = await recommendProductServices.getTrainingRecommendItemStatus(+customer_id);
+
+        if (training_status && training_status.EC === 0) {
+            if (training_status.DT.active === 0) {
+
+                let update_training_status = await recommendProductServices.updateTrainingRecommendItemStatus(+customer_id, 1);
+                if (update_training_status && update_training_status.EC === 0) {
+
+                    let backup_recommend_item_res = await recommendProductServices.createHistoryRecommendItem(+customer_id);
+                    if (backup_recommend_item_res && backup_recommend_item_res.EC === 0) {
+                        var options = {
+                            scriptPath: "E:/MINH_QUAN/DO_AN_TOT_NGHIEP/WEBSITE/Backend/src/routes",
+                            args: [req.query.customer_id]
+                        };
+
+                        // Run training modal from Predict and Predict 3 Session
+                        let result_predict = await PythonShell.run('simulatingPredict.py', options);
+                        //let result_predict_3_session = PythonShell.run('simulatingPredict3Session.py', options);
+
+                        if (+result_predict === 0) {
+
+                            let update_training_status_2 = await recommendProductServices.updateTrainingRecommendItemStatus(+customer_id, 0);
+                            if (update_training_status_2 && update_training_status_2.EC === 0) {
+
+                                return res.status(200).json({
+                                    EC: 0,
+                                    DT: '',
+                                    EM: 'Training recommeded item successfully !'
+                                })
+                            } else {
+                                serverErrorMessage();
+                            }
+                        } else {
+                            return res.status(500).json({
+                                EC: -1,
+                                DT: '',
+                                EM: 'Training recommeded item failed !'
+                            })
+                        }
+                    } else {
+                        await recommendProductServices.updateTrainingRecommendItemStatus(+customer_id, 0);
+                        serverErrorMessage();
+                    }
+
+                } else {
+                    serverErrorMessage();
+                }
+
+            } else {
+                return res.status(200).json({
+                    EC: -1,
+                    DT: "",
+                    EM: 'Training data of recommend item is processing !'
+                })
+            }
+        } else {
+            serverErrorMessage();
+        }
+    } catch (error) {
+        console.log(error);
+        serverErrorMessage();
+    }
+}
+
 module.exports = {
     createRecommendProducts, handleExecuteTrainingRecommendProduct,
-    getRecommendProducts
+    getRecommendProducts, handleSimulatingExecuteTrainingRecommendProduct,
+    simulatingCreateRecommendProducts
 }

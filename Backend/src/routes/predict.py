@@ -37,7 +37,7 @@ def get_unrated_products_and_predict(user_id, redis_host='localhost', redis_port
             if sim is not None:
                 similar_users.append((int(user_v), sim))
     
-    similar_users = sorted(similar_users, key=lambda x: -x[1])[:10]  # Sort and get top 10
+    similar_users = sorted(similar_users, key=lambda x: -float(x[1]))[:10]  # Sort and get top 10
 
     similar_user_ids = [user_v for user_v, _ in similar_users]
     similar_user_ids_str = ', '.join(map(str, similar_user_ids))
@@ -187,4 +187,4 @@ if __name__ == '__main__':
     result = get_unrated_products_and_predict(user_id, mysql_config=mysql_config)
     a = {'data': result}
     res = requests.post('http://127.0.0.1:8080/api/recommend', json=a)
-    print("OK")
+    print(res)

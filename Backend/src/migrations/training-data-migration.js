@@ -2,25 +2,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('SearchSession', {
+        await queryInterface.createTable('TrainingData', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.BIGINT
             },
-            content: {
-                type: Sequelize.TEXT
-            },
-            sessionID: {
+            customerID: {
                 type: Sequelize.BIGINT
             },
-            searchTime: {
+            active: {
+                type: Sequelize.TINYINT
+            },
+            lastTrainingTime: {
                 type: Sequelize.DATE
             }
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('SearchSession');
+        await queryInterface.dropTable('TrainingData');
     }
 };

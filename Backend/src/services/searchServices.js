@@ -18,7 +18,8 @@ const customerSearchRecord = async (session_id, content) => {
 
                 await db.SearchSession.create({
                     sessionID: session_id,
-                    content: content
+                    content: content,
+                    searchTime: new Date()
                 });
 
                 return {

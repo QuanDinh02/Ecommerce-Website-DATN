@@ -2,25 +2,25 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('SearchSession', {
+        await queryInterface.createTable('RecommendThreeSessionProduct', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.BIGINT
             },
-            content: {
-                type: Sequelize.TEXT
-            },
-            sessionID: {
+            product_id: {
                 type: Sequelize.BIGINT
             },
-            searchTime: {
-                type: Sequelize.DATE
-            }
+            predict_rating: {
+                type: Sequelize.FLOAT(11,10)
+            },
+            customerID: {
+                type: Sequelize.BIGINT
+            },
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('SearchSession');
+        await queryInterface.dropTable('RecommendThreeSessionProduct');
     }
 };

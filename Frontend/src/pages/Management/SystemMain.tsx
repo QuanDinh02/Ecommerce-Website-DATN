@@ -6,6 +6,8 @@ import { FaRegBuilding } from "react-icons/fa";
 import { GoReport } from "react-icons/go";
 import SidebarAccordion from "./SidebarAccordion";
 import { VscBell } from "react-icons/vsc";
+import { MdOutlineAccountCircle } from "react-icons/md";
+import { IoMdExit } from "react-icons/io";
 import { Outlet, useNavigate } from "react-router-dom";
 import React from "react";
 import classNames from "classnames";
@@ -73,15 +75,40 @@ const SystemMain = () => {
     const navigate = useNavigate();
 
     const [showNotification, setShowNotification] = React.useState<boolean>(false);
+    const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
 
     const notificationStyle = classNames('w-10 h-10 flex items-center justify-center rounded-full cursor-pointer', {
         'bg-gray-200 text-black': showNotification,
         'bg-[#F5F5F5] text-gray-500': !showNotification,
     });
 
+    const infoSettingBox = React.useRef<HTMLDivElement>(null);
+
+    const handleShowWidgetInfo = () => {
+        setShowInfoSettingBox(true);
+        // if (account && isAuthenticated) {
+        //     setShowInfoSettingBox(true);
+        // }
+    }
+
+    React.useEffect(() => {
+
+        const closeInfoSettingBox = (e) => {
+            if (!infoSettingBox.current?.contains(e.target)) {
+                setShowInfoSettingBox(false);
+            }
+        }
+
+        document.body.addEventListener("mousedown", closeInfoSettingBox);
+
+        return () => {
+            document.body.removeEventListener('mousedown', closeInfoSettingBox);
+        };
+    }, []);
+
     React.useEffect(() => {
         navigate("/fms/dashboard");
-    },[]);
+    }, []);
 
     return (
         <div className="system-main w-full flex relative">
@@ -97,7 +124,33 @@ const SystemMain = () => {
             <div className="system-main__content w-5/6 bg-[#F5F5F5] h-fit min-h-screen realative ">
                 <div className="content__header w-full h-20 px-5 py-3 flex items-center justify-end absolute top-0 sticky bg-[#F5F5F5] gap-x-2">
                     <div className={notificationStyle} onClick={() => setShowNotification(!showNotification)}><VscBell className="w-6 h-6" /></div>
-                    <div className="flex items-center gap-x-2">Welcome Admin <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white">A</div></div>
+                    <div
+                        className="relative"
+                        onClick={() => {
+                            handleShowWidgetInfo();
+                        }}
+                    >
+                        <div className="flex items-center gap-x-2 cursor-pointer group">
+                            <span className="group-hover:text-blue-600">Welcome Admin</span> <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white">A</div>
+                        </div>
+                        {
+                            showInfoSettingBox &&
+                            <div className='widget-info absolute bg-white top-10 w-[14rem] right-[-5px] z-50 border border-gray-300 shadow-xl'
+                                onClick={() => handleShowWidgetInfo()}
+                                ref={infoSettingBox}
+                            >
+                                <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer w-full flex items-center gap-x-2' onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowInfoSettingBox(false);
+                                }}><MdOutlineAccountCircle className="w-5 h-5"/> Quản lý Tài Khoản</div>
+                                <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer flex items-center gap-x-2' onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowInfoSettingBox(false);
+                                }}><IoMdExit className="w-5 h-5"/> Đăng Xuất</div>
+                            </div>
+                        }
+                    </div>
+
                 </div>
                 <div className="content__body w-full bg-[#F5F5F5] px-5 pb-5">
                     <Outlet />

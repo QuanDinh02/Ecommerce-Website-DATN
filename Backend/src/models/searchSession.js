@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
   SearchSession.init({
     sessionID: DataTypes.BIGINT,
     content: DataTypes.TEXT,
+    searchTime: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'SearchSession',
