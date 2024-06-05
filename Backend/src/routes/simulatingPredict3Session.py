@@ -13,7 +13,7 @@ def is_json(myjson):
 def handleSaveRecommendItem():
 
    data = {'data': '10'}
-   res = requests.post('http://127.0.0.1:8080/api/simulating-recommend', json=data)
+   res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
    res_data = res.text
 
    x = json.loads(res_data, object_hook=lambda d: SimpleNamespace(**d))
@@ -22,5 +22,5 @@ def handleSaveRecommendItem():
 
 if __name__ == '__main__':
 
-    r = Timer(7.0, handleSaveRecommendItem);
+    r = Timer(20.0, handleSaveRecommendItem);
     r.start()

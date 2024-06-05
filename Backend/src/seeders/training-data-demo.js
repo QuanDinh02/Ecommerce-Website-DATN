@@ -7,19 +7,22 @@ module.exports = {
             {
                 //id: 1
                 customerID: 1,
-                active: 0,
+                activePredict: 0,
+                activePredict3Session: 0,
                 lastTrainingTime: null,
             },
             {
                 //id: 2
                 customerID: 2,
-                active: 0,
+                activePredict: 0,
+                activePredict3Session: 0,
                 lastTrainingTime: null,
             },
             {
                 //id: 3
                 customerID: 3,
-                active: 0,
+                activePredict: 0,
+                activePredict3Session: 0,
                 lastTrainingTime: null,
             },
         ], {});

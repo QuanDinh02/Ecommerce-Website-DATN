@@ -2,10 +2,35 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
-const createRecommendProducts = async (data) => {
+const createRecommendProducts = async (customer_id, data) => {
     try {
 
         await db.RecommendProduct.bulkCreate(data);
+
+        await updateTrainingRecommendItemStatus(+customer_id, 0);
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Save recommend products !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const create3SessionRecommendProducts = async (customer_id, data) => {
+    try {
+
+        await db.RecommendThreeSessionProduct.bulkCreate(data);
+
+        await updateTraining3SessionRecommendItemStatus(+customer_id, 0);
 
         return {
             EC: 0,
@@ -26,7 +51,7 @@ const createRecommendProducts = async (data) => {
 const createHistoryRecommendItem = async (customer_id) => {
     try {
 
-        let productList = await db.RecommendProduct.findAll({
+        let productList_1 = await db.RecommendProduct.findAll({
             raw: true,
             attributes: ['id', 'product_id'],
             where: {
@@ -35,6 +60,18 @@ const createHistoryRecommendItem = async (customer_id) => {
                 },
             },
         });
+
+        let productList_2 = await db.RecommendThreeSessionProduct.findAll({
+            raw: true,
+            attributes: ['id', 'product_id'],
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        let productList = [..._.cloneDeep(productList_1), ..._.cloneDeep(productList_2)];
 
         if (productList && productList.length > 0) {
             let history_create_time = new Date();
@@ -51,6 +88,14 @@ const createHistoryRecommendItem = async (customer_id) => {
             if (result) {
 
                 await db.RecommendProduct.destroy({
+                    where: {
+                        customerID: {
+                            [Op.eq]: customer_id,
+                        },
+                    },
+                });
+
+                await db.RecommendThreeSessionProduct.destroy({
                     where: {
                         customerID: {
                             [Op.eq]: customer_id,
@@ -94,7 +139,36 @@ const updateTrainingRecommendItemStatus = async (customer_id, status_code) => {
     try {
 
         await db.TrainingData.update({
-            active: status_code
+            activePredict: status_code
+        }, {
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Update training customer recommend item status !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateTraining3SessionRecommendItemStatus = async (customer_id, status_code) => {
+    try {
+
+        await db.TrainingData.update({
+            activePredict3Session: status_code
         }, {
             where: {
                 customerID: {
@@ -142,6 +216,133 @@ const getTrainingRecommendItemStatus = async (customer_id) => {
             EC: -1,
             DT: [],
             EM: 'Training customer recommend item is not existed !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getBothRecommendProducts = async (customer_id) => {
+    try {
+        let productListRaw_1 = await db.RecommendProduct.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'product_id'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name', 'summary'],
+                    raw: true,
+                },
+            ],
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        let productListRaw_2 = await db.RecommendThreeSessionProduct.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'product_id'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name', 'summary'],
+                    raw: true,
+                },
+            ],
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        let productListRaw = [..._.cloneDeep(productListRaw_1), ..._.cloneDeep(productListRaw_2)];
+
+        productListRaw = _(productListRaw).take(20).value();
+
+        let productListFinal = await productListRaw.map(item => {
+            return {
+                id: item.Product.id,
+                name: item.Product.name,
+                summary: item.Product.summary ? item.Product.summary : ""
+            }
+        });
+
+        let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+            let productType = await db.ProductType.findOne({
+                raw: true,
+                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.id
+                    }
+                }
+            });
+
+            // let productImage = await db.Image.findOne({
+            //     raw: true,
+            //     nest: true,
+            //     attributes: ['id', 'image'],
+            //     where: {
+            //         productID: {
+            //             [Op.eq]: item.id
+            //         }
+            //     }
+            // });
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'rating'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.id,
+                    },
+                }
+            });
+
+            let star_ratings = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
+                '5': 0,
+            }
+
+            await productReviewList.forEach(item => {
+                star_ratings[`${item.rating}`] += 1;
+            });
+
+            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+            return {
+                ...item,
+                //image: productImage?.image ? productImage?.image : "",
+                image: "",
+                current_price: productType.currentPrice,
+                price: productType.price,
+                sold: productType.sold,
+                rating: rating_average
+            }
+        }));
+
+        return {
+            EC: 0,
+            DT: {
+                product_list: productListFinalWithImage
+            },
+            EM: 'Get recommend products from 2 training !'
         }
 
     } catch (error) {
@@ -248,7 +449,114 @@ const getRecommendProducts = async (customer_id) => {
             DT: {
                 product_list: productListFinalWithImage
             },
-            EM: 'Get recommend products !'
+            EM: 'Get recommend products from training predict !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const get3SessionRecommendProducts = async (customer_id) => {
+    try {
+        let productListRaw = await db.RecommendThreeSessionProduct.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'product_id'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name', 'summary'],
+                    raw: true,
+                },
+            ],
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        productListRaw = _(productListRaw).take(20).value();
+
+        let productListFinal = await productListRaw.map(item => {
+            return {
+                id: item.Product.id,
+                name: item.Product.name,
+                summary: item.Product.summary ? item.Product.summary : ""
+            }
+        });
+
+        let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+            let productType = await db.ProductType.findOne({
+                raw: true,
+                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.id
+                    }
+                }
+            });
+
+            // let productImage = await db.Image.findOne({
+            //     raw: true,
+            //     nest: true,
+            //     attributes: ['id', 'image'],
+            //     where: {
+            //         productID: {
+            //             [Op.eq]: item.id
+            //         }
+            //     }
+            // });
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'rating'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.id,
+                    },
+                }
+            });
+
+            let star_ratings = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
+                '5': 0,
+            }
+
+            await productReviewList.forEach(item => {
+                star_ratings[`${item.rating}`] += 1;
+            });
+
+            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+            return {
+                ...item,
+                //image: productImage?.image ? productImage?.image : "",
+                image: "",
+                current_price: productType.currentPrice,
+                price: productType.price,
+                sold: productType.sold,
+                rating: rating_average
+            }
+        }));
+
+        return {
+            EC: 0,
+            DT: {
+                product_list: productListFinalWithImage
+            },
+            EM: 'Get recommend products from training predict 3 session !'
         }
 
     } catch (error) {
@@ -379,6 +687,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
 }
 
 module.exports = {
-    createRecommendProducts, getRecommendProducts, getTrainingRecommendItemStatus, updateTrainingRecommendItemStatus,
-    getHistoryRecommendProducts, createHistoryRecommendItem
+    createRecommendProducts, getTrainingRecommendItemStatus, updateTrainingRecommendItemStatus,
+    getHistoryRecommendProducts, createHistoryRecommendItem, create3SessionRecommendProducts, updateTraining3SessionRecommendItemStatus,
+    getRecommendProducts, get3SessionRecommendProducts, getBothRecommendProducts
 }

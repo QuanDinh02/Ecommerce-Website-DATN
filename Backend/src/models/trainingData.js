@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     }
     TrainingData.init({
         customerID: DataTypes.BIGINT,
-        active: DataTypes.TINYINT,
+        activePredict: DataTypes.TINYINT,
+        activePredict3Session: DataTypes.TINYINT,
         lastTrainingTime: DataTypes.DATE,
     }, {
         sequelize,

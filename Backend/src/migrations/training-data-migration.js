@@ -12,7 +12,10 @@ module.exports = {
             customerID: {
                 type: Sequelize.BIGINT
             },
-            active: {
+            activePredict: {
+                type: Sequelize.TINYINT
+            },
+            activePredict3Session: {
                 type: Sequelize.TINYINT
             },
             lastTrainingTime: {

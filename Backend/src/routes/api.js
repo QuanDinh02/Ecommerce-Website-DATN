@@ -88,6 +88,7 @@ const ApiRoute = (app) => {
     router.get('/training-recommend-item', recommendProductController.handleExecuteTrainingRecommendProduct);
 
     router.post('/simulating-recommend', recommendProductController.simulatingCreateRecommendProducts);
+    router.post('/simulating-3session-recommend', recommendProductController.simulatingCreateRecommend3SessionProducts);
     router.get('/simulating-training-recommend-item', recommendProductController.handleSimulatingExecuteTrainingRecommendProduct);
 
     // >>> check data: 
