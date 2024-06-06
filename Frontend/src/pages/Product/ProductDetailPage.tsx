@@ -1024,11 +1024,11 @@ const ProductDetailPage = () => {
                                             <div className="w-80 h-80 flex items-center justify-center">
                                                 {/* <img src={selectedImage.image} className="select-none" /> */}
                                                 <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
-                                                {productDetailInfo.product_image !== "" ?
+                                                {/* {productDetailInfo.product_image !== "" ?
                                                     <img src={`data:image/jpeg;base64,${productDetailInfo.product_image}`} alt='' />
                                                     :
                                                     <img src={Product01} />
-                                                }
+                                                } */}
                                             </div>
                                             <div className="swiper-list w-80 mt-2 mb-5">
                                                 <Swiper

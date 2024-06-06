@@ -146,6 +146,7 @@ const SystemMain = () => {
                                 <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer flex items-center gap-x-2' onClick={(e) => {
                                     e.stopPropagation();
                                     setShowInfoSettingBox(false);
+                                    navigate("/fms/login");
                                 }}><IoMdExit className="w-5 h-5"/> Đăng Xuất</div>
                             </div>
                         }

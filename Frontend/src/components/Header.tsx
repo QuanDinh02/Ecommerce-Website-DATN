@@ -462,7 +462,10 @@ const Header = () => {
                                                         onClick={() => handleSelectRecommendedProduct(item)}
                                                     //onClick={() => handleSearchBookDetail(item.id, item.name)}
                                                     >
-                                                        <CiSearch className='w-5 h-5' />
+                                                        <div>
+                                                            <CiSearch className='w-5 h-5' />
+                                                        </div>
+
                                                         <span className='item-name'>{item.name}</span>
                                                     </div>
                                                 )
