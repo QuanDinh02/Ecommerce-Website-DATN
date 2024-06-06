@@ -5,6 +5,8 @@ const _ = require("lodash");
 const createRecommendProducts = async (customer_id, data) => {
     try {
 
+        console.log(">>> create data predict.py : ", data);
+
         await db.RecommendProduct.bulkCreate(data);
 
         await updateTrainingRecommendItemStatus(+customer_id, 0);
@@ -28,6 +30,7 @@ const createRecommendProducts = async (customer_id, data) => {
 const create3SessionRecommendProducts = async (customer_id, data) => {
     try {
 
+        console.log(">>> create data after3Session.py : ", data);
         await db.RecommendThreeSessionProduct.bulkCreate(data);
 
         await updateTraining3SessionRecommendItemStatus(+customer_id, 0);
@@ -71,7 +74,7 @@ const createHistoryRecommendItem = async (customer_id) => {
             },
         });
 
-        let productList = [..._.cloneDeep(productList_1), ..._.cloneDeep(productList_2)];
+        let productList = [..._.cloneDeep(productList_2), ..._.cloneDeep(productList_1)];
 
         if (productList && productList.length > 0) {
             let history_create_time = new Date();

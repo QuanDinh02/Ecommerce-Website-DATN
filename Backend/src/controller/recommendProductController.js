@@ -315,7 +315,7 @@ const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
                     if (backup_recommend_item_res && backup_recommend_item_res.EC === 0) {
 
                         var options = {
-                            scriptPath: "E:/MINH_QUAN/DO_AN_TOT_NGHIEP/WEBSITE/Backend/src/routes",
+                            scriptPath: "src/routes",
                             args: [req.query.customer_id]
                         };
 
