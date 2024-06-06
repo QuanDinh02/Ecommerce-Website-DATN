@@ -87,7 +87,7 @@ const RecommendItem = () => {
             setRecommendItemList(response.product_list);
             //let result = await getProductWithImageByCustomer(response.product_list);
             //console.log(result);
-            //startTrainingRecommendItemData(customer_id);
+            startTrainingRecommendItemData(customer_id);
         }
     }
 
