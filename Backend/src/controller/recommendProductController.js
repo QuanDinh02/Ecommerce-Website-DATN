@@ -82,7 +82,7 @@ const getRecommendProducts = async (req, res) => {
             let status_1 = training_status.DT.activePredict;
             let status_2 = training_status.DT.activePredict3Session;
 
-            if(status_1 === 0 && status_2 === 0) {
+            if (status_1 === 0 && status_2 === 0) {
                 let result = await recommendProductServices.getBothRecommendProducts(+customer_id);
 
                 return res.status(200).json({
@@ -228,14 +228,16 @@ const simulatingCreateRecommend3SessionProducts = async (req, res) => {
         let customerID = data.customer_id;
         let list = JSON.parse(data.list);
 
-        let dataFormat = list.map(item => {
+        let convertData = list.map(item => {
             return {
                 product_id: +item.product_id,
                 predict_rating: +item.predict_rating,
                 customerID: +customerID
             }
         })
-        
+
+        let dataFormat = convertData.filter(item => item.product_id !== 0);
+
         let result = await recommendProductServices.create3SessionRecommendProducts(customerID, dataFormat);
 
         return res.status(200).json({

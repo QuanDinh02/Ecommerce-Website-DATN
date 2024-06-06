@@ -11,6 +11,7 @@ from redis.commands.search.field import TagField, TextField, NumericField, Vecto
 from redis.commands.search.query import Query
 import timeit
 import requests
+import sys
 
 INDEX_NAME = 'idx:product-name1'
 DOC_PREFIX = 'ecommerce:product:'
@@ -39,6 +40,11 @@ def create_query_table(query, queries, encoded_queries, extra_params = {}):
 def ranking_items(itemSessionVector, itemRealSearch):
     scoreList = []
     itemScoreList = []
+    if len(itemSessionVector) == 0:
+        for i in itemRealSearch:
+            itemScoreList.append(i[1])
+        return itemScoreList
+    
     for i in itemRealSearch:
         for j in itemSessionVector:
             score = cosine_similarity([i[0]],[j[0]])*j[1]
@@ -100,17 +106,29 @@ def getSearhContent(cusID, mysql_config={}):
     query_get_search = f'''
         SELECT content
         FROM SearchSession ss JOIN ecommerce.Session s ON ss.sessionID = s.id
-        WHERE customerID = {cusID} and (sessionID in (select distinct id
-                                                    from Session 
-                                                    where customerID = {cusID}
-                                                        and createdAt = (select max(createdAt) 
-                                                                        from Session 
-                                                                        where customerID = {cusID})))
+        WHERE customerID = {cusID} 
+        and TIME_TO_SEC(TIMEDIFF(NOW(), searchTime)) <= 1800
+        and (sessionID in (select distinct id
+                            from Session 
+                            where customerID = {cusID}
+                                and createdAt = (select max(createdAt) 
+                                                from Session 
+                                                where customerID = {cusID})))
         ORDER BY s.createdAt desc, searchTime desc
-        LIMIT 10;
     '''
     cursor.execute(query_get_search)
     searchContent = cursor.fetchall()
+    if len(searchContent) == 0:
+        query_get_search = f'''
+            Select content
+            from SearchSession ss JOIN ecommerce.Session s ON ss.sessionID = s.id
+            where customerID = {cusID}
+            order by searchTime desc
+            limit 10;
+        '''
+        cursor.execute(query_get_search)
+        searchContent = cursor.fetchall()
+
     res = []
     for i in range(len(searchContent)):
         res.append(searchContent[i]['content'])
@@ -156,27 +174,6 @@ def get_predicted_ratings(user_id, item_ids, redis_host='localhost', redis_port=
     cursor.execute(query_training_data)
     training_data = cursor.fetchall()
     training_data_dict = {(row['user_id'], row['item_id']): row['rating'] for row in training_data}
-    
-    
-    # # Connect to Redis
-    # r = redis.Redis(host=redis_host, port=redis_port, db=0)
-
-    # Get top 10 similar users from Redis
-    # a = timeit.default_timer()
-    # sim_key_pattern = f'ecommerce:sim:{user_id}:*'
-    # similar_users = []
-    # for key in r.scan_iter(sim_key_pattern):
-    #     key_str = key.decode() if isinstance(key, bytes) else key
-    #     user_v = key_str.split(':')[-1]
-    #     sim_value = r.execute_command('JSON.GET', key_str)
-    #     if sim_value:
-    #         sim_data = json.loads(sim_value)
-    #         sim = sim_data.get('mfps')
-    #         if sim is not None:
-    #             similar_users.append((int(user_v), sim))
-    # b =  timeit.default_timer()
-    # print('Load sim:', b-a)
-    # similar_users = sorted(similar_users, key=lambda x: -float(x[1])) # Sort and get top 10
     
     query_get_sim = f'''
         select user_v, sim
@@ -226,89 +223,95 @@ def get_predicted_ratings(user_id, item_ids, redis_host='localhost', redis_port=
 
 
 if __name__ == "__main__":
-    a = timeit.default_timer()
-    client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
-    start = timeit.default_timer()
-    print("Load model...")
-    embedder = SentenceTransformer('keepitreal/vietnamese-sbert')
-    stop = timeit.default_timer()
-    print("Load model:", stop - start)
-    
     mysql_config = {
         'user': 'root',
         'password': 'Password@123',
         'host': 'localhost',
         'database': 'ecommerce',
     }
+    client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
+
+    params = sys.argv[1]
+    customerID = params
+    
     weight = {
-        'w_click' : 0.2,
-        'w_favorite': 0.3,
-        'w_buy': 0.5
-    }
+            'w_click' : 0.2,
+            'w_favorite': 0.3,
+            'w_buy': 0.5
+        }
+    
     type_to_weight = {
         0: weight['w_click'],    # type 0 -> w_click
         1: weight['w_buy'],      # type 1 -> w_buy
         2: weight['w_favorite']  # type 2 -> w_favorite
     }
     
-    query = (
-        Query('(*)=>[KNN 20 @vector_name $query_vector AS vector_score]')
-            .sort_by('vector_score')
-            .return_fields('vector_score', 'id', 'name')
-            .paging(0, 20)
-            .dialect(2)
-    )
-
-    customerID = '10577013'
-    
-    # checkIndex(client)
     print("Get items 4 SS...")
     itemSessionVector = getInfo4Session(customerID, client, mysql_config)
     print("Get search content...")
     search_content = getSearhContent(customerID, mysql_config)
     print(search_content)
     
-    
-    while(True):
-        print("Encode search...")
-        encoded_queries = embedder.encode(search_content)
-        print("Search 20 items...")
-        itemRealSearch = create_query_table(query, search_content, encoded_queries)
-        print("Ranking...")
-        rankingItems = ranking_items(itemSessionVector, itemRealSearch)
+    if(search_content): 
+        a = timeit.default_timer()
+        start = timeit.default_timer()
+        print("Load model...")
+        embedder = SentenceTransformer('keepitreal/vietnamese-sbert')
         
-        if (len(rankingItems)) > 0:
-            break
-    
-    print(tuple(rankingItems))
-    
-    print("Check items...")
-    cnx = mysql.connector.connect(**mysql_config)
-    cursor = cnx.cursor(dictionary=True)
-    query_rated_item = f'''
-        select distinct productID
-        from ProductReview
-        where customerID = {customerID} and productID in {tuple(rankingItems)};
-    '''
-    cursor.execute(query_rated_item)
-    ListRated = cursor.fetchall()
-    print(ListRated)
-    
-    ListPredict = [index for index in rankingItems if index not in ListRated]
-    print(ListPredict)
-    
-    print("Predict rating top 10...")
-    start_1 = timeit.default_timer()
-    result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
-    stop_1 = timeit.default_timer()
-    print("Predict:", stop_1 - start_1)
-    b = timeit.default_timer()
-    print('Total time:', b - a)
-    # print(result)
-    # stop = timeit.default_timer()
-    
-    json_result = json.dumps(result, ensure_ascii=False, indent=4)
-    res ={'customer_id': customerID, 'list': json_result}
-    
-    data = {'data': res}
-    res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
+        print(embedder)
+        stop = timeit.default_timer()
+        print("Load model:", stop - start)
+        
+        query = (
+            Query('(*)=>[KNN 20 @vector_name $query_vector AS vector_score]')
+                .sort_by('vector_score')
+                .return_fields('vector_score', 'id', 'name')
+                .paging(0, 20)
+                .dialect(2)
+        )
+
+        while(True):
+            print("Encode search...")
+            encoded_queries = embedder.encode(search_content)
+            print(len(encoded_queries))
+            print("Search 20 items...")
+            itemRealSearch = create_query_table(query, search_content, encoded_queries)
+            print("Ranking...")
+            rankingItems = ranking_items(itemSessionVector, itemRealSearch)
+            
+            if (len(rankingItems)) > 0:
+                break
+        
+        print(tuple(rankingItems))
+        
+        print("Check items...")
+        cnx = mysql.connector.connect(**mysql_config)
+        cursor = cnx.cursor(dictionary=True)
+        query_rated_item = f'''
+            select distinct productID
+            from ProductReview
+            where customerID = {customerID} and productID in {tuple(rankingItems)};
+        '''
+        cursor.execute(query_rated_item)
+        ListRated = cursor.fetchall()
+        print(ListRated)
+        
+        ListPredict = [index for index in rankingItems if index not in ListRated]
+        print(ListPredict)
+        
+        print("Predict rating...")
+        start_1 = timeit.default_timer()
+        result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
+        stop_1 = timeit.default_timer()
+        print("Predict:", stop_1 - start_1)
+        b = timeit.default_timer()
+        print('Total time:', b - a)
+
+        data = {'data': result}
+        res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
+    else:
+        json_result = json.dumps([{'product_id': '', 'predict_rating': ''}], ensure_ascii=False, indent=4)
+        res ={'customer_id': customerID, 'list': json_result}
+        res_json = json.dumps(res, ensure_ascii=False, indent=4)
+        data = {'data': res_json}
+        res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)

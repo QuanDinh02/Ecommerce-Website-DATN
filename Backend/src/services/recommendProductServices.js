@@ -84,7 +84,9 @@ const createHistoryRecommendItem = async (customer_id) => {
                 }
             });
 
-            let result = await db.HistoryRecommendProduct.bulkCreate(history_data);
+            let dataFormat = history_data.filter(item => item.product_id !== 0);
+
+            let result = await db.HistoryRecommendProduct.bulkCreate(dataFormat);
             if (result) {
 
                 await db.RecommendProduct.destroy({
@@ -293,7 +295,27 @@ const getBothRecommendProducts = async (customer_id) => {
             },
         });
 
-        let productListRaw = [..._.cloneDeep(productListRaw_1), ..._.cloneDeep(productListRaw_2)];
+        // let productListRaw_3 = await db.RecommendThreeSessionProduct.findAll({
+        //     raw: true,
+        //     nest: true,
+        //     attributes: ['id', 'product_id'],
+        //     include: [
+        //         {
+        //             model: db.Product,
+        //             attributes: ['id', 'name'],
+        //             raw: true,
+        //         },
+        //     ],
+        //     where: {
+        //         customerID: {
+        //             [Op.eq]: customer_id,
+        //         },
+        //     },
+        // });
+
+        // console.log(productListRaw_3)
+
+        let productListRaw = [..._.cloneDeep(productListRaw_2), ..._.cloneDeep(productListRaw_1)];
 
         let productListFinal = await productListRaw.map(item => {
             return {

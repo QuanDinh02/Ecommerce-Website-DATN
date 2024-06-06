@@ -2,6 +2,7 @@ import mysql.connector
 import json
 import requests
 import timeit
+import sys
 
 def get_unrated_products_and_predict(user_id, redis_host='localhost', redis_port=6379, mysql_config={}):
     # Connect to MySQL
@@ -110,7 +111,9 @@ if __name__ == '__main__':
         'database': 'ecommerce',
     }
 
-    user_id = '2415'
+    params = sys.argv[1]
+    user_id = params
+    
     # start = timeit.default_timer()
     result = get_unrated_products_and_predict(user_id, mysql_config=mysql_config)
     # stop = timeit.default_timer()
