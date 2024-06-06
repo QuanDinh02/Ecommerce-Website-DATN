@@ -117,12 +117,12 @@ const RecommendItem = () => {
                         <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
-                                    {/* <LoadImage img_style="w-40 h-40" product_id={31261845}/> */}
-                                    {item.image ?
+                                    <LoadImage img_style="w-40 h-40" product_id={item.id}/>
+                                    {/* {item.image ?
                                         <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-40" />
                                         :
                                         <PiImageThin className="w-40 h-40 text-gray-300" />
-                                    }
+                                    } */}
                                 </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {

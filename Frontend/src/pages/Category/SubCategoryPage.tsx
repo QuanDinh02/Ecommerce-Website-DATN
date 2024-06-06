@@ -31,6 +31,7 @@ import {
     PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST,
     LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
 } from "@/data/category";
+import LoadImage from "@/components/LoadImage";
 
 interface ISubCategoryActive {
     id: number
@@ -583,11 +584,12 @@ const SubCategoryPage = () => {
                                                                                             }}
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                {item.image ?
+                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                                {/* {item.image ?
                                                                                                     <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
                                                                                                     :
                                                                                                     <PiImageThin className="w-40 h-60 text-gray-300" />
-                                                                                                }
+                                                                                                } */}
                                                                                             </div>
                                                                                             <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -662,11 +664,12 @@ const SubCategoryPage = () => {
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
-                                                            {item.image ?
+                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                            {/* {item.image ?
                                                                 <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
                                                                 :
                                                                 <PiImageThin className="w-40 h-60 text-gray-300" />
-                                                            }
+                                                            } */}
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">

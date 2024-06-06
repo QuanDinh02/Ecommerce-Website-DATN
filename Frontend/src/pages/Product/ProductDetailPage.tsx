@@ -59,6 +59,7 @@ import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import ReactPaginate from "react-paginate";
 import { dateFormat } from "@/utils/dateFormat";
 import { saveCustomerActivity } from "@/services/customerService";
+import LoadImage from "@/components/LoadImage";
 
 const ProductDetailPage = () => {
 
@@ -1022,6 +1023,7 @@ const ProductDetailPage = () => {
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
                                                 {/* <img src={selectedImage.image} className="select-none" /> */}
+                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
                                                 {productDetailInfo.product_image !== "" ?
                                                     <img src={`data:image/jpeg;base64,${productDetailInfo.product_image}`} alt='' />
                                                     :

@@ -15,6 +15,7 @@ import Button from "@/components/Button";
 import { useDispatch } from "react-redux";
 import { DeleteCartItem, UpdateCartItem } from "@/redux/actions/action";
 import { deleteCartItem, updateCartItem } from "@/services/cartItemService";
+import LoadImage from "@/components/LoadImage";
 export interface ICartItemInfo {
     id: number
     name: string
@@ -163,11 +164,12 @@ const ShoppingCartPage = () => {
                                                                 return (
                                                                     <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                         <td>
-                                                                            {item.product_info.image ?
+                                                                            <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} />
+                                                                            {/* {item.product_info.image ?
                                                                                 <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
                                                                                 :
                                                                                 <PiImageThin className="w-32 h-32 cursor-pointer" />
-                                                                            }
+                                                                            } */}
                                                                         </td>
                                                                         <td className="py-3 px-2">
                                                                             <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>

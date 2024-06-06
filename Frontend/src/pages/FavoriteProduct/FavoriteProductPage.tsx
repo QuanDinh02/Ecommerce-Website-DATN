@@ -18,6 +18,7 @@ import { AddCartItem, DeleteWishListItem } from "@/redux/actions/action";
 import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
 import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItemService";
 import _ from 'lodash';
+import LoadImage from "@/components/LoadImage";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -146,11 +147,12 @@ const FavoriteProductPage = () => {
                                                             return (
                                                                 <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                                     <td>
-                                                                        {item.product_info.image ?
+                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} />
+                                                                        {/* {item.product_info.image ?
                                                                             <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
                                                                             :
                                                                             <PiImageThin className="w-32 h-32 cursor-pointer" />
-                                                                        }
+                                                                        } */}
                                                                     </td>
                                                                     <td className="py-3 px-2">
                                                                         <div
