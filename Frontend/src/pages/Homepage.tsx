@@ -42,13 +42,15 @@ import Modal from "@/components/Modal";
 import { CurrencyFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
-import { getRecommendItemByCustomer } from "@/services/recommendItemService";
+import { getRecommendItemByCustomer, startTrainingRecommendItemData, getProductWithImageByCustomer } from "@/services/recommendItemService";
 import CategoryMenu from "@/components/CategoryMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
 import ProductRating from "./Category/ProductRating";
 import { saveCustomerActivity } from "@/services/customerService";
 
+import IMG from '../assets/img/homepage/recommend_items/31261845.jpeg';
+import LoadImage from "@/components/LoadImage";
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -80,9 +82,12 @@ const RecommendItem = () => {
     const [recommendItemList, setRecommendItemList] = React.useState<IRecommendProduct[]>([]);
 
     const fetchRecommendItems = async (customer_id: number) => {
-        let response: IData = await getRecommendItemByCustomer(+customer_id);
+        let response: IData = await getRecommendItemByCustomer(customer_id);
         if (response) {
             setRecommendItemList(response.product_list);
+            //let result = await getProductWithImageByCustomer(response.product_list);
+            //console.log(result);
+            //startTrainingRecommendItemData(customer_id);
         }
     }
 
@@ -112,6 +117,7 @@ const RecommendItem = () => {
                         <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
+                                    {/* <LoadImage img_style="w-40 h-40" product_id={31261845}/> */}
                                     {item.image ?
                                         <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-40" />
                                         :
@@ -212,10 +218,10 @@ const Homepage = () => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
         }
-    },[]);
+    }, []);
 
     React.useEffect(() => {
-        if(userRole === "seller") {
+        if (userRole === "seller") {
             navigate("/seller-info/dashboard");
         }
     }, [userRole]);
@@ -230,7 +236,7 @@ const Homepage = () => {
                             <img src={Banner} alt="" className="w-full h-full" />
                         </div>
                     </div>
-                    <div className="section benefits bg-white my-8 px-5 py-6 flex items-center justify-between">
+                    {/* <div className="section benefits bg-white my-8 px-5 py-6 flex items-center justify-between">
                         {clientBenefits.map((item, index) => {
                             return (
                                 <div className="benefit-item flex items-center gap-4" key={`benefit-item-${index}`}>
@@ -644,8 +650,8 @@ const Homepage = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="header px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
+                    </div> */}
+                    <div className="header mt-6 px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
                     <div className="section customer-recommendation bg-white mb-8">
                         <div className="px-5 py-6 bg-[#EEEEEE]">
                             <div className="product-list grid grid-cols-5 gap-y-6 gap-x-2">

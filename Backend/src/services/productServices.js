@@ -106,6 +106,48 @@ const getProductDetail = async (product_id) => {
     }
 }
 
+const getProductsImage = async (data) => {
+    try {
+        // let productListWithImage = await data.map(async item => {
+        //     let productImage = await db.Image.findOne({
+        //         raw: true,
+        //         attributes: ['id', 'image'],
+        //         where: {
+        //             productID: {
+        //                 [Op.eq]: item.id
+        //             }
+        //         }
+        //     });
+
+        //     if (productImage) {
+        //         return {
+        //             ...item, image: productImage.image
+        //         }
+        //     }
+
+        //     return {
+        //         ...item, image: ""
+        //     }
+        // });
+
+        // console.log(productListWithImage);
+
+        return {
+            EC: 0,
+            DT: data,
+            EM: 'Products With Image !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductsByCategory = async (category_id, item_limit, page) => {
     try {
         if (item_limit > 0) {
@@ -132,7 +174,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                 include: [
                     {
                         model: db.Product,
-                        attributes: ['id', 'name','summary'],
+                        attributes: ['id', 'name', 'summary'],
                     },
                     {
                         model: db.SubCategory,
@@ -264,7 +306,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                 include: [
                     {
                         model: db.Product,
-                        attributes: ['id', 'name','summary'],
+                        attributes: ['id', 'name', 'summary'],
                     },
                     {
                         model: db.SubCategory,
@@ -538,5 +580,5 @@ const getProductReviews = async (product_id, item_limit, page) => {
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
-    getProductDetail, getProductReviews
+    getProductDetail, getProductReviews, getProductsImage
 }

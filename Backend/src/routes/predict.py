@@ -116,5 +116,4 @@ if __name__ == '__main__':
     # stop = timeit.default_timer()
     # print('time:', stop-start)
     a = {'data': result}
-    res = requests.post('http://127.0.0.1:8080/api/recommend', json=a)
-    print(result)
+    res = requests.post('http://127.0.0.1:8080/api/simulating-recommend', json=a)

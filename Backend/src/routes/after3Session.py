@@ -311,4 +311,4 @@ if __name__ == "__main__":
     res ={'customer_id': customerID, 'list': json_result}
     
     data = {'data': res}
-    res = requests.post('http://127.0.0.1:8080/api/recommend', json=data)
+    res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)

@@ -57,6 +57,8 @@ const ApiRoute = (app) => {
 
     router.get('/products/search', productController.handleGetSearchProducts);
 
+    router.post('/image/products', productController.handleGetProductsImage);
+
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
 
     router.put('/product', upload.single('image'), productController.handleUpdateProductImage);

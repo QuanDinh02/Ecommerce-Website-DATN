@@ -135,6 +135,33 @@ const createHistoryRecommendItem = async (customer_id) => {
     }
 }
 
+const clearHistoryRecommendItem = async (customer_id) => {
+    try {
+
+        await db.HistoryRecommendProduct.destroy({
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            },
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Clear Backup recommend item successfully !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const updateTrainingRecommendItemStatus = async (customer_id, status_code) => {
     try {
 
@@ -268,8 +295,6 @@ const getBothRecommendProducts = async (customer_id) => {
 
         let productListRaw = [..._.cloneDeep(productListRaw_1), ..._.cloneDeep(productListRaw_2)];
 
-        productListRaw = _(productListRaw).take(20).value();
-
         let productListFinal = await productListRaw.map(item => {
             return {
                 id: item.Product.id,
@@ -374,8 +399,6 @@ const getRecommendProducts = async (customer_id) => {
                 },
             },
         });
-
-        productListRaw = _(productListRaw).take(20).value();
 
         let productListFinal = await productListRaw.map(item => {
             return {
@@ -482,8 +505,6 @@ const get3SessionRecommendProducts = async (customer_id) => {
             },
         });
 
-        productListRaw = _(productListRaw).take(20).value();
-
         let productListFinal = await productListRaw.map(item => {
             return {
                 id: item.Product.id,
@@ -589,7 +610,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
             },
         });
 
-        productListRaw = _(productListRaw).take(20).value();
+        //productListRaw = _(productListRaw).take(20).value();
 
         let productListFinal = await productListRaw.map(item => {
             return {
@@ -689,5 +710,5 @@ const getHistoryRecommendProducts = async (customer_id) => {
 module.exports = {
     createRecommendProducts, getTrainingRecommendItemStatus, updateTrainingRecommendItemStatus,
     getHistoryRecommendProducts, createHistoryRecommendItem, create3SessionRecommendProducts, updateTraining3SessionRecommendItemStatus,
-    getRecommendProducts, get3SessionRecommendProducts, getBothRecommendProducts
+    getRecommendProducts, get3SessionRecommendProducts, getBothRecommendProducts, clearHistoryRecommendItem
 }

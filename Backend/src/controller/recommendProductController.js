@@ -133,25 +133,38 @@ const getRecommendProducts = async (req, res) => {
 const simulatingCreateRecommendProducts = async (req, res) => {
     try {
 
-        let data = {
-            customer_id: 1,
-            list:
-                [
-                    { product_id: '195797729', predict_rating: '4.436582809224318' },
-                    { product_id: '21441058', predict_rating: '4.436582809224318' },
-                    { product_id: '176598086', predict_rating: '4.330790847049378' },
-                    { product_id: '58678598', predict_rating: '4.330790847049378' },
-                    { product_id: '1025034', predict_rating: '4.2317216981132075' },
-                    { product_id: '579949', predict_rating: '4.2317216981132075' },
-                    { product_id: '68716608', predict_rating: '3.3717679944095043' },
-                    { product_id: '11488924', predict_rating: '3.2317216981132075' },
-                    { product_id: '56941526', predict_rating: '2.4365828092243182' },
-                    { product_id: '25421010', predict_rating: '1' }
-                ]
-        }
+        // let data = {
+        //     customer_id: 1,
+        //     list:
+        //         [
+        //             { product_id: '195797729', predict_rating: '4.436582809224318' },
+        //             { product_id: '21441058', predict_rating: '4.436582809224318' },
+        //             { product_id: '176598086', predict_rating: '4.330790847049378' },
+        //             { product_id: '58678598', predict_rating: '4.330790847049378' },
+        //             { product_id: '1025034', predict_rating: '4.2317216981132075' },
+        //             { product_id: '579949', predict_rating: '4.2317216981132075' },
+        //             { product_id: '68716608', predict_rating: '3.3717679944095043' },
+        //             { product_id: '11488924', predict_rating: '3.2317216981132075' },
+        //             { product_id: '56941526', predict_rating: '2.4365828092243182' },
+        //             { product_id: '25421010', predict_rating: '1' }
+        //         ]
+        // }
+
+        // let customerID = data.customer_id;
+        // let list = data.list;
+
+        // let dataFormat = list.map(item => {
+        //     return {
+        //         product_id: +item.product_id,
+        //         predict_rating: +item.predict_rating,
+        //         customerID: +customerID
+        //     }
+        // })
+
+        let data = JSON.parse(req.body.data);
 
         let customerID = data.customer_id;
-        let list = data.list;
+        let list = JSON.parse(data.list);
 
         let dataFormat = list.map(item => {
             return {
@@ -182,25 +195,38 @@ const simulatingCreateRecommendProducts = async (req, res) => {
 const simulatingCreateRecommend3SessionProducts = async (req, res) => {
     try {
 
-        let data = {
-            customer_id: 1,
-            list:
-                [
-                    { product_id: '39001', predict_rating: '4.436582809224318' },
-                    { product_id: '57881', predict_rating: '4.436582809224318' },
-                    { product_id: '63213', predict_rating: '4.330790847049378' },
-                    { product_id: '63217', predict_rating: '4.330790847049378' },
-                    { product_id: '70765', predict_rating: '4.2317216981132075' },
-                    { product_id: '70865', predict_rating: '4.2317216981132075' },
-                    { product_id: '93540', predict_rating: '3.3717679944095043' },
-                    { product_id: '105628', predict_rating: '3.2317216981132075' },
-                    { product_id: '92969', predict_rating: '2.4365828092243182' },
-                    { product_id: '107482', predict_rating: '1' }
-                ]
-        }
+        // let data = {
+        //     customer_id: 1,
+        //     list:
+        //         [
+        //             { product_id: '39001', predict_rating: '4.436582809224318' },
+        //             { product_id: '57881', predict_rating: '4.436582809224318' },
+        //             { product_id: '63213', predict_rating: '4.330790847049378' },
+        //             { product_id: '63217', predict_rating: '4.330790847049378' },
+        //             { product_id: '70765', predict_rating: '4.2317216981132075' },
+        //             { product_id: '70865', predict_rating: '4.2317216981132075' },
+        //             { product_id: '93540', predict_rating: '3.3717679944095043' },
+        //             { product_id: '105628', predict_rating: '3.2317216981132075' },
+        //             { product_id: '92969', predict_rating: '2.4365828092243182' },
+        //             { product_id: '107482', predict_rating: '1' }
+        //         ]
+        // }
+
+        // let customerID = data.customer_id;
+        // let list = data.list;
+
+        // let dataFormat = list.map(item => {
+        //     return {
+        //         product_id: +item.product_id,
+        //         predict_rating: +item.predict_rating,
+        //         customerID: +customerID
+        //     }
+        // })
+
+        let data = JSON.parse(req.body.data);
 
         let customerID = data.customer_id;
-        let list = data.list;
+        let list = JSON.parse(data.list);
 
         let dataFormat = list.map(item => {
             return {
@@ -209,7 +235,7 @@ const simulatingCreateRecommend3SessionProducts = async (req, res) => {
                 customerID: +customerID
             }
         })
-
+        
         let result = await recommendProductServices.create3SessionRecommendProducts(customerID, dataFormat);
 
         return res.status(200).json({
@@ -281,6 +307,7 @@ const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
 
                 if (update_training_status.EC === 0 && update_training_3session_status.EC === 0) {
 
+                    await recommendProductServices.clearHistoryRecommendItem(+customer_id);
                     let backup_recommend_item_res = await recommendProductServices.createHistoryRecommendItem(+customer_id);
 
                     if (backup_recommend_item_res && backup_recommend_item_res.EC === 0) {
@@ -291,8 +318,8 @@ const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
                         };
 
                         // Run training modal from Predict and Predict 3 Session
-                        PythonShell.run('simulatingPredict.py', options);
-                        PythonShell.run('simulatingPredict3Session.py', options);
+                        PythonShell.run('predict.py', options);
+                        PythonShell.run('after3Session.py', options);
 
                         return res.status(200).json({
                             EC: 0,
@@ -300,26 +327,6 @@ const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
                             EM: 'Training data of recommend item is processing !'
                         });
 
-                        // if (+result_predict === 0 || +result_predict_3_session === 0) {
-
-                        //     let update_training_status_2 = await recommendProductServices.updateTrainingRecommendItemStatus(+customer_id, 0);
-                        //     if (update_training_status_2 && update_training_status_2.EC === 0) {
-
-                        //         return res.status(200).json({
-                        //             EC: 0,
-                        //             DT: '',
-                        //             EM: 'Training recommeded item successfully !'
-                        //         })
-                        //     } else {
-                        //         serverErrorMessage();
-                        //     }
-                        // } else {
-                        //     return res.status(500).json({
-                        //         EC: -1,
-                        //         DT: '',
-                        //         EM: 'Training recommeded item failed !'
-                        //     })
-                        // }
                     } else {
                         await recommendProductServices.updateTrainingRecommendItemStatus(+customer_id, 0);
                         serverErrorMessage();
