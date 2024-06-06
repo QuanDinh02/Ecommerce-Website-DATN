@@ -165,7 +165,7 @@ const clearHistoryRecommendItem = async (customer_id) => {
 const updateTrainingRecommendItemStatus = async (customer_id, status_code) => {
     try {
 
-        await db.TrainingData.update({
+        await db.TrainingWebData.update({
             activePredict: status_code
         }, {
             where: {
@@ -194,7 +194,7 @@ const updateTrainingRecommendItemStatus = async (customer_id, status_code) => {
 const updateTraining3SessionRecommendItemStatus = async (customer_id, status_code) => {
     try {
 
-        await db.TrainingData.update({
+        await db.TrainingWebData.update({
             activePredict3Session: status_code
         }, {
             where: {
@@ -223,7 +223,7 @@ const updateTraining3SessionRecommendItemStatus = async (customer_id, status_cod
 const getTrainingRecommendItemStatus = async (customer_id) => {
     try {
 
-        let result = await db.TrainingData.findOne({
+        let result = await db.TrainingWebData.findOne({
             raw: true,
             where: {
                 customerID: {

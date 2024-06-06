@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.bulkInsert('TrainingData', [
+        await queryInterface.bulkInsert('TrainingWebData', [
             {
                 //id: 1
                 customerID: 1,
@@ -29,6 +29,6 @@ module.exports = {
     },
 
     async down(queryInterface, Sequelize) {
-        await queryInterface.bulkDelete('TrainingData', null, {});
+        await queryInterface.bulkDelete('TrainingWebData', null, {});
     }
 };

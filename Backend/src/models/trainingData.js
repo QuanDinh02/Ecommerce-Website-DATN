@@ -3,19 +3,19 @@ const {
     Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-    class TrainingData extends Model {
+    class TrainingWebData extends Model {
         static associate(models) {
-            TrainingData.belongsTo(models.Customer, { foreignKey: 'customerID' });
+            TrainingWebData.belongsTo(models.Customer, { foreignKey: 'customerID' });
         }
     }
-    TrainingData.init({
+    TrainingWebData.init({
         customerID: DataTypes.BIGINT,
         activePredict: DataTypes.TINYINT,
         activePredict3Session: DataTypes.TINYINT,
         lastTrainingTime: DataTypes.DATE,
     }, {
         sequelize,
-        modelName: 'TrainingData',
+        modelName: 'TrainingWebData',
     });
-    return TrainingData;
+    return TrainingWebData;
 };
