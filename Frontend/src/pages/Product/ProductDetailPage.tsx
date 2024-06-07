@@ -999,20 +999,30 @@ const ProductDetailPage = () => {
                             <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
                                 <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-1">
                                     <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
-                                    <MdOutlineArrowForwardIos />
-                                    <div
-                                        className="cursor-pointer hover:underline"
-                                        onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.title)}
-                                    >
-                                        {activeCategory.title}
-                                    </div>
-                                    <MdOutlineArrowForwardIos />
-                                    <div
-                                        className="cursor-pointer hover:underline"
-                                        onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.title, activeSubCategory.id, activeSubCategory.title)}
-                                    >
-                                        {activeSubCategory.title}
-                                    </div>
+                                    {
+                                        activeCategory && activeCategory.id !== null &&
+                                        <>
+                                            <MdOutlineArrowForwardIos />
+                                            <div
+                                                className="cursor-pointer hover:underline"
+                                                onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.title)}
+                                            >
+                                                {activeCategory.title}
+                                            </div>
+                                        </>
+                                    }
+                                    {
+                                        activeSubCategory && activeSubCategory.id !== null &&
+                                        <>
+                                            <MdOutlineArrowForwardIos />
+                                            <div
+                                                className="cursor-pointer hover:underline"
+                                                onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.title, activeSubCategory.id, activeSubCategory.title)}
+                                            >
+                                                {activeSubCategory.title}
+                                            </div>
+                                        </>
+                                    }
                                     <MdOutlineArrowForwardIos />
                                     <div className="font-medium cursor-pointer hover:underline w-1/3 line-clamp-1">{activeProduct.name}</div>
                                 </div>
