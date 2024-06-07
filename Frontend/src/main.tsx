@@ -20,6 +20,7 @@ import ShoppingCartPage from './pages/ShoppingCart/ShoppingCartPage.tsx';
 import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx';
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
+import SearchPage from '@/pages/SearchPage.tsx';
 
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
 import CustomerAccount from '@/pages/CustomerInfo/CustomerAccount.tsx';
@@ -249,6 +250,10 @@ const router = createBrowserRouter(
               element: <CustomerSupport />
             },
           ]
+        },
+        {
+          path: "search",
+          element: <SearchPage/>
         },
         {
           path: "category",

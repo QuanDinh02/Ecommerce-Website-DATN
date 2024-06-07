@@ -40,3 +40,11 @@ export const getProductReview = async (product_id: number, page: number) => {
     }
     return null;
 }
+
+export const getProductListBySearch = async (search_content: string, search_page: number) => {
+    let result: APIResponse = await axios.get(`/api/products/search-page?limit=${20}&content=${search_content}&page=${search_page}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

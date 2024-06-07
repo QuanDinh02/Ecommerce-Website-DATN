@@ -149,7 +149,7 @@ const Header = () => {
     const handleKeyPress = (event) => {
 
         if (event.key === 'Enter') {
-            handleSaveSearch();
+            handleSearch();
         }
 
         if (productSearchList.length > 0) {
@@ -378,6 +378,14 @@ const Header = () => {
         }
     }
 
+    const handleSearch = async () => {
+        await handleSaveSearch();
+        navigate({
+            pathname: "/search",
+            search: `?keyword=${productSearch}&page=${1}`,
+        })
+    }
+
     const handleSaveSearch = async () => {
         if (account && isAuthenticated) {
             let result = await saveCustomerSearch(productSearch);
@@ -473,7 +481,7 @@ const Header = () => {
                                         }
                                     </div>
                                 }
-                                <div className='search-bar__btn' onClick={() => handleSaveSearch()}>Tìm kiếm</div>
+                                <div className='search-bar__btn' onClick={() => handleSearch()}>Tìm kiếm</div>
                             </div>
 
                         </>

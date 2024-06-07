@@ -57,6 +57,8 @@ const ApiRoute = (app) => {
 
     router.get('/products/search', productController.handleGetSearchProducts);
 
+    router.get('/products/search-page',cacheMiddleware(300), productController.handleGetSearchProductsWithPagination);
+
     router.post('/image/products', productController.handleGetProductsImage);
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);

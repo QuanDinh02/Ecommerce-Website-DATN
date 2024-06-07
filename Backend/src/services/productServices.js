@@ -492,6 +492,122 @@ const getSearchProducts = async (product_name) => {
     }
 }
 
+const getSearchProductsWithPagination = async (content, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let productListRaw = await db.Product.findAll({
+                raw: true,
+                attributes: ['id', 'name', 'summary'],
+                where: {
+                    name: {
+                        [Op.substring]: `${content}`
+                    }
+                },
+            });
+
+            const listLength = productListRaw.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            productListRaw.reverse();
+            productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+            let productListFinal = await productListRaw.map(item => {
+
+                return {
+                    id: item.id,
+                    name: item.name,
+                    summary: item.summary ? item.summary : "",
+                }
+            });
+
+            let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+                let productType = await db.ProductType.findOne({
+                    raw: true,
+                    attributes: ['id', 'currentPrice', 'price', 'sold'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+
+                // let productImage = await db.Image.findOne({
+                //     raw: true,
+                //     nest: true,
+                //     attributes: ['id', 'image'],
+                //     where: {
+                //         productID: {
+                //             [Op.eq]: item.id
+                //         }
+                //     }
+                // });
+
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'rating'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.id,
+                        },
+                    }
+                });
+
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                return {
+                    ...item,
+                    //image: productImage?.image ? productImage?.image : "",
+                    image: "",
+                    current_price: productType.currentPrice,
+                    price: productType.price,
+                    sold: productType.sold,
+                    rating: rating_average
+                }
+            }));
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    product_list: productListFinalWithImage
+                },
+                EM: 'Get products by search !'
+            }
+        }
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductReviews = async (product_id, item_limit, page) => {
     try {
         if (item_limit > 0) {
@@ -580,5 +696,5 @@ const getProductReviews = async (product_id, item_limit, page) => {
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
-    getProductDetail, getProductReviews, getProductsImage
+    getProductDetail, getProductReviews, getProductsImage, getSearchProductsWithPagination
 }
