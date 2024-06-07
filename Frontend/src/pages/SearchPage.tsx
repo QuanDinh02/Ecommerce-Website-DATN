@@ -135,14 +135,6 @@ const SearchPage = () => {
         }
     }
 
-    // const handleFetchData = (keyword: string, page: number) => {
-
-    //     navigate({
-    //         pathname: "/search",
-    //         search: `?keyword=${keyword}&page=${page}`,
-    //     })
-    // }
-
     const handleProductDetailNavigation = async (product_id: number) => {
         if (account && isAuthenticated) {
             let result = await saveCustomerActivity({
@@ -303,7 +295,9 @@ const SearchPage = () => {
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-        fetchProductsBySearch(searchKeyword, searchPage);
+        if(searchKeyword !== "") {
+            fetchProductsBySearch(searchKeyword, searchPage);
+        }
 
     }, [searchKeyword, searchPage]);
 
