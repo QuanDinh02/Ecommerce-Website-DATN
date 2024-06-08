@@ -15,7 +15,7 @@ import { TfiViewListAlt } from "react-icons/tfi";
 import { IAccount, ICartItem } from "./Product/ProductDetailPage_types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
-import { saveCustomerActivity } from "@/services/customerService";
+import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 import LoadImage from "@/components/LoadImage";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
@@ -135,12 +135,15 @@ const SearchPage = () => {
         }
     }
 
-    const handleProductDetailNavigation = async (product_id: number) => {
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
         if (account && isAuthenticated) {
-            let result = await saveCustomerActivity({
+            saveCustomerActivity({
                 product_id: product_id,
                 type: 0
             });
+
+            saveCustomerSearch(product_name);
+
             navigate("/product-detail", { state: { product_id: product_id } });
         }
         navigate("/product-detail", { state: { product_id: product_id } });
@@ -506,7 +509,7 @@ const SearchPage = () => {
                                                                                             className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group"
                                                                                             key={`sub-category-item-${index}`}
                                                                                             onClick={() => {
-                                                                                                handleProductDetailNavigation(item.id);
+                                                                                                handleProductDetailNavigation(item.id, item.name);
                                                                                             }}
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center">
@@ -586,7 +589,7 @@ const SearchPage = () => {
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`sub-category-column-item-${index}`}
                                                         onClick={() => {
-                                                            handleProductDetailNavigation(item.id);
+                                                            handleProductDetailNavigation(item.id, item.name);
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">

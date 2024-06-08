@@ -47,7 +47,7 @@ import CategoryMenu from "@/components/CategoryMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
 import ProductRating from "./Category/ProductRating";
-import { saveCustomerActivity } from "@/services/customerService";
+import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 
 import IMG from '../assets/img/homepage/recommend_items/31261845.jpeg';
 import LoadImage from "@/components/LoadImage";
@@ -91,12 +91,15 @@ const RecommendItem = () => {
         }
     }
 
-    const handleProductDetailNavigation = async (product_id: number) => {
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
         if (account && isAuthenticated) {
-            let result = await saveCustomerActivity({
+            saveCustomerActivity({
                 product_id: product_id,
                 type: 0
             });
+
+            saveCustomerSearch(product_name);
+
             navigate("/product-detail", { state: { product_id: product_id } });
         }
         navigate("/product-detail", { state: { product_id: product_id } });
@@ -114,7 +117,7 @@ const RecommendItem = () => {
                 recommendItemList && recommendItemList.length > 0 &&
                 recommendItemList.map((item, index) => {
                     return (
-                        <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id)}>
+                        <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
                                     <LoadImage img_style="w-40 h-40" product_id={item.id}/>

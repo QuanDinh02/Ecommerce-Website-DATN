@@ -25,7 +25,7 @@ import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import _ from 'lodash';
 import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
-import { saveCustomerActivity } from "@/services/customerService";
+import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
 import {
     PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST,
@@ -314,12 +314,15 @@ const SubCategoryPage = () => {
         navigate("/category", { state: { category_id: category_id, category_name: category_title } })
     }
 
-    const handleProductDetailNavigation = async (product_id: number) => {
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
         if (account && isAuthenticated) {
-            let result = await saveCustomerActivity({
+            saveCustomerActivity({
                 product_id: product_id,
                 type: 0
             });
+
+            saveCustomerSearch(product_name);
+
             navigate("/product-detail", { state: { product_id: product_id } });
         }
         navigate("/product-detail", { state: { product_id: product_id } });
@@ -580,7 +583,7 @@ const SubCategoryPage = () => {
                                                                                             className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group"
                                                                                             key={`sub-category-item-${index}`}
                                                                                             onClick={() => {
-                                                                                                handleProductDetailNavigation(item.id);
+                                                                                                handleProductDetailNavigation(item.id, item.name);
                                                                                             }}
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center">
@@ -660,7 +663,7 @@ const SubCategoryPage = () => {
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`sub-category-column-item-${index}`}
                                                         onClick={() => {
-                                                            handleProductDetailNavigation(item.id);
+                                                            handleProductDetailNavigation(item.id, item.name);
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">

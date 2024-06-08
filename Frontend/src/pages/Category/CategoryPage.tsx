@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
 import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
-import { saveCustomerActivity } from "@/services/customerService";
+import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 import _ from 'lodash';
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
 import {
@@ -337,12 +337,15 @@ const CategoryPage = () => {
         }
     }
 
-    const handleProductDetailNavigation = async (product_id: number) => {
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
         if (account && isAuthenticated) {
-            let result = await saveCustomerActivity({
+            saveCustomerActivity({
                 product_id: product_id,
                 type: 0
             });
+
+            saveCustomerSearch(product_name);
+
             navigate("/product-detail", { state: { product_id: product_id } });
         }
         navigate("/product-detail", { state: { product_id: product_id } });
@@ -585,7 +588,7 @@ const CategoryPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id)}>
+                                                                                        <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                             <div className="product__image flex items-center justify-center">
                                                                                                 <LoadImage img_style="w-40 h-60" product_id={item.id} />
                                                                                                 {/* {item.image ?
@@ -663,7 +666,7 @@ const CategoryPage = () => {
                                                 return (
                                                     <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`category-column-item-${index}`}
-                                                        onClick={() => handleProductDetailNavigation(item.id)}
+                                                        onClick={() => handleProductDetailNavigation(item.id, item.name)}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             <LoadImage img_style="w-40 h-60" product_id={item.id} />
