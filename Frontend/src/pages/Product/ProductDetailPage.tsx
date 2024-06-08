@@ -1,5 +1,5 @@
 import { MdOutlineArrowForwardIos } from "react-icons/md";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 import Product01 from '../../assets/img/product_detail/product_01.svg';
 import Product02 from '../../assets/img/product_detail/product_02.svg';
@@ -63,11 +63,14 @@ import LoadImage from "@/components/LoadImage";
 
 const ProductDetailPage = () => {
 
+    const [searchParams] = useSearchParams();
+
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+    const [productID, setProductID] = React.useState<number>(0);
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
@@ -235,7 +238,7 @@ const ProductDetailPage = () => {
         }
     }
 
-    const fetchProductsBySubCategory = async (product_id: number) => {
+    const fetchProductDetail = async (product_id: number) => {
         let response: IProductDetail = await getProductDetailInfo(+product_id);
         if (response) {
 
@@ -949,33 +952,44 @@ const ProductDetailPage = () => {
     }
 
     React.useEffect(() => {
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-        setTimeout(() => {
-            setDataLoading(false);
-        }, 1000);
-    }, []);
+        let product_id = searchParams.get('id');
+
+        let activeProductID: number = product_id ? +product_id : 0;
+
+        if (activeProductID !== productID) {
+            setProductID(activeProductID);
+        }
+
+    }, [searchParams.get('id')]);
 
     React.useEffect(() => {
+
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        if (location.state) {
-            let { product_id } = location.state;
-            if (product_id) {
-                fetchProductsBySubCategory(product_id);
-                fetchProductReviews(product_id);
-            }
+
+        if(productID !== 0) {
+            fetchProductDetail(productID);
+            fetchProductReviews(productID);
         }
-    }, [location.state]);
+
+    }, [productID]);
 
     React.useEffect(() => {
         // 2876581
-        //fetchProductsBySubCategory(2876581);
+        //fetchProductDetail(2876581);
         //fetchProductReviews(2876581);
 
         if (productDetailInfo.id !== 0) {
             fetchProductReviews(productDetailInfo.id);
         }
-    }, [currentPage])
+    }, [currentPage]);
+
+    React.useEffect(() => {
+
+        setTimeout(() => {
+            setDataLoading(false);
+        }, 1000);
+    }, []);
 
     return (
         <>

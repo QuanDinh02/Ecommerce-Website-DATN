@@ -346,9 +346,15 @@ const CategoryPage = () => {
 
             saveCustomerSearch(product_name);
 
-            navigate("/product-detail", { state: { product_id: product_id } });
+            navigate({
+                pathname: "/product",
+                search: `?id=${product_id}`,
+            });
         }
-        navigate("/product-detail", { state: { product_id: product_id } });
+        navigate({
+            pathname: "/product",
+            search: `?id=${product_id}`,
+        });
     }
 
     React.useEffect(() => {

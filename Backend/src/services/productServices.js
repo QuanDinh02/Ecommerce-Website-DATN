@@ -77,7 +77,7 @@ const getProductDetail = async (product_id) => {
             name: productInfo.name,
             currentPrice: productDetail.currentPrice,
             price: productDetail.price,
-            sold: productDetail.price,
+            sold: productDetail.sold,
             description: productInfo.summary,
             //product_image: productImage?.image ? productImage?.image : "",
             product_image: "",

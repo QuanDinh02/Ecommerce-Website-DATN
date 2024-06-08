@@ -264,7 +264,7 @@ const router = createBrowserRouter(
           element: <SubCategoryPage />
         },
         {
-          path: "product-detail",
+          path: "product",
           element: <ProductDetailPage />
         },
         {
