@@ -96,7 +96,7 @@ def get_unrated_products_and_predict(user_id, redis_host='localhost', redis_port
     sorted_result = sorted(unrated_products, key=lambda x: float(x['predict_rating']), reverse=True)
     print(sorted_result[:20])
     # Convert the sorted list to a JSON string
-    json_result = json.dumps(sorted_result[:50], ensure_ascii=False, indent=4)
+    json_result = json.dumps(sorted_result[:25], ensure_ascii=False, indent=4)
     res ={'customer_id': user_id, 'list': json_result}
     res_json = json.dumps(res, ensure_ascii=False, indent=4)
     return res_json

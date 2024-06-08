@@ -7,7 +7,7 @@ from sentence_transformers import SentenceTransformer
 import mysql.connector
 import json
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search.field import TagField, TextField, NumericField, VectorField
+from redis.commands.search.field import TextField, NumericField, VectorField
 from redis.commands.search.query import Query
 import timeit
 import requests
@@ -67,7 +67,7 @@ def ranking_items(itemSessionVector, itemRealSearch):
     for i in rankScoreIndex:
         if int(itemScoreList[int(i)]) not in rankItemId:
             rankItemId.append(int(itemScoreList[int(i)]))
-            if len (rankItemId) == 10:
+            if len (rankItemId) == 25:
                 break
         else:
             continue
@@ -94,12 +94,13 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
         )
         ORDER BY s.createdAt DESC, sa.productID, sa.type;
     '''
+
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
     # itemSessionVector = [(item['productID'], type_to_weight[item['type']]) for item in res4Session]
     itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['description_embeddings'], type_to_weight[item['type']]) for item in res4Session]
     return itemSessionVector
-    
+
 def getSearhContent(cusID, mysql_config={}):
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
@@ -214,9 +215,9 @@ def get_predicted_ratings(user_id, item_ids, redis_host='localhost', redis_port=
         unrated_products.append({'product_id': str(product_id), 'predict_rating': str(predicted_rating)})
 
     sorted_result = sorted(unrated_products, key=lambda x: float(x['predict_rating']), reverse=True)
-    print(sorted_result[:10])
+    # print(sorted_result[:10])
     # Convert the sorted list to a JSON string
-    json_result = json.dumps(sorted_result[:10], ensure_ascii=False, indent=4)
+    json_result = json.dumps(sorted_result[:25], ensure_ascii=False, indent=4)
     res ={'customer_id': user_id, 'list': json_result}
     res_json = json.dumps(res, ensure_ascii=False, indent=4)
     return res_json
@@ -233,7 +234,7 @@ if __name__ == "__main__":
 
     params = sys.argv[1]
     customerID = params
-    
+    # customerID = '10577013'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -263,10 +264,10 @@ if __name__ == "__main__":
         print("Load model:", stop - start)
         
         query = (
-            Query('(*)=>[KNN 20 @vector_name $query_vector AS vector_score]')
+            Query('(*)=>[KNN 50 @vector_name $query_vector AS vector_score]')
                 .sort_by('vector_score')
                 .return_fields('vector_score', 'id', 'name')
-                .paging(0, 20)
+                .paging(0, 50)
                 .dialect(2)
         )
 
