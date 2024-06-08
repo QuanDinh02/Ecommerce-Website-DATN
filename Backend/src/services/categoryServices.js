@@ -95,6 +95,44 @@ const getAllCategories = async () => {
     }
 }
 
+const getCategoryInfo = async (category_id) => {
+    try {
+        let categoryData = await db.Category.findOne({
+            raw: true,
+            attributes: ['id', 'title'],
+            where: {
+                id: {
+                    [Op.eq]: category_id,
+                },
+            }
+        });
+
+        if(categoryData) {
+            return {
+                EC: 0,
+                DT: categoryData,
+                EM: 'Get category info successfully !'
+            }
+        }
+
+        else {
+            return {
+                EC: -1,
+                DT: "",
+                EM: 'Category is not existed !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getAllCategories
+    getAllCategories, getCategoryInfo
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdCancel, MdOutlineMessage } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
@@ -32,6 +32,7 @@ import {
     LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
 } from "@/data/category";
 import LoadImage from "@/components/LoadImage";
+import { getSubCategoryInfo } from "@/services/subCategoryService";
 
 interface ISubCategoryActive {
     id: number
@@ -62,11 +63,13 @@ interface IData {
 
 const SubCategoryPage = () => {
 
+    const [searchParams] = useSearchParams();
+
     const navigate = useNavigate();
-    const location = useLocation();
     const dispatch = useDispatch();
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+    const [subCategoryID, setSubCategoryID] = React.useState<number>(0);
 
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
     const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
@@ -194,11 +197,14 @@ const SubCategoryPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
-        setProductListLoading(true);
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        setTimeout(() => {
-            setProductListLoading(false);
-        }, LOADING_ITEM_PAGE_CHANGE_TIME);
+
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${subCategoryID}&page=${+event.selected + 1}`,
+
+        }, {
+            replace: true
+        });
     }
 
     const refetchWishList = async () => {
@@ -284,6 +290,25 @@ const SubCategoryPage = () => {
         }, 1500);
     }
 
+    const fetchSubCategoryInfo = async (sub_category_id: number) => {
+        let sub_category_info = await getSubCategoryInfo(sub_category_id);
+        if (sub_category_info) {
+            console.log(sub_category_info);
+
+            setActiveSubCategory({
+                ...activeSubCategory, id: sub_category_info.id, title: sub_category_info.title
+            })
+
+            let category_info = sub_category_info.category_info;
+
+            if (category_info.id !== null) {
+                setActiveCategory({
+                    ...activeCategory, id: category_info.id, name: category_info.title
+                });
+            }
+        }
+    }
+
     const fetchProductsBySubCategory = async (sub_category_id: number) => {
         let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage);
         if (response) {
@@ -310,8 +335,11 @@ const SubCategoryPage = () => {
         }
     }
 
-    const handleCategoryNavigation = (category_id: number, category_title: string) => {
-        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+    const handleCategoryNavigation = (category_id: number) => {
+        navigate({
+            pathname: "/category",
+            search: `?id=${category_id}&page=1`,
+        });
     }
 
     const handleProductDetailNavigation = (product_id: number, product_name: string) => {
@@ -335,37 +363,47 @@ const SubCategoryPage = () => {
     }
 
     React.useEffect(() => {
-        let { category_id, category_name, sub_category_id, sub_category_name } = location.state;
 
-        setActiveCategory({
-            ...activeCategory, id: category_id, name: category_name
-        });
+        let sub_category_id = searchParams.get('id');
 
-        setActiveSubCategory({
-            ...activeSubCategory, id: sub_category_id ? sub_category_id : 0, title: sub_category_name ? sub_category_name : ""
-        });
+        let activeSubCategoryID: number = sub_category_id ? +sub_category_id : 0;
 
-        fetchProductsBySubCategory(sub_category_id);
-    }, []);
+        if (activeSubCategoryID !== subCategoryID) {
+            setSubCategoryID(activeSubCategoryID);
+            fetchSubCategoryInfo(activeSubCategoryID);
+        }
+
+    }, [searchParams.get('id')]);
 
     React.useEffect(() => {
-        window.onbeforeunload = function () {
-            window.scrollTo(0, 0);
+
+        let page = searchParams.get('page');
+
+        let activePage: number = page ? +page : 1;
+
+        if (activePage !== currentPage) {
+            setCurrentPage(activePage);
         }
+
+    }, [searchParams.get('page')])
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        if (subCategoryID !== 0 && currentPage != 0) {
+            fetchProductsBySubCategory(subCategoryID);
+        }
+
+    }, [subCategoryID, currentPage]);
+
+    React.useEffect(() => {
 
         setTimeout(() => {
             setDataLoading(false);
         }, 1000);
-    }, [])
 
-    React.useEffect(() => {
-        window.onbeforeunload = function () {
-            window.scrollTo(0, 0);
-        }
-        if (activeSubCategory.id !== 0) {
-            fetchProductsBySubCategory(activeSubCategory.id);
-        }
-    }, [currentPage])
+    }, []);
 
     return (
         <>
@@ -389,7 +427,7 @@ const SubCategoryPage = () => {
                             <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                                 <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                 <MdOutlineArrowForwardIos />
-                                <div className="cursor-pointer hover:underline" onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
+                                <div className="cursor-pointer hover:underline" onClick={() => handleCategoryNavigation(activeCategory.id)}>{activeCategory.name}</div>
                                 <MdOutlineArrowForwardIos />
                                 <div className="font-medium cursor-pointer hover:underline">{activeSubCategory.title}</div>
                             </div>
@@ -397,29 +435,6 @@ const SubCategoryPage = () => {
                         <div className="category__content mt-4 mb-24">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
                                 <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
-                                    {/* <div className="section">
-                                        <div className="section__title text-lg mb-3">Thương hiệu</div>
-                                        {filterItems.map((item, index) => {
-                                            return (
-                                                <div key={`category-item-${index}`} className="mb-2 duration-300 group cursor-pointer flex items-center gap-x-2" onClick={() => handleFilter(item.id)}>
-                                                    {
-                                                        item.check ?
-                                                            <>
-                                                                <div className="w-5 h-5 border-2 rounded-[2px] bg-white border-[#FCB800] flex items-center justify-center"><FaCheck className="w-4 h-4 text-[#FCB800]" /></div>
-                                                                <div className="group-hover:text-[#FCB800]">{item.name}</div>
-                                                            </>
-                                                            :
-                                                            <>
-                                                                <div className="w-5 h-5 border-2 border-gray-300 rounded-[2px] bg-white group-hover:border-[#FCB800]"></div>
-                                                                <div className="group-hover:text-[#FCB800]">{item.name}</div>
-                                                            </>
-                                                    }
-                                                </div>
-                                            )
-                                        })}
-                                        <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
-                                    </div>
-                                    <div className="section-breakline border-t border-gray-300 my-4"></div> */}
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
@@ -736,6 +751,7 @@ const SubCategoryPage = () => {
                                                 containerClassName="pagination flex items-center gap-2 "
                                                 activeLinkClassName="page-active-background"
                                                 renderOnZeroPageCount={null}
+                                                forcePage={currentPage - 1}
                                             />
                                         </div>
                                     }
@@ -805,5 +821,6 @@ const SubCategoryPage = () => {
         </>
     )
 }
+
 
 export default SubCategoryPage;

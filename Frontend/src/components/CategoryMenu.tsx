@@ -61,36 +61,35 @@ const CategoryMenu = () => {
         }
     }
 
-    const handleCategoryNavigation = (category_id: number, category_title: string) => {
+    const handleCategoryNavigation = (category_id: number) => {
         if (location.pathname === "/category") {
-            navigate("/category", { state: { category_id: category_id, category_name: category_title } });
+            navigate({
+                pathname: "/category",
+                search: `?id=${category_id}&page=1`,
+            });
             window.scrollTo({ top: 0, left: 0 });
             window.location.reload();
         }
-        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+        navigate({
+            pathname: "/category",
+            search: `?id=${category_id}&page=1`,
+        });
     }
 
-    const handleSubCategoryNavigation = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
+    const handleSubCategoryNavigation = (sub_category_id: number) => {
         if (location.pathname === "/sub-category") {
-            navigate("/sub-category", {
-                state: {
-                    category_id: category_id,
-                    category_name: category_title,
-                    sub_category_id: sub_category_id,
-                    sub_category_name: sub_category_title
-                }
-            })
+            navigate({
+                pathname: "/sub-category",
+                search: `?id=${sub_category_id}&page=1`,
+            });
             window.scrollTo({ top: 0, left: 0 });
             window.location.reload();
         }
-        navigate("/sub-category", {
-            state: {
-                category_id: category_id,
-                category_name: category_title,
-                sub_category_id: sub_category_id,
-                sub_category_name: sub_category_title
-            }
-        })
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${sub_category_id}&page=1`,
+        });
+        
     }
 
     React.useEffect(() => {
@@ -104,7 +103,7 @@ const CategoryMenu = () => {
                 return (
                     <div key={`category-item-${item.id}`} className="w-full px-3.5 py-3 hover:bg-[#FCB800] cursor-pointer flex items-center flex gap-4 group"
                         onMouseEnter={() => handleShowSubmenu(true, item.sub_category_list.length > 0, item.sub_category_list, item.id, item.title)}
-                        onClick={() => handleCategoryNavigation(item.id, item.title)}
+                        onClick={() => handleCategoryNavigation(item.id)}
                     >
                         <span>{categoryIcon[index].icon}</span>
                         <div className="flex-1 flex items-center justify-between">
@@ -126,7 +125,7 @@ const CategoryMenu = () => {
                                         <div
                                             className="item hover:text-[#FCB800] cursor-pointer hover:translate-x-1 duration-300 line-clamp-1"
                                             key={`sub-category-${item.id}`}
-                                            onClick={() => handleSubCategoryNavigation(hoverCategory.id, hoverCategory.title, item.id, item.title)}
+                                            onClick={() => handleSubCategoryNavigation(item.id)}
                                         >{item.title}</div>
                                     )
                                 })

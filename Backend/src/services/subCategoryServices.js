@@ -49,7 +49,7 @@ const getSubCategoryByCategory = async (category_id) => {
                     id: id,
                     count: cnt
                 }
-            }).sortBy('count','desc').orderBy("count","desc").take(20)
+            }).sortBy('count', 'desc').orderBy("count", "desc").take(20)
             .value();
 
         let finalRecommendSubCategory = sortedData.map(item => +item.id);
@@ -80,6 +80,60 @@ const getSubCategoryByCategory = async (category_id) => {
     }
 }
 
+const getSubCategoryInfo = async (sub_category_id) => {
+    try {
+        let subCategoryData = await db.SubCategory.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'title'],
+            include:
+            {
+                model: db.Category,
+                attributes: ['id', 'title'],
+            }
+            ,
+            where: {
+                id: {
+                    [Op.eq]: sub_category_id
+                },
+            }
+        });
+
+        let formatData = {
+            id: subCategoryData.id,
+            title: subCategoryData.title,
+            category_info: {
+                id: subCategoryData.Category.id,
+                title: subCategoryData.Category.title
+            }
+        }
+
+        if (subCategoryData) {
+            return {
+                EC: 0,
+                DT: formatData,
+                EM: 'Get sub-category info successfully !'
+            }
+        }
+
+        else {
+            return {
+                EC: -1,
+                DT: "",
+                EM: 'SubCategory is not existed !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getSubCategoryByCategory
+    getSubCategoryByCategory, getSubCategoryInfo
 }

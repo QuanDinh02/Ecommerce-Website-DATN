@@ -68,7 +68,10 @@ const PaymentPage = () => {
     }
 
     const handleProductDetailNavigation = (product_id: number) => {
-        navigate("/product-detail", { state: { product_id: product_id } });
+        navigate({
+            pathname: "/product",
+            search: `?id=${product_id}`,
+        });
     }
 
     const handleOnChange = (field: string, value: string) => {

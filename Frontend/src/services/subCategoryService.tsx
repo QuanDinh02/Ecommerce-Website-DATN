@@ -8,3 +8,11 @@ export const getSubCategoryByCategory = async (category_id: number) => {
     }
     return null;
 }
+
+export const getSubCategoryInfo = async (sub_category_id: number) => {
+    let result: APIResponse = await axios.get(`/api/sub-category?id=${sub_category_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

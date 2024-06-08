@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdOutlineMessage } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
@@ -30,9 +30,10 @@ import _ from 'lodash';
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
 import {
     PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST,
-    LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
+    PRODUCT_PRICE_SORT_TIME
 } from "@/data/category";
 import LoadImage from "@/components/LoadImage";
+import { getCategoryInfo } from "@/services/categoryService";
 interface ISubCategory {
     id: number
     title: string
@@ -63,14 +64,17 @@ interface IData {
 
 const CategoryPage = () => {
 
+    const [searchParams] = useSearchParams();
+
     const navigate = useNavigate();
-    const location = useLocation();
     const dispatch = useDispatch();
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
+    const [categoryID, setCategoryID] = React.useState<number>(0);
 
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
     const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
@@ -192,11 +196,14 @@ const CategoryPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
-        setProductListLoading(true);
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        setTimeout(() => {
-            setProductListLoading(false);
-        }, LOADING_ITEM_PAGE_CHANGE_TIME);
+
+        navigate({
+            pathname: "/category",
+            search: `?id=${categoryID}&page=${+event.selected + 1}`,
+
+        }, {
+            replace: true
+        });
     }
 
     const hanldeFavoriteItem = () => {
@@ -279,15 +286,11 @@ const CategoryPage = () => {
         }
     }
 
-    const handleSelectSubCategory = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
-        navigate("/sub-category", {
-            state: {
-                category_id: category_id,
-                category_name: category_title,
-                sub_category_id: sub_category_id,
-                sub_category_name: sub_category_title
-            }
-        })
+    const handleSelectSubCategory = (sub_category_id: number) => {
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${sub_category_id}&page=1`,
+        });
     }
 
     const handleSelectCategory = (category_id: number, category_title: string) => {
@@ -357,35 +360,58 @@ const CategoryPage = () => {
         });
     }
 
-    React.useEffect(() => {
-        let { category_id, category_name } = location.state;
-
-        setActiveCategory({
-            ...activeCategory, id: category_id, name: category_name
-        });
-
-        fetchSubCategory(category_id);
-        fetchProductsByCategory(category_id);
-    }, []);
-
-    React.useEffect(() => {
-        window.onbeforeunload = function () {
-            window.scrollTo(0, 0);
+    const fetchCategoryInfo = async (category_id: number) => {
+        let category_info = await getCategoryInfo(category_id);
+        if (category_info) {
+            setActiveCategory({
+                ...activeCategory, id: category_id, name: category_info.title
+            });
         }
+    }
+
+    React.useEffect(() => {
+
+        let category_id = searchParams.get('id');
+
+        let activeCategoryID: number = category_id ? +category_id : 0;
+
+        if (activeCategoryID !== categoryID) {
+            setCategoryID(activeCategoryID);
+            fetchCategoryInfo(activeCategoryID);
+        }
+
+    }, [searchParams.get('id')]);
+
+    React.useEffect(() => {
+
+        let page = searchParams.get('page');
+
+        let activePage: number = page ? +page : 1;
+
+        if (activePage !== currentPage) {
+            setCurrentPage(activePage);
+        }
+
+    }, [searchParams.get('page')])
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        if (categoryID !== 0 && currentPage != 0) {
+            fetchSubCategory(categoryID);
+            fetchProductsByCategory(categoryID);
+        }
+
+    }, [categoryID, currentPage]);
+
+    React.useEffect(() => {
 
         setTimeout(() => {
             setDataLoading(false);
         }, 1000);
-    }, [])
 
-    React.useEffect(() => {
-        window.onbeforeunload = function () {
-            window.scrollTo(0, 0);
-        }
-        if (activeCategory.id !== 0) {
-            fetchProductsByCategory(activeCategory.id);
-        }
-    }, [currentPage])
+    }, []);
 
     return (
         <>
@@ -422,7 +448,7 @@ const CategoryPage = () => {
                                                 <div
                                                     key={`sub-category-item-${item.id}`}
                                                     className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
-                                                    onClick={() => handleSelectSubCategory(activeCategory.id, activeCategory.name, item.id, item.title)}
+                                                    onClick={() => handleSelectSubCategory(item.id)}
                                                 >{item.title}</div>
                                             )
                                         })}
@@ -738,6 +764,7 @@ const CategoryPage = () => {
                                                 containerClassName="pagination flex items-center gap-2 "
                                                 activeLinkClassName="page-active-background"
                                                 renderOnZeroPageCount={null}
+                                                forcePage={currentPage - 1}
                                             />
                                         </div>
                                     }

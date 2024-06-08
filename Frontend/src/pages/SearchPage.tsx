@@ -144,9 +144,15 @@ const SearchPage = () => {
 
             saveCustomerSearch(product_name);
 
-            navigate("/product-detail", { state: { product_id: product_id } });
+            navigate({
+                pathname: "/product",
+                search: `?id=${product_id}`,
+            });
         }
-        navigate("/product-detail", { state: { product_id: product_id } });
+        navigate({
+            pathname: "/product",
+            search: `?id=${product_id}`,
+        });
     }
 
     const hanldeAddShoppingCart = async (quantity: number, customer_id: number, product_id: number) => {
@@ -298,7 +304,7 @@ const SearchPage = () => {
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-        if(searchKeyword !== "") {
+        if (searchKeyword !== "") {
             fetchProductsBySearch(searchKeyword, searchPage);
         }
 

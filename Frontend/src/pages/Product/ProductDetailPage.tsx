@@ -1241,8 +1241,8 @@ const ProductDetailPage = () => {
                                                             <ReactPaginate
                                                                 nextLabel=">"
                                                                 onPageChange={handlePageClick}
-                                                                pageRangeDisplayed={3}
-                                                                marginPagesDisplayed={3}
+                                                                pageRangeDisplayed={5}
+                                                                marginPagesDisplayed={0}
                                                                 pageCount={totalPages}
                                                                 previousLabel="<"
                                                                 pageClassName="page-item"
@@ -1251,7 +1251,7 @@ const ProductDetailPage = () => {
                                                                 previousLinkClassName="page-link pre-next"
                                                                 nextClassName="page-item"
                                                                 nextLinkClassName="page-link pre-next"
-                                                                breakLabel="..."
+                                                                breakLabel=""
                                                                 breakClassName="page-item"
                                                                 breakLinkClassName="page-link"
                                                                 containerClassName="pagination flex items-center gap-2 "
