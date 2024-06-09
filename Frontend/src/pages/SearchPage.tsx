@@ -7,7 +7,7 @@ import { useImmer } from "use-immer";
 import { MdKeyboardArrowDown, MdOutlineMessage } from "react-icons/md";
 import {
     PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST,
-    LOADING_ITEM_PAGE_CHANGE_TIME, PRODUCT_PRICE_SORT_TIME
+    PRODUCT_PRICE_SORT_TIME
 } from "@/data/category";
 import _ from 'lodash';
 import { BsGrid3X3 } from "react-icons/bs";
@@ -16,7 +16,6 @@ import { IAccount, ICartItem } from "./Product/ProductDetailPage_types";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
-import LoadImage from "@/components/LoadImage";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
 import { successToast1 } from "@/components/Toast/Toast";
@@ -33,6 +32,7 @@ import Modal from "@/components/Modal";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { getProductListBySearch } from "@/services/productService";
 import Product01 from '../assets/img/products_by_category/product_01.svg';
+import LoadImageS3 from "@/components/LoadImageS3";
 
 interface ICateogryProduct {
     id: number
@@ -519,12 +519,7 @@ const SearchPage = () => {
                                                                                             }}
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
-                                                                                                {/* {item.image ?
-                                                                                                    <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
-                                                                                                    :
-                                                                                                    <PiImageThin className="w-40 h-60 text-gray-300" />
-                                                                                                } */}
+                                                                                                <LoadImageS3 img_style="w-40 h-60" img_url={item.image} />
                                                                                             </div>
                                                                                             <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -599,12 +594,7 @@ const SearchPage = () => {
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
-                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
-                                                            {/* {item.image ?
-                                                                <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-60" />
-                                                                :
-                                                                <PiImageThin className="w-40 h-60 text-gray-300" />
-                                                            } */}
+                                                            <LoadImageS3 img_style="w-40 h-60" img_url={item.image} />
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">

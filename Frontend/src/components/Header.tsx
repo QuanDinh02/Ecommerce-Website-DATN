@@ -6,7 +6,6 @@ import { PiShoppingCartLight } from "react-icons/pi";
 import { BsHeart, BsPerson } from "react-icons/bs";
 import { FiMenu } from "react-icons/fi";
 import { IoIosArrowDown } from "react-icons/io";
-import { PiImageThin } from "react-icons/pi";
 
 import classNames from 'classnames';
 import Item6 from '../assets/img/homepage/item6.svg';
@@ -26,6 +25,7 @@ import { fetchAccount, userLogout } from '@/services/userService';
 import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { fetchWishList } from "@/services/wishListService";
 import { saveCustomerSearch } from '@/services/customerService';
+import LoadImageS3 from './LoadImageS3';
 interface ICustomerAccount {
     customer_id: number
     username: string
@@ -523,11 +523,7 @@ const Header = () => {
 
                                                                 return (
                                                                     <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                        {(item.product_info.image !== "") ?
-                                                                            <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-12 h-12 cursor-pointer" />
-                                                                            :
-                                                                            <PiImageThin className="w-12 h-12 cursor-pointer text-black" />
-                                                                        }
+                                                                        <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/>
                                                                         <div className='flex items-center justify-between w-full'>
                                                                             <div>
                                                                                 <div

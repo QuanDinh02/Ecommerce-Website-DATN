@@ -9,7 +9,6 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { TailSpin } from "react-loader-spinner";
-import { PiImageThin } from "react-icons/pi";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
 import { IWishList } from "./FavoriteProductPage_types";
@@ -18,7 +17,7 @@ import { AddCartItem, DeleteWishListItem } from "@/redux/actions/action";
 import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
 import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItemService";
 import _ from 'lodash';
-import LoadImage from "@/components/LoadImage";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -150,12 +149,7 @@ const FavoriteProductPage = () => {
                                                             return (
                                                                 <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                                     <td>
-                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} />
-                                                                        {/* {item.product_info.image ?
-                                                                            <img src={`data:image/jpeg;base64,${item.product_info.image}`} alt='' className="w-32 h-32 cursor-pointer my-4" />
-                                                                            :
-                                                                            <PiImageThin className="w-32 h-32 cursor-pointer" />
-                                                                        } */}
+                                                                        <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} />
                                                                     </td>
                                                                     <td className="py-3 px-2">
                                                                         <div

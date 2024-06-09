@@ -31,6 +31,7 @@ import { AddCartItem, AddWishListItem } from "@/redux/actions/action";
 import { useDispatch } from "react-redux";
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import { INewWishListItem, IWishList } from "./FavoriteProduct/FavoriteProductPage_types";
+import LoadImageS3 from "@/components/LoadImageS3";
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -176,12 +177,7 @@ const RecommendItemList = (props: IProps) => {
                         <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
-                                    <LoadImage img_style="w-40 h-40" product_id={item.id}/>
-                                    {/* {item.image ?
-                                        <img src={`data:image/jpeg;base64,${item.image}`} alt='' className="w-40 h-40" />
-                                        :
-                                        <PiImageThin className="w-40 h-40 text-gray-300" />
-                                    } */}
+                                    <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/>
                                 </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {

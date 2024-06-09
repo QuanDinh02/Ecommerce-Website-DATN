@@ -2,6 +2,24 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
+require('dotenv').config()
+
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretAccessKey
+    },
+    region: bucketRegion
+});
+
 const getQuickCartItemsByCustomer = async (customer_id) => {
     try {
 
@@ -41,15 +59,13 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
             });
             let shopInfo = product.Seller;
 
-            // let productImage = await db.Image.findOne({
-            //     raw: true,
-            //     attributes: ['id', 'image'],
-            //     where: {
-            //         productID: {
-            //             [Op.eq]: product.id
-            //         }
-            //     }
-            // });
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${product.id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
             return {
                 id: item.id,
@@ -58,8 +74,7 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 product_info: {
                     id: product.id,
                     name: product.name,
-                    //image: productImage ? productImage?.image : "",
-                    image: "",
+                    image: url,
                 },
                 shop_info: {
                     id: shopInfo.id,

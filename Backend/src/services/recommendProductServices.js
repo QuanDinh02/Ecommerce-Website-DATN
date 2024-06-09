@@ -2,6 +2,24 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
+require('dotenv').config()
+
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretAccessKey
+    },
+    region: bucketRegion
+});
+
 const createRecommendProducts = async (customer_id, data) => {
     try {
 
@@ -298,26 +316,6 @@ const getBothRecommendProducts = async (customer_id) => {
             },
         });
 
-        // let productListRaw_3 = await db.RecommendThreeSessionProduct.findAll({
-        //     raw: true,
-        //     nest: true,
-        //     attributes: ['id', 'product_id'],
-        //     include: [
-        //         {
-        //             model: db.Product,
-        //             attributes: ['id', 'name'],
-        //             raw: true,
-        //         },
-        //     ],
-        //     where: {
-        //         customerID: {
-        //             [Op.eq]: customer_id,
-        //         },
-        //     },
-        // });
-
-        // console.log(productListRaw_3)
-
         let productListRaw = [..._.cloneDeep(productListRaw_2), ..._.cloneDeep(productListRaw_1)];
 
         let productListFinal = await productListRaw.map(item => {
@@ -340,16 +338,13 @@ const getBothRecommendProducts = async (customer_id) => {
                 }
             });
 
-            // let productImage = await db.Image.findOne({
-            //     raw: true,
-            //     nest: true,
-            //     attributes: ['id', 'image'],
-            //     where: {
-            //         productID: {
-            //             [Op.eq]: item.id
-            //         }
-            //     }
-            // });
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${item.id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
             let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                 raw: true,
@@ -378,8 +373,7 @@ const getBothRecommendProducts = async (customer_id) => {
 
             return {
                 ...item,
-                //image: productImage?.image ? productImage?.image : "",
-                image: "",
+                image: url,
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
@@ -445,16 +439,13 @@ const getRecommendProducts = async (customer_id) => {
                 }
             });
 
-            // let productImage = await db.Image.findOne({
-            //     raw: true,
-            //     nest: true,
-            //     attributes: ['id', 'image'],
-            //     where: {
-            //         productID: {
-            //             [Op.eq]: item.id
-            //         }
-            //     }
-            // });
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${item.id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
             let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                 raw: true,
@@ -483,8 +474,7 @@ const getRecommendProducts = async (customer_id) => {
 
             return {
                 ...item,
-                //image: productImage?.image ? productImage?.image : "",
-                image: "",
+                image: url,
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
@@ -550,16 +540,13 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 }
             });
 
-            // let productImage = await db.Image.findOne({
-            //     raw: true,
-            //     nest: true,
-            //     attributes: ['id', 'image'],
-            //     where: {
-            //         productID: {
-            //             [Op.eq]: item.id
-            //         }
-            //     }
-            // });
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${item.id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
             let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                 raw: true,
@@ -588,8 +575,7 @@ const get3SessionRecommendProducts = async (customer_id) => {
 
             return {
                 ...item,
-                //image: productImage?.image ? productImage?.image : "",
-                image: "",
+                image: url,
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
@@ -667,16 +653,13 @@ const getHistoryRecommendProducts = async (customer_id) => {
                 }
             });
 
-            // let productImage = await db.Image.findOne({
-            //     raw: true,
-            //     nest: true,
-            //     attributes: ['id', 'image'],
-            //     where: {
-            //         productID: {
-            //             [Op.eq]: item.id
-            //         }
-            //     }
-            // });
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${item.id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
             let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                 raw: true,
@@ -705,8 +688,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
 
             return {
                 ...item,
-                //image: productImage?.image ? productImage?.image : "",
-                image: "",
+                image: url,
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,

@@ -48,3 +48,11 @@ export const getProductListBySearch = async (search_content: string, search_page
     }
     return null;
 }
+
+export const getTestImage = async () => {
+    let result: APIResponse = await axios.get('/api/image');
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

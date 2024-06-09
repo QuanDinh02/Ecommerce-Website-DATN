@@ -12,12 +12,15 @@ import sessionController from '../controller/sessionController';
 import orderController from '../controller/orderController';
 import recommendProductController from '../controller/recommendProductController';
 import locationController from '../controller/locationController';
+import imageController from '../controller/imageController';
 import { checkUserJWT } from '../middleware/jwt';
 import { cacheMiddleware } from '../middleware/cache';
 
 const router = express.Router();
-const multer = require('multer')
-const upload = multer();
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const ApiRoute = (app) => {
 
@@ -58,9 +61,7 @@ const ApiRoute = (app) => {
 
     router.get('/products/search', productController.handleGetSearchProducts);
 
-    router.get('/products/search-page',cacheMiddleware(300), productController.handleGetSearchProductsWithPagination);
-
-    router.post('/image/products', productController.handleGetProductsImage);
+    router.get('/products/search-page', cacheMiddleware(300), productController.handleGetSearchProductsWithPagination);
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
     router.get('/sub-category', subCategoryController.getSubCategoryInfo);
@@ -96,6 +97,10 @@ const ApiRoute = (app) => {
     router.post('/simulating-recommend', recommendProductController.simulatingCreateRecommendProducts);
     router.post('/simulating-3session-recommend', recommendProductController.simulatingCreateRecommend3SessionProducts);
     router.get('/simulating-training-recommend-item', recommendProductController.handleSimulatingExecuteTrainingRecommendProduct);
+
+    router.get('/image', imageController.getImage);
+    router.post('/image', upload.single('image'), imageController.uploadImage);
+    router.delete('/image/:id', imageController.deleteImage);
 
     // >>> check data: 
     // {

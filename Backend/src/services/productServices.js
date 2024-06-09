@@ -2,6 +2,24 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
+require('dotenv').config()
+
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretAccessKey
+    },
+    region: bucketRegion
+});
+
 const getProductDetail = async (product_id) => {
     try {
 
@@ -61,16 +79,13 @@ const getProductDetail = async (product_id) => {
             }
         });
 
-        // let productImage = await db.Image.findOne({
-        //     raw: true,
-        //     nest: true,
-        //     attributes: ['id', 'image'],
-        //     where: {
-        //         productID: {
-        //             [Op.eq]: product_id
-        //         }
-        //     }
-        // });
+        const getObjectParams = {
+            Bucket: bucketName,
+            Key: `${product_id}.jpeg`
+        }
+
+        const command = new GetObjectCommand(getObjectParams);
+        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
         let finalData = {
             id: product_id,
@@ -79,8 +94,7 @@ const getProductDetail = async (product_id) => {
             price: productDetail.price,
             sold: productDetail.sold,
             description: productInfo.summary,
-            //product_image: productImage?.image ? productImage?.image : "",
-            product_image: "",
+            product_image: url,
             inventory_count: productDetail.quantity,
             sub_category: sub_category,
             category: category,
@@ -94,48 +108,6 @@ const getProductDetail = async (product_id) => {
             EC: 0,
             DT: finalData,
             EM: 'Product Detail Info !'
-        }
-
-    } catch (error) {
-        console.log(error);
-        return {
-            EC: -2,
-            DT: [],
-            EM: 'Something is wrong on services !',
-        }
-    }
-}
-
-const getProductsImage = async (data) => {
-    try {
-        // let productListWithImage = await data.map(async item => {
-        //     let productImage = await db.Image.findOne({
-        //         raw: true,
-        //         attributes: ['id', 'image'],
-        //         where: {
-        //             productID: {
-        //                 [Op.eq]: item.id
-        //             }
-        //         }
-        //     });
-
-        //     if (productImage) {
-        //         return {
-        //             ...item, image: productImage.image
-        //         }
-        //     }
-
-        //     return {
-        //         ...item, image: ""
-        //     }
-        // });
-
-        // console.log(productListWithImage);
-
-        return {
-            EC: 0,
-            DT: data,
-            EM: 'Products With Image !'
         }
 
     } catch (error) {
@@ -221,16 +193,13 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     }
                 });
 
-                // let productImage = await db.Image.findOne({
-                //     raw: true,
-                //     nest: true,
-                //     attributes: ['id', 'image'],
-                //     where: {
-                //         productID: {
-                //             [Op.eq]: item.id
-                //         }
-                //     }
-                // });
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: `${item.id}.jpeg`
+                }
+        
+                const command = new GetObjectCommand(getObjectParams);
+                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -259,8 +228,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    //image: productImage?.image ? productImage?.image : "",
-                    image: "",
+                    image: url,
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -353,16 +321,13 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     }
                 });
 
-                // let productImage = await db.Image.findOne({
-                //     raw: true,
-                //     nest: true,
-                //     attributes: ['id', 'image'],
-                //     where: {
-                //         productID: {
-                //             [Op.eq]: item.id
-                //         }
-                //     }
-                // });
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: `${item.id}.jpeg`
+                }
+        
+                const command = new GetObjectCommand(getObjectParams);
+                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -391,8 +356,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    //image: productImage?.image ? productImage?.image : "",
-                    image: "",
+                    image: url,
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -535,16 +499,13 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
                     }
                 });
 
-                // let productImage = await db.Image.findOne({
-                //     raw: true,
-                //     nest: true,
-                //     attributes: ['id', 'image'],
-                //     where: {
-                //         productID: {
-                //             [Op.eq]: item.id
-                //         }
-                //     }
-                // });
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: `${item.id}.jpeg`
+                }
+        
+                const command = new GetObjectCommand(getObjectParams);
+                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -573,8 +534,7 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
 
                 return {
                     ...item,
-                    //image: productImage?.image ? productImage?.image : "",
-                    image: "",
+                    image: url,
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -696,5 +656,5 @@ const getProductReviews = async (product_id, item_limit, page) => {
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
-    getProductDetail, getProductReviews, getProductsImage, getSearchProductsWithPagination
+    getProductDetail, getProductReviews, getSearchProductsWithPagination
 }
