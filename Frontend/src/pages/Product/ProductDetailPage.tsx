@@ -54,6 +54,7 @@ import { getRecommendRelevantProduct } from "@/services/recommendItemService";
 
 import LoadImageS3 from "@/components/LoadImageS3";
 import ProductRating from "../Category/ProductRating";
+import LoadImage from "@/components/LoadImage";
 
 interface IRecommendProduct {
     id: number
@@ -198,7 +199,10 @@ const RelevantRecommendItemList = (props: IProps) => {
                     return (
                         <SwiperSlide>
                             <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
-                                <div className="product__image w-40 mx-auto mb-6"><LoadImageS3 img_style="w-full h-full" img_url={item.image} /></div>
+                                <div className="product__image w-40 mx-auto mb-6">
+                                    {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
+                                    <LoadImage img_style="w-full h-full" product_id={item.id}/>
+                                </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                         e.stopPropagation();
@@ -302,11 +306,6 @@ const ProductDetailPage = () => {
     const [totalRatings, setTotalRatings] = React.useState<number>(0);
     const [ratings, setRatings] = React.useState<IRatings>();
     const [ratingAverage, setRatingAverage] = React.useState<number>(0);
-
-    const [selectedImage, setSelectedImage] = React.useState({
-        id: 1,
-        image: Product01
-    });
 
     const [activeCategory, setActiveCategory] = React.useState<ICategoryActive>({
         id: 0,
@@ -667,7 +666,8 @@ const ProductDetailPage = () => {
                                     <div className="flex">
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
-                                                <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/>
+                                                {/* <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/> */}
+                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id}/>
                                             </div>
                                             {/* <div className="swiper-list w-80 mt-2 mb-5">
                                                 <Swiper

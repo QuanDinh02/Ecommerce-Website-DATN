@@ -11,6 +11,7 @@ import { ThreeDots } from "react-loader-spinner";
 import { MdStorefront } from "react-icons/md";
 import LoadImageS3 from "@/components/LoadImageS3";
 import { useNavigate } from "react-router-dom";
+import LoadImage from "@/components/LoadImage";
 
 export const STATUS_STYLE = {
     'ĐANG XỬ LÝ': {
@@ -139,7 +140,8 @@ const AllOrder = () => {
                                                                 return (
                                                                     <div className="order-product flex items-center justify-between pb-4 mb-4 border-b border-gray-300" key={`order-product-${index}-${product_index}`}>
                                                                         <div className="order-product__info flex gap-x-4">
-                                                                            <LoadImageS3 img_style="w-24 h-24" img_url={product.product_image}/>
+                                                                            {/* <LoadImageS3 img_style="w-24 h-24" img_url={product.product_image}/> */}
+                                                                            <LoadImage img_style="w-24 h-24" product_id={product.product_id}/>
                                                                             <div className="flex flex-col gap-y-1">
                                                                                 <div className="font-medium cursor-pointer hover:underline hover:text-[#FCB800]" onClick={() => handleProductDetailNavigation(product.product_id)}>{product.product_name}</div>
                                                                                 <div>x{product.quantity}</div>

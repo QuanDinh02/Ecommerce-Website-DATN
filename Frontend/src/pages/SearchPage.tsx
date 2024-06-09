@@ -33,6 +33,7 @@ import { FiMinus, FiPlus } from "react-icons/fi";
 import { getProductListBySearch } from "@/services/productService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
+import LoadImage from "@/components/LoadImage";
 
 interface ICateogryProduct {
     id: number
@@ -566,7 +567,8 @@ const SearchPage = () => {
                                                                                             }}
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                <LoadImageS3 img_style="w-40 h-60" img_url={item.image} />
+                                                                                                {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
+                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id}/>
                                                                                             </div>
                                                                                             <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -641,7 +643,8 @@ const SearchPage = () => {
                                                         }}
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
-                                                            <LoadImageS3 img_style="w-40 h-60" img_url={item.image} />
+                                                            {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
+                                                            <LoadImage img_style="w-40 h-60" product_id={item.id}/>
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
@@ -712,7 +715,8 @@ const SearchPage = () => {
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize-h-auto">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
-                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
+                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id}/>
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

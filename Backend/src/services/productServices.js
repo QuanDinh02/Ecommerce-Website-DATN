@@ -2,23 +2,23 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
-require('dotenv').config()
+// require('dotenv').config()
 
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+// const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+// const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-const bucketName = process.env.BUCKET_NAME;
-const bucketRegion = process.env.BUCKET_REGION;
-const accessKey = process.env.ACCESS_KEY
-const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+// const bucketName = process.env.BUCKET_NAME;
+// const bucketRegion = process.env.BUCKET_REGION;
+// const accessKey = process.env.ACCESS_KEY
+// const secretAccessKey = process.env.SECRET_ACCESS_KEY;
 
-const s3 = new S3Client({
-    credentials: {
-        accessKeyId: accessKey,
-        secretAccessKey: secretAccessKey
-    },
-    region: bucketRegion
-});
+// const s3 = new S3Client({
+//     credentials: {
+//         accessKeyId: accessKey,
+//         secretAccessKey: secretAccessKey
+//     },
+//     region: bucketRegion
+// });
 
 const getProductDetail = async (product_id) => {
     try {
@@ -79,13 +79,13 @@ const getProductDetail = async (product_id) => {
             }
         });
 
-        const getObjectParams = {
-            Bucket: bucketName,
-            Key: `${product_id}.jpeg`
-        }
+        // const getObjectParams = {
+        //     Bucket: bucketName,
+        //     Key: `${product_id}.jpeg`
+        // }
 
-        const command = new GetObjectCommand(getObjectParams);
-        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+        // const command = new GetObjectCommand(getObjectParams);
+        // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
         let finalData = {
             id: product_id,
@@ -94,7 +94,8 @@ const getProductDetail = async (product_id) => {
             price: productDetail.price,
             sold: productDetail.sold,
             description: productInfo.summary,
-            product_image: url,
+            //product_image: url,
+            product_image: "",
             inventory_count: productDetail.quantity,
             sub_category: sub_category,
             category: category,
@@ -205,13 +206,13 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     }
                 });
 
-                const getObjectParams = {
-                    Bucket: bucketName,
-                    Key: `${item.id}.jpeg`
-                }
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${item.id}.jpeg`
+                // }
 
-                const command = new GetObjectCommand(getObjectParams);
-                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -240,7 +241,8 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    image: url,
+                    //image: url,
+                    image: "",
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -345,13 +347,13 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     }
                 });
 
-                const getObjectParams = {
-                    Bucket: bucketName,
-                    Key: `${item.id}.jpeg`
-                }
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${item.id}.jpeg`
+                // }
 
-                const command = new GetObjectCommand(getObjectParams);
-                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -380,7 +382,8 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
                 return {
                     ...item,
-                    image: url,
+                    //image: url,
+                    image: "",
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
@@ -535,13 +538,13 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
                     }
                 });
 
-                const getObjectParams = {
-                    Bucket: bucketName,
-                    Key: `${item.id}.jpeg`
-                }
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${item.id}.jpeg`
+                // }
 
-                const command = new GetObjectCommand(getObjectParams);
-                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
                     raw: true,
@@ -570,7 +573,8 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
 
                 return {
                     ...item,
-                    image: url,
+                    //image: url,
+                    image: "",
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,

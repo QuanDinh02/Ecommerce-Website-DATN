@@ -15,6 +15,7 @@ import { successToast1 } from "@/components/Toast/Toast";
 import Button from "@/components/Button";
 import { deleteAllCartItem } from "@/services/cartItemService";
 import LoadImageS3 from "@/components/LoadImageS3";
+import LoadImage from "@/components/LoadImage";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN"
@@ -201,7 +202,8 @@ const PaymentPage = () => {
                                                         return (
                                                             <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                 <td>
-                                                                    <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/>
+                                                                    {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
+                                                                    <LoadImage img_style="w-32 h-32" product_id={item.product_info.id}/>
                                                                 </td>
                                                                 <td className="py-3 px-2">
                                                                     <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>

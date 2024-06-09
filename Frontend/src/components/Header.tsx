@@ -26,6 +26,8 @@ import { fetchCartItem, deleteCartItem } from '@/services/cartItemService';
 import { fetchWishList } from "@/services/wishListService";
 import { saveCustomerSearch } from '@/services/customerService';
 import LoadImageS3 from './LoadImageS3';
+import LoadImage from "@components/LoadImage";
+
 interface ICustomerAccount {
     customer_id: number
     username: string
@@ -523,7 +525,8 @@ const Header = () => {
 
                                                                 return (
                                                                     <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                        <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/>
+                                                                        {/* <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/> */}
+                                                                        <LoadImage img_style="w-12 h-12" product_id={item.product_info.id}/>
                                                                         <div className='flex items-center justify-between w-full'>
                                                                             <div>
                                                                                 <div

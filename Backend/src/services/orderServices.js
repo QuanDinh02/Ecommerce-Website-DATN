@@ -2,23 +2,23 @@ const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
 
-require('dotenv').config()
+// require('dotenv').config()
 
-const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+// const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
+// const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
-const bucketName = process.env.BUCKET_NAME;
-const bucketRegion = process.env.BUCKET_REGION;
-const accessKey = process.env.ACCESS_KEY
-const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+// const bucketName = process.env.BUCKET_NAME;
+// const bucketRegion = process.env.BUCKET_REGION;
+// const accessKey = process.env.ACCESS_KEY
+// const secretAccessKey = process.env.SECRET_ACCESS_KEY;
 
-const s3 = new S3Client({
-    credentials: {
-        accessKeyId: accessKey,
-        secretAccessKey: secretAccessKey
-    },
-    region: bucketRegion
-});
+// const s3 = new S3Client({
+//     credentials: {
+//         accessKeyId: accessKey,
+//         secretAccessKey: secretAccessKey
+//     },
+//     region: bucketRegion
+// });
 
 const addNewOrder = async (orderData, session_id) => {
     try {
@@ -142,19 +142,20 @@ const getOrderByCustomer = async (customer_id) => {
 
                 delete orderItem.Product;
 
-                const getObjectParams = {
-                    Bucket: bucketName,
-                    Key: `${productInfo.id}.jpeg`
-                }
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${productInfo.id}.jpeg`
+                // }
         
-                const command = new GetObjectCommand(getObjectParams);
-                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                 return {
                     ...orderItem,
                     product_id: productInfo.id,
                     product_name: productInfo.name,
-                    product_image: url
+                    //product_image: url
+                    product_image: ""
                 }
 
             }));

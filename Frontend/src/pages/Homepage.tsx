@@ -31,6 +31,7 @@ import { INewWishListItem, IWishList } from "./FavoriteProduct/FavoriteProductPa
 import LoadImageS3 from "@/components/LoadImageS3";
 import { useImmer } from "use-immer";
 import Rating from "@/components/Rating";
+import LoadImage from "@/components/LoadImage";
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -193,7 +194,8 @@ const RecommendItemList = (props: IProps) => {
                         <div className="product cursor-pointer px-4 py-2 group bg-white border border-gray-200" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
-                                    <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/>
+                                    {/* <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/> */}
+                                    <LoadImage img_style="w-40 h-40" product_id={item.id}/>
                                 </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -406,7 +408,8 @@ const Homepage = () => {
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize-h-auto">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
-                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
+                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id}/>
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

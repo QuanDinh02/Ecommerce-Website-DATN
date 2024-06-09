@@ -18,6 +18,7 @@ import { IAccount, ICartItem } from "../Product/ProductDetailPage_types";
 import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItemService";
 import _ from 'lodash';
 import LoadImageS3 from "@/components/LoadImageS3";
+import LoadImage from "@/components/LoadImage";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -149,7 +150,8 @@ const FavoriteProductPage = () => {
                                                             return (
                                                                 <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                                     <td>
-                                                                        <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} />
+                                                                        {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} /> */}
+                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id}/>
                                                                     </td>
                                                                     <td className="py-3 px-2">
                                                                         <div
