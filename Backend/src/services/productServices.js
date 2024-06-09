@@ -147,6 +147,12 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     {
                         model: db.Product,
                         attributes: ['id', 'name', 'summary'],
+                        raw: true,
+                        nest: true,
+                        include: {
+                            model: db.Seller,
+                            attributes: ['id', 'shopName']
+                        }
                     },
                     {
                         model: db.SubCategory,
@@ -173,11 +179,17 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     name: item.SubCategory.title
                 }
 
+                let seller_info = {
+                    id: item.Product.Seller.id,
+                    name: item.Product.Seller.shopName,
+                }
+
                 return {
                     id: item.Product.id,
                     name: item.Product.name,
                     summary: item.Product.summary ? item.Product.summary : "",
-                    sub_category: sub_category
+                    sub_category: sub_category,
+                    seller_info: seller_info
                 }
             });
 
@@ -197,7 +209,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     Bucket: bucketName,
                     Key: `${item.id}.jpeg`
                 }
-        
+
                 const command = new GetObjectCommand(getObjectParams);
                 const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -275,6 +287,12 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     {
                         model: db.Product,
                         attributes: ['id', 'name', 'summary'],
+                        raw: true,
+                        nest: true,
+                        include: {
+                            model: db.Seller,
+                            attributes: ['id', 'shopName']
+                        }
                     },
                     {
                         model: db.SubCategory,
@@ -301,11 +319,17 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     name: item.SubCategory.title
                 }
 
+                let seller_info = {
+                    id: item.Product.Seller.id,
+                    name: item.Product.Seller.shopName,
+                }
+
                 return {
                     id: item.Product.id,
                     name: item.Product.name,
                     summary: item.Product.summary ? item.Product.summary : "",
-                    sub_category: sub_category
+                    sub_category: sub_category,
+                    seller_info: seller_info
                 }
             });
 
@@ -325,7 +349,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     Bucket: bucketName,
                     Key: `${item.id}.jpeg`
                 }
-        
+
                 const command = new GetObjectCommand(getObjectParams);
                 const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -465,6 +489,11 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
             let productListRaw = await db.Product.findAll({
                 raw: true,
                 attributes: ['id', 'name', 'summary'],
+                nest: true,
+                include: {
+                    model: db.Seller,
+                    attributes: ['id', 'shopName']
+                },
                 where: {
                     name: {
                         [Op.substring]: `${content}`
@@ -480,10 +509,17 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
 
             let productListFinal = await productListRaw.map(item => {
 
+                let seller_info = {
+                    id: item.Seller.id,
+                    name: item.Seller.shopName,
+                }
+
                 return {
                     id: item.id,
                     name: item.name,
                     summary: item.summary ? item.summary : "",
+                    seller_info: seller_info
+
                 }
             });
 
@@ -503,7 +539,7 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
                     Bucket: bucketName,
                     Key: `${item.id}.jpeg`
                 }
-        
+
                 const command = new GetObjectCommand(getObjectParams);
                 const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 

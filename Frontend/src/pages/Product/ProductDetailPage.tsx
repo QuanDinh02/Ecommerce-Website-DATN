@@ -892,8 +892,8 @@ const ProductDetailPage = () => {
                                                     spaceBetween={10}
                                                     slidesPerView={5}
                                                 >
-                                                    {<RelevantRecommendItemList setShow_quick_view={setShowQuickView} item_id={productID}/>}
-                                                    {/* {swiperSlides()} */}
+                                                    {/* {<RelevantRecommendItemList setShow_quick_view={setShowQuickView} item_id={productID}/>} */}
+                                                    {swiperSlides()}
                                                 </Swiper>
                                             </div>
                                         </div>

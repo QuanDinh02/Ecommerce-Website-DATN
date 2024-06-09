@@ -289,6 +289,11 @@ const getBothRecommendProducts = async (customer_id) => {
                     model: db.Product,
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
                 },
             ],
             where: {
@@ -307,6 +312,11 @@ const getBothRecommendProducts = async (customer_id) => {
                     model: db.Product,
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
                 },
             ],
             where: {
@@ -319,10 +329,17 @@ const getBothRecommendProducts = async (customer_id) => {
         let productListRaw = [..._.cloneDeep(productListRaw_2), ..._.cloneDeep(productListRaw_1)];
 
         let productListFinal = await productListRaw.map(item => {
+
+            let seller_info = {
+                id: item.Product.Seller.id,
+                name: item.Product.Seller.shopName,
+            }
+
             return {
                 id: item.Product.id,
                 name: item.Product.name,
-                summary: item.Product.summary ? item.Product.summary : ""
+                summary: item.Product.summary ? item.Product.summary : "",
+                seller_info: seller_info
             }
         });
 
@@ -342,7 +359,7 @@ const getBothRecommendProducts = async (customer_id) => {
                 Bucket: bucketName,
                 Key: `${item.id}.jpeg`
             }
-    
+
             const command = new GetObjectCommand(getObjectParams);
             const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -410,6 +427,11 @@ const getRecommendProducts = async (customer_id) => {
                     model: db.Product,
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
                 },
             ],
             where: {
@@ -420,10 +442,17 @@ const getRecommendProducts = async (customer_id) => {
         });
 
         let productListFinal = await productListRaw.map(item => {
+
+            let seller_info = {
+                id: item.Product.Seller.id,
+                name: item.Product.Seller.shopName,
+            }
+
             return {
                 id: item.Product.id,
                 name: item.Product.name,
-                summary: item.Product.summary ? item.Product.summary : ""
+                summary: item.Product.summary ? item.Product.summary : "",
+                seller_info: seller_info
             }
         });
 
@@ -443,7 +472,7 @@ const getRecommendProducts = async (customer_id) => {
                 Bucket: bucketName,
                 Key: `${item.id}.jpeg`
             }
-    
+
             const command = new GetObjectCommand(getObjectParams);
             const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -511,6 +540,11 @@ const get3SessionRecommendProducts = async (customer_id) => {
                     model: db.Product,
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
                 },
             ],
             where: {
@@ -521,10 +555,17 @@ const get3SessionRecommendProducts = async (customer_id) => {
         });
 
         let productListFinal = await productListRaw.map(item => {
+
+            let seller_info = {
+                id: item.Product.Seller.id,
+                name: item.Product.Seller.shopName,
+            }
+
             return {
                 id: item.Product.id,
                 name: item.Product.name,
-                summary: item.Product.summary ? item.Product.summary : ""
+                summary: item.Product.summary ? item.Product.summary : "",
+                seller_info: seller_info
             }
         });
 
@@ -544,7 +585,7 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 Bucket: bucketName,
                 Key: `${item.id}.jpeg`
             }
-    
+
             const command = new GetObjectCommand(getObjectParams);
             const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -612,6 +653,11 @@ const getHistoryRecommendProducts = async (customer_id) => {
                     model: db.Product,
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
                 },
             ],
             where: {
@@ -624,10 +670,17 @@ const getHistoryRecommendProducts = async (customer_id) => {
         //productListRaw = _(productListRaw).take(20).value();
 
         let productListFinal = await productListRaw.map(item => {
+
+            let seller_info = {
+                id: item.Product.Seller.id,
+                name: item.Product.Seller.shopName,
+            }
+
             return {
                 id: item.Product.id,
                 name: item.Product.name,
-                summary: item.Product.summary ? item.Product.summary : ""
+                summary: item.Product.summary ? item.Product.summary : "",
+                seller_info: seller_info
             }
         });
 
@@ -657,7 +710,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
                 Bucket: bucketName,
                 Key: `${item.id}.jpeg`
             }
-    
+
             const command = new GetObjectCommand(getObjectParams);
             const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -725,12 +778,21 @@ const getRelevantRecommendProducts = async (data) => {
                 raw: true,
                 nest: true,
                 attributes: ['id', 'name', 'summary', 'shop_id'],
+                include: {
+                    model: db.Seller,
+                    attributes: ['id', 'shopName']
+                },
                 where: {
                     id: {
                         [Op.eq]: item.product_id
                     }
                 }
             });
+
+            let seller_info = {
+                id: productInfo.Seller.id,
+                name: productInfo.Seller.shopName,
+            }
 
             let productType = await db.ProductType.findOne({
                 raw: true,
@@ -746,7 +808,7 @@ const getRelevantRecommendProducts = async (data) => {
                 Bucket: bucketName,
                 Key: `${item.product_id}.jpeg`
             }
-    
+
             const command = new GetObjectCommand(getObjectParams);
             const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -778,6 +840,7 @@ const getRelevantRecommendProducts = async (data) => {
             return {
                 id: productInfo.id,
                 name: productInfo.name,
+                seller_info: seller_info,
                 summary: productInfo.summary,
                 image: url,
                 current_price: productType.currentPrice,

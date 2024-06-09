@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdOutlineMessage } from "react-icons/md";
+import { MdOutlineArrowForwardIos, MdKeyboardArrowDown } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { BsGrid3X3 } from "react-icons/bs";
 import { TfiViewListAlt } from "react-icons/tfi";
-import { CurrencyFormat } from '@/utils/numberFormat';
+import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { PiImageThin, PiShoppingCartLight } from "react-icons/pi";
@@ -13,7 +13,6 @@ import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
-import Product01 from '../../assets/img/products_by_category/product_01.svg';
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { getSubCategoryByCategory } from "@/services/subCategoryService";
 import { getProductsByCategory } from "@/services/productService";
@@ -35,6 +34,7 @@ import {
 
 import { getCategoryInfo } from "@/services/categoryService";
 import LoadImageS3 from "@/components/LoadImageS3";
+import Rating from "@/components/Rating";
 interface ISubCategory {
     id: number
     title: string
@@ -54,6 +54,7 @@ interface ICateogryProduct {
     rating: number
     sold: number
     summary: string
+    seller_info: IShopInfo
 }
 
 interface IData {
@@ -61,6 +62,22 @@ interface IData {
     page_total: number
     product_list: ICateogryProduct[]
     total_items: number
+}
+
+interface IShopInfo {
+    id: number
+    name: string
+}
+interface IProductQuickView {
+    id: number
+    name: string
+    image_url: string
+    current_price: number
+    price: number
+    rating: number
+    sold: number
+    summary: string
+    seller_info: IShopInfo
 }
 
 const CategoryPage = () => {
@@ -80,14 +97,27 @@ const CategoryPage = () => {
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
     const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
 
-    const [previewImage, setPreviewImage] = React.useState("");
-
     const [activeCategory, setActiveCategory] = React.useState<ICategory>({
         id: 0,
         name: ""
     });
 
     const [subCategoryList, setSubCategoryList] = useImmer<ISubCategory[]>([]);
+
+    const [productQuickView, setProductQuickView] = useImmer<IProductQuickView>({
+        id: 0,
+        name: "",
+        image_url: "",
+        current_price: 0,
+        price: 0,
+        rating: 0,
+        sold: 0,
+        summary: "",
+        seller_info: {
+            id: 0,
+            name: ""
+        }
+    })
 
     const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
 
@@ -207,10 +237,6 @@ const CategoryPage = () => {
         });
     }
 
-    const hanldeFavoriteItem = () => {
-        successToast1("Thêm vào sản phẩm yêu thích thành công");
-    }
-
     const refetchWishList = async () => {
         let wishListData: any = await fetchWishList(account.customer_id);
         if (wishListData && !_.isEmpty(wishListData.DT)) {
@@ -224,11 +250,11 @@ const CategoryPage = () => {
         }
     }
 
-    const handleAddFavouriteItem = async (product_id: number, customer_id: number) => {
+    const handleAddFavouriteItem = async (product_id: number) => {
         if (account && isAuthenticated) {
             let data: INewWishListItem = {
                 productID: product_id,
-                customerID: customer_id
+                customerID: account.customer_id
             }
 
             let result = await createWishListItem(data);
@@ -245,11 +271,11 @@ const CategoryPage = () => {
         }
     }
 
-    const hanldeAddShoppingCart = async (quantity: number, customer_id: number, product_id: number) => {
+    const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {
         if (account && isAuthenticated) {
             let data: INewCartItem = {
                 quantity: quantity,
-                customerID: customer_id,
+                customerID: account.customer_id,
                 productID: product_id
             }
 
@@ -276,7 +302,21 @@ const CategoryPage = () => {
         }
     }
 
-    const handleQuickView = () => {
+    const handleQuickView = (item: ICateogryProduct) => {
+        console.log(item);
+        setProductQuickView(draft => {
+            draft.id = item.id;
+            draft.name = item.name;
+            draft.image_url = item.image;
+            draft.current_price = item.current_price;
+            draft.price = item.price;
+            draft.rating = item.rating;
+            draft.sold = item.sold;
+            draft.summary = item.summary;
+            if (item.seller_info.id !== null) {
+                draft.seller_info = item.seller_info;
+            }
+        });
         setShowQuickView(true);
         document.body.style.overflow = "hidden";
     }
@@ -623,12 +663,12 @@ const CategoryPage = () => {
                                                                                     return (
                                                                                         <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                <LoadImageS3 img_style="w-40 h-60" img_url={item.image}/>
+                                                                                                <LoadImageS3 img_style="w-40 h-60" img_url={item.image} />
                                                                                             </div>
                                                                                             <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();
-                                                                                                    hanldeAddShoppingCart(1, account.customer_id, item.id);
+                                                                                                    hanldeAddShoppingCart(1, item.id);
                                                                                                 }}>
                                                                                                     <PiShoppingCartLight className="w-6 h-6 " />
                                                                                                     <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -639,7 +679,7 @@ const CategoryPage = () => {
                                                                                                 </div>
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();
-                                                                                                    handleQuickView();
+                                                                                                    handleQuickView(item);
                                                                                                 }}>
                                                                                                     <IoEyeOutline className="w-6 h-6" />
                                                                                                     <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -650,7 +690,7 @@ const CategoryPage = () => {
                                                                                                 </div>
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();
-                                                                                                    handleAddFavouriteItem(item.id, account.customer_id);
+                                                                                                    handleAddFavouriteItem(item.id);
                                                                                                 }}>
                                                                                                     <IoMdHeartEmpty className="w-6 h-6" />
                                                                                                     <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -720,11 +760,11 @@ const CategoryPage = () => {
                                                                 </div>
                                                                 <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    hanldeAddShoppingCart(1, account.customer_id, item.id);
+                                                                    hanldeAddShoppingCart(1, item.id);
                                                                 }}>Thêm vào giỏ hàng</div>
                                                                 <div className="mt-2 flex items-center gap-x-1 text-gray-400 hover:text-red-600 hover:font-medium w-fit" onClick={(e) => {
                                                                     e.stopPropagation();
-                                                                    handleAddFavouriteItem(item.id, account.customer_id);
+                                                                    handleAddFavouriteItem(item.id);
                                                                 }}><FaRegHeart /> Yêu thích</div>
                                                             </div>
                                                         </div>
@@ -765,46 +805,35 @@ const CategoryPage = () => {
                         </div>
                     </div>
             }
-            <Modal show={showQuickView} setShow={setShowQuickView} size="customize">
+            <Modal show={showQuickView} setShow={setShowQuickView} size="customize-h-auto">
                 <div className="product-quick-view flex w-full relative">
-                    <div className="product-quick-view__image w-2/5">
-                        <img src={Product01} alt="" className="w-[26.875rem] h-[26.875rem]" />
+                    <div className="product-quick-view__image w-2/5 flex items-center justify-center">
+                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
                     </div>
                     <div className="product-quick-view__info w-3/5">
-                        <div className="product__name font-medium text-2xl">Apple iPhone Retina 6s Plus 64GB</div>
-                        <div className="product__rating-stars flex items-center gap-x-3 mt-1">
-                            <div className="flex items-center gap-x-0.5">
-                                {
-                                    [...Array(5)].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
-                            </div>
-                            <GoDotFill className="text-gray-300 w-3 h-3" />
-                            <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
-                                <MdOutlineMessage className="w-5 h-5" />
-                                <span>101 đánh giá</span>
-                            </div>
+                        <div className="product__name font-medium text-2xl">{productQuickView.name}</div>
+                        <div className="product__rating-stars flex items-center gap-x-3 my-3">
+                            <Rating rating={productQuickView.rating} />
                             <GoDotFill className="text-gray-300 w-3 h-3" />
                             <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                 <IoBagCheckOutline className="w-5 h-5" />
-                                <span>Đã bán 2k2</span>
+                                <span>Đã bán {numberKFormat(productQuickView.sold)}</span>
                             </div>
                         </div>
-                        <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
+                        <div className="flex items-center gap-2 my-4">
+                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
+                        </div>
                         <div className="shop flex items-center gap-x-4">
-                            <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
+                            {
+                                productQuickView.seller_info.name !== "" &&
+                                <div>Shop: <span className="font-bold text-blue-500">{productQuickView.seller_info.name}</span></div>
+                            }
                             <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
                         </div>
                         <div className="border-t border-gray-300 w-full my-4"></div>
-                        <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
+                        <div className="product__benefit text-sm text-gray-400 line-clamp-4">
+                            {productQuickView.summary}
                         </div>
                         <div className="border-t border-gray-300 w-full my-4"></div>
                         <div className="flex items-end gap-x-4">
@@ -816,8 +845,8 @@ const CategoryPage = () => {
                                     <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
                                 </div>
                             </div>
-                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer">Thêm vào giỏ hàng</div>
-                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
+                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(1, productQuickView.id)}>Thêm vào giỏ hàng</div>
+                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
                         </div>
                     </div>
                 </div>
