@@ -2,9 +2,6 @@ import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Product01 from '../../assets/img/product_detail/product_01.svg';
-import Product02 from '../../assets/img/product_detail/product_02.svg';
-import Product03 from '../../assets/img/product_detail/product_03.svg';
-import Product04 from '../../assets/img/product_detail/product_04.svg';
 
 import Item from '../../assets/img/homepage/item.svg';
 
@@ -261,6 +258,8 @@ const ProductDetailPage = () => {
 
     const [searchParams] = useSearchParams();
 
+    const product_detail_ref = React.useRef<HTMLDivElement>(null);
+ 
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -323,33 +322,6 @@ const ProductDetailPage = () => {
         id: 0,
         name: ""
     });
-
-    const [images, setImages] = React.useState([
-        {
-            id: 1,
-            image: Product01
-        },
-        {
-            id: 2,
-            image: Product02
-        },
-        {
-            id: 3,
-            image: Product03
-        },
-        {
-            id: 4,
-            image: Product04
-        },
-        {
-            id: 5,
-            image: Product01
-        },
-        {
-            id: 6,
-            image: Product02
-        },
-    ]);
 
     const [productDetail, setProductDetail] = useImmer([
         {
@@ -534,7 +506,7 @@ const ProductDetailPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        product_detail_ref.current?.scrollIntoView({behavior: 'smooth'});
     }
 
     const swiperSlides = () => {
@@ -697,7 +669,7 @@ const ProductDetailPage = () => {
                                             <div className="w-80 h-80 flex items-center justify-center">
                                                 <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/>
                                             </div>
-                                            <div className="swiper-list w-80 mt-2 mb-5">
+                                            {/* <div className="swiper-list w-80 mt-2 mb-5">
                                                 <Swiper
                                                     spaceBetween={10}
                                                     slidesPerView={4}
@@ -719,7 +691,7 @@ const ProductDetailPage = () => {
                                                     })}
 
                                                 </Swiper>
-                                            </div>
+                                            </div> */}
                                         </div>
                                         <div className="product__informations flex-1">
                                             <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
@@ -798,7 +770,7 @@ const ProductDetailPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="border-t border-gray-300 w-full my-4"></div>
+                                    <div className="border-t border-gray-300 w-full my-4" ref={product_detail_ref}></div>
                                     <div className="product__info-detail">
                                         <div className="flex items-center mb-5">
                                             {
@@ -900,6 +872,7 @@ const ProductDetailPage = () => {
                                                                 containerClassName="pagination flex items-center gap-2 "
                                                                 activeLinkClassName="page-active-background"
                                                                 renderOnZeroPageCount={null}
+                                                                forcePage={currentPage - 1}
                                                             />
                                                         </div>
                                                     }
