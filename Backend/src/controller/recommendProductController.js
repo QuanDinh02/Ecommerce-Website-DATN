@@ -151,7 +151,7 @@ const simulatingCreateRecommendProducts = async (req, res) => {
         // }
 
         // let customerID = data.customer_id;
-        // let list = data.list;
+        // let list = JSON.parse(data.list);
 
         // let dataFormat = list.map(item => {
         //     return {
@@ -213,9 +213,9 @@ const simulatingCreateRecommend3SessionProducts = async (req, res) => {
         // }
 
         // let customerID = data.customer_id;
-        // let list = data.list;
+        // let list = JSON.parse(data.list);
 
-        // let dataFormat = list.map(item => {
+        // let convertData = list.map(item => {
         //     return {
         //         product_id: +item.product_id,
         //         predict_rating: +item.predict_rating,
@@ -355,8 +355,49 @@ const handleSimulatingExecuteTrainingRecommendProduct = async (req, res) => {
     }
 }
 
+const handlePredictRecommendRelevantProducts = async (req, res) => {
+    try {
+        let { id: item_id } = req.query;
+
+        var options = {
+            scriptPath: "src/routes",
+            args: [item_id]
+        };
+
+        let relevantData = await PythonShell.run('predictItem.py', options);
+
+        let data = JSON.parse(relevantData);
+
+        let itemID = data.item_id;
+        let list = JSON.parse(data.list);
+
+        let dataFormat = list.map(item => {
+            return {
+                product_id: +item.product_id,
+            }
+        })
+
+        let result = await recommendProductServices.getRelevantRecommendProducts(dataFormat);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     createRecommendProducts, handleExecuteTrainingRecommendProduct,
     getRecommendProducts, handleSimulatingExecuteTrainingRecommendProduct,
-    simulatingCreateRecommendProducts, simulatingCreateRecommend3SessionProducts
+    simulatingCreateRecommendProducts, simulatingCreateRecommend3SessionProducts, handlePredictRecommendRelevantProducts
 }

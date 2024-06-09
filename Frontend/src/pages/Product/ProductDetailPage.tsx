@@ -1,5 +1,5 @@
 import { MdOutlineArrowForwardIos } from "react-icons/md";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import Product01 from '../../assets/img/product_detail/product_01.svg';
 import Product02 from '../../assets/img/product_detail/product_02.svg';
@@ -7,14 +7,8 @@ import Product03 from '../../assets/img/product_detail/product_03.svg';
 import Product04 from '../../assets/img/product_detail/product_04.svg';
 
 import Item from '../../assets/img/homepage/item.svg';
-import Item2 from '../../assets/img/homepage/item2.svg';
-import Item3 from '../../assets/img/homepage/item3.svg';
-import Item4 from '../../assets/img/homepage/item4.svg';
-import Item5 from '../../assets/img/homepage/item5.svg';
-import Item6 from '../../assets/img/homepage/item6.svg';
-import Item7 from '../../assets/img/homepage/item7.svg';
-import Item8 from '../../assets/img/homepage/item8.svg';
-import Item9 from '../../assets/img/homepage/item9.svg';
+
+import { IoIosArrowForward } from "react-icons/io";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -58,15 +52,216 @@ import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductP
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import ReactPaginate from "react-paginate";
 import { dateFormat } from "@/utils/dateFormat";
-import { saveCustomerActivity } from "@/services/customerService";
-import LoadImage from "@/components/LoadImage";
+import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
+import { getRecommendRelevantProduct } from "@/services/recommendItemService";
+
+import LoadImageS3 from "@/components/LoadImageS3";
+import ProductRating from "../Category/ProductRating";
+
+interface IRecommendProduct {
+    id: number
+    current_price: number
+    price: number
+    image: string
+    name: string
+    rating: number
+    sold: number
+    summary: string
+}
+
+interface ICustomerAccount {
+    customer_id: number
+    username: string
+    role: string
+}
+
+interface IData {
+    product_list: IRecommendProduct[]
+}
+
+interface IProps {
+    setShow_quick_view: (value: boolean) => void,
+    item_id: number
+}
+
+const RelevantRecommendItemList = (props: IProps) => {
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const account: ICustomerAccount = useSelector<RootState, ICustomerAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
+    const [recommendItemList, setRecommendItemList] = React.useState<IRecommendProduct[]>([]);
+
+    const fetchRecommendItems = async (item_id: number) => {
+        let response: IData = await getRecommendRelevantProduct(item_id);
+        if (response) {
+            setRecommendItemList(response.product_list);
+        }
+    }
+
+    const refetchWishList = async () => {
+        let wishListData: any = await fetchWishList(account.customer_id);
+        if (wishListData && !_.isEmpty(wishListData.DT)) {
+            let wish_list_data: IWishList[] = wishListData.DT;
+            let count = wish_list_data.length;
+
+            dispatch(AddWishListItem({
+                wish_list_item: wish_list_data,
+                wish_list_count: count
+            }));
+        }
+    }
+
+    const handleAddFavouriteItem = async (product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewWishListItem = {
+                productID: product_id,
+                customerID: account.customer_id
+            }
+
+            let result = await createWishListItem(data);
+            if (result && result.EC === 0) {
+                await saveCustomerActivity({
+                    product_id: product_id,
+                    type: 2
+                });
+                refetchWishList();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: account.customer_id,
+                productID: product_id
+            }
+
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const refetchCartItem = async () => {
+        let cartItemsData: any = await fetchCartItem(account.customer_id);
+        if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+            let cart_item_data: ICartItem[] = cartItemsData.DT;
+            let count = cart_item_data.length;
+
+            dispatch(AddCartItem({
+                cart_items: cart_item_data,
+                count: count
+            }));
+        }
+    }
+
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
+        if (account && isAuthenticated) {
+            saveCustomerActivity({
+                product_id: product_id,
+                type: 0
+            });
+
+            saveCustomerSearch(product_name);
+
+            navigate({
+                pathname: "/product",
+                search: `?id=${product_id}`,
+            });
+        }
+
+        navigate({
+            pathname: "/product",
+            search: `?id=${product_id}`,
+        });
+    }
+
+    React.useEffect(() => {
+        if (account && isAuthenticated && props.item_id !== 0) {
+            fetchRecommendItems(props.item_id);
+        }
+    }, [isAuthenticated]);
+
+    return (
+        <>
+            {
+                recommendItemList && recommendItemList.length > 0 &&
+                recommendItemList.map((item, index) => {
+                    return (
+                        <SwiperSlide>
+                            <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
+                                <div className="product__image w-40 mx-auto mb-6"><LoadImageS3 img_style="w-full h-full" img_url={item.image} /></div>
+                                <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        hanldeAddShoppingCart(1, item.id);
+                                    }}>
+                                        <PiShoppingCartLight className="w-6 h-6 " />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Thêm vào giỏ hàng</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        props.setShow_quick_view(true);
+                                    }}>
+                                        <IoEyeOutline className="w-6 h-6" />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Xem nhanh</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleAddFavouriteItem(item.id);
+                                    }}>
+                                        <IoMdHeartEmpty className="w-6 h-6" />
+                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                <span className="text-sm">Yêu thích</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
+                                <div className="product__price flex items-center gap-2 mb-2.5">
+                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                </div>
+                                <ProductRating
+                                    ratings={item.rating}
+                                    selling_count={item.sold}
+                                    key={`item-rating-product-${item.id}`}
+                                    item_grid={true}
+                                />
+                            </div>
+                        </SwiperSlide>
+                    )
+                })
+            }
+        </>
+    )
+}
 
 const ProductDetailPage = () => {
 
     const [searchParams] = useSearchParams();
 
     const navigate = useNavigate();
-    const location = useLocation();
     const dispatch = useDispatch();
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
@@ -323,17 +518,18 @@ const ProductDetailPage = () => {
         }
     }
 
-    const handleCategoryNavigation = (category_id: number, category_title: string) => {
-        navigate("/category", { state: { category_id: category_id, category_name: category_title } })
+    const handleCategoryNavigation = (category_id: number) => {
+        navigate({
+            pathname: "/category",
+            search: `?id=${category_id}&page=1`,
+        });
     }
 
-    const handleSubCategoryNavigation = (category_id: number, category_title: string, sub_category_id: number, sub_category_title: string) => {
-        navigate("/sub-category", {
-            state: {
-                category_id: category_id, category_name: category_title,
-                sub_category_id: sub_category_id, sub_category_name: sub_category_title,
-            }
-        })
+    const handleSubCategoryNavigation = (sub_category_id: number) => {
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${sub_category_id}&page=1`,
+        });
     }
 
     const handlePageClick = (event) => {
@@ -344,609 +540,62 @@ const ProductDetailPage = () => {
     const swiperSlides = () => {
         return (
             <>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                {
+                    [...Array(10)].map((item, index) => {
+                        return (
+                            <SwiperSlide>
+                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
+                                    <div className="product__image w-40 mx-auto mb-6"><img src={Item} alt="" /></div>
+                                    <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
+                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                            e.stopPropagation();
+                                            hanldeAddShoppingCart();
+                                        }}>
+                                            <PiShoppingCartLight className="w-6 h-6 " />
+                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                    <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                            e.stopPropagation();
+                                            setShowQuickView(true);
+                                        }}>
+                                            <IoEyeOutline className="w-6 h-6" />
+                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                    <span className="text-sm">Xem nhanh</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                            e.stopPropagation();
+                                            hanldeFavoriteItem()
+                                        }}>
+                                            <IoMdHeartEmpty className="w-6 h-6" />
+                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                    <span className="text-sm">Yêu thích</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
+                                    <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
+                                    <div className="flex items-center mb-1 group-hover:hidden">
+                                        <div className="product__rating-stars flex items-center gap-x-1">
+                                            <Rating rating={5} />
+                                        </div>
+                                        <TbMinusVertical className="text-gray-300" />
+                                        <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item2} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item3} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item4} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item5} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item6} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item7} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item8} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
-                <SwiperSlide>
-                    <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                        <div className="product__image w-40 mx-auto mb-6"><img src={Item9} alt="" /></div>
-                        <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeAddShoppingCart();
-                            }}>
-                                <PiShoppingCartLight className="w-6 h-6 " />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Thêm vào giỏ hàng</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                setShowQuickView(true);
-                            }}>
-                                <IoEyeOutline className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Xem nhanh</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                e.stopPropagation();
-                                hanldeFavoriteItem()
-                            }}>
-                                <IoMdHeartEmpty className="w-6 h-6" />
-                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                        <span className="text-sm">Yêu thích</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                        <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                        <div className="flex items-center mb-1 group-hover:hidden">
-                            <div className="product__rating-stars flex items-center gap-x-1">
-                                {
-                                    [...Array(Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-[#FCB800]" />
-                                        )
-                                    })
-                                }
-                                {
-                                    [...Array(5 - Math.floor(5))].map((item, index) => {
-                                        return (
-                                            <GoStarFill className="text-gray-400" />
-                                        )
-                                    })
-                                }
-                            </div>
-                            <TbMinusVertical className="text-gray-300" />
-                            <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                        </div>
-                        <div className="product_ratings group-hover:hidden flex items-center text-sm ">
-                            <div className="font-bold">4.9</div>
-                            <div>/5.0</div>
-                            <div className="ml-1">(123)</div>
-                        </div>
-                    </div>
-                </SwiperSlide>
+                            </SwiperSlide>
+                        )
+                    })
+                }
+
             </>
         )
     }
@@ -967,7 +616,7 @@ const ProductDetailPage = () => {
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
-        if(productID !== 0) {
+        if (productID !== 0) {
             fetchProductDetail(productID);
             fetchProductReviews(productID);
         }
@@ -1019,7 +668,7 @@ const ProductDetailPage = () => {
                                             <MdOutlineArrowForwardIos />
                                             <div
                                                 className="cursor-pointer hover:underline"
-                                                onClick={() => handleCategoryNavigation(activeCategory.id, activeCategory.title)}
+                                                onClick={() => handleCategoryNavigation(activeCategory.id)}
                                             >
                                                 {activeCategory.title}
                                             </div>
@@ -1031,7 +680,7 @@ const ProductDetailPage = () => {
                                             <MdOutlineArrowForwardIos />
                                             <div
                                                 className="cursor-pointer hover:underline"
-                                                onClick={() => handleSubCategoryNavigation(activeCategory.id, activeCategory.title, activeSubCategory.id, activeSubCategory.title)}
+                                                onClick={() => handleSubCategoryNavigation(activeSubCategory.id)}
                                             >
                                                 {activeSubCategory.title}
                                             </div>
@@ -1046,13 +695,7 @@ const ProductDetailPage = () => {
                                     <div className="flex">
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
-                                                {/* <img src={selectedImage.image} className="select-none" /> */}
-                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
-                                                {/* {productDetailInfo.product_image !== "" ?
-                                                    <img src={`data:image/jpeg;base64,${productDetailInfo.product_image}`} alt='' />
-                                                    :
-                                                    <img src={Product01} />
-                                                } */}
+                                                <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/>
                                             </div>
                                             <div className="swiper-list w-80 mt-2 mb-5">
                                                 <Swiper
@@ -1178,14 +821,14 @@ const ProductDetailPage = () => {
                                         </div>
                                         {
                                             productDetail[0].selected &&
-                                            <div className="product__info-description text-gray-500 mb-5 w-2/3">
+                                            <div className="product__info-description text-gray-500 mb-12 w-2/3">
                                                 <span className="text-balance w-auto">{productDetailInfo.description}</span>
                                             </div>
                                         }
                                         {
                                             productDetail[1].selected &&
                                             <>
-                                                <div className="border bg-gray-100 border-gray-300 p-5 mb-8">
+                                                <div className="border bg-gray-100 border-gray-300 p-5 mb-12">
                                                     <div className="product_ratings flex items-center gap-x-3 mb-4">
                                                         <div className="text-3xl font-bold text-[#FCB800]">{ratingAverage ? ratingAverage : 0}</div>
                                                         <div className="flex items-center">
@@ -1237,7 +880,7 @@ const ProductDetailPage = () => {
                                                     }
                                                     {
                                                         productReviews && productReviews.length > 0 &&
-                                                        <div className='pagination-container flex justify-center'>
+                                                        <div className='pagination-container flex justify-center mb-12'>
                                                             <ReactPaginate
                                                                 nextLabel=">"
                                                                 onPageChange={handlePageClick}
@@ -1264,7 +907,10 @@ const ProductDetailPage = () => {
                                             </>
                                         }
                                         <div>
-                                            <div className="font-medium text-xl">Các sản phẩm liên quan</div>
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-lg text-gray-400">CÁC SẢN PHẨM LIÊN QUAN</span>
+                                                <div className="text-red-500 hover:underline cursor-pointer flex items-center gap-x-1"><span>Xem Tất Cả</span> <IoIosArrowForward /></div>
+                                            </div>
                                             <div className="banner w-full mb-5">
                                                 <Swiper
                                                     navigation={true}
@@ -1273,7 +919,8 @@ const ProductDetailPage = () => {
                                                     spaceBetween={10}
                                                     slidesPerView={5}
                                                 >
-                                                    {swiperSlides()}
+                                                    {<RelevantRecommendItemList setShow_quick_view={setShowQuickView} item_id={productID}/>}
+                                                    {/* {swiperSlides()} */}
                                                 </Swiper>
                                             </div>
                                         </div>

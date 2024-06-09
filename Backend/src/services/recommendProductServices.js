@@ -714,8 +714,99 @@ const getHistoryRecommendProducts = async (customer_id) => {
     }
 }
 
+const getRelevantRecommendProducts = async (data) => {
+    try {
+
+        //data = _(data).take(20).value();
+
+        let productList = await Promise.all(data.map(async item => {
+
+            let productInfo = await db.Product.findOne({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'name', 'summary', 'shop_id'],
+                where: {
+                    id: {
+                        [Op.eq]: item.product_id
+                    }
+                }
+            });
+
+            let productType = await db.ProductType.findOne({
+                raw: true,
+                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.product_id
+                    }
+                }
+            });
+
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${item.product_id}.jpeg`
+            }
+    
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'rating'],
+                where: {
+                    productID: {
+                        [Op.eq]: item.id,
+                    },
+                }
+            });
+
+            let star_ratings = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
+                '5': 0,
+            }
+
+            await productReviewList.forEach(item => {
+                star_ratings[`${item.rating}`] += 1;
+            });
+
+            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+            return {
+                id: productInfo.id,
+                name: productInfo.name,
+                summary: productInfo.summary,
+                image: url,
+                current_price: productType.currentPrice,
+                price: productType.price,
+                sold: productType.sold,
+                rating: rating_average
+            }
+        }));
+
+        return {
+            EC: 0,
+            DT: {
+                product_list: productList
+            },
+            EM: "Recommend relevant products !"
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     createRecommendProducts, getTrainingRecommendItemStatus, updateTrainingRecommendItemStatus,
     getHistoryRecommendProducts, createHistoryRecommendItem, create3SessionRecommendProducts, updateTraining3SessionRecommendItemStatus,
-    getRecommendProducts, get3SessionRecommendProducts, getBothRecommendProducts, clearHistoryRecommendItem
+    getRecommendProducts, get3SessionRecommendProducts, getBothRecommendProducts, clearHistoryRecommendItem, getRelevantRecommendProducts
 }

@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 from redis.commands.search.query import Query
 import json
 import mysql.connector
-import requests
+import sys
 
 def get_name_embedding(redis_client, key):
     data = redis_client.json().get(key)
@@ -62,9 +62,10 @@ if __name__ == '__main__':
                 .paging(0, 20)
                 .dialect(2)
         )
-    
-    item_id = '271966796'
-    
+      
+    params = sys.argv[1]
+    item_id = params
+
     query_get_name = f'''
         SELECT name
         FROM Product
@@ -83,4 +84,4 @@ if __name__ == '__main__':
     res_json = json.dumps(res, ensure_ascii=False, indent=4)
     
     a = {'data': res_json}
-    # res = requests.post('http://127.0.0.1:8080/api/recommend', json=a)
+    print(a)
