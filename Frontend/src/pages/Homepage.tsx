@@ -5,7 +5,7 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { GoDotFill, GoStarFill } from "react-icons/go";
 
-import { PiShoppingCartLight} from "react-icons/pi";
+import { PiShoppingCartLight } from "react-icons/pi";
 import { successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
@@ -14,7 +14,7 @@ import Modal from "@/components/Modal";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
-import { getRecommendItemByCustomer, startTrainingRecommendItemData} from "@/services/recommendItemService";
+import { getRecommendItemByCustomer, startTrainingRecommendItemData } from "@/services/recommendItemService";
 import CategoryMenu from "@/components/CategoryMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
@@ -172,7 +172,7 @@ const RecommendItemList = (props: IProps) => {
                 search: `?id=${product_id}`,
             });
         }
-        
+
         navigate({
             pathname: "/product",
             search: `?id=${product_id}`,
@@ -180,7 +180,7 @@ const RecommendItemList = (props: IProps) => {
     }
 
     React.useEffect(() => {
-        if (account && isAuthenticated) {
+        if (account && isAuthenticated && account.role === "customer") {
             fetchRecommendItems(account.customer_id);
         }
     }, [isAuthenticated]);
@@ -195,7 +195,7 @@ const RecommendItemList = (props: IProps) => {
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6">
                                     {/* <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/> */}
-                                    <LoadImage img_style="w-40 h-40" product_id={item.id}/>
+                                    <LoadImage img_style="w-40 h-40" product_id={item.id} />
                                 </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 group-hover:block group-hover:flex duration-300 absolute bottom-0 bg-white left-0 right-0">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -257,7 +257,7 @@ const Homepage = () => {
     const navigate = useNavigate();
     const userRole = useSelector<RootState, string>(state => state.user.role);
     const dispatch = useDispatch();
-    
+
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
@@ -409,7 +409,7 @@ const Homepage = () => {
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
                         {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id}/>
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

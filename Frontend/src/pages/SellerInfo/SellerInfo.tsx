@@ -12,6 +12,7 @@ import { RxDashboard } from "react-icons/rx";
 import { CgUserList } from "react-icons/cg";
 import React from "react";
 import { TailSpin } from "react-loader-spinner";
+import Drawer from "@/components/Drawer";
 
 interface ISideBarChild {
     path: string
@@ -109,7 +110,7 @@ const SideBar: ISideBarItem[] = [
 const SellerInfo = () => {
 
     const account: ISellerAccount = useSelector<RootState, ISellerAccount>(state => state.user.account);
-
+    
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
     React.useEffect(() => {
@@ -135,21 +136,27 @@ const SellerInfo = () => {
                         />
                     </div>
                     :
-                    <div className="px-[30px] w-[80rem] mx-auto py-8 flex">
-                        <div className="seller-info__sidebar w-1/3 flex flex-col gap-x-2 w-60 bg-gray-100">
-                            <div className="p-3 flex items-center gap-x-2 mb-2 bg-gray-200">
-                                <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
-                                <div>
-                                    <div className="user_name font-bold">{account.username}</div>
-                                    <div className="text-black opacity-80"> NGƯỜI BÁN</div>
+                    <>
+                        <div className="px-[30px] w-[80rem] mx-auto py-8 flex">
+                            <div className="seller-info__sidebar w-1/3 flex flex-col gap-x-2 w-60 bg-gray-100">
+                                <div className="p-3 flex items-center gap-x-2 mb-2 bg-gray-200">
+                                    <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
+                                    <div>
+                                        <div className="user_name font-bold">{account.username}</div>
+                                        <div className="text-black opacity-80"> NGƯỜI BÁN</div>
+                                    </div>
                                 </div>
+                                <Accordion data={SideBar} user_type="seller" />
                             </div>
-                            <Accordion data={SideBar} user_type="seller" />
+                            <div className="seller-info__content w-2/3 flex-1 py-5 px-10 bg-white">
+                                <Outlet />
+                            </div>
                         </div>
-                        <div className="seller-info__content w-2/3 flex-1 py-5 px-10 bg-white">
-                            <Outlet />
-                        </div>
-                    </div>
+                        {/* <div className="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800">
+
+                        </div> */}
+
+                    </>
             }
 
         </div>

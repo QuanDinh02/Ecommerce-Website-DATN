@@ -92,7 +92,7 @@ export const Dropdown = (props: IDropdown) => {
                 showDropdown ?
                     <>
                         <MdOutlineKeyboardArrowDown className="absolute right-1 top-2 w-6 h-6 text-gray-500 rotate-180 " />
-                        <div className="w-full h-40 bg-white border border-gray-200 absolute top-10 overflow-y-auto">
+                        <div className="w-full max-h-40 bg-white border border-gray-200 absolute top-10 overflow-y-auto">
                             {data && data.length > 0 &&
                                 data.map(item => {
                                     return (

@@ -13,6 +13,7 @@ import orderController from '../controller/orderController';
 import recommendProductController from '../controller/recommendProductController';
 import locationController from '../controller/locationController';
 import imageController from '../controller/imageController';
+import sellerController from '../controller/sellerController';
 import { checkUserJWT } from '../middleware/jwt';
 import { cacheMiddleware } from '../middleware/cache';
 
@@ -103,6 +104,8 @@ const ApiRoute = (app) => {
     router.get('/image', imageController.getImage);
     router.post('/image', upload.single('image'), imageController.uploadImage);
     router.delete('/image/:id', imageController.deleteImage);
+
+    router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
 
     // >>> check data: 
     // {

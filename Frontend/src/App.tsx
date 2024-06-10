@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import { Toaster } from 'react-hot-toast';
 import 'swiper/css';
 import "react-datepicker/dist/react-datepicker.css";
+import 'react-quill/dist/quill.snow.css';
 
 function App() {
   return (
