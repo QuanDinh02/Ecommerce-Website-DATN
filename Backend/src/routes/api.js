@@ -106,6 +106,8 @@ const ApiRoute = (app) => {
     router.delete('/image/:id', imageController.deleteImage);
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
+    router.post('/seller/product', sellerController.createNewProduct);
+    router.delete('/seller/product/:id', sellerController.deleteProduct);
 
     // >>> check data: 
     // {

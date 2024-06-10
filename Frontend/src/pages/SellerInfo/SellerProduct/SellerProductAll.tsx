@@ -12,8 +12,10 @@ import ReactPaginate from "react-paginate";
 import { Dropdown } from "@/components/Dropdown";
 import { useImmer } from "use-immer";
 import { ThreeDots } from "react-loader-spinner";
-import { getProductsPagination } from "@/services/sellerService";
+import { deleteProduct, getProductsPagination } from "@/services/sellerService";
 import LoadImage from "@/components/LoadImage";
+import Modal from "@/components/Modal";
+import { successToast1 } from "@/components/Toast/Toast";
 
 interface IProduct {
     id: number
@@ -45,6 +47,10 @@ const tableHeaders = [
 const SHOW_ITEMS = [10, 25, 50];
 
 const SellerProductAll = () => {
+
+    const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
+    const [deleteProductID, setDeleteProductID] = React.useState<number>(-1);
+    const [deleteProductName, setDeleteProductName] = React.useState<string>("");
 
     const [showItem, setShowItem] = React.useState<number>(10);
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
@@ -83,6 +89,26 @@ const SellerProductAll = () => {
             setTotalItems(response.total_items);
             setLoadingAnimation();
         }
+    }
+
+    const handleDeleteProduct = async (product_id: number) => {
+        let result = await deleteProduct(product_id);
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            setShowDeleteBox(false);
+            setLoadingAnimation();
+            setTimeout(() => {
+                fetchProductsPagination(showItem, 1);
+            }, 1000);
+        } else {
+            return;
+        }
+    }
+
+    let handleShowDeleteModal = (product_id: number, product_name: string) => {
+        setDeleteProductID(product_id);
+        setDeleteProductName(product_name);
+        setShowDeleteBox(true);
     }
 
     React.useEffect(() => {
@@ -195,7 +221,7 @@ const SellerProductAll = () => {
                                                                     <div className="w-8 h-8 bg-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-500 rounded-lg">
                                                                         <RiEdit2Fill className="w-4 h-4 text-white" />
                                                                     </div>
-                                                                    <div className="w-8 h-8 bg-red-400 flex items-center justify-center cursor-pointer hover:bg-red-500 rounded-lg">
+                                                                    <div className="w-8 h-8 bg-red-400 flex items-center justify-center cursor-pointer hover:bg-red-500 rounded-lg" onClick={() => handleShowDeleteModal(item.id, item.name)}>
                                                                         <HiTrash className="w-4 h-4 text-white" />
                                                                     </div>
                                                                 </div>
@@ -245,6 +271,15 @@ const SellerProductAll = () => {
                         </div>
                     </>
             }
+            <Modal show={showDeleteBox} setShow={setShowDeleteBox} size="delete-confirmation-box">
+                <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
+                    <div className="text-xl mt-2">Bạn muốn xóa sản phẩm <span className="font-medium">{deleteProductName}</span> ?</div>
+                    <div className="flex items-center justify-end gap-x-2 transition-all">
+                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowDeleteBox(false)}>Hủy</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer duration-200" OnClick={() => handleDeleteProduct(deleteProductID)}>Xóa</Button>
+                    </div>
+                </div>
+            </Modal>
         </>
     )
 }
