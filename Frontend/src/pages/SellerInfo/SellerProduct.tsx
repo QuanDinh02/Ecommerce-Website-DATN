@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 const SellerProduct = () => {
 
     return (
-        <div className="seller-order-container">
+        <div className="seller-order-container h-full">
             <Outlet />
         </div>
     )

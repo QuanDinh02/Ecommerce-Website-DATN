@@ -110,7 +110,7 @@ const SellerProductAll = () => {
     return (
         <>
             <div className="flex items-center justify-between mb-8">
-                <div className="text-2xl font-bold text-gray-600">Sản phẩm <span className="text-xl text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
+                <div className="text-xl font-bold text-gray-600">Sản phẩm <span className="text-lg text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
                 <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit">Thêm Sản Phẩm</Button>
             </div>
             <div className="w-full flex items-center justify-between mb-6">
@@ -185,7 +185,7 @@ const SellerProductAll = () => {
                                                             </td>
                                                             <td className="py-3 px-2">
                                                                 {item.sub_category.title !== "" &&
-                                                                    <span className="px-3 py-1 bg-gray-100 text-sm line-clamp-1 rounded-full ">{item.sub_category.title}</span>
+                                                                    <span className="px-3 py-0.5 bg-gray-100 text-sm line-clamp-1 rounded-full ">{item.sub_category.title}</span>
                                                                 }
                                                             </td>
                                                             <td className="py-3 px-2">{item.quantity}</td>
@@ -235,7 +235,9 @@ const SellerProductAll = () => {
                                             </>
                                             :
                                             <tr>
-                                                <td className="text-center py-3" colSpan={6}>Không có dữ liệu !</td>
+                                                <td className="text-center py-3" colSpan={6}>
+                                                    <div className="w-full text-gray-500 text-center py-2">Không có dữ liệu !</div>
+                                                </td>
                                             </tr>
                                     }
                                 </tbody>
