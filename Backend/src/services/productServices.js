@@ -198,7 +198,7 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
 
                 let productType = await db.ProductType.findOne({
                     raw: true,
-                    attributes: ['id', 'currentPrice', 'price', 'sold'],
+                    attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                     where: {
                         productID: {
                             [Op.eq]: item.id
@@ -246,7 +246,8 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
-                    rating: rating_average
+                    rating: rating_average,
+                    quantity: productType.quantity
                 }
             }));
 
@@ -339,7 +340,7 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
 
                 let productType = await db.ProductType.findOne({
                     raw: true,
-                    attributes: ['id', 'currentPrice', 'price', 'sold'],
+                    attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                     where: {
                         productID: {
                             [Op.eq]: item.id
@@ -387,7 +388,8 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page) => {
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
-                    rating: rating_average
+                    rating: rating_average,
+                    quantity: productType.quantity
                 }
             }));
 
@@ -530,7 +532,7 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
 
                 let productType = await db.ProductType.findOne({
                     raw: true,
-                    attributes: ['id', 'currentPrice', 'price', 'sold'],
+                    attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                     where: {
                         productID: {
                             [Op.eq]: item.id
@@ -578,7 +580,8 @@ const getSearchProductsWithPagination = async (content, item_limit, page) => {
                     current_price: productType.currentPrice,
                     price: productType.price,
                     sold: productType.sold,
-                    rating: rating_average
+                    rating: rating_average,
+                    quantity: productType.quantity
                 }
             }));
 

@@ -794,17 +794,12 @@ const ProductDetailPage = () => {
                                         </div>
                                         {
                                             productDetail[0].selected &&
-                                            <div className="product__info-description text-gray-500 mb-12 w-2/3">
-                                                <span className="text-balance w-auto">
-                                                    <ReactQuill
-                                                        value={productDetailInfo.description}
-                                                        readOnly={true}
-                                                        theme={"bubble"}
-                                                        className="border-0"
-                                                    />
-                                                    {/* {productDetailInfo.description} */}
-                                                </span>
-                                            </div>
+                                            <ReactQuill
+                                                value={productDetailInfo.description}
+                                                readOnly={true}
+                                                theme={"bubble"}
+                                                className="ql-no-border"
+                                            />
                                         }
                                         {
                                             productDetail[1].selected &&

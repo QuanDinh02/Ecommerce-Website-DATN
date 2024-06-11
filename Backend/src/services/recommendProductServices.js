@@ -347,7 +347,7 @@ const getBothRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -395,7 +395,8 @@ const getBothRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average
+                rating: rating_average,
+                quantity: productType.quantity
             }
         }));
 
@@ -461,7 +462,7 @@ const getRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -509,7 +510,8 @@ const getRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average
+                rating: rating_average,
+                quantity: productType.quantity
             }
         }));
 
@@ -575,7 +577,7 @@ const get3SessionRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -623,7 +625,8 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average
+                rating: rating_average,
+                quantity: productType.quantity
             }
         }));
 
@@ -701,7 +704,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -749,7 +752,8 @@ const getHistoryRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average
+                rating: rating_average,
+                quantity: productType.quantity
             }
         }));
 
@@ -800,7 +804,7 @@ const getRelevantRecommendProducts = async (data) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold'],
+                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.product_id
@@ -851,7 +855,8 @@ const getRelevantRecommendProducts = async (data) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average
+                rating: rating_average,
+                quantity: productType.quantity
             }
         }));
 

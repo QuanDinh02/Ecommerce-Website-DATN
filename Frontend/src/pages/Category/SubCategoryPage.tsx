@@ -36,6 +36,7 @@ import { getSubCategoryInfo } from "@/services/subCategoryService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
+import ReactQuill from "react-quill";
 
 interface ISubCategoryActive {
     id: number
@@ -56,6 +57,7 @@ interface ICateogryProduct {
     sold: number
     summary: string
     seller_info: IShopInfo
+    quantity: number
 }
 
 interface IData {
@@ -79,6 +81,7 @@ interface IProductQuickView {
     sold: number
     summary: string
     seller_info: IShopInfo
+    quantity: number
 }
 
 const SubCategoryPage = () => {
@@ -176,6 +179,7 @@ const SubCategoryPage = () => {
         rating: 0,
         sold: 0,
         summary: "",
+        quantity: 0,
         seller_info: {
             id: 0,
             name: ""
@@ -318,9 +322,8 @@ const SubCategoryPage = () => {
             draft.rating = item.rating;
             draft.sold = item.sold;
             draft.summary = item.summary;
-            if (item.seller_info.id !== null) {
-                draft.seller_info = item.seller_info;
-            }
+            draft.quantity = item.quantity;
+            draft.seller_info = item.seller_info;
         });
         setShowQuickView(true);
         document.body.style.overflow = "hidden";
@@ -651,47 +654,47 @@ const SubCategoryPage = () => {
                                                                                 {productList && productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
                                                                                         <div
-                                                                                            className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group"
+                                                                                            className="product border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group"
                                                                                             key={`sub-category-item-${index}`}
                                                                                             onClick={() => {
                                                                                                 handleProductDetailNavigation(item.id, item.name);
                                                                                             }}
                                                                                         >
-                                                                                            <div className="product__image flex items-center justify-center">
+                                                                                            <div className="product__image flex items-center justify-center relative">
                                                                                                 {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id}/>
-                                                                                            </div>
-                                                                                            <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    hanldeAddShoppingCart(1, item.id);
-                                                                                                }}>
-                                                                                                    <PiShoppingCartLight className="w-6 h-6 " />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                                <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        hanldeAddShoppingCart(1, item.id);
+                                                                                                    }}>
+                                                                                                        <PiShoppingCartLight className="w-6 h-6 " />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    handleQuickView(item);
-                                                                                                }}>
-                                                                                                    <IoEyeOutline className="w-6 h-6" />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Xem nhanh</span>
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        handleQuickView(item);
+                                                                                                    }}>
+                                                                                                        <IoEyeOutline className="w-6 h-6" />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Xem nhanh</span>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
-                                                                                                </div>
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    handleAddFavouriteItem(item.id);
-                                                                                                }}>
-                                                                                                    <IoMdHeartEmpty className="w-6 h-6" />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Yêu thích</span>
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        handleAddFavouriteItem(item.id);
+                                                                                                    }}>
+                                                                                                        <IoMdHeartEmpty className="w-6 h-6" />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Yêu thích</span>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
@@ -701,7 +704,6 @@ const SubCategoryPage = () => {
                                                                                                 <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
                                                                                                 <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
                                                                                             </div>
-
                                                                                             <ProductRating
                                                                                                 ratings={item.rating}
                                                                                                 selling_count={item.sold}
@@ -735,7 +737,7 @@ const SubCategoryPage = () => {
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                            <LoadImage img_style="w-40 h-60" product_id={item.id}/>
+                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
@@ -746,8 +748,13 @@ const SubCategoryPage = () => {
                                                                     key={`item-rating-${item.id}`}
                                                                     item_grid={false}
                                                                 />
-                                                                <div className="product__description text-sm text-gray-400 mt-4 line-clamp-3">
-                                                                    {item.summary}
+                                                                <div className="product__description text-sm text-gray-400 mt-4">
+                                                                    <ReactQuill
+                                                                        value={item.summary}
+                                                                        readOnly={true}
+                                                                        theme={"bubble"}
+                                                                        className="ql-no-border ql-line-clamp-3"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                             <div className="product__right-content w-60">
@@ -807,7 +814,7 @@ const SubCategoryPage = () => {
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
                         {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id}/>
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>
@@ -816,25 +823,34 @@ const SubCategoryPage = () => {
                             <GoDotFill className="text-gray-300 w-3 h-3" />
                             <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                 <IoBagCheckOutline className="w-5 h-5" />
-                                <span>Đã bán {productQuickView.sold ?  numberKFormat(productQuickView.sold): 0}</span>
+                                <span>Đã bán {productQuickView.sold ? numberKFormat(productQuickView.sold) : 0}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
                             <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
                             <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
                         </div>
-                        <div className="shop flex items-center gap-x-4">
+                        <div className="shop flex items-center gap-x-4 mb-4">
                             {
-                                productQuickView.seller_info.name !== "" &&
-                                <div>Shop: <span className="font-bold text-blue-500">{productQuickView.seller_info.name}</span></div>
+                                productQuickView.seller_info.id ?
+                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productQuickView.seller_info.name}</span></div>
+                                    : <></>
                             }
-                            <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
+                            <div>Tình trạng:&nbsp;
+                                {
+                                    productQuickView.quantity > 0 ?
+                                        <span className="font-medium text-green-500">Còn hàng</span>
+                                        :
+                                        <span className="font-medium text-red-500">Hết hàng</span>
+                                }
+                            </div>
                         </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
-                        <div className="product__benefit text-sm text-gray-400 line-clamp-4">
-                            {productQuickView.summary}
-                        </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <ReactQuill
+                            value={productQuickView.summary}
+                            readOnly={true}
+                            theme={"bubble"}
+                            className="ql-no-border ql-line-clamp-3"
+                        />
                         <div className="flex items-end gap-x-4">
                             <div>
                                 <div className="mb-1">Số lượng</div>

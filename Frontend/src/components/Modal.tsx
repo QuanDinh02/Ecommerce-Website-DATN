@@ -13,7 +13,7 @@ const Modal = (props: MProps) => {
     const { show, setShow, children, size: type } = props;
 
     const sizes = {
-        'customize': 'w-[72.25rem] h-4/5',
+        'customize': 'w-[72.25rem] max-h-4/5',
         'customize-h-auto': 'w-[72.25rem] min-h-1/3 max-h-4/5',
         'delete-confirmation-box': 'w-[40rem] h-[180px]',
         'form-box': 'w-[40rem] h-auto',

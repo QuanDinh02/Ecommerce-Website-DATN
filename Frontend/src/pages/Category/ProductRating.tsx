@@ -14,7 +14,7 @@ const ProductRating = (props: IProps) => {
         <>
             {props.item_grid ?
                 <>
-                    <div className="flex items-center mb-1 group-hover:hidden">
+                    <div className="flex items-center mb-1">
                         <div className="product__rating-stars flex items-center gap-x-1">
                             {
                                 [...Array(Math.floor(props.ratings))].map((item, index) => {
@@ -37,7 +37,7 @@ const ProductRating = (props: IProps) => {
                 </>
                 :
                 <>
-                    <div className="flex items-center mb-1 group-hover:hidden gap-x-2">
+                    <div className="flex items-center mb-1 gap-x-2">
                         <div className="product__rating-stars flex items-center gap-x-1">
                             {
                                 [...Array(Math.floor(props.ratings))].map((item, index) => {

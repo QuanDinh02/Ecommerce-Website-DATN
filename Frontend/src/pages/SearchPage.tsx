@@ -34,6 +34,7 @@ import { getProductListBySearch } from "@/services/productService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
+import ReactQuill from "react-quill";
 
 interface ICateogryProduct {
     id: number
@@ -45,6 +46,7 @@ interface ICateogryProduct {
     sold: number
     summary: string
     seller_info: IShopInfo
+    quantity: number
 }
 
 interface IData {
@@ -68,6 +70,7 @@ interface IProductQuickView {
     sold: number
     summary: string
     seller_info: IShopInfo
+    quantity: number
 }
 
 const SearchPage = () => {
@@ -129,6 +132,7 @@ const SearchPage = () => {
         rating: 0,
         sold: 0,
         summary: "",
+        quantity: 0,
         seller_info: {
             id: 0,
             name: ""
@@ -230,6 +234,7 @@ const SearchPage = () => {
             draft.rating = item.rating;
             draft.sold = item.sold;
             draft.summary = item.summary;
+            draft.quantity = item.quantity;
             if (item.seller_info.id !== null) {
                 draft.seller_info = item.seller_info;
             }
@@ -566,11 +571,10 @@ const SearchPage = () => {
                                                                                                 handleProductDetailNavigation(item.id, item.name);
                                                                                             }}
                                                                                         >
-                                                                                            <div className="product__image flex items-center justify-center">
+                                                                                            <div className="product__image flex items-center justify-center relative">
                                                                                                 {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id}/>
-                                                                                            </div>
-                                                                                            <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
+                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                                <div className="product__utility hidden absolute bottom-[-10px] bg-white items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();
                                                                                                     hanldeAddShoppingCart(1, item.id);
@@ -605,12 +609,12 @@ const SearchPage = () => {
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
+                                                                                            </div>
                                                                                             <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                                                                                             <div className="flex items-center gap-2 mb-2">
                                                                                                 <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
                                                                                                 <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
                                                                                             </div>
-
                                                                                             <ProductRating
                                                                                                 ratings={item.rating}
                                                                                                 selling_count={item.sold}
@@ -644,7 +648,7 @@ const SearchPage = () => {
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                            <LoadImage img_style="w-40 h-60" product_id={item.id}/>
+                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
@@ -655,8 +659,13 @@ const SearchPage = () => {
                                                                     key={`item-rating-${item.id}`}
                                                                     item_grid={false}
                                                                 />
-                                                                <div className="product__description text-sm text-gray-400 mt-4 line-clamp-3">
-                                                                    {item.summary}
+                                                                <div className="product__description text-sm text-gray-400 mt-4">
+                                                                    <ReactQuill
+                                                                        value={item.summary}
+                                                                        readOnly={true}
+                                                                        theme={"bubble"}
+                                                                        className="ql-no-border ql-line-clamp-3"
+                                                                    />
                                                                 </div>
                                                             </div>
                                                             <div className="product__right-content w-60">
@@ -716,7 +725,7 @@ const SearchPage = () => {
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
                         {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id}/>
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>
@@ -725,25 +734,34 @@ const SearchPage = () => {
                             <GoDotFill className="text-gray-300 w-3 h-3" />
                             <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                 <IoBagCheckOutline className="w-5 h-5" />
-                                <span>Đã bán {productQuickView.sold ?  numberKFormat(productQuickView.sold): 0}</span>
+                                <span>Đã bán {productQuickView.sold ? numberKFormat(productQuickView.sold) : 0}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
                             <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
                             <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
                         </div>
-                        <div className="shop flex items-center gap-x-4">
+                        <div className="shop flex items-center gap-x-4 mb-4">
                             {
-                                productQuickView.seller_info.name !== "" &&
-                                <div>Shop: <span className="font-bold text-blue-500">{productQuickView.seller_info.name}</span></div>
+                                productQuickView.seller_info.id ?
+                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productQuickView.seller_info.name}</span></div>
+                                    : <></>
                             }
-                            <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
+                            <div>Tình trạng:&nbsp;
+                                {
+                                    productQuickView.quantity > 0 ?
+                                        <span className="font-medium text-green-500">Còn hàng</span>
+                                        :
+                                        <span className="font-medium text-red-500">Hết hàng</span>
+                                }
+                            </div>
                         </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
-                        <div className="product__benefit text-sm text-gray-400 line-clamp-4">
-                            {productQuickView.summary}
-                        </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <ReactQuill
+                            value={productQuickView.summary}
+                            readOnly={true}
+                            theme={"bubble"}
+                            className="ql-no-border ql-line-clamp-3"
+                        />
                         <div className="flex items-end gap-x-4">
                             <div>
                                 <div className="mb-1">Số lượng</div>
