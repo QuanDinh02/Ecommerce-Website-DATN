@@ -16,6 +16,7 @@ import { deleteProduct, getProductsPagination } from "@/services/sellerService";
 import LoadImage from "@/components/LoadImage";
 import Modal from "@/components/Modal";
 import { successToast1 } from "@/components/Toast/Toast";
+import { useNavigate } from "react-router-dom";
 
 interface IProduct {
     id: number
@@ -41,12 +42,14 @@ interface ISubCategory {
 }
 
 const tableHeaders = [
-    'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá', 'Chỉnh sửa'
+    'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá hiện tại','Giá','Chỉnh sửa'
 ];
 
 const SHOW_ITEMS = [10, 25, 50];
 
 const SellerProductAll = () => {
+
+    const navigate = useNavigate();
 
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
     const [deleteProductID, setDeleteProductID] = React.useState<number>(-1);
@@ -137,7 +140,7 @@ const SellerProductAll = () => {
         <>
             <div className="flex items-center justify-between mb-8">
                 <div className="text-xl font-bold text-gray-600">Sản phẩm <span className="text-lg text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
-                <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit">Thêm Sản Phẩm</Button>
+                <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit" OnClick={() => { navigate("/seller-info/product/new"); }}>Thêm Sản Phẩm</Button>
             </div>
             <div className="w-full flex items-center justify-between mb-6">
                 <div className="w-1/2 border border-gray-300 py-2 px-3 flex items-center gap-x-1 rounded-lg">
@@ -211,11 +214,12 @@ const SellerProductAll = () => {
                                                             </td>
                                                             <td className="py-3 px-2">
                                                                 {item.sub_category.title !== "" &&
-                                                                    <span className="px-3 py-0.5 bg-gray-100 text-sm line-clamp-1 rounded-full ">{item.sub_category.title}</span>
+                                                                    <span className="px-3 py-0.5 bg-gray-100 text-sm line-clamp-1 rounded-full w-fit">{item.sub_category.title}</span>
                                                                 }
                                                             </td>
                                                             <td className="py-3 px-2">{item.quantity}</td>
                                                             <td className="py-3 px-2"><span className="text-gray-600 font-medium">{CurrencyFormat(item.current_price)}</span></td>
+                                                            <td className="py-3 px-2"><span className="text-gray-600 font-medium">{CurrencyFormat(item.price)}</span></td>
                                                             <td className="py-3 px-2">
                                                                 <div className="flex gap-4 items-center">
                                                                     <div className="w-8 h-8 bg-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-500 rounded-lg">
@@ -261,7 +265,7 @@ const SellerProductAll = () => {
                                             </>
                                             :
                                             <tr>
-                                                <td className="text-center py-3" colSpan={6}>
+                                                <td className="text-center py-3" colSpan={7}>
                                                     <div className="w-full text-gray-500 text-center py-2">Không có dữ liệu !</div>
                                                 </td>
                                             </tr>

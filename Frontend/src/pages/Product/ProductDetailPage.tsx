@@ -55,6 +55,7 @@ import { getRecommendRelevantProduct } from "@/services/recommendItemService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import ProductRating from "../Category/ProductRating";
 import LoadImage from "@/components/LoadImage";
+import ReactQuill from "react-quill";
 
 interface IRecommendProduct {
     id: number
@@ -201,7 +202,7 @@ const RelevantRecommendItemList = (props: IProps) => {
                             <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                 <div className="product__image w-40 mx-auto mb-6">
                                     {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                    <LoadImage img_style="w-full h-full" product_id={item.id}/>
+                                    <LoadImage img_style="w-full h-full" product_id={item.id} />
                                 </div>
                                 <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
@@ -263,7 +264,7 @@ const ProductDetailPage = () => {
     const [searchParams] = useSearchParams();
 
     const product_detail_ref = React.useRef<HTMLDivElement>(null);
- 
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -505,7 +506,7 @@ const ProductDetailPage = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
-        product_detail_ref.current?.scrollIntoView({behavior: 'smooth'});
+        product_detail_ref.current?.scrollIntoView({ behavior: 'smooth' });
     }
 
     const swiperSlides = () => {
@@ -667,7 +668,7 @@ const ProductDetailPage = () => {
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
                                                 {/* <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/> */}
-                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id}/>
+                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
                                             </div>
                                             {/* <div className="swiper-list w-80 mt-2 mb-5">
                                                 <Swiper
@@ -708,7 +709,7 @@ const ProductDetailPage = () => {
                                                 <GoDotFill className="text-gray-300 w-3 h-3" />
                                                 <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                                     <IoBagCheckOutline className="w-5 h-5" />
-                                                    <span>Đã bán {numberKFormat(productDetailInfo.sold)}</span>
+                                                    <span>Đã bán {productDetailInfo.sold ? numberKFormat(productDetailInfo.sold) : 0}</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-x-3">
@@ -794,7 +795,15 @@ const ProductDetailPage = () => {
                                         {
                                             productDetail[0].selected &&
                                             <div className="product__info-description text-gray-500 mb-12 w-2/3">
-                                                <span className="text-balance w-auto">{productDetailInfo.description}</span>
+                                                <span className="text-balance w-auto">
+                                                    <ReactQuill
+                                                        value={productDetailInfo.description}
+                                                        readOnly={true}
+                                                        theme={"bubble"}
+                                                        className="border-0"
+                                                    />
+                                                    {/* {productDetailInfo.description} */}
+                                                </span>
                                             </div>
                                         }
                                         {

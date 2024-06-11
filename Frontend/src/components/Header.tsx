@@ -250,6 +250,13 @@ const Header = () => {
         }
     );
 
+    const headerSectionTopStyle = classNames(
+        "section_top ",
+        {
+            'seller-header': account ? (account.role === "seller" ? true : false) : false
+        }
+    )
+
     const handleShowMenu = (show: boolean, check: boolean) => {
         if (show && check) {
             setShowMenu(true);
@@ -414,7 +421,7 @@ const Header = () => {
     return (
         <>
             <div className={headerStickyStyle}>
-                <div className='section_top'>
+                <div className={headerSectionTopStyle}>
                     {
                         scrollPosition > 144 ?
                             <div className='categories relative cursor-pointer'
@@ -526,7 +533,7 @@ const Header = () => {
                                                                 return (
                                                                     <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
                                                                         {/* <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/> */}
-                                                                        <LoadImage img_style="w-12 h-12" product_id={item.product_info.id}/>
+                                                                        <LoadImage img_style="w-12 h-12" product_id={item.product_info.id} />
                                                                         <div className='flex items-center justify-between w-full'>
                                                                             <div>
                                                                                 <div
@@ -592,7 +599,7 @@ const Header = () => {
                                         <span className='hover:opacity-70 cursor-pointer'>{account.username}</span>
                                         {
                                             showInfoSettingBox &&
-                                            <div className='widget-info absolute bg-white top-[50px] w-[12rem] right-[-50px] z-50 border border-gray-400'
+                                            <div className='widget-info absolute bg-white top-[50px] w-[12rem] right-[-20px] z-50 border border-gray-400'
                                                 onClick={() => handleShowWidgetInfo()}
                                                 ref={infoSettingBox}
                                             >

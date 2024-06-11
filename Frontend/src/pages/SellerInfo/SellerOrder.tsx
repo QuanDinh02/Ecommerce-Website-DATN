@@ -16,7 +16,7 @@ const SellerOrder = () => {
     const [dateRange, setDateRange] = React.useState([null, null]);
     const [startDate, endDate] = dateRange;
 
-    const [productDetail, setProductDetail] = useImmer([
+    const [orderStatus, setOrderStatus] = useImmer([
         {
             id: 1,
             name: "Tất cả",
@@ -61,8 +61,8 @@ const SellerOrder = () => {
         },
     ]);
 
-    const hanldeSetProductDetail = (id: number) => {
-        setProductDetail(draft => {
+    const hanldeSetOrderStatus = (id: number) => {
+        setOrderStatus(draft => {
             draft.forEach(item => {
                 if (item.id === id) {
                     item.selected = true;
@@ -78,11 +78,11 @@ const SellerOrder = () => {
             <div className="order-managment__tab-list mb-10">
                 <div className="flex items-center mb-5 border-b-2 border-gray-200">
                     {
-                        productDetail && productDetail.length > 0 &&
-                        productDetail.map((item, index) => {
+                        orderStatus && orderStatus.length > 0 &&
+                        orderStatus.map((item, index) => {
                             if (item.selected) {
                                 return (
-                                    <div className="px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer text-sm flex flex-col gap-y-1 items-center justify-center" key={`detail-${item.id}`}>
+                                    <div className="px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer text-sm flex gap-x-1 items-center justify-center" key={`detail-${item.id}`}>
                                         <div>{item.name}</div>
                                         <div>({item.value})</div>
                                     </div>
@@ -90,9 +90,9 @@ const SellerOrder = () => {
                             }
                             return (
                                 <div
-                                    className="px-5 py-2 border-b-2 border-white text-gray-300 cursor-pointer text-sm flex flex-col gap-y-1 items-center justify-center"
+                                    className="px-5 py-2 border-b-2 border-white text-gray-300 cursor-pointer text-sm flex gap-x-1 items-center justify-center"
                                     key={`detail-${item.id}`}
-                                    onClick={() => hanldeSetProductDetail(item.id)}
+                                    onClick={() => hanldeSetOrderStatus(item.id)}
                                 >
                                     <div>{item.name}</div>
                                     <div>({item.value})</div>

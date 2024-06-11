@@ -145,7 +145,7 @@ const createNewProduct = async (data, img_file) => {
 
             await db.ProductType.create({
                 quantity: data.quantity,
-                currentPrice: data.currentPrice,
+                currentPrice: data.currentPrice === 0 ? data.price : data.currentPrice,
                 price: data.price,
                 productID: product_info.id,
             });
@@ -161,13 +161,13 @@ const createNewProduct = async (data, img_file) => {
                     return {
                         EC: 0,
                         DT: "",
-                        EM: 'Create new product successfully!'
+                        EM: 'Thêm sản phẩm thành công!'
                     }
                 } else {
                     return {
                         EC: -1,
                         DT: "",
-                        EM: 'Create new product successfully with upload image failed !'
+                        EM: 'Thêm sản phẩm thành công với ảnh lỗi !'
                     }
                 }
             }
@@ -240,7 +240,59 @@ const deleteProduct = async (product_id) => {
     }
 }
 
+const getAllCategories = async () => {
+    try {
+        let categoryData = await db.Category.findAll({
+            raw: true,
+            attributes: ['id', 'title'],
+        });
+
+        const sortedCategoryList = _.orderBy(categoryData, [category => category.title.toLowerCase()], ['asc']);
+
+        return {
+            EC: 0,
+            DT: sortedCategoryList,
+            EM: 'Get all categories successfully !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getSubCategoriesByCategory = async (category_id) => {
+    try {
+        let subCategoryData = await db.SubCategory.findAll({
+            raw: true,
+            attributes: ['id', 'title'],
+            where: {
+                categoryID: {
+                    [Op.eq]: category_id
+                }
+            }
+        });
+
+        const sortedSubCategoryList = _.orderBy(subCategoryData, [sub_category => sub_category.title.toLowerCase()], ['asc']);
+
+        return {
+            EC: 0,
+            DT: sortedSubCategoryList,
+            EM: 'Get subcategories successfully !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
 
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct
+    getProductPagination, createNewProduct, deleteProduct, getAllCategories, getSubCategoriesByCategory
 }

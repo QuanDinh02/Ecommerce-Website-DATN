@@ -24,18 +24,18 @@ const getProductPagination = async (req, res) => {
 
 const createNewProduct = async (req, res) => {
     try {
-     
-        let { name, summary, seller_id, quantity, currentPrice, price, sub_category_id } = req.body;
-        // let { user } = req;
+
+        let { name, summary, quantity, currentPrice, price, sub_category_id} = req.body;
+        let { user } = req;
 
         let data = {
-            name: name, 
+            name: name,
             summary: summary,
-            seller_id: seller_id,
-            quantity: quantity,
-            currentPrice: currentPrice,
-            price: price, 
-            sub_category_id: sub_category_id, 
+            seller_id: +user.seller_id,
+            quantity: +quantity,
+            currentPrice: +currentPrice,
+            price: +price,
+            sub_category_id: +sub_category_id,
         }
 
         if (!req.files || Object.keys(req.files).length === 0) {
@@ -53,7 +53,6 @@ const createNewProduct = async (req, res) => {
                 EM: result.EM
             })
         }
-
 
     } catch (error) {
         console.log(error);
@@ -84,6 +83,44 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+const getCategoryList = async (req, res) => {
+    try {
+        let result = await sellerServices.getAllCategories();
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getSubCategoryList = async (req, res) => {
+    try {
+        let { category_id } = req.params;
+
+        let result = await sellerServices.getSubCategoriesByCategory(category_id);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct
+    getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList
 }

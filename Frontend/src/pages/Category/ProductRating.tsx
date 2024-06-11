@@ -32,7 +32,7 @@ const ProductRating = (props: IProps) => {
                             }
                         </div>
                         <TbMinusVertical className="text-gray-300" />
-                        <div className="text-sm">Đã bán {numberKFormat(props.selling_count)}</div>
+                        <div className="text-sm">Đã bán {props.selling_count ?  numberKFormat(props.selling_count): 0}</div>
                     </div>
                 </>
                 :
@@ -54,7 +54,7 @@ const ProductRating = (props: IProps) => {
                                 })
                             }
                         </div>
-                        <div className="text-sm">Đã bán {numberKFormat(props.selling_count)}</div>
+                        <div className="text-sm">Đã bán {props.selling_count ?  numberKFormat(props.selling_count): 0}</div>
                     </div>
                 </>
             }

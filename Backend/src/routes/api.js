@@ -106,9 +106,11 @@ const ApiRoute = (app) => {
     router.delete('/image/:id', imageController.deleteImage);
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
-    router.post('/seller/product', sellerController.createNewProduct);
+    router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);
 
+    router.get('/seller/categories', cacheMiddleware(300), sellerController.getCategoryList);
+    router.get('/seller/subcategories/:category_id', cacheMiddleware(300), sellerController.getSubCategoryList);
     // >>> check data: 
     // {
     //     customer_id: 1,

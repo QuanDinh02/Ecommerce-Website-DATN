@@ -137,7 +137,7 @@ const SellerInfo = () => {
                     </div>
                     :
                     <>
-                        <div className="px-[30px] w-[80rem] mx-auto py-8 flex">
+                        <div className="px-[30px] w-full mx-auto py-8 flex">
                             <div className="seller-info__sidebar w-1/3 flex flex-col gap-x-2 w-60 bg-gray-100">
                                 <div className="p-3 flex items-center gap-x-2 mb-2 bg-gray-200">
                                     <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
@@ -152,10 +152,6 @@ const SellerInfo = () => {
                                 <Outlet />
                             </div>
                         </div>
-                        {/* <div className="fixed top-0 left-0 z-40 h-screen p-4 overflow-y-auto transition-transform -translate-x-full bg-white w-80 dark:bg-gray-800">
-
-                        </div> */}
-
                     </>
             }
 
