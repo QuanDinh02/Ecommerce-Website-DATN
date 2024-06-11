@@ -1,4 +1,3 @@
-import Drawer from "@/components/Drawer";
 import React from "react";
 import ReactQuill from 'react-quill';
 import { RiEdit2Fill } from "react-icons/ri";
@@ -10,13 +9,17 @@ import { TiArrowUnsorted } from "react-icons/ti";
 import Button from "@/components/Button";
 import ReactPaginate from "react-paginate";
 import { Dropdown } from "@/components/Dropdown";
+import { CustomizeDropdown, MODULE } from "./SellerAddNewProduct";
 import { useImmer } from "use-immer";
 import { ThreeDots } from "react-loader-spinner";
-import { deleteProduct, getProductsPagination } from "@/services/sellerService";
+import { deleteProduct, getCategoryList, getProductsPagination, getSubCategoryByCategory, updateProduct } from "@/services/sellerService";
 import LoadImage from "@/components/LoadImage";
 import Modal from "@/components/Modal";
-import { successToast1 } from "@/components/Toast/Toast";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import { useNavigate } from "react-router-dom";
+import FloatingInput from "@/components/Floating/FloatingInput";
+import { TfiReload } from "react-icons/tfi";
+import { getSubCategoryInfo } from "@/services/subCategoryService";
 
 interface IProduct {
     id: number
@@ -26,6 +29,7 @@ interface IProduct {
     image: string
     sold: number
     quantity: number
+    summary: string
     sub_category: ISubCategory
 }
 
@@ -41,8 +45,13 @@ interface ISubCategory {
     title: string
 }
 
+interface ICategory {
+    id: number
+    title: string
+}
+
 const tableHeaders = [
-    'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá hiện tại','Giá','Chỉnh sửa'
+    'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá hiện tại', 'Giá', 'Chỉnh sửa'
 ];
 
 const SHOW_ITEMS = [10, 25, 50];
@@ -52,6 +61,9 @@ const SellerProductAll = () => {
     const navigate = useNavigate();
 
     const [showDeleteBox, setShowDeleteBox] = React.useState<boolean>(false);
+    const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false);
+    const [update, setUpdate] = React.useState<boolean>(false);
+
     const [deleteProductID, setDeleteProductID] = React.useState<number>(-1);
     const [deleteProductName, setDeleteProductName] = React.useState<string>("");
 
@@ -64,6 +76,27 @@ const SellerProductAll = () => {
     const [totalItems, setTotalItems] = React.useState<number>(0);
 
     const [productList, setProductList] = React.useState<IProduct[]>([]);
+
+    const [productID, setProductID] = React.useState<number>(0);
+    const [productName, setProductName] = React.useState<string>("");
+    const [productPrice, setProductPrice] = React.useState<number>(0);
+    const [productCurrentPrice, setProductCurrentPrice] = React.useState<number>(0);
+    const [inventory, setInventory] = React.useState<number>(0);
+
+    const [categoryList, setCategoryList] = React.useState<ICategory[]>([]);
+    const [subCategoryList, setSubCategoryList] = React.useState<ISubCategory[]>([]);
+
+    const [productDescription, setProductDescription] = React.useState<string>("");
+
+    const [productCategory, setProductCategory] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm"
+    });
+
+    const [productSubCategory, setProductSubCategory] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm con"
+    });
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
@@ -114,6 +147,149 @@ const SellerProductAll = () => {
         setShowDeleteBox(true);
     }
 
+    let handleShowUpdateModal = async (item: IProduct) => {
+
+        setProductID(item.id);
+        setProductName(item.name);
+        setProductPrice(item.price);
+        setProductCurrentPrice(item.current_price);
+        setInventory(item.quantity);
+        setProductDescription(item.summary);
+
+        if (item.sub_category.id !== null) {
+            let subCategoryInfo = await getSubCategoryInfo(item.sub_category.id);
+
+            console.log(subCategoryInfo);
+
+            setProductCategory(draft => {
+                draft.id = subCategoryInfo.category_info.id;
+                draft.title = subCategoryInfo.category_info.title;
+            });
+
+            setProductSubCategory(draft => {
+                draft.id = subCategoryInfo.id;
+                draft.title = subCategoryInfo.title;
+            });
+
+            let sub_category_list = await getSubCategoryByCategory(subCategoryInfo.category_info.id);
+            setSubCategoryList(sub_category_list);
+
+            setShowUpdateModal(true);
+        }
+
+        else {
+            setProductCategory(draft => {
+                draft.id = 0;
+                draft.title = "Chọn danh mục sản phẩm";
+            });
+
+            setProductSubCategory(draft => {
+                draft.id = 0;
+                draft.title = "Chọn danh mục sản phẩm con";
+            });
+
+            fetchCategoryList();
+
+            setSubCategoryList([]);
+
+            setShowUpdateModal(true);
+        }
+    }
+
+    const handleSetProductPrice = (num: any) => {
+        if (!isNaN(num) && num >= 0) {
+            setProductPrice(+num);
+        }
+    }
+
+    const handleSetProductCurrentPrice = (num: any) => {
+        if (!isNaN(num) && num >= 0) {
+            setProductCurrentPrice(+num);
+        }
+    }
+
+    const handleSetInventory = (num: any) => {
+        if (!isNaN(num) && num >= 0) {
+            setInventory(num);
+        }
+    }
+
+    const handleSelectProductCategory = async (category: ICategory) => {
+        if (category) {
+            setProductCategory(draft => {
+                draft.id = category.id;
+                draft.title = category.title;
+            });
+
+            let sub_category_list = await getSubCategoryByCategory(category.id);
+            if (sub_category_list) {
+                setSubCategoryList(sub_category_list);
+            }
+        }
+    }
+
+    const handleSelectProductSubCategory = (sub_category: ICategory) => {
+        if (sub_category) {
+            setProductSubCategory(draft => {
+                draft.id = sub_category.id;
+                draft.title = sub_category.title;
+            })
+        }
+    }
+
+    const fetchCategoryList = async () => {
+        let result = await getCategoryList();
+        if (result) {
+            setCategoryList(result);
+        }
+    }
+
+    const handleUpdateProduct = async () => {
+
+        if (productName.length === 0) {
+            errorToast1("Tên sản phẩm trống !");
+            return;
+        }
+
+        if (productSubCategory.id === 0) {
+            errorToast1("Vui lòng chọn danh mục sản phẩm !");
+            return;
+        }
+
+        if (productPrice < 1) {
+            errorToast1("Vui lòng nhập giá sản phẩm !");
+            return;
+        }
+
+        setUpdate(true);
+
+        let data = {
+            id: productID,
+            name: productName,
+            price: productPrice,
+            currentPrice: productCurrentPrice,
+            quantity: inventory,
+            summary: productDescription,
+            sub_category_id: productSubCategory.id
+        };
+
+        let result = await updateProduct(data);
+
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setUpdate(false);
+                fetchProductsPagination(showItem, currentPage);
+                setTimeout(() => {
+                    setShowUpdateModal(false);
+                }, 1000);
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
+        }
+    }
+
     React.useEffect(() => {
 
         if (showItem !== 0) {
@@ -134,6 +310,10 @@ const SellerProductAll = () => {
         setTimeout(() => {
             setDataLoading(false);
         }, 800);
+    }, []);
+
+    React.useEffect(() => {
+        fetchCategoryList();
     }, []);
 
     return (
@@ -222,7 +402,7 @@ const SellerProductAll = () => {
                                                             <td className="py-3 px-2"><span className="text-gray-600 font-medium">{CurrencyFormat(item.price)}</span></td>
                                                             <td className="py-3 px-2">
                                                                 <div className="flex gap-4 items-center">
-                                                                    <div className="w-8 h-8 bg-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-500 rounded-lg">
+                                                                    <div className="w-8 h-8 bg-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-500 rounded-lg" onClick={() => handleShowUpdateModal(item)}>
                                                                         <RiEdit2Fill className="w-4 h-4 text-white" />
                                                                     </div>
                                                                     <div className="w-8 h-8 bg-red-400 flex items-center justify-center cursor-pointer hover:bg-red-500 rounded-lg" onClick={() => handleShowDeleteModal(item.id, item.name)}>
@@ -281,6 +461,89 @@ const SellerProductAll = () => {
                     <div className="flex items-center justify-end gap-x-2 transition-all">
                         <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowDeleteBox(false)}>Hủy</Button>
                         <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer duration-200" OnClick={() => handleDeleteProduct(deleteProductID)}>Xóa</Button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal show={showUpdateModal} setShow={setShowUpdateModal} size="update-modal">
+                <div className="flex flex-col h-full relative">
+                    <div className="text-xl font-bold text-orange-400 mb-8">Cập nhật Sản Phẩm</div>
+                    <div className="flex gap-x-4 flex-1 mb-2">
+                        <div className="w-1/2">
+                            <div className="font-medium mb-4 text-sm">THÔNG TIN SẢN PHẨM</div>
+                            <FloatingInput
+                                label="Tên sản phẩm"
+                                value={productName}
+                                setValue={setProductName}
+                                input_style="px-3 py-2 border-gray-300 w-full rounded-md"
+                                block_style="w-full"
+                                id={'product-name'} />
+                            <div className="flex mt-4 gap-x-3">
+                                <CustomizeDropdown
+                                    data={categoryList}
+                                    value={productCategory}
+                                    setValue={handleSelectProductCategory}
+                                    style="px-3 py-2 rounded-md border border-gray-300 w-1/2"
+                                    id={"product-category"}
+                                    label={"Danh mục sản phẩm"}
+                                />
+                                <CustomizeDropdown
+                                    data={subCategoryList}
+                                    value={productSubCategory}
+                                    setValue={handleSelectProductSubCategory}
+                                    style="px-3 py-2 rounded-md border border-gray-300 w-1/2"
+                                    id={"product-sub-category"}
+                                    label={"Danh mục sản phẩm (con)"}
+                                    depend={productCategory.id === 0}
+                                />
+                            </div>
+                            <div className="flex mt-4 gap-x-3">
+                                <FloatingInput
+                                    label="Giá sản phẩm"
+                                    value={productPrice}
+                                    setValue={handleSetProductPrice}
+                                    input_style="px-3 py-2 border-gray-300 w-full rounded-md"
+                                    block_style="w-1/2"
+                                    id={'product-price'} />
+                                <FloatingInput
+                                    label="Giá giảm (nếu có)"
+                                    value={productCurrentPrice}
+                                    setValue={handleSetProductCurrentPrice}
+                                    input_style="px-3 py-2 border-gray-300 w-full rounded-md"
+                                    block_style="w-1/2"
+                                    id={'product-current-price'} />
+                            </div>
+                            <div className="flex mt-4 gap-x-3">
+                                <FloatingInput
+                                    label="Tồn kho"
+                                    value={inventory}
+                                    setValue={handleSetInventory}
+                                    input_style="px-3 py-2 border-gray-300 w-full rounded-md"
+                                    block_style="w-full"
+                                    id={'product-inventory'} />
+                            </div>
+
+                            <div className="font-medium mt-6 mb-4 text-sm">ẢNH SẢN PHẨM</div>
+                            <div className="w-full grid grid-cols-4 gap-y-2 gap-x-2 border border-gray-300 rounded-md p-2">
+                                <div className="w-full h-32 border border-gray-200 relative rounded-md group cursor-pointer">
+                                    <LoadImage img_style="w-full h-full rounded-md" product_id={productID} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="w-1/2">
+                            <div className="font-medium mb-1 text-sm">MÔ TẢ SẢN PHẨM</div>
+                            <ReactQuill
+                                theme="snow"
+                                value={productDescription}
+                                onChange={setProductDescription} className="w-full mt-4 "
+                                modules={MODULE}
+                            />
+
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-between sticky bottom-0 w-full bg-white border-t border-gray-200">
+                        <Button styles="px-4 py-2 rounded-lg bg-orange-400 text-white hover:bg-orange-500 w-fit mt-4 " OnClick={() => handleUpdateProduct()}>
+                            <div className="text-black font-medium flex items-center gap-x-2">{update && <TfiReload className="animate-spin" />} Cập nhật</div>
+                        </Button>
                     </div>
                 </div>
             </Modal>

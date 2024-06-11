@@ -9,7 +9,7 @@ import { TbTrash } from "react-icons/tb";
 import { getCategoryList, getSubCategoryByCategory, createNewProduct } from "@/services/sellerService";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 
-const MODULE = {
+export const MODULE = {
     toolbar: [
         [{ header: [1, 2, 3, 4, 5, false] }],
         ['bold', 'italic', 'underline', 'strike', 'blockquote'],
@@ -54,7 +54,7 @@ interface IUploadImage {
     image_file: any
 }
 
-const Dropdown = (props: IDropdown) => {
+export const CustomizeDropdown = (props: IDropdown) => {
 
     const { data, style, value, setValue, id, label, depend } = props;
 
@@ -62,7 +62,7 @@ const Dropdown = (props: IDropdown) => {
     const ref = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        setValue(data[0]);
+        setValue(value);
 
         const closeDropdown = (e) => {
             if (!ref.current?.contains(e.target)) {
@@ -252,7 +252,7 @@ const SellerAddNewProduct = () => {
         }
 
         if (productSubCategory.id === 0) {
-            errorToast1("Vui lòng danh mục sản phẩm !");
+            errorToast1("Vui lòng chọn danh mục sản phẩm !");
             return;
         }
 
@@ -310,7 +310,7 @@ const SellerAddNewProduct = () => {
                         block_style="w-full"
                         id={'product-name'} />
                     <div className="flex mt-4 gap-x-3">
-                        <Dropdown
+                        <CustomizeDropdown
                             data={categoryList}
                             value={productCategory}
                             setValue={handleSelectProductCategory}
@@ -318,7 +318,7 @@ const SellerAddNewProduct = () => {
                             id={"product-category"}
                             label={"Danh mục sản phẩm"}
                         />
-                        <Dropdown
+                        <CustomizeDropdown
                             data={subCategoryList}
                             value={productSubCategory}
                             setValue={handleSelectProductSubCategory}

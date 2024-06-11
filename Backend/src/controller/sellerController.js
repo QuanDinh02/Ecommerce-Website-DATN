@@ -25,7 +25,7 @@ const getProductPagination = async (req, res) => {
 const createNewProduct = async (req, res) => {
     try {
 
-        let { name, summary, quantity, currentPrice, price, sub_category_id} = req.body;
+        let { name, summary, quantity, currentPrice, price, sub_category_id } = req.body;
         let { user } = req;
 
         let data = {
@@ -53,6 +53,40 @@ const createNewProduct = async (req, res) => {
                 EM: result.EM
             })
         }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const updateProduct = async (req, res) => {
+    try {
+
+        let { id, name, summary, quantity, currentPrice, price, sub_category_id } = req.body;
+        let { user } = req;
+
+        let data = {
+            id: id,
+            name: name,
+            summary: summary,
+            seller_id: +user.seller_id,
+            quantity: +quantity,
+            currentPrice: +currentPrice,
+            price: +price,
+            sub_category_id: +sub_category_id,
+        }
+
+        let result = await sellerServices.updateProduct(data);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
 
     } catch (error) {
         console.log(error);
@@ -122,5 +156,6 @@ const getSubCategoryList = async (req, res) => {
 }
 
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList
+    getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
+    updateProduct
 }

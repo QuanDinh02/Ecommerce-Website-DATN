@@ -18,6 +18,7 @@ const Modal = (props: MProps) => {
         'delete-confirmation-box': 'w-[40rem] h-[180px]',
         'form-box': 'w-[40rem] h-auto',
         'form-box-2': 'w-[40rem] h-2/3',
+        'update-modal': 'w-4/6 h-4/5'
     };
 
     const handleCloseModal = () => {

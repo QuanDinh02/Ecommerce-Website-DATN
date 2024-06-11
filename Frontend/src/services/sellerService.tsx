@@ -11,6 +11,16 @@ interface INewProduct {
     image: any
 }
 
+interface IUpdateProduct {
+    id: number
+    name: string
+    summary: string
+    quantity: number
+    price: number
+    currentPrice: number
+    sub_category_id: number
+}
+
 export const getProductsPagination = async (product_display_limit: number, page: number) => {
     let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}`);
     if (result && result?.DT) {
@@ -62,5 +72,11 @@ export const createNewProduct = async (data: INewProduct) => {
         }
     });
 
+    return result;
+}
+
+export const updateProduct = async (data: IUpdateProduct) => {
+
+    let result: APIResponse =  await axios.put(`/api/seller/product`, data);
     return result;
 }

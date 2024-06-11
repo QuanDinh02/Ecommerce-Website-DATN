@@ -107,6 +107,7 @@ const ApiRoute = (app) => {
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
+    router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);
 
     router.get('/seller/categories', cacheMiddleware(300), sellerController.getCategoryList);

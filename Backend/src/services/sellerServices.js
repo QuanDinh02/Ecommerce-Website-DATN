@@ -38,7 +38,7 @@ const getProductPagination = async (shop_seller_id, item_limit, page) => {
 
             let productListRaw = await db.Product.findAll({
                 raw: true,
-                attributes: ['id', 'name'],
+                attributes: ['id', 'name', 'summary'],
                 where: {
                     shop_id: {
                         [Op.eq]: shop_seller_id,
@@ -202,6 +202,49 @@ const createNewProduct = async (data, img_file) => {
     }
 }
 
+const updateProduct = async (data) => {
+    try {
+
+        await db.Product.update({
+            name: data.name,
+            summary: data.summary,
+            shop_id: data.seller_id
+        }, {
+            where: {
+                id: +data.id
+            }
+        });
+
+        await db.ProductType.update({
+            quantity: data.quantity,
+            price: data.price,
+            currentPrice: data.currentPrice
+        }, {
+            where: {
+                productID: +data.id
+            }
+        });
+
+        await db.ProductSubCategory.update({
+            subCategoryID: data.sub_category_id,
+        }, {
+            where: {
+                productID: +data.id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Cập nhật sản phẩm thành công!'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 const deleteProduct = async (product_id) => {
     try {
         await db.Product.destroy({
@@ -294,5 +337,6 @@ const getSubCategoriesByCategory = async (category_id) => {
 }
 
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct, getAllCategories, getSubCategoriesByCategory
+    getProductPagination, createNewProduct, deleteProduct, getAllCategories, getSubCategoriesByCategory,
+    updateProduct
 }
