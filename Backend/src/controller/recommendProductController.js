@@ -373,6 +373,39 @@ const handlePredictRecommendRelevantProducts = async (req, res) => {
         let itemID = data.item_id;
         let list = JSON.parse(data.list);
 
+        // let list = [
+        //     {
+        //         product_id: 274639776
+        //     },
+        //     {
+        //         product_id: 274639684
+        //     },
+        //     {
+        //         product_id: 274638826
+        //     },
+        //     {
+        //         product_id: 274638661
+        //     },
+        //     {
+        //         product_id: 274638435
+        //     },
+        //     {
+        //         product_id: 274612002
+        //     },
+        //     {
+        //         product_id: 274585510
+        //     },
+        //     {
+        //         product_id: 274574543
+        //     },
+        //     {
+        //         product_id: 274568849
+        //     },
+        //     {
+        //         product_id: 274564366
+        //     }
+        // ]
+        
         let dataFormat = list.map(item => {
             return {
                 product_id: +item.product_id,

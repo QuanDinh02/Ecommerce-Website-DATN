@@ -1,10 +1,6 @@
 import { MdOutlineArrowForwardIos } from "react-icons/md";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import Product01 from '../../assets/img/product_detail/product_01.svg';
-
-import Item from '../../assets/img/homepage/item.svg';
-
 import { IoIosArrowForward } from "react-icons/io";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -23,7 +19,6 @@ import { FaRegHeart } from "react-icons/fa6";
 import { useImmer } from "use-immer";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { IoMdHeartEmpty } from "react-icons/io";
-import { TbMinusVertical } from "react-icons/tb";
 
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
@@ -66,6 +61,8 @@ interface IRecommendProduct {
     rating: number
     sold: number
     summary: string
+    seller_info: IShopInfo
+    quantity: number
 }
 
 interface ICustomerAccount {
@@ -78,8 +75,26 @@ interface IData {
     product_list: IRecommendProduct[]
 }
 
+interface IShopInfo {
+    id: number
+    name: string
+}
+
+interface IProductQuickView {
+    id: number
+    name: string
+    image_url: string
+    current_price: number
+    price: number
+    rating: number
+    sold: number
+    summary: string
+    seller_info: IShopInfo
+    quantity: number
+}
+
 interface IProps {
-    setShow_quick_view: (value: boolean) => void,
+    setShow_quick_view: (item: IRecommendProduct) => void,
     item_id: number
 }
 
@@ -187,74 +202,83 @@ const RelevantRecommendItemList = (props: IProps) => {
     }
 
     React.useEffect(() => {
-        if (account && isAuthenticated && props.item_id !== 0) {
+        if (props.item_id !== 0) {
             fetchRecommendItems(props.item_id);
         }
     }, [isAuthenticated]);
 
     return (
         <>
-            {
-                recommendItemList && recommendItemList.length > 0 &&
-                recommendItemList.map((item, index) => {
-                    return (
-                        <SwiperSlide>
-                            <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
-                                <div className="product__image w-40 mx-auto mb-6">
-                                    {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                    <LoadImage img_style="w-full h-full" product_id={item.id} />
-                                </div>
-                                <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                        e.stopPropagation();
-                                        hanldeAddShoppingCart(1, item.id);
-                                    }}>
-                                        <PiShoppingCartLight className="w-6 h-6 " />
-                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                <span className="text-sm">Thêm vào giỏ hàng</span>
+            <Swiper
+                navigation={true}
+                modules={[Navigation]}
+                className="mySwiper product-list"
+                spaceBetween={10}
+                slidesPerView={5}
+            >
+                {
+                    recommendItemList && recommendItemList.length > 0 &&
+                    recommendItemList.map((item, index) => {
+                        return (
+                            <SwiperSlide>
+                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
+                                    <div className="product__image w-40 mx-auto mb-6 relative">
+                                        {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} />
+                                        <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                hanldeAddShoppingCart(1, item.id);
+                                            }}>
+                                                <PiShoppingCartLight className="w-6 h-6 " />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                props.setShow_quick_view(item);
+                                            }}>
+                                                <IoEyeOutline className="w-6 h-6" />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Xem nhanh</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddFavouriteItem(item.id);
+                                            }}>
+                                                <IoMdHeartEmpty className="w-6 h-6" />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Yêu thích</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                        e.stopPropagation();
-                                        props.setShow_quick_view(true);
-                                    }}>
-                                        <IoEyeOutline className="w-6 h-6" />
-                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                <span className="text-sm">Xem nhanh</span>
-                                            </div>
-                                        </div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
+                                    <div className="product__price flex items-center gap-2 mb-2.5">
+                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
                                     </div>
-                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleAddFavouriteItem(item.id);
-                                    }}>
-                                        <IoMdHeartEmpty className="w-6 h-6" />
-                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                <span className="text-sm">Yêu thích</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <ProductRating
+                                        ratings={item.rating}
+                                        selling_count={item.sold}
+                                        key={`item-rating-product-${item.id}`}
+                                        item_grid={true}
+                                    />
                                 </div>
-                                <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
-                                <div className="product__price flex items-center gap-2 mb-2.5">
-                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
-                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
-                                </div>
-                                <ProductRating
-                                    ratings={item.rating}
-                                    selling_count={item.sold}
-                                    key={`item-rating-product-${item.id}`}
-                                    item_grid={true}
-                                />
-                            </div>
-                        </SwiperSlide>
-                    )
-                })
-            }
+                            </SwiperSlide>
+                        )
+                    })
+                }
+            </Swiper>
+
         </>
     )
 }
@@ -300,6 +324,39 @@ const ProductDetailPage = () => {
             name: ""
         },
     });
+
+    const [productQuickView, setProductQuickView] = useImmer<IProductQuickView>({
+        id: 0,
+        name: "",
+        image_url: "",
+        current_price: 0,
+        price: 0,
+        rating: 0,
+        sold: 0,
+        summary: "",
+        quantity: 0,
+        seller_info: {
+            id: 0,
+            name: ""
+        }
+    })
+
+    const handleQuickView = (item: IRecommendProduct) => {
+        setProductQuickView(draft => {
+            draft.id = item.id;
+            draft.name = item.name;
+            draft.image_url = item.image;
+            draft.current_price = item.current_price;
+            draft.price = item.price;
+            draft.rating = item.rating;
+            draft.sold = item.sold;
+            draft.summary = item.summary;
+            draft.quantity = item.quantity;
+            draft.seller_info = item.seller_info;
+        });
+        setShowQuickView(true);
+        document.body.style.overflow = "hidden";
+    }
 
     const [productReviews, setProductReviews] = React.useState<IProductReview[]>([]);
     const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -362,10 +419,6 @@ const ProductDetailPage = () => {
         })
     }
 
-    const hanldeFavoriteItem = () => {
-        successToast1("Thêm vào sản phẩm yêu thích !");
-    }
-
     const refetchCartItem = async () => {
         let cartItemsData: any = await fetchCartItem(account.customer_id);
         if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
@@ -392,14 +445,19 @@ const ProductDetailPage = () => {
         }
     }
 
-    const hanldeAddShoppingCart = () => {
+    const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: account.customer_id,
+                productID: product_id
+            }
 
-        if (productAmount === 0) {
-            errorToast1("Sản phẩm hết hàng !");
-            return;
-        }
-        if (!_.isEmpty(account) && isAuthenticated) {
-            handleAddCartItem(amount, account.customer_id, productDetailInfo.id);
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
         } else {
             navigate("/login");
         }
@@ -468,11 +526,11 @@ const ProductDetailPage = () => {
         }
     }
 
-    const handleAddFavouriteItem = async (product_id: number, customer_id: number) => {
+    const handleAddFavouriteItem = async (product_id: number) => {
         if (account && isAuthenticated) {
             let data: INewWishListItem = {
                 productID: product_id,
-                customerID: customer_id
+                customerID: account.customer_id
             }
 
             let result = await createWishListItem(data);
@@ -507,69 +565,6 @@ const ProductDetailPage = () => {
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
         product_detail_ref.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    const swiperSlides = () => {
-        return (
-            <>
-                {
-                    [...Array(10)].map((item, index) => {
-                        return (
-                            <SwiperSlide>
-                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group">
-                                    <div className="product__image w-40 mx-auto mb-6"><img src={Item} alt="" /></div>
-                                    <div className="product__utility hidden flex items-center justify-center gap-x-4 mb-2 group-hover:block group-hover:flex duration-300">
-                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                            e.stopPropagation();
-                                            hanldeAddShoppingCart();
-                                        }}>
-                                            <PiShoppingCartLight className="w-6 h-6 " />
-                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                    <span className="text-sm">Thêm vào giỏ hàng</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                            e.stopPropagation();
-                                            setShowQuickView(true);
-                                        }}>
-                                            <IoEyeOutline className="w-6 h-6" />
-                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                    <span className="text-sm">Xem nhanh</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                            e.stopPropagation();
-                                            hanldeFavoriteItem()
-                                        }}>
-                                            <IoMdHeartEmpty className="w-6 h-6" />
-                                            <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                    <span className="text-sm">Yêu thích</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">Điện thoại NOKIA 1O5 4G 2O19 bản 2 sim thiết kế bền bỉ, tặng kèm pin sạc, bảo hành 12 tháng</div>
-                                    <div className="product__price font-medium text-lg mb-2">{CurrencyFormat(768000)}</div>
-                                    <div className="flex items-center mb-1 group-hover:hidden">
-                                        <div className="product__rating-stars flex items-center gap-x-1">
-                                            <Rating rating={5} />
-                                        </div>
-                                        <TbMinusVertical className="text-gray-300" />
-                                        <div className="text-sm">Đã bán {numberKFormat(1200)}</div>
-                                    </div>
-                                </div>
-                            </SwiperSlide>
-                        )
-                    })
-                }
-
-            </>
-        )
     }
 
     React.useEffect(() => {
@@ -758,13 +753,13 @@ const ProductDetailPage = () => {
                                             <div className="flex items-center gap-x-4 mt-6 mb-4">
                                                 <Button
                                                     styles="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer flex items-center justify-center gap-x-2"
-                                                    OnClick={() => hanldeAddShoppingCart()}
+                                                    OnClick={() => hanldeAddShoppingCart(1, productDetailInfo.id)}
                                                 >
                                                     <LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng
                                                 </Button>
                                                 <Button
                                                     styles="text-gray-600 hover:text-red-500 duration-300 cursor-pointer"
-                                                    OnClick={() => handleAddFavouriteItem(productDetailInfo.id, account.customer_id)}
+                                                    OnClick={() => handleAddFavouriteItem(productDetailInfo.id)}
                                                 >
                                                     <FaRegHeart className="w-7 h-7" />
                                                 </Button>
@@ -889,16 +884,7 @@ const ProductDetailPage = () => {
                                                 <div className="text-red-500 hover:underline cursor-pointer flex items-center gap-x-1"><span>Xem Tất Cả</span> <IoIosArrowForward /></div>
                                             </div>
                                             <div className="banner w-full mb-5">
-                                                <Swiper
-                                                    navigation={true}
-                                                    modules={[Navigation]}
-                                                    className="mySwiper product-list"
-                                                    spaceBetween={10}
-                                                    slidesPerView={5}
-                                                >
-                                                    {/* {<RelevantRecommendItemList setShow_quick_view={setShowQuickView} item_id={productID}/>} */}
-                                                    {swiperSlides()}
-                                                </Swiper>
+                                                <RelevantRecommendItemList setShow_quick_view={handleQuickView} item_id={productID} />
                                             </div>
                                         </div>
                                     </div>
@@ -909,40 +895,45 @@ const ProductDetailPage = () => {
             </div>
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize">
                 <div className="product-quick-view flex w-full relative">
-                    <div className="product-quick-view__image w-2/5">
-                        <img src={Product01} alt="" className="w-[26.875rem] h-[26.875rem]" />
+                    <div className="product-quick-view__image w-2/5 flex items-center justify-center">
+                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
+                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
                     </div>
                     <div className="product-quick-view__info w-3/5">
-                        <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
-                        <div className="product__rating-stars flex items-center gap-x-3 mt-1">
-                            <div className="flex items-center gap-x-0.5">
-                                <Rating rating={5} />
-                                <span className="ml-1 text-[#FCB800] font-medium">5.0</span>
-                            </div>
-                            <GoDotFill className="text-gray-300 w-3 h-3" />
-                            <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
-                                <MdOutlineMessage className="w-5 h-5" />
-                                <span>101 đánh giá</span>
-                            </div>
+                        <div className="product__name font-medium text-2xl">{productQuickView.name}</div>
+                        <div className="product__rating-stars flex items-center gap-x-3 my-3">
+                            <Rating rating={productQuickView.rating} />
                             <GoDotFill className="text-gray-300 w-3 h-3" />
                             <div className="product__comment-count text-gray-400 flex items-center gap-x-1">
                                 <IoBagCheckOutline className="w-5 h-5" />
-                                <span>Đã bán 2k2</span>
+                                <span>Đã bán {productQuickView.sold ? numberKFormat(productQuickView.sold) : 0}</span>
                             </div>
                         </div>
-                        <div className="product__price text-2xl font-bold my-4">{CurrencyFormat(2399000)}</div>
-                        <div className="shop flex items-center gap-x-4">
-                            <div>Shop: <span className="font-bold text-blue-500">Shop Pro</span></div>
-                            <div>Tình trạng: <span className="font-medium text-green-500">Còn hàng</span></div>
+                        <div className="flex items-center gap-2 my-4">
+                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
                         </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
-                        <div className="product__benefit text-sm text-gray-400 flex flex-col gap-2">
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Unrestrained and portable active stereo speaker</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Free from the confines of wires and chords</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />20 hours of portable capabilities</div>
-                            <div className="flex items-center gap-x-1"><GoDotFill className="text-gray-400 w-2 h-2" />Double-ended Coil Cord with 3.5mm Stereo Plugs Included</div>
+                        <div className="shop flex items-center gap-x-4 mb-4">
+                            {
+                                productQuickView.seller_info.id ?
+                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productQuickView.seller_info.name}</span></div>
+                                    : <></>
+                            }
+                            <div>Tình trạng:&nbsp;
+                                {
+                                    productQuickView.quantity > 0 ?
+                                        <span className="font-medium text-green-500">Còn hàng</span>
+                                        :
+                                        <span className="font-medium text-red-500">Hết hàng</span>
+                                }
+                            </div>
                         </div>
-                        <div className="border-t border-gray-300 w-full my-4"></div>
+                        <ReactQuill
+                            value={productQuickView.summary}
+                            readOnly={true}
+                            theme={"bubble"}
+                            className="ql-no-border ql-line-clamp-3"
+                        />
                         <div className="flex items-end gap-x-4">
                             <div>
                                 <div className="mb-1">Số lượng</div>
@@ -952,8 +943,8 @@ const ProductDetailPage = () => {
                                     <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
                                 </div>
                             </div>
-                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart()}>Thêm vào giỏ hàng</div>
-                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => hanldeFavoriteItem()}><FaRegHeart className="w-7 h-7" /></div>
+                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(1, productQuickView.id)}>Thêm vào giỏ hàng</div>
+                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
                         </div>
                     </div>
                 </div>
