@@ -205,7 +205,7 @@ const RelevantRecommendItemList = (props: IProps) => {
         if (props.item_id !== 0) {
             fetchRecommendItems(props.item_id);
         }
-    }, [isAuthenticated]);
+    }, [isAuthenticated, props.item_id]);
 
     return (
         <>
@@ -505,24 +505,6 @@ const ProductDetailPage = () => {
             setTotalRatings(response.total_ratings);
             setRatings(response.ratings);
             setRatingAverage(response.rating_average)
-        }
-    }
-
-    const handleAddCartItem = async (quantity: number, customer_id: number, product_id: number) => {
-        if (account && isAuthenticated) {
-            let data: INewCartItem = {
-                quantity: quantity,
-                customerID: customer_id,
-                productID: product_id
-            }
-
-            let result = await createCartItem(data);
-            if (result && result.EC === 0) {
-                refetchCartItem();
-                successToast1(result.EM);
-            }
-        } else {
-            navigate("/login");
         }
     }
 
