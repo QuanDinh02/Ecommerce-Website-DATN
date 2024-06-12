@@ -33,6 +33,7 @@ import { useImmer } from "use-immer";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
+import Button from "@/components/Button";
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -395,17 +396,29 @@ const Homepage = () => {
                             <img src={Banner} alt="" className="w-full h-full" />
                         </div>
                     </div>
-                    <div className="header mt-6 px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
-                    <div className="section customer-recommendation bg-white mb-8">
-                        <div className="px-5 py-6 bg-[#EEEEEE]">
-                            <div className="product-list grid grid-cols-5 gap-y-6 gap-x-2">
-                                <RecommendItemList setShow_quick_view={handleQuickView} />
+                    {
+                        (account && isAuthenticated && account.role === "customer") ?
+                            <>
+                                <div className="header mt-6 px-5 py-4 bg-white flex items-center justify-center border-b-4 border-red-500 text-red-500 text-lg sticky top-[75px] z-30">GỢI Ý DÀNH CHO BẠN</div>
+                                <div className="section customer-recommendation bg-white mb-8">
+                                    <div className="px-5 py-6 bg-[#EEEEEE]">
+                                        <div className="product-list grid grid-cols-5 gap-y-6 gap-x-2">
+                                            <RecommendItemList setShow_quick_view={handleQuickView} />
+                                        </div>
+                                    </div>
+                                    <div className="w-full flex items-center justify-center bg-[#EEEEEE]">
+                                        <div className="w-1/3 bg-white flex items-center justify-center py-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">Xem Thêm</div>
+                                    </div>
+                                </div>
+                            </>
+                            :
+                            <div className="mt-6 p-6 bg-white flex flex-col items-center justify-center gap-y-2">
+                                <div className="">Các sản phẩm đề xuất dành cho bạn</div>
+                                <Button styles="w-60 px-3 py-2 bg-[#FCB800] font-medium rounded-md" OnClick={() => navigate("/login")}>Đăng nhập</Button>
+                                <div className="text-sm">Khách hàng mới? <span className="cursor-pointer hover:text-blue-600 hover:underline" onClick={() => navigate("/register/customer")}>Đăng ký tại đây</span></div>
                             </div>
-                        </div>
-                        <div className="w-full flex items-center justify-center bg-[#EEEEEE]">
-                            <div className="w-1/3 bg-white flex items-center justify-center py-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">Xem Thêm</div>
-                        </div>
-                    </div>
+                    }
+
                 </div>
             </div>
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize-h-auto">
