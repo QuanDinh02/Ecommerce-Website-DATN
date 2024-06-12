@@ -8,6 +8,7 @@ import { BsFillPlusCircleFill } from "react-icons/bs";
 import { TbTrash } from "react-icons/tb";
 import { getCategoryList, getSubCategoryByCategory, createNewProduct } from "@/services/sellerService";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
+import FloatingNumberInput from "@/components/Floating/FloatingNumberInput";
 
 export const MODULE = {
     toolbar: [
@@ -329,14 +330,15 @@ const SellerAddNewProduct = () => {
                         />
                     </div>
                     <div className="flex mt-4 gap-x-3">
-                        <FloatingInput
+                        <FloatingNumberInput
                             label="Giá sản phẩm"
                             value={productPrice}
                             setValue={handleSetProductPrice}
                             input_style="px-3 py-2 border-gray-300 w-full rounded-md"
                             block_style="w-1/2"
-                            id={'product-price'} />
-                        <FloatingInput
+                            id={'product-price'}
+                        />
+                        <FloatingNumberInput
                             label="Giá giảm (nếu có)"
                             value={productCurrentPrice}
                             setValue={handleSetProductCurrentPrice}
@@ -345,13 +347,14 @@ const SellerAddNewProduct = () => {
                             id={'product-current-price'} />
                     </div>
                     <div className="flex mt-4 gap-x-3">
-                        <FloatingInput
+                        <FloatingNumberInput
                             label="Số lượng nhập kho"
                             value={inventory}
                             setValue={handleSetInventory}
                             input_style="px-3 py-2 border-gray-300 w-full rounded-md"
                             block_style="w-full"
-                            id={'product-inventory'} />
+                            id={'product-inventory'}
+                            normal={true} />
                     </div>
                     <div className="font-medium mt-6 mb-1 text-sm">MÔ TẢ SẢN PHẨM</div>
                     <ReactQuill
