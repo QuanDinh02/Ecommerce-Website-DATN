@@ -62,10 +62,8 @@ if __name__ == '__main__':
                 .paging(0, 20)
                 .dialect(2)
         )
-      
     params = sys.argv[1]
     item_id = params
-
     query_get_name = f'''
         SELECT name
         FROM Product
@@ -73,15 +71,19 @@ if __name__ == '__main__':
     '''
     cursor.execute(query_get_name)
     item_name = cursor.fetchall()
-    print(item_name[0]['name'])
+    
     encoded_name_product = embedder.encode(item_name[0]['name'])
     while(True):
         itemSim = create_query_table(redis_client, query, encoded_name_product)
         if (len(itemSim)) > 0:
                 break
-    json_result = json.dumps(itemSim, ensure_ascii=False, indent=4)
+    itemSim_1 = []
+    for data in itemSim:
+        itemSim_1.append({'product_id': data})
+    json_result = json.dumps(itemSim_1, ensure_ascii=False, indent=4)
     res ={'item_id': item_id, 'list': json_result}
     res_json = json.dumps(res, ensure_ascii=False, indent=4)
     
-    a = {'data': res_json}
-    print(a)
+    a = {"data": res_json}
+    b = json.dumps(a, ensure_ascii=False)
+    print(b)

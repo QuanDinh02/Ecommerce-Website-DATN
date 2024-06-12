@@ -361,12 +361,14 @@ const handlePredictRecommendRelevantProducts = async (req, res) => {
 
         var options = {
             scriptPath: "src/routes",
-            args: [item_id]
+            args: [item_id],
         };
 
         let relevantData = await PythonShell.run('predictItem.py', options);
 
-        let data = JSON.parse(relevantData);
+        let py_result = JSON.parse(relevantData[0]);
+
+        let data = JSON.parse(py_result.data);
 
         let itemID = data.item_id;
         let list = JSON.parse(data.list);
