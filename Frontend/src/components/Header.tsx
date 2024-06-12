@@ -529,34 +529,36 @@ const Header = () => {
                                                     <>
                                                         {
                                                             cartItemList.map((item, index) => {
-
-                                                                return (
-                                                                    <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                        {/* <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/> */}
-                                                                        <LoadImage img_style="w-12 h-12" product_id={item.product_info.id} />
-                                                                        <div className='flex items-center justify-between w-full'>
-                                                                            <div>
-                                                                                <div
-                                                                                    className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleProductDetailNavigation(item.product_info.id)
-                                                                                    }
-                                                                                    }
-                                                                                >
-                                                                                    {item.product_info.name}
+                                                                if (index <= 3) {
+                                                                    return (
+                                                                        <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
+                                                                            {/* <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/> */}
+                                                                            <LoadImage img_style="w-12 h-12" product_id={item.product_info.id} />
+                                                                            <div className='flex items-center justify-between w-full'>
+                                                                                <div>
+                                                                                    <div
+                                                                                        className='line-clamp-2 text-black text-blue-500 font-normal duration-300 hover:text-[#FCB800] cursor-pointer text-sm mb-1'
+                                                                                        onClick={(e) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleProductDetailNavigation(item.product_info.id)
+                                                                                        }
+                                                                                        }
+                                                                                    >
+                                                                                        {item.product_info.name}
+                                                                                    </div>
+                                                                                    <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
+                                                                                        <span>{item.quantity}</span>
+                                                                                        <span>x</span>
+                                                                                        <span>{CurrencyFormat(item.price)}</span>
+                                                                                    </div>
                                                                                 </div>
-                                                                                <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
-                                                                                    <span>{item.quantity}</span>
-                                                                                    <span>x</span>
-                                                                                    <span>{CurrencyFormat(item.price)}</span>
-                                                                                </div>
+                                                                                <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer' onClick={() => handleDeleteCartItem(+item.id)}>&#128473;</div>
                                                                             </div>
-                                                                            <div className='font-normal text-gray-300 text-xl hover:text-red-500 cursor-pointer' onClick={() => handleDeleteCartItem(+item.id)}>&#128473;</div>
-                                                                        </div>
 
-                                                                    </div>
-                                                                )
+                                                                        </div>
+                                                                    )
+                                                                }
+
                                                             })
                                                         }
                                                         <div className='shopping-cart-total flex items-center justify-between mb-8'>

@@ -11,7 +11,7 @@ import fileUpload from 'express-fileupload';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8081;
 
 // cors config
 configCors(app);
