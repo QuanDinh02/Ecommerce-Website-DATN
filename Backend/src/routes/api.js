@@ -105,6 +105,10 @@ const ApiRoute = (app) => {
     router.post('/image', upload.single('image'), imageController.uploadImage);
     router.delete('/image/:id', imageController.deleteImage);
 
+    router.get('/seller/register/email-validate', userController.checkSellerEmailExist);
+    router.post('/seller/register/verification-code', sellerController.sendVertificatedCode);
+    router.post('/seller/register/verify', sellerController.handleCodeVertification);
+
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
@@ -112,24 +116,7 @@ const ApiRoute = (app) => {
 
     router.get('/seller/categories', cacheMiddleware(300), sellerController.getCategoryList);
     router.get('/seller/subcategories/:category_id', cacheMiddleware(300), sellerController.getSubCategoryList);
-    // >>> check data: 
-    // {
-    //     customer_id: 1,
-    //     list: 
-    //     [
-    //         { product_id: '195797729', predict_rating: '4.436582809224318' },
-    //         { product_id: '21441058', predict_rating: '4.436582809224318' },
-    //         { product_id: '176598086', predict_rating: '4.330790847049378' },
-    //         { product_id: '58678598', predict_rating: '4.330790847049378' },
-    //         { product_id: '1025034', predict_rating: '4.2317216981132075' },
-    //         { product_id: '579949', predict_rating: '4.2317216981132075' },
-    //         { product_id: '68716608', predict_rating: '3.3717679944095043' },
-    //         { product_id: '11488924', predict_rating: '3.2317216981132075' },
-    //         { product_id: '56941526', predict_rating: '2.4365828092243182' },
-    //         { product_id: '25421010', predict_rating: '1' }
-    //     ]
-    // } 
-
+ 
     return app.use('/api', router);
 }
 

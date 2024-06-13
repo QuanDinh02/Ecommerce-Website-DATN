@@ -3,18 +3,18 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class CustomerVertification extends Model {
+  class CodeVertification extends Model {
     static associate(models) {
         
     }
   }
-  CustomerVertification.init({
+  CodeVertification.init({
     email: DataTypes.STRING,
     code: DataTypes.STRING,
     createdAt: DataTypes.DATE,
   }, {
     sequelize,
-    modelName: 'CustomerVertification',
+    modelName: 'CodeVertification',
   });
-  return CustomerVertification;
+  return CodeVertification;
 };

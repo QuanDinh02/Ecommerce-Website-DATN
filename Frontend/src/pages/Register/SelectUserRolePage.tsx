@@ -50,7 +50,7 @@ const SelectUserRolePage = () => {
                             <div><FaUser className="w-12 h-12" /></div>
                             <div className='text-xl font-medium mt-2'>Khách hàng</div>
                         </div>
-                        <div className={activeStyle}>
+                        <div className={activeStyle} onClick={() => navigate("/register/seller")}>
                             <div><FaUserTie className="w-12 h-12" /></div>
                             <div className='text-xl font-medium mt-2'>Người bán</div>
                         </div>

@@ -81,6 +81,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import SellerSignUpPage from './pages/Register/SellerSignUpPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -296,6 +297,10 @@ const router = createBrowserRouter(
             {
               path: "customer",
               element: <CustomerSignUpPage />
+            },
+            {
+              path: "seller",
+              element: <SellerSignUpPage/>
             },
           ]
         },

@@ -356,7 +356,7 @@ const handleCreateVertificationCode = async (data) => {
     try {
         let { code, email } = data;
 
-        let existCode = await db.CustomerVertification.findAll({
+        let existCode = await db.CodeVertification.findAll({
             raw: true,
             where: {
                 email: {
@@ -366,7 +366,7 @@ const handleCreateVertificationCode = async (data) => {
         });
 
         if (existCode.length > 0) {
-            await db.CustomerVertification.destroy({
+            await db.CodeVertification.destroy({
                 where: {
                     email: {
                         [Op.eq]: email,
@@ -374,7 +374,7 @@ const handleCreateVertificationCode = async (data) => {
                 }
             });
 
-            let result = await db.CustomerVertification.create({
+            let result = await db.CodeVertification.create({
                 email: email,
                 code: code,
                 createdAt: new Date()
@@ -394,7 +394,7 @@ const handleCreateVertificationCode = async (data) => {
                 EM: 'Create new OTP code failed !'
             }
         } else {
-            await db.CustomerVertification.destroy({
+            await db.CodeVertification.destroy({
                 where: {
                     email: {
                         [Op.eq]: email,
@@ -402,7 +402,7 @@ const handleCreateVertificationCode = async (data) => {
                 }
             });
 
-            let result = await db.CustomerVertification.create({
+            let result = await db.CodeVertification.create({
                 email: email,
                 code: code,
                 createdAt: new Date()
@@ -436,7 +436,7 @@ const handleOTPVertification = async (data) => {
     try {
         let { otp, email } = data;
 
-        let result = await db.CustomerVertification.findOne({
+        let result = await db.CodeVertification.findOne({
             raw: true,
             attributes: ['id', 'code', 'createdAT'],
             where: {
@@ -456,7 +456,7 @@ const handleOTPVertification = async (data) => {
 
             if (result.code === otp && time_span < process.env.OTP_TIME_DURATION) {
 
-                await db.CustomerVertification.destroy({
+                await db.CodeVertification.destroy({
                     where: {
                         email: {
                             [Op.eq]: email,

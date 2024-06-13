@@ -45,6 +45,34 @@ const checkCustomerEmailExist = async (email) => {
 
 }
 
+const checkSellerEmailExist = async (email) => {
+    try {
+        let check = await db.Seller.findOne({ where: { email: email } });
+        if(check) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: "Email đã tồn tại"
+            }
+        } else {
+            return {
+                EC: 1,
+                DT: '',
+                EM: "Email không tồn tại"
+            }
+        }
+        
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: 2,
+            DT: '',
+            EM: "Some things is wrong at service!"
+        }
+    }
+
+}
+
 const userRegister = async (userData) => {
 
     try {
@@ -74,6 +102,43 @@ const userRegister = async (userData) => {
 
                     await db.Customer.create({
                         mobile: userData.phone,
+                        email: userData.email,
+                        userID: user_info.id,
+                    })
+
+                    return {
+                        EC: 0,
+                        DT: '',
+                        EM: 'Đăng ký thành công !',
+                    }
+                }
+            }
+        }
+
+        if(role === 2) {
+            let checkUsername = await checkUserNameExist(userData.username);
+    
+            if (checkUsername) {
+                return {
+                    EC: 1,
+                    DT: '',
+                    EM: 'Tên đăng nhập đã tồn tại !',
+                }
+            } else {
+                let hash_password = hashPassword(userData.password);
+    
+                let userInfo = await db.User.create({
+                    username: userData.username,
+                    password: hash_password,
+                    role: 2,
+                    registeredAt: new Date(),
+                    lastLogin: null,
+                })
+
+                if(userInfo) {
+                    let user_info = userInfo.dataValues;
+
+                    await db.Seller.create({
                         email: userData.email,
                         userID: user_info.id,
                     })
@@ -259,4 +324,8 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { userRegister, userLogin, hashPassword, checkCustomerEmailExist, checkPassword }
+module.exports = { 
+    userRegister, userLogin, hashPassword, 
+    checkCustomerEmailExist, checkPassword, 
+    checkSellerEmailExist 
+}

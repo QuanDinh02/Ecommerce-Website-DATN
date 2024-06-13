@@ -80,3 +80,8 @@ export const updateProduct = async (data: IUpdateProduct) => {
     let result: APIResponse =  await axios.put(`/api/seller/product`, data);
     return result;
 }
+
+export const checkSellerEmailExist = async (email: string) => {
+    let result: APIResponse = await axios.get(`/api/seller/register/email-validate?email=${email}`);
+    return result;
+}
