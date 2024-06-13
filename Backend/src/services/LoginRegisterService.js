@@ -268,7 +268,7 @@ const userLogin = async (userData) => {
 
                         let payload = {
                             seller_id: seller_id,
-                            username: sellerInfo.name,
+                            username: user.username,
                             role: user.role,
                             isAuthenticated: true,
                         }

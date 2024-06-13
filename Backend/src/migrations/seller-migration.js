@@ -27,6 +27,12 @@ module.exports = {
             intro: {
                 type: Sequelize.TEXT("medium")
             },
+            gender: {
+                type: Sequelize.TINYINT
+            },
+            birth: {
+                type: Sequelize.DATE
+            },
             userID: {
                 type: Sequelize.BIGINT
             }

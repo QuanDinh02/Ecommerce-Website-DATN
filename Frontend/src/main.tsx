@@ -57,6 +57,8 @@ import SellerProductAll from '@/pages/SellerInfo/SellerProduct/SellerProductAll.
 import SellerAddNewProduct from '@/pages/SellerInfo/SellerProduct/SellerAddNewProduct.tsx';
 import SellerProfile from '@/pages/SellerInfo/SellerProfile.tsx';
 import RegisterPage from '@/pages/RegisterPage.tsx';
+import SellerSignUpPage from '@/pages/Register/SellerSignUpPage.tsx';
+import ShopInfo from '@/pages/SellerInfo/ShopInfo.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -81,7 +83,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import SellerSignUpPage from './pages/Register/SellerSignUpPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -149,6 +150,7 @@ const router = createBrowserRouter(
               ]
             },
             { path: "profile", element: <SellerProfile /> },
+            { path: "shop", element: <ShopInfo/> },
             {
               path: "product",
               element: <SellerProduct />,

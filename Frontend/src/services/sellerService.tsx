@@ -21,6 +21,13 @@ interface IUpdateProduct {
     sub_category_id: number
 }
 
+interface IUpdateSellerInfo {
+    name: string
+    mobile: string
+    gender: number
+    birth: Date
+}
+
 export const getProductsPagination = async (product_display_limit: number, page: number) => {
     let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}`);
     if (result && result?.DT) {
@@ -83,5 +90,18 @@ export const updateProduct = async (data: IUpdateProduct) => {
 
 export const checkSellerEmailExist = async (email: string) => {
     let result: APIResponse = await axios.get(`/api/seller/register/email-validate?email=${email}`);
+    return result;
+}
+
+export const getSellerInfo = async () => {
+    let result: APIResponse = await axios.get('/api/seller/info');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
+    let result: APIResponse = await axios.put('/api/seller/info', data);
     return result;
 }

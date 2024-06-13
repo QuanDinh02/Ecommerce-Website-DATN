@@ -147,7 +147,7 @@ const CustomerAccountInfo = () => {
                 });
 
                 let { day: DAY, month: MONTH, year: YEAR } = getDayMonthYear(`${result.birth}`);
-                
+
                 setDate(draft => {
                     draft.day = +DAY;
                     draft.month = +MONTH + 1;
@@ -193,60 +193,77 @@ const CustomerAccountInfo = () => {
                         </div>
                         :
                         <>
-                            <div className="customer-info w-1/2">
-                                <div className="mb-5">
-                                    <div className="title mb-1">Tên đăng nhập</div>
-                                    <div className="username font-medium">{account.username}</div>
+                            <div className="customer-info w-2/3">
+                                <div className="w-full mb-6 flex items-center">
+                                    <div className="title w-1/4 text-end pr-8">Tên đăng nhập</div>
+                                    <div className="username font-medium w-3/4">{account.username}</div>
                                 </div>
-                                <div className='w-4/5 mb-5'>
-                                    <div className='input_label'>Họ Tên</div>
-                                    <div className='relative'>
-                                        <input type="text" placeholder="Họ Tên" className="form_input" value={customerInfo.name} onChange={(e) => handleOnChangeCustomerInfo('name', e.target.value)} />
+                                <div className='w-full mb-6 flex items-center'>
+                                    <div className='input_label w-1/4 text-end pr-8'>Họ Tên</div>
+                                    <div className='w-3/4'>
+                                        <div className="w-3/4">
+                                            <input type="text" placeholder="Họ Tên" className="form_input" value={customerInfo.name} onChange={(e) => handleOnChangeCustomerInfo('name', e.target.value)} />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='w-4/5 mb-5'>
-                                    <div className='input_label'>Số điện thoại</div>
-                                    <div className='relative'>
-                                        <input type="text" placeholder="Số điện thoại" className="form_input" value={customerInfo.mobile} onChange={(e) => handleOnChangeCustomerInfo('mobile', e.target.value)} />
+                                <div className='w-full mb-6 flex items-center'>
+                                    <div className='input_label w-1/4 text-end pr-8'>Số điện thoại</div>
+                                    <div className='w-3/4'>
+                                        <div className="w-3/4">
+                                            <input type="text" placeholder="Số điện thoại" className="form_input" value={customerInfo.mobile} onChange={(e) => handleOnChangeCustomerInfo('mobile', e.target.value)} />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className='w-4/5 mb-5'>
-                                    <div className='input_label'>Email</div>
-                                    <div className='relative'>
-                                        <input type="text" placeholder="Email" className="form_input cursor-not-allowed" disabled value={customerInfo.email} />
+                                <div className='w-full mb-6 flex items-center'>
+                                    <div className='input_label w-1/4 text-end pr-8'>Email</div>
+                                    <div className='w-3/4'>
+                                        <div className="w-3/4">
+                                            <input type="text" placeholder="Email" className="form_input cursor-not-allowed" disabled value={customerInfo.email} />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="mb-5">
-                                    <div className="title mb-1">Giới tính</div>
-                                    <div className="flex gap-x-4">
-                                        {
-                                            GENDERS.map((item, index) => {
-                                                return (
-                                                    <div className='flex items-center gap-2 mb-2 cursor-pointer w-fit' key={`gender-select-${index}`} onClick={() => handleOnChangeCustomerInfo('gender', item.value)}>
-                                                        <div className={customerInfo.gender === item.value ? 'w-5 h-5 border-2 border-[#FCB800] rounded-full flex items-center justify-center' : 'w-5 h-5 border-2 border-gray-300 rounded-full'}>
-                                                            <div className={customerInfo.gender === item.value ? 'w-3 h-3 bg-[#FCB800] rounded-full' : ""}></div>
-                                                        </div>
-                                                        <div>{item.title}</div>
-                                                    </div>
-                                                )
-                                            })
-                                        }
+                                <div className="w-full mb-6 flex items-center">
+                                    <div className="title w-1/4 text-end pr-8">Giới tính</div>
+                                    <div className="w-3/4">
+                                        <div className="w-3/4">
+                                            <div className="flex gap-x-4">
+                                                {
+                                                    GENDERS.map((item, index) => {
+                                                        return (
+                                                            <div className='flex items-center gap-2 mb-2 cursor-pointer w-fit' key={`gender-select-${index}`} onClick={() => handleOnChangeCustomerInfo('gender', item.value)}>
+                                                                <div className={customerInfo.gender === item.value ? 'w-5 h-5 border-2 border-[#FCB800] rounded-full flex items-center justify-center' : 'w-5 h-5 border-2 border-gray-300 rounded-full'}>
+                                                                    <div className={customerInfo.gender === item.value ? 'w-3 h-3 bg-[#FCB800] rounded-full' : ""}></div>
+                                                                </div>
+                                                                <div>{item.title}</div>
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-4/5 mb-6">
-                                    <div className="title mb-1">Ngày sinh</div>
-                                    <div className="w-full flex gap-x-2">
-                                        <FieldDropdown key="select-day" style={"border h-10 w-1/3"} data={DAYS} value={date.day} setValue={handleDateSelect} field="day" />
-                                        <FieldDropdown key="select-month" style={"border h-10 w-1/3"} data={MONTHS} value={date.month} setValue={handleDateSelect} field="month" />
-                                        <FieldDropdown key="select-year" style={"border h-10 w-1/3"} data={YEARS} value={date.year} setValue={handleDateSelect} field="year" />
+                                <div className="w-full mb-6 flex items-center">
+                                    <div className="title w-1/4 text-end pr-8">Ngày sinh</div>
+                                    <div className="w-3/4">
+                                        <div className="w-3/4">
+                                            <div className="w-full flex gap-x-2">
+                                                <FieldDropdown key="select-day" style={"border h-10 w-1/3"} data={DAYS} value={date.day} setValue={handleDateSelect} field="day" />
+                                                <FieldDropdown key="select-month" style={"border h-10 w-1/3"} data={MONTHS} value={date.month} setValue={handleDateSelect} field="month" />
+                                                <FieldDropdown key="select-year" style={"border h-10 w-1/3"} data={YEARS} value={date.year} setValue={handleDateSelect} field="year" />
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="w-4/5">
-                                    <Button styles="w-1/3 bg-[#FCB800] h-10 hover:opacity-80" OnClick={() => handleUpdateCustomerInfo()}>Lưu</Button>
+                                <div className="w-full flex items-center">
+                                    <div className="w-1/4"></div>
+                                    <div className="w-3/4">
+                                        <Button styles="w-1/4 bg-[#FCB800] h-10 hover:opacity-80 px-5" OnClick={() => handleUpdateCustomerInfo()}>Lưu</Button>
+                                    </div>
                                 </div>
 
                             </div>
-                            <div className="customer-image w-1/2 flex flex-col items-center justify-center gap-y-2 border-l border-gray-200">
+                            <div className="customer-image w-1/3 flex flex-col items-center gap-y-2 border-l border-gray-100">
                                 <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
                                     <AiOutlineUser className="w-14 h-14 text-gray-400" />
                                 </div>

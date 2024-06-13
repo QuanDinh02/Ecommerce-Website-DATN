@@ -12,6 +12,8 @@ module.exports = {
                 email: "nguyenminhthanh@gmail.com",
                 address: "123 Le Van Sy Quan 3, TPHCM",
                 intro: "OvalShop bán các loại mặt hàng và có hơn 300 chi nhánh trên toàn quốc",
+                gender: 0,
+                birth: new Date(),
                 userID: 3
             },
         ], {});

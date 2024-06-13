@@ -12,7 +12,7 @@ import { RxDashboard } from "react-icons/rx";
 import { CgUserList } from "react-icons/cg";
 import React from "react";
 import { TailSpin } from "react-loader-spinner";
-import Drawer from "@/components/Drawer";
+import { MdOutlineStorefront } from "react-icons/md";
 
 interface ISideBarChild {
     path: string
@@ -81,6 +81,13 @@ const SideBar: ISideBarItem[] = [
         path: "/profile",
         name: "Thông tin người bán",
         icon: <CgUserList className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
+        children: []
+    },
+    {
+        path: "/shop",
+        name: "Quản Lý Shop",
+        icon: <MdOutlineStorefront className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },

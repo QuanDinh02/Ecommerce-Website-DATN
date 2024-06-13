@@ -479,7 +479,64 @@ const handleOTPVertification = async (data) => {
     }
 }
 
+const getSellerInfo = async (seller_id) => {
+    try {
+        let customerInfo = await db.Seller.findOne({
+            raw: true,
+            attributes: ['id', 'name', 'mobile', 'gender', 'birth', 'email'],
+            where: {
+                id: {
+                    [Op.eq]: +seller_id
+                }
+            }
+        })
+
+        return {
+            EC: 0,
+            DT: customerInfo,
+            EM: 'Customer Info !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateSellerInfo = async (data) => {
+    try {
+        await db.Seller.update({
+            name: data.name,
+            mobile: data.mobile,
+            gender: data.gender,
+            birth: data.birth
+        }, {
+            where: {
+                id: +data.id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Cập nhật thông tin thành công'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct, getAllCategories, getSubCategoriesByCategory,
-    updateProduct,handleCreateVertificationCode, handleOTPVertification
+    getProductPagination, createNewProduct, deleteProduct, 
+    getAllCategories, getSubCategoriesByCategory,updateProduct,
+    handleCreateVertificationCode, handleOTPVertification, 
+    getSellerInfo, updateSellerInfo
 }
