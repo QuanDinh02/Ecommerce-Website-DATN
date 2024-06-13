@@ -283,7 +283,6 @@ const CategoryPage = () => {
             draft.seller_info = item.seller_info;
         });
         setShowQuickView(true);
-        document.body.style.overflow = "hidden";
     }
 
     const handleProductAmount = (num: any) => {

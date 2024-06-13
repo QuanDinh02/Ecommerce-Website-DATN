@@ -240,7 +240,6 @@ const SearchPage = () => {
             }
         });
         setShowQuickView(true);
-        document.body.style.overflow = "hidden";
     }
 
     const refetchWishList = async () => {

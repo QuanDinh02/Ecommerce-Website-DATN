@@ -300,7 +300,6 @@ const Homepage = () => {
             draft.seller_info = item.seller_info;
         });
         setShowQuickView(true);
-        document.body.style.overflow = "hidden";
     }
 
     const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {

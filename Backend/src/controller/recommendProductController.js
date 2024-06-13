@@ -359,60 +359,7 @@ const handlePredictRecommendRelevantProducts = async (req, res) => {
     try {
         let { id: item_id } = req.query;
 
-        var options = {
-            scriptPath: "src/routes",
-            args: [item_id],
-        };
-
-        let relevantData = await PythonShell.run('predictItem.py', options);
-
-        let py_result = JSON.parse(relevantData[0]);
-
-        let data = JSON.parse(py_result.data);
-
-        let itemID = data.item_id;
-        let list = JSON.parse(data.list);
-
-        // let list = [
-        //     {
-        //         product_id: 274639776
-        //     },
-        //     {
-        //         product_id: 274639684
-        //     },
-        //     {
-        //         product_id: 274638826
-        //     },
-        //     {
-        //         product_id: 274638661
-        //     },
-        //     {
-        //         product_id: 274638435
-        //     },
-        //     {
-        //         product_id: 274612002
-        //     },
-        //     {
-        //         product_id: 274585510
-        //     },
-        //     {
-        //         product_id: 274574543
-        //     },
-        //     {
-        //         product_id: 274568849
-        //     },
-        //     {
-        //         product_id: 274564366
-        //     }
-        // ]
-        
-        let dataFormat = list.map(item => {
-            return {
-                product_id: +item.product_id,
-            }
-        })
-
-        let result = await recommendProductServices.getRelevantRecommendProducts(dataFormat);
+        let result = await recommendProductServices.getRelevantRecommendProducts(item_id);
 
         return res.status(200).json({
             EC: result.EC,

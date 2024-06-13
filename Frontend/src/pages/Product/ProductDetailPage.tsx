@@ -355,7 +355,6 @@ const ProductDetailPage = () => {
             draft.seller_info = item.seller_info;
         });
         setShowQuickView(true);
-        document.body.style.overflow = "hidden";
     }
 
     const [productReviews, setProductReviews] = React.useState<IProductReview[]>([]);

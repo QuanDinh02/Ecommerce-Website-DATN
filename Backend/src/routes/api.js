@@ -99,7 +99,7 @@ const ApiRoute = (app) => {
     router.post('/simulating-3session-recommend', recommendProductController.simulatingCreateRecommend3SessionProducts);
     router.get('/simulating-training-recommend-item', recommendProductController.handleSimulatingExecuteTrainingRecommendProduct);
 
-    router.get('/predict-recommend-relevant-item', recommendProductController.handlePredictRecommendRelevantProducts);
+    router.get('/predict-recommend-relevant-item', cacheMiddleware(300), recommendProductController.handlePredictRecommendRelevantProducts);
 
     router.get('/image', imageController.getImage);
     router.post('/image', upload.single('image'), imageController.uploadImage);

@@ -577,7 +577,7 @@ const get3SessionRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -704,7 +704,7 @@ const getHistoryRecommendProducts = async (customer_id) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                 where: {
                     productID: {
                         [Op.eq]: item.id
@@ -775,12 +775,20 @@ const getHistoryRecommendProducts = async (customer_id) => {
     }
 }
 
-const getRelevantRecommendProducts = async (data) => {
+const getRelevantRecommendProducts = async (item_id) => {
     try {
 
-        //data = _(data).take(20).value();
+        let relevant_product_list = await db.SimItem.findAll({
+            raw: true,
+            attributes: ['id', 'item_rec'],
+            where: {
+                item_id: {
+                    [Op.eq]: item_id
+                }
+            }
+        })
 
-        let productList = await Promise.all(data.map(async item => {
+        let productList = await Promise.all(relevant_product_list.map(async item => {
 
             let productInfo = await db.Product.findOne({
                 raw: true,
@@ -792,7 +800,7 @@ const getRelevantRecommendProducts = async (data) => {
                 },
                 where: {
                     id: {
-                        [Op.eq]: item.product_id
+                        [Op.eq]: item.item_rec
                     }
                 }
             });
@@ -804,17 +812,17 @@ const getRelevantRecommendProducts = async (data) => {
 
             let productType = await db.ProductType.findOne({
                 raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold','quantity'],
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
                 where: {
                     productID: {
-                        [Op.eq]: item.product_id
+                        [Op.eq]: item.item_rec
                     }
                 }
             });
 
             // const getObjectParams = {
             //     Bucket: bucketName,
-            //     Key: `${item.product_id}.jpeg`
+            //     Key: `${item.item_rec}.jpeg`
             // }
 
             // const command = new GetObjectCommand(getObjectParams);
@@ -826,7 +834,7 @@ const getRelevantRecommendProducts = async (data) => {
                 attributes: ['id', 'rating'],
                 where: {
                     productID: {
-                        [Op.eq]: item.id,
+                        [Op.eq]: item.item_rec,
                     },
                 }
             });

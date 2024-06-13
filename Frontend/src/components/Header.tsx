@@ -5,10 +5,8 @@ import { IoIosSearch } from "react-icons/io";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { BsHeart, BsPerson } from "react-icons/bs";
 import { FiMenu } from "react-icons/fi";
-import { IoIosArrowDown } from "react-icons/io";
 
 import classNames from 'classnames';
-import Item6 from '../assets/img/homepage/item6.svg';
 import { CurrencyFormat } from '@/utils/numberFormat';
 
 import CategoryMenu from "@/components/CategoryMenu";
@@ -102,7 +100,6 @@ const Header = () => {
     const [scrollPosition, setScrollPosition] = React.useState(0);
 
     const [showMenu, setShowMenu] = React.useState<boolean>(false);
-    const [showViewProduct, setShowViewProduct] = React.useState<boolean>(false);
     const [showMiniShoppingCart, setShowMiniShoppingCart] = React.useState<boolean>(false);
     const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
 
@@ -653,25 +650,7 @@ const Header = () => {
                                     </div>
                                 }
                             </div>
-                            <div className='recent-products font-normal' onMouseEnter={() => setShowViewProduct(true)}>
-                                <span>Sản phẩm xem gần đây</span>
-                                <IoIosArrowDown />
-                            </div>
                         </div>
-                        {
-                            showViewProduct &&
-                            <div className='recently-viewed-products absolute top-[3.25rem] bg-white w-full px-12 py-5' onMouseLeave={() => setShowViewProduct(false)}>
-                                <div className='w-[80rem] mx-auto px-[30px] h-full flex flex-wrap'>
-                                    <div className='viewed-item border-2 border-white hover:border-[#FCB800] duration-500 cursor-pointer'>
-                                        <img src={Item6} alt="" className='w-24 h-24' />
-                                    </div>
-                                </div>
-                                <div className='text-black mt-10 text-center'>
-                                    <span className='cursor-pointer underline hover:text-[#FCB800] duration-300'>Xem tất cả các sản phẩm bạn đã xem</span>
-                                </div>
-                            </div>
-                        }
-
                     </div>
                 </>
             }
