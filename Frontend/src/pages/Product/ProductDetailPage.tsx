@@ -205,7 +205,7 @@ const RelevantRecommendItemList = (props: IProps) => {
         if (props.item_id !== 0) {
             fetchRecommendItems(props.item_id);
         }
-    }, [isAuthenticated, props.item_id]);
+    }, [props.item_id]);
 
     return (
         <>
