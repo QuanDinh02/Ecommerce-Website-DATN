@@ -23,7 +23,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Rating from "@/components/Rating";
-import { getProductDetailInfo, getProductReview, getProductsHistory } from "@/services/productService";
+import { getProductDetailInfo, getProductReview, getProductsHistoryNoPagination } from "@/services/productService";
 import { LiaCartPlusSolid } from "react-icons/lia";
 
 import { RootState } from "@/redux/reducer/rootReducer";
@@ -47,7 +47,6 @@ import { dateFormat } from "@/utils/dateFormat";
 import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 import { getRecommendRelevantProduct } from "@/services/recommendItemService";
 
-import LoadImageS3 from "@/components/LoadImageS3";
 import ProductRating from "../Category/ProductRating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
@@ -726,7 +725,7 @@ const ProductDetailPage = () => {
     }
 
     const fetchHistoryItems = async (data: number[]) => {
-        let response: IData = await getProductsHistory(data);
+        let response: IData = await getProductsHistoryNoPagination(data);
         if (response) {
             setHistoryProductList(response.product_list);
         }
