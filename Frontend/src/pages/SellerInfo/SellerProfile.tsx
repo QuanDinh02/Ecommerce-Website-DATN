@@ -170,7 +170,7 @@ const SellerProfile = () => {
 
         setTimeout(() => {
             setDataLoading(false);
-        }, 1000);
+        }, 500);
 
     }, []);
 
@@ -251,8 +251,8 @@ const SellerProfile = () => {
                                 </div>
                                 <div className="w-4/5 flex items-center">
                                     <div className="w-1/4"></div>
-                                    <div className="w-3/4">
-                                        <Button styles="w-1/3 bg-[#FCB800] h-10 hover:opacity-80" OnClick={() => handleUpdateSellerInfo()}>Lưu</Button>
+                                    <div className="w-2/4">
+                                        <Button styles="w-1/3 bg-[#FCB800] h-10 hover:opacity-80 cursor-pointer rounded" OnClick={() => handleUpdateSellerInfo()}>Lưu</Button>
                                     </div>
                                 </div>
                             </div>

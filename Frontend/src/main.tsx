@@ -84,6 +84,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import ShopManagement from './pages/SellerInfo/ShopManagement.tsx';
 
 
 const router = createBrowserRouter(
@@ -152,7 +153,16 @@ const router = createBrowserRouter(
               ]
             },
             { path: "profile", element: <SellerProfile /> },
-            { path: "shop", element: <ShopInfo/> },
+            {
+              path: "shop", element: <ShopManagement />,
+              children: [
+                {
+                  path: "info",
+                  element: <ShopInfo/>
+                }
+              ]
+
+            },
             {
               path: "product",
               element: <SellerProduct />,
@@ -258,7 +268,7 @@ const router = createBrowserRouter(
         },
         {
           path: "search",
-          element: <SearchPage/>
+          element: <SearchPage />
         },
         {
           path: "category",
@@ -266,7 +276,7 @@ const router = createBrowserRouter(
         },
         {
           path: "history",
-          element: <HistoryViewProductPage/>
+          element: <HistoryViewProductPage />
         },
         {
           path: "sub-category",
@@ -308,7 +318,7 @@ const router = createBrowserRouter(
             },
             {
               path: "seller",
-              element: <SellerSignUpPage/>
+              element: <SellerSignUpPage />
             },
           ]
         },
@@ -324,36 +334,36 @@ const router = createBrowserRouter(
     },
     {
       path: "/fms",
-      element: <System/>,
+      element: <System />,
       errorElement: <ErrorPage />,
       children: [
-        { 
-          path: "", 
-          element: <SystemMain/>,
+        {
+          path: "",
+          element: <SystemMain />,
           children: [
             {
               path: "dashboard",
-              element: <SystemDashboard/>
+              element: <SystemDashboard />
             },
             {
               path: "employee",
-              element: <EmployeeManagement/>
+              element: <EmployeeManagement />
             },
             {
               path: "customer",
-              element: <CustomerManagement/>
+              element: <CustomerManagement />
             },
             {
               path: "seller",
-              element: <SellerManagement/>
+              element: <SellerManagement />
             },
             {
               path: "department",
-              element: <DepartmentManagement/>
+              element: <DepartmentManagement />
             },
             {
               path: "report",
-              element: <SystemReport/>
+              element: <SystemReport />
             },
           ]
         },
@@ -361,7 +371,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/fms/login",
-      element: <SystemLogin/>,
+      element: <SystemLogin />,
       errorElement: <ErrorPage />
     }
   ], {

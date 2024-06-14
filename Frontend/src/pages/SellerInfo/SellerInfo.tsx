@@ -88,8 +88,13 @@ const SideBar: ISideBarItem[] = [
         path: "/shop",
         name: "Quản Lý Shop",
         icon: <MdOutlineStorefront className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
+        skip: true,
+        children: [
+            {
+                path: "/info",
+                name: "Thông Tin Shop",
+            },
+        ]
     },
     {
         path: "/notification",
