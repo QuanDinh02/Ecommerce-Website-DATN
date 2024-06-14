@@ -4,11 +4,12 @@ import Banner from '../assets/img/homepage/Banner.svg';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { GoDotFill, GoStarFill } from "react-icons/go";
-
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation } from 'swiper/modules';
 import { PiShoppingCartLight } from "react-icons/pi";
 import { successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
-import { IoMdHeartEmpty } from "react-icons/io";
+import { IoIosArrowForward, IoMdHeartEmpty } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
@@ -34,6 +35,7 @@ import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import Button from "@/components/Button";
+import { getProductsHistoryNoPagination } from "@/services/productService";
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -76,6 +78,11 @@ interface IProductQuickView {
 
 interface IProps {
     setShow_quick_view: (product: IRecommendProduct) => void
+}
+
+interface IHistoryItemProps {
+    setShow_quick_view: (product: IRecommendProduct) => void
+    data: IRecommendProduct[]
 }
 
 const RecommendItemList = (props: IProps) => {
@@ -197,7 +204,7 @@ const RecommendItemList = (props: IProps) => {
                     return (
                         <div className="product cursor-pointer px-4 py-2 bg-white border border-gray-200 hover:shadow-md hover:border-gray-400 group" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                             <div className="relative">
-                                <div className="product__image w-40 mx-auto mb-6 relative">
+                                <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                     {/* <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/> */}
                                     <LoadImage img_style="w-40 h-40" product_id={item.id} />
                                     <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
@@ -237,7 +244,7 @@ const RecommendItemList = (props: IProps) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800]">{item.name}</div>
+                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                             <div className="product__price flex items-center gap-2 mb-2.5">
                                 <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
                                 <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
@@ -256,6 +263,176 @@ const RecommendItemList = (props: IProps) => {
     )
 }
 
+const HistoryItemList = (props: IHistoryItemProps) => {
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const account: ICustomerAccount = useSelector<RootState, ICustomerAccount>(state => state.user.account);
+    const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
+    const refetchWishList = async () => {
+        let wishListData: any = await fetchWishList(account.customer_id);
+        if (wishListData && !_.isEmpty(wishListData.DT)) {
+            let wish_list_data: IWishList[] = wishListData.DT;
+            let count = wish_list_data.length;
+
+            dispatch(AddWishListItem({
+                wish_list_item: wish_list_data,
+                wish_list_count: count
+            }));
+        }
+    }
+
+    const handleAddFavouriteItem = async (product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewWishListItem = {
+                productID: product_id,
+                customerID: account.customer_id
+            }
+
+            let result = await createWishListItem(data);
+            if (result && result.EC === 0) {
+                await saveCustomerActivity({
+                    product_id: product_id,
+                    type: 2
+                });
+                refetchWishList();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {
+        if (account && isAuthenticated) {
+            let data: INewCartItem = {
+                quantity: quantity,
+                customerID: account.customer_id,
+                productID: product_id
+            }
+
+            let result = await createCartItem(data);
+            if (result && result.EC === 0) {
+                refetchCartItem();
+                successToast1(result.EM);
+            }
+        } else {
+            navigate("/login");
+        }
+    }
+
+    const refetchCartItem = async () => {
+        let cartItemsData: any = await fetchCartItem(account.customer_id);
+        if (cartItemsData && !_.isEmpty(cartItemsData.DT)) {
+            let cart_item_data: ICartItem[] = cartItemsData.DT;
+            let count = cart_item_data.length;
+
+            dispatch(AddCartItem({
+                cart_items: cart_item_data,
+                count: count
+            }));
+        }
+    }
+
+    const handleProductDetailNavigation = (product_id: number, product_name: string) => {
+        if (account && isAuthenticated) {
+            saveCustomerActivity({
+                product_id: product_id,
+                type: 0
+            });
+
+            saveCustomerSearch(product_name);
+
+            navigate({
+                pathname: "/product",
+                search: `?id=${product_id}`,
+            });
+        }
+
+        navigate({
+            pathname: "/product",
+            search: `?id=${product_id}`,
+        });
+    }
+
+    return (
+        <>
+            <Swiper
+                navigation={true}
+                modules={[Navigation]}
+                className="mySwiper product-list"
+                spaceBetween={10}
+                slidesPerView={5}
+            >
+                {
+                    props.data && props.data.length > 0 &&
+                    props.data.map((item, index) => {
+                        return (
+                            <SwiperSlide>
+                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group h-full" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
+                                    <div className="product__image w-40 mx-auto mb-6 relative py-4">
+                                        {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} />
+                                        <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                hanldeAddShoppingCart(1, item.id);
+                                            }}>
+                                                <PiShoppingCartLight className="w-6 h-6 " />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                props.setShow_quick_view(item);
+                                            }}>
+                                                <IoEyeOutline className="w-6 h-6" />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Xem nhanh</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleAddFavouriteItem(item.id);
+                                            }}>
+                                                <IoMdHeartEmpty className="w-6 h-6" />
+                                                <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                    <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                        <span className="text-sm">Yêu thích</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                    <div className="product__price flex items-center gap-2 mb-2.5">
+                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                    </div>
+                                    <ProductRating
+                                        ratings={item.rating}
+                                        selling_count={item.sold}
+                                        key={`item-rating-product-${item.id}`}
+                                        item_grid={false}
+                                    />
+                                </div>
+                            </SwiperSlide>
+                        )
+                    })
+                }
+            </Swiper>
+
+        </>
+    )
+}
+
 const Homepage = () => {
 
     const navigate = useNavigate();
@@ -264,6 +441,8 @@ const Homepage = () => {
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
+
+    const [historyProductList, setHistoryProductList] = React.useState<IRecommendProduct[]>([]);
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
@@ -286,7 +465,6 @@ const Homepage = () => {
     const [amount, setAmount] = React.useState<number>(1);
 
     const handleQuickView = (item: IRecommendProduct) => {
-        console.log(item);
         setProductQuickView(draft => {
             draft.id = item.id;
             draft.name = item.name;
@@ -373,6 +551,13 @@ const Homepage = () => {
         }
     }
 
+    const fetchHistoryItems = async (data: number[]) => {
+        let response: IData = await getProductsHistoryNoPagination(data);
+        if (response) {
+            setHistoryProductList(response.product_list);
+        }
+    }
+
     React.useEffect(() => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
@@ -385,6 +570,14 @@ const Homepage = () => {
         }
     }, [userRole]);
 
+    React.useEffect(() => {
+        let history_product_view_list: string | null = localStorage.getItem("hpvl");
+        if (history_product_view_list) {
+            let old_data = JSON.parse(history_product_view_list);
+            fetchHistoryItems(old_data);
+        }
+    }, []);
+
     return (
         <>
             <div className="homepage-container w-full bg-[#EEEEEE]">
@@ -395,6 +588,18 @@ const Homepage = () => {
                             <img src={Banner} alt="" className="w-full h-full" />
                         </div>
                     </div>
+                    {
+                        historyProductList.length > 0 &&
+                        <div className="bg-white p-4 mt-6">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-lg text-gray-500">SẢN PHẨM BẠN ĐÃ XEM</span>
+                                <div className="text-red-500 hover:underline cursor-pointer flex items-center gap-x-1" onClick={() => navigate("/history")}><span>Xem Tất Cả</span> <IoIosArrowForward /></div>
+                            </div>
+                            <div className="w-full mb-5">
+                                <HistoryItemList data={historyProductList} setShow_quick_view={handleQuickView} />
+                            </div>
+                        </div>
+                    }
                     {
                         (account && isAuthenticated && account.role === "customer") ?
                             <>

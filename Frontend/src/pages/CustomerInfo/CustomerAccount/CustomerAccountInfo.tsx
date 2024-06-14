@@ -87,12 +87,12 @@ const CustomerAccountInfo = () => {
     }
 
     const handleUpdateCustomerInfo = async () => {
-        if (customerInfo.name.length === 0) {
+        if (!customerInfo.name || customerInfo.name.length === 0) {
             errorToast1("Họ tên không hợp lệ");
             return;
         }
 
-        if (customerInfo.mobile.length < 10) {
+        if (!customerInfo.mobile || customerInfo.mobile.length < 10) {
             errorToast1("Số điện thoại không hợp lệ");
             return;
         }
@@ -104,7 +104,9 @@ const CustomerAccountInfo = () => {
 
         let new_birth = new Date();
 
-        new_birth.setUTCFullYear(date.year, date.month - 1, date.day);
+        new_birth.setDate(date.day);
+        new_birth.setMonth(date.month - 1);
+        new_birth.setFullYear(date.year);
 
         let updateData = {
             id: customerInfo.id,

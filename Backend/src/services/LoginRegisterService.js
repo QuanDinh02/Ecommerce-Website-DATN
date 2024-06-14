@@ -20,7 +20,7 @@ const checkPassword = (inputPassword, hashPass) => {
 const checkCustomerEmailExist = async (email) => {
     try {
         let check = await db.Customer.findOne({ where: { email: email } });
-        if(check) {
+        if (check) {
             return {
                 EC: 0,
                 DT: '',
@@ -33,7 +33,7 @@ const checkCustomerEmailExist = async (email) => {
                 EM: "Email không tồn tại"
             }
         }
-        
+
     } catch (error) {
         console.log(error);
         return {
@@ -48,7 +48,7 @@ const checkCustomerEmailExist = async (email) => {
 const checkSellerEmailExist = async (email) => {
     try {
         let check = await db.Seller.findOne({ where: { email: email } });
-        if(check) {
+        if (check) {
             return {
                 EC: 0,
                 DT: '',
@@ -61,7 +61,7 @@ const checkSellerEmailExist = async (email) => {
                 EM: "Email không tồn tại"
             }
         }
-        
+
     } catch (error) {
         console.log(error);
         return {
@@ -76,10 +76,14 @@ const checkSellerEmailExist = async (email) => {
 const userRegister = async (userData) => {
 
     try {
-        let {role} = userData;
-        if(role === 3) {
+        let { role } = userData;
+
+        let new_birth = new Date();
+        new_birth.setUTCFullYear(1900, 0, 1);
+
+        if (role === 3) {
             let checkUsername = await checkUserNameExist(userData.username);
-    
+
             if (checkUsername) {
                 return {
                     EC: 1,
@@ -88,7 +92,7 @@ const userRegister = async (userData) => {
                 }
             } else {
                 let hash_password = hashPassword(userData.password);
-    
+
                 let userInfo = await db.User.create({
                     username: userData.username,
                     password: hash_password,
@@ -97,13 +101,15 @@ const userRegister = async (userData) => {
                     lastLogin: null,
                 })
 
-                if(userInfo) {
+                if (userInfo) {
                     let user_info = userInfo.dataValues;
 
                     await db.Customer.create({
                         mobile: userData.phone,
                         email: userData.email,
                         userID: user_info.id,
+                        gender: 0,
+                        birth: new_birth
                     })
 
                     return {
@@ -115,9 +121,9 @@ const userRegister = async (userData) => {
             }
         }
 
-        if(role === 2) {
+        if (role === 2) {
             let checkUsername = await checkUserNameExist(userData.username);
-    
+
             if (checkUsername) {
                 return {
                     EC: 1,
@@ -126,7 +132,7 @@ const userRegister = async (userData) => {
                 }
             } else {
                 let hash_password = hashPassword(userData.password);
-    
+
                 let userInfo = await db.User.create({
                     username: userData.username,
                     password: hash_password,
@@ -135,12 +141,14 @@ const userRegister = async (userData) => {
                     lastLogin: null,
                 })
 
-                if(userInfo) {
+                if (userInfo) {
                     let user_info = userInfo.dataValues;
 
                     await db.Seller.create({
                         email: userData.email,
                         userID: user_info.id,
+                        gender: 0,
+                        birth: new_birth
                     })
 
                     return {
@@ -225,7 +233,7 @@ const userLogin = async (userData) => {
 
                         let sessionData = await db.Session.findAll({
                             raw: true,
-                            attributes: ['id','createdAt'],
+                            attributes: ['id', 'createdAt'],
                             order: [
                                 ['createdAt', 'DESC'],
                             ],
@@ -324,8 +332,8 @@ const userLogin = async (userData) => {
     }
 }
 
-module.exports = { 
-    userRegister, userLogin, hashPassword, 
-    checkCustomerEmailExist, checkPassword, 
-    checkSellerEmailExist 
+module.exports = {
+    userRegister, userLogin, hashPassword,
+    checkCustomerEmailExist, checkPassword,
+    checkSellerEmailExist
 }

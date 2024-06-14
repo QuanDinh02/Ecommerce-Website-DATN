@@ -56,3 +56,25 @@ export const getTestImage = async () => {
     }
     return null;
 }
+
+interface IProductHistory {
+    data: number[]
+    limit: number
+    page: number
+}
+
+export const getProductsHistory = async (data: IProductHistory) => {
+    let result: APIResponse = await axios.post('/api/products/history',data);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const getProductsHistoryNoPagination = async (data: number[]) => {
+    let result: APIResponse = await axios.post('/api/products/history/swiper',data);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

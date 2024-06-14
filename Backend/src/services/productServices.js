@@ -121,6 +121,225 @@ const getProductDetail = async (product_id) => {
     }
 }
 
+const getProductsHistory = async (item_limit, page, data) => {
+    try {
+
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            const listLength = data.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            let limit_data = _(data).drop(offSet).take(item_limit).value();
+
+            let productList = await Promise.all(limit_data.map(async item => {
+
+                let productInfo = await db.Product.findOne({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'name', 'summary', 'shop_id'],
+                    include: {
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
+                    where: {
+                        id: {
+                            [Op.eq]: item
+                        }
+                    }
+                });
+
+                let seller_info = {
+                    id: productInfo.Seller.id,
+                    name: productInfo.Seller.shopName,
+                }
+
+                let productType = await db.ProductType.findOne({
+                    raw: true,
+                    attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item
+                        }
+                    }
+                });
+
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${item}.jpeg`
+                // }
+
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'rating'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item,
+                        },
+                    }
+                });
+
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                return {
+                    id: productInfo.id,
+                    name: productInfo.name,
+                    seller_info: seller_info,
+                    summary: productInfo.summary,
+                    //image: url,
+                    image: "",
+                    current_price: productType.currentPrice,
+                    price: productType.price,
+                    sold: productType.sold,
+                    rating: rating_average,
+                    quantity: productType.quantity
+                }
+            }));
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    product_list: productList
+                },
+                EM: "History products !"
+            }
+        }
+        return {
+            EC: -1,
+            DT: "",
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getProductsHistorySwiper = async (data) => {
+    try {
+
+        let limit_data = _(data).take(20).value();
+
+        let productList = await Promise.all(limit_data.map(async item => {
+
+            let productInfo = await db.Product.findOne({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'name', 'summary', 'shop_id'],
+                include: {
+                    model: db.Seller,
+                    attributes: ['id', 'shopName']
+                },
+                where: {
+                    id: {
+                        [Op.eq]: item
+                    }
+                }
+            });
+
+            let seller_info = {
+                id: productInfo.Seller.id,
+                name: productInfo.Seller.shopName,
+            }
+
+            let productType = await db.ProductType.findOne({
+                raw: true,
+                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                where: {
+                    productID: {
+                        [Op.eq]: item
+                    }
+                }
+            });
+
+            // const getObjectParams = {
+            //     Bucket: bucketName,
+            //     Key: `${item}.jpeg`
+            // }
+
+            // const command = new GetObjectCommand(getObjectParams);
+            // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'rating'],
+                where: {
+                    productID: {
+                        [Op.eq]: item,
+                    },
+                }
+            });
+
+            let star_ratings = {
+                '1': 0,
+                '2': 0,
+                '3': 0,
+                '4': 0,
+                '5': 0,
+            }
+
+            await productReviewList.forEach(item => {
+                star_ratings[`${item.rating}`] += 1;
+            });
+
+            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+            return {
+                id: productInfo.id,
+                name: productInfo.name,
+                seller_info: seller_info,
+                summary: productInfo.summary,
+                //image: url,
+                image: "",
+                current_price: productType.currentPrice,
+                price: productType.price,
+                sold: productType.sold,
+                rating: rating_average,
+                quantity: productType.quantity
+            }
+        }));
+
+        return {
+            EC: 0,
+            DT: {
+                product_list: productList
+            },
+            EM: "History products !"
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductsByCategory = async (category_id, item_limit, page) => {
     try {
         if (item_limit > 0) {
@@ -699,5 +918,6 @@ const getProductReviews = async (product_id, item_limit, page) => {
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
-    getProductDetail, getProductReviews, getSearchProductsWithPagination
+    getProductDetail, getProductReviews, getSearchProductsWithPagination,
+    getProductsHistory, getProductsHistorySwiper
 }

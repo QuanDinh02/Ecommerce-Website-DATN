@@ -1,0 +1,72 @@
+.history-view-product-container {
+
+    .product-list {
+        .product {
+            &__utility {
+                animation: appearBottomUpAnimation 0.2s ease-in;
+
+                .utility-item {
+                    &:hover {
+                        .tooltip-box {
+                            display: block;
+                        }
+                    }
+                }
+            }
+
+            .tooltip-box {
+                display  : none;
+                animation: appearAnimation 0.4s ease-in;
+
+                .tooltip {
+                    &::after {
+                        content     : "";
+                        position    : absolute;
+                        top         : 100%;
+                        left        : 50%;
+                        margin-left : -5px;
+                        border-width: 5px;
+                        border-style: solid;
+                        border-color: black transparent transparent transparent;
+                    }
+                }
+            }
+
+        }
+    }
+
+    .pagination-history-view-product-container {
+
+        .page-active-background {
+            background-color: #FCB800 !important;
+            color           : white !important;
+            padding         : 8px 12px;
+            border-radius   : 4px;
+        }
+
+        .page-item {
+            padding      : 6px;
+            border-radius: 4px;
+            font-size    : 18px;
+
+            a {
+                color: rgb(88, 88, 88);
+            }
+
+        }
+
+        .pre-next {
+            color: gray;
+        }
+
+        .page-background {
+            color           : black;
+            background-color: #EEEEEE;
+        }
+    }
+
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
+    }
+}

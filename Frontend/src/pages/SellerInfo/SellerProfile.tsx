@@ -107,7 +107,9 @@ const SellerProfile = () => {
 
         let new_birth = new Date();
 
-        new_birth.setUTCFullYear(date.year, date.month - 1, date.day);
+        new_birth.setDate(date.day);
+        new_birth.setMonth(date.month - 1);
+        new_birth.setFullYear(date.year);
 
         let updateData = {
             name: sellerInfo.name,
@@ -240,7 +242,7 @@ const SellerProfile = () => {
                                 <div className='w-4/5 mb-6 flex items-center'>
                                     <div className='input_label w-1/4 text-end pr-8'>Ngày sinh</div>
                                     <div className='w-3/4'>
-                                        <div className="w-full flex gap-x-2">
+                                        <div className="w-2/3 flex gap-x-2">
                                             <FieldDropdown key="select-day" style={"border h-10 w-1/3"} data={DAYS} value={date.day} setValue={handleDateSelect} field="day" />
                                             <FieldDropdown key="select-month" style={"border h-10 w-1/3"} data={MONTHS} value={date.month} setValue={handleDateSelect} field="month" />
                                             <FieldDropdown key="select-year" style={"border h-10 w-1/3"} data={YEARS} value={date.year} setValue={handleDateSelect} field="year" />

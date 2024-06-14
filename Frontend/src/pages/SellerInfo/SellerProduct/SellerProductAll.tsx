@@ -415,7 +415,7 @@ const SellerProductAll = () => {
                                                     )
                                                 })}
                                                 <tr>
-                                                    <td colSpan={6}>
+                                                    <td colSpan={7}>
                                                         {
                                                             <div className='pagination-container my-4 flex justify-center'>
                                                                 <ReactPaginate

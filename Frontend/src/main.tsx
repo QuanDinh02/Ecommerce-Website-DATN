@@ -21,6 +21,7 @@ import FavoriteProductPage from './pages/FavoriteProduct/FavoriteProductPage.tsx
 import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
 import SearchPage from '@/pages/SearchPage.tsx';
+import HistoryViewProductPage from '@/pages/HistoryViewProductPage.tsx';
 
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
 import CustomerAccount from '@/pages/CustomerInfo/CustomerAccount.tsx';
@@ -83,6 +84,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
 
 const router = createBrowserRouter(
   [
@@ -261,6 +263,10 @@ const router = createBrowserRouter(
         {
           path: "category",
           element: <CategoryPage />
+        },
+        {
+          path: "history",
+          element: <HistoryViewProductPage/>
         },
         {
           path: "sub-category",
