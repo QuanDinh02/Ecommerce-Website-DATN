@@ -158,7 +158,7 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: "info",
-                  element: <ShopInfo/>
+                  element: <ShopInfo />
                 }
               ]
 
@@ -295,7 +295,10 @@ const router = createBrowserRouter(
         },
         {
           path: "payment",
-          element: <PaymentPage />
+          element:
+            <CustomerRoute>
+              <PaymentPage />
+            </CustomerRoute>
         },
         {
           path: "favorite-products",

@@ -145,15 +145,18 @@ const ShoppingCartPage = () => {
                                     <div className="font-medium cursor-pointer hover:underline">Giỏ hàng</div>
                                 </div>
                             </div>
-                            <div className="shopping-cart__content mt-16 mb-24">
+                            <div className="shopping-cart__content mt-8 mb-24">
                                 <div className="main main w-[80rem] mx-auto px-[30px]">
-                                    <div className="title text-4xl text-center font-medium mb-20">Giỏ hàng</div>
+                                    <div className="title mb-12 flex items-center gap-x-2 text-gray-600">
+                                        <span className="text-2xl font-medium">GIỎ HÀNG</span>
+                                        <span>({cartItemCount} sản phẩm) </span>
+                                    </div>
                                     {cartItemCount > 0 ?
-                                        <>
-                                            <div className="w-full">
+                                        <div className="flex gap-x-6">
+                                            <div className="w-3/4">
                                                 <table className="table-auto w-full bg-white">
                                                     <thead>
-                                                        <tr className="bg-[#F2F2F2]">
+                                                        <tr className="bg-[#F2F2F2] border border-gray-200">
                                                             {tableHeaders && tableHeaders.map((item, index) => {
                                                                 return (
                                                                     <th className="text-left py-3 px-2 font-medium text-sm" key={`header-field-${index}`}>{item}</th>
@@ -168,21 +171,21 @@ const ShoppingCartPage = () => {
                                                                     <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                         <td>
                                                                             {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
-                                                                            <LoadImage img_style="w-32 h-32" product_id={item.product_info.id}/>
+                                                                            <LoadImage img_style="w-24 h-24" product_id={item.product_info.id} />
                                                                         </td>
                                                                         <td className="py-3 px-2">
-                                                                            <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
-                                                                            <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
+                                                                            <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
+                                                                            <div className="text-sm">Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
                                                                         </td>
-                                                                        <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
+                                                                        <td className="py-3 px-2 text-sm">{CurrencyFormat(item.price)}</td>
                                                                         <td className="py-3 px-2">
-                                                                            <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                                                            <div className="w-24 h-8 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
                                                                                 <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity - 1)} />
                                                                                 <input type="text" className="w-1/2 text-center outline-none select-none" value={item.quantity} onChange={(e) => handleUpdateCartItem(item.id, +e.target.value)} />
                                                                                 <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity + 1)} />
                                                                             </div>
                                                                         </td>
-                                                                        <td className="py-3 px-2">{CurrencyFormat(item.price * item.quantity)}</td>
+                                                                        <td className="py-3 px-2 font-medium">{CurrencyFormat(item.price * item.quantity)}</td>
                                                                         <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
                                                                             setDeleteCartItemId(item.id);
                                                                             setShowDeleteBox(true);
@@ -195,16 +198,9 @@ const ShoppingCartPage = () => {
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <div className="shopping-cart-payment mt-20 flex justify-between">
+                                            <div className="w-1/4 shopping-cart-payment flex flex-col gap-y-8">
                                                 <div>
-                                                    <div className="text-lg tracking-wide">Phiếu giảm giá</div>
-                                                    <div className="w-[23rem] border border-gray-400 h-12 mt-6 px-5 flex items-center">
-                                                        <input type="text" className="outline-none w-full" placeholder="Nhập mã giảm giá" />
-                                                    </div>
-                                                    <div className="bg-[#FCB800] px-5 py-3 w-fit mt-6 font-medium cursor-pointer hover:opacity-80">Áp dụng mã giảm giá</div>
-                                                </div>
-                                                <div>
-                                                    <div className="w-[23rem] bg-gray-100 border border-gray-400 px-8 py-5">
+                                                    <div className="w-[23rem] bg-gray-100 border border-gray-200 px-8 py-5">
                                                         <div className="flex items-center justify-between pb-5 border-b border-gray-300 mb-4">
                                                             <div>Tổng</div>
                                                             <div>{CurrencyFormat(cartItemTotal)}</div>
@@ -219,13 +215,22 @@ const ShoppingCartPage = () => {
                                                         </div>
                                                         <div className="flex items-center justify-between text-lg font-medium">
                                                             <div>Tổng cộng</div>
-                                                            <div className="text-red-500 text-xl font-bold">{CurrencyFormat(orderCost)}</div>
+                                                            <div className="text-red-500 text-xl">{CurrencyFormat(orderCost)}</div>
                                                         </div>
                                                     </div>
-                                                    <div className="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold" onClick={() => navigate("/payment")}>Tiến hành thanh toán</div>
+                                                    <div className="bg-[#FCB800] px-5 py-3 w-[23rem] mt-4 cursor-pointer hover:opacity-80 text-center font-medium" onClick={() => navigate("/payment")}>Tiến hành đặt hàng</div>
+                                                </div>
+                                                <div className="border border-gray-200 bg-gray-100 py-4 px-8 w-[23rem]">
+                                                    <div className="text-lg mb-2 font-medium">Mã giảm giá/ Quà tặng</div>
+                                                    <div className="flex items-center  gap-x-1">
+                                                        <div className="border border-gray-400 h-12 px-5 flex items-center flex-1 bg-white">
+                                                            <input type="text" className="outline-none w-full" placeholder="Nhập mã giảm giá" />
+                                                        </div>
+                                                        <div className="bg-[#FCB800] px-5 py-3 w-fit font-medium cursor-pointer hover:opacity-80">Nhập Mã</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </>
+                                        </div>
                                         :
                                         <div className="w-full text-gray-500 text-center text-lg border border-gray-300 bg-gray-100 py-2">Chưa có sản phẩm trong giỏ hàng !</div>
                                     }

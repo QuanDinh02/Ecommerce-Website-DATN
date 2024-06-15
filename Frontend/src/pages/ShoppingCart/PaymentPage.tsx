@@ -6,7 +6,7 @@ import React from "react";
 import { ICartItem } from "./ShoppingCartPage";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
-import { TailSpin } from "react-loader-spinner";
+import { RotatingLines, TailSpin } from "react-loader-spinner";
 import _ from 'lodash';
 import { useImmer } from "use-immer";
 import { getCustomerOrderAddress } from "@/services/customerService";
@@ -14,8 +14,61 @@ import { createNewOrder } from "@/services/orderServices";
 import { successToast1 } from "@/components/Toast/Toast";
 import Button from "@/components/Button";
 import { deleteAllCartItem } from "@/services/cartItemService";
-import LoadImageS3 from "@/components/LoadImageS3";
-import LoadImage from "@/components/LoadImage";
+import { FaRegCircleCheck } from "react-icons/fa6";
+
+const STEP = [
+    {
+        id: 1,
+        label: "Địa Chỉ Giao Hàng"
+    },
+    {
+        id: 2,
+        label: "Thanh Toán & Đặt Mua"
+    },
+    {
+        id: 3,
+        label: "Hoàn Tất"
+    }
+]
+
+const SHIPPING_METHOD = [
+    {
+        id: 1,
+        label: "Giao hàng tiêu chuẩn",
+        value: 0,
+        isSelected: true
+    },
+    {
+        id: 2,
+        label: "Giao hàng tiết kiệm",
+        value: 10000,
+        isSelected: false
+    },
+    {
+        id: 3,
+        label: "Giao hàng hỏa tốc",
+        value: 30000,
+        isSelected: false
+    },
+]
+
+const PAYMENT_METHOD = [
+    {
+        id: 1,
+        label: "Thanh toán tiền mặt khi nhận hàng",
+        isSelected: true
+    },
+    {
+        id: 2,
+        label: "Thanh toán bằng thẻ quốc tế Visa, Masterm, JCB",
+        isSelected: false
+    },
+    {
+        id: 3,
+        label: "Thẻ ATM nội địa/ Internet Banking",
+        isSelected: false
+    },
+]
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "SỐ LƯỢNG", "THÀNH TIỀN"
@@ -35,11 +88,36 @@ interface ICustomerAccount {
     role: string
 }
 
+const SuccessAnnouncement = () => {
+
+    const navigate = useNavigate();
+
+    return (
+        <div className="border border-gray-200 shadow py-6 w-fit px-12">
+            <div className="announcement__main flex flex-col gap-y-1 duration-800 mb-4">
+                <div className="w-full flex item-center justify-center"><FaRegCircleCheck className="w-16 h-16 text-[#6acd03]" /></div>
+            </div>
+            <div className="announcement__title text-black text-xl mb-4 text-center text-gray-600 font-medium">Cám ơn bạn đã mua hàng tại FoxMart !</div>
+            <div className="text-center mb-2">Mã đơn hàng của bạn:</div>
+            <div className="flex items-center justify-center mb-5">
+                <div className="bg-[#6acd03] text-white px-5 py-2 w-32 text-center">570774532</div>
+            </div>
+            <div className="text-center">Bạn có thể xem lại <span className="text-blue-600 hover:underline cursor-pointer">đơn hàng của tôi</span></div>
+        </div>
+    )
+}
+
 const PaymentPage = () => {
 
     const navigate = useNavigate();
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
+    const [paymentStep, setPaymentStep] = React.useState<number>(1);
+    const [shippingMethod, setShippingMethod] = React.useState<number>(1);
+    const [paymentMethod, setPaymentMethod] = React.useState<number>(1);
+
+    const [createOrder, setCreateOrder] = React.useState<boolean>(false);
 
     const cartItemList: ICartItem[] = useSelector<RootState, ICartItem[]>(state => state.cartItem.cart_item_list);
     const cartItemCount: number = useSelector<RootState, number>(state => state.cartItem.cart_item_count);
@@ -92,39 +170,46 @@ const PaymentPage = () => {
         }
     }
 
-    const handlePayment = async () => {
+    const handleOrderPayment = async () => {
 
-        let orderItems = cartItemList.map(item => {
+        window.scrollTo({ top: 0, left: 0 });
 
-            let order_item = {
-                productID: item.product_info.id,
-                quantity: item.quantity,
-                price: item.price
-            }
+        setPaymentStep(paymentStep + 1);
+        // let orderItems = cartItemList.map(item => {
 
-            return order_item;
-        })
+        //     let order_item = {
+        //         productID: item.product_info.id,
+        //         quantity: item.quantity,
+        //         price: item.price
+        //     }
 
-        let response: any = await createNewOrder({
-            status: 0,
-            shipFee: transportedFee,
-            totalPrice: orderCost,
-            shipMethod: 0,
-            address: orderAddress.other_address === "" ? orderAddress.address : orderAddress.other_address,
-            note: orderAddress.note,
-            customerID: account.customer_id,
-            order_items: orderItems
-        });
+        //     return order_item;
+        // })
 
-        if (response && response.EC === 0) {
-            let result = await deleteAllCartItem(account.customer_id);
-            if (result && result.EC === 0) {
-                successToast1(response.EM);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            }
-        }
+        // let response: any = await createNewOrder({
+        //     status: 0,
+        //     shipFee: transportedFee,
+        //     totalPrice: orderCost,
+        //     shipMethod: 0,
+        //     address: orderAddress.other_address === "" ? orderAddress.address : orderAddress.other_address,
+        //     note: orderAddress.note,
+        //     customerID: account.customer_id,
+        //     order_items: orderItems
+        // });
+
+        // if (response && response.EC === 0) {
+        //     let result = await deleteAllCartItem(account.customer_id);
+        //     if (result && result.EC === 0) {
+        //         successToast1(response.EM);
+        //         setTimeout(() => {
+        //             window.location.reload();
+        //         }, 1500);
+        //     }
+        // }
+    }
+
+    const handleSelectOrderAddress = () => {
+        setPaymentStep(paymentStep + 1);
     }
 
     React.useEffect(() => {
@@ -155,6 +240,14 @@ const PaymentPage = () => {
         setOrderCost(cartItemValueSum + transportedFee);
     }, [cartItemList]);
 
+    React.useEffect(() => {
+        if(paymentStep === 3) {
+            setCreateOrder(true);
+            setTimeout(() => {
+                setCreateOrder(false);
+            },2000);
+        }
+    },[paymentStep]);
 
     return (
         <div className="payment-container">
@@ -182,72 +275,153 @@ const PaymentPage = () => {
                         </div>
                         :
                         <div className="main main w-[80rem] mx-auto px-[30px]">
-                            <div className="title text-4xl text-center font-medium mb-20">Thanh toán</div>
-                            {cartItemCount > 0 ?
-                                <>
-                                    <div className="w-full">
-                                        <table className="table-auto w-full bg-white">
-                                            <thead>
-                                                <tr className="bg-[#F2F2F2]">
-                                                    {tableHeaders && tableHeaders.map((item, index) => {
-                                                        return (
-                                                            <th className="text-left py-3 px-2 font-medium text-sm" key={`header-field-${index}`}>{item}</th>
-                                                        )
-                                                    })}
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {cartItemList && cartItemList.length > 0 &&
-                                                    cartItemList.map((item, index) => {
-                                                        return (
-                                                            <tr key={`cart-item-${index}`} className="border-b border-gray-300">
-                                                                <td>
-                                                                    {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
-                                                                    <LoadImage img_style="w-32 h-32" product_id={item.product_info.id}/>
-                                                                </td>
-                                                                <td className="py-3 px-2">
-                                                                    <div className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
-                                                                    <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
-                                                                </td>
-                                                                <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
-                                                                <td className="py-3 px-2"><div>{item.quantity}</div></td>
-                                                                <td className="py-3 px-2">{CurrencyFormat(item.price * item.quantity)}</td>
-                                                            </tr>
-                                                        )
-                                                    })
-                                                }
-
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div className="payment-order- mt-20 flex justify-between">
-                                        <div>
-                                            <div className="text-lg tracking-wide font-medium mb-6">Thông tin giao hàng</div>
-                                            <div className="mb-4">
-                                                <div className="mb-2">Họ và Tên {requiredTag()}</div>
-                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.fullname} disabled />
+                            <div className="step-box flex items-center justify-center mb-10">
+                                <div className="flex items-center">
+                                    {
+                                        STEP.map((step, index) => {
+                                            if (step.id <= paymentStep) {
+                                                return (
+                                                    <>
+                                                        {(index !== 0) &&
+                                                            <div className="w-60 h-2 bg-[#FCB800]"></div>
+                                                        }
+                                                        <div className="relative">
+                                                            <div className="w-8 h-8 border-2 border-[#FCB800] rounded-full flex items-center justify-center text-xl bg-[#FCB800] text-white">{step.id}</div>
+                                                            <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 text-center text-gray-600 font-medium">{step.label}</div>
+                                                        </div>
+                                                    </>
+                                                )
+                                            }
+                                            return (
+                                                <>
+                                                    {(index !== 0) &&
+                                                        <div className="w-60 h-2 bg-gray-200"></div>
+                                                    }
+                                                    <div className="relative">
+                                                        <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">{step.id}</div>
+                                                        <div className="absolute top-[-20px] left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-60 text-center text-gray-400 font-medium">{step.label}</div>
+                                                    </div>
+                                                </>
+                                            )
+                                        })
+                                    }
+                                    {/* <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">1</div>
+                                <div className="w-60 h-2 bg-gray-200"></div>
+                                <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">2</div>
+                                <div className="w-60 h-2 bg-gray-200"></div>
+                                <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">3</div> */}
+                                </div>
+                            </div>
+                            {
+                                paymentStep === 1 &&
+                                <div className="shipping-order-address">
+                                    <div>
+                                        <div className="text-lg tracking-wide font-medium">Địa chỉ giao hàng</div>
+                                        <div className="my-6 text-gray-600 font-medium">Chọn địa chỉ giao hàng có sẵn của bạn bên dưới:</div>
+                                        <div className="border border-gray-200 shadow rounded px-4 py-3 w-1/2">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <div className="text-lg font-bold">{orderAddress.fullname}</div>
+                                                <div className="text-green-500 font-medium">Mặc định</div>
                                             </div>
-                                            <div className="mb-4">
-                                                <div className="mb-2">Số điện thoại {requiredTag()}</div>
-                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.mobile} disabled />
-                                            </div>
-                                            <div className="mb-4">
-                                                <div className="mb-2">Địa chỉ {requiredTag()}</div>
-                                                <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.address} disabled />
-                                            </div>
-                                            <div className="mb-4">
-                                                <div className="mb-2">Địa chỉ giao hàng (nếu khác với địa chỉ hiện có)</div>
-                                                <input onChange={(e) => handleOnChange('other_address', e.target.value)} type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" />
-                                            </div>
-                                            <div className="mb-4">
-                                                <div className="mb-2">Ghi chú</div>
-                                                <textarea onChange={(e) => handleOnChange('note', e.target.value)} className="outline-none w-[40rem] h-12 border border-gray-400 px-3 py-2 h-40" placeholder="Ghi chú cho đơn hàng" />
+                                            <div className="mb-1 text-gray-600">Địa chỉ: {orderAddress.address}</div>
+                                            <div className="mb-1 text-gray-600">Điện thoại: {orderAddress.mobile}</div>
+                                            <div className="w-full flex items-center gap-x-2 mt-2 ">
+                                                <Button styles="px-3 py-2 border border-[#FCB800] bg-[#FCB800] w-fit rounded cursor-pointer hover:opacity-80" OnClick={() => handleSelectOrderAddress()} >Giao đến địa chỉ này</Button>
+                                                <Button styles="px-4 py-2 rounded cursor-pointer border border-gray-300 hover:bg-gray-100 w-fit">Sửa</Button>
                                             </div>
                                         </div>
-                                        <div>
-                                            <div className="text-lg tracking-wide font-medium">Thông tin đơn hàng</div>
-                                            <div className="w-[23rem] bg-gray-100 border border-gray-400 px-8 py-5 mt-6">
-                                                <div className="flex items-center justify-between pb-2 border-b border-gray-300 mb-4 font-medium">
+                                        <div className="mt-6 flex items-center gap-x-1">
+                                            <span className="text-gray-600">Bạn muốn giao hàng đến địa chỉ khác?</span>
+                                            <span className="font-medium text-blue-600 cursor-pointer hover:underline">Thêm địa chỉ giao hàng mới</span>
+                                        </div>
+                                        {/* <div className="mb-4">
+                                        <div className="mb-2">Họ và Tên</div>
+                                        <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.fullname} disabled />
+                                    </div>
+                                    <div className="mb-4">
+                                        <div className="mb-2">Số điện thoại</div>
+                                        <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.mobile} disabled />
+                                    </div>
+                                    <div className="mb-4">
+                                        <div className="mb-2">Địa chỉ</div>
+                                        <input type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3 cursor-not-allowed" value={orderAddress.address} disabled />
+                                    </div>
+                                    <div className="mb-4">
+                                        <div className="mb-2">Địa chỉ giao hàng (nếu khác với địa chỉ hiện có)</div>
+                                        <input onChange={(e) => handleOnChange('other_address', e.target.value)} type="text" className="outline-none w-[40rem] h-12 border border-gray-400 px-3" />
+                                    </div>
+                                    <div className="mb-4">
+                                        <div className="mb-2">Ghi chú</div>
+                                        <textarea onChange={(e) => handleOnChange('note', e.target.value)} className="outline-none w-[40rem] h-12 border border-gray-400 px-3 py-2 h-40" placeholder="Ghi chú cho đơn hàng" />
+                                    </div> */}
+                                    </div>
+
+                                </div>
+                            }
+                            {
+                                paymentStep === 2 &&
+                                <div>
+                                    <div className="w-full flex gap-x-8">
+                                        <div className="w-3/4">
+                                            <div className="text-lg font-bold text-xl text-gray-600 mb-4">1. Chọn hình thức giao hàng</div>
+                                            <div className="border border-gray-300 rounded p-4">
+                                                <div className="flex flex-col gap-y-4">
+                                                    {
+                                                        SHIPPING_METHOD.map((item, index) => {
+                                                            return (
+                                                                <div className='flex items-center gap-x-6 mb-2 cursor-pointer w-fit' key={`shipping-method-select-${index}`} onClick={() => setShippingMethod(item.id)}>
+                                                                    <div className={item.id === shippingMethod ? 'w-7 h-7 border-2 border-[#FCB800] rounded-full flex items-center justify-center' : 'w-7 h-7 border-2 border-gray-300 rounded-full'}>
+                                                                        <div className={item.id === shippingMethod ? 'w-3 h-3 bg-[#FCB800] rounded-full' : ""}></div>
+                                                                    </div>
+                                                                    <div className="flex gap-x-2 items-center">
+                                                                        {item.value === 0 && <span className="rounded-full px-4 py-1 text-white bg-green-500">Miễn phí</span>}{item.label}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="text-lg font-bold text-xl text-gray-600 my-4">2. Chọn hình thức thanh toán</div>
+                                            <div className="border border-gray-300 rounded p-4">
+                                                <div className="flex flex-col gap-y-4">
+                                                    {
+                                                        PAYMENT_METHOD.map((item, index) => {
+                                                            return (
+                                                                <div className='flex items-center gap-x-6 mb-2 cursor-pointer w-fit' key={`shipping-method-select-${index}`} onClick={() => setPaymentMethod(item.id)}>
+                                                                    <div className={item.id === paymentMethod ? 'w-7 h-7 border-2 border-[#FCB800] rounded-full flex items-center justify-center' : 'w-7 h-7 border-2 border-gray-300 rounded-full'}>
+                                                                        <div className={item.id === paymentMethod ? 'w-3 h-3 bg-[#FCB800] rounded-full' : ""}></div>
+                                                                    </div>
+                                                                    <div className="flex gap-x-2 items-center">
+                                                                        {item.label}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <Button styles="w-[20rem] bg-red-500 hover:bg-red-600 px-4 py-2 mt-6 cursor-pointer text-center font-bold text-lg text-white rounded" OnClick={() => handleOrderPayment()}>ĐẶT MUA</Button>
+                                                <div className="text-sm text-gray-600 mt-2">(Xin vui lòng kiểm tra đơn hàng trước khi đặt mua)</div>
+                                            </div>
+                                        </div>
+                                        <div className="w-1/4">
+                                            <div className="w-[23rem] border border-gray-300 px-6 py-5 rounded mb-4">
+                                                <div className="w-full flex items-center justify-between mb-4 border-b border-gray-200 pb-4">
+                                                    <div className="text-lg text-lg">Địa chỉ giao hàng</div>
+                                                    <Button styles="px-4 py-2 rounded cursor-pointer border border-gray-300 hover:bg-gray-100 w-fit">Sửa</Button>
+                                                </div>
+                                                <div className="text-lg font-bold mb-1">{orderAddress.fullname}</div>
+                                                <div className="mb-1 text-gray-600">Địa chỉ: {orderAddress.address}</div>
+                                                <div className="mb-1 text-gray-600">Điện thoại: {orderAddress.mobile}</div>
+                                            </div>
+                                            <div className="w-[23rem] border border-gray-300 px-6 py-5 rounded">
+                                                <div className="w-full flex items-center justify-between mb-4 border-b border-gray-200 pb-4">
+                                                    <div className="text-lg text-lg">Thông tin đơn hàng</div>
+                                                    <Button styles="px-4 py-2 rounded cursor-pointer border border-gray-300 hover:bg-gray-100 w-fit">Sửa</Button>
+                                                </div>
+                                                <div className="flex items-center justify-between pb-2 mb-4">
                                                     <div>SẢN PHẨM</div>
                                                     <div>THÀNH TIỀN</div>
                                                 </div>
@@ -256,9 +430,9 @@ const PaymentPage = () => {
                                                         cartItemList && cartItemList.length > 0 &&
                                                         cartItemList.map((item, index) => {
                                                             return (
-                                                                <div className="flex items-center justify-between mb-2 text-sm">
+                                                                <div className="flex items-center justify-between pt-2 mb-2 text-sm border-t border-gray-200">
                                                                     <div className="flex items-center w-2/3">
-                                                                        <div className="w-60 w-4/5">{item.product_info.name}</div>
+                                                                        <div className="w-60 w-4/5 text-blue-600">{item.product_info.name}</div>
                                                                         <div className="font-bold w-1/5">x{item.quantity}</div>
                                                                     </div>
                                                                     <div className="w-1/3 text-end">{CurrencyFormat(item.price * item.quantity)}</div>
@@ -267,32 +441,50 @@ const PaymentPage = () => {
                                                         })
                                                     }
                                                 </div>
-
-                                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 mb-4 font-medium">
-                                                    <div>Tổng</div>
+                                                <div className="flex items-center justify-between pb-5 border-b border-gray-300 text-sm mb-4">
+                                                    <div>Tạm tính</div>
                                                     <div>{CurrencyFormat(cartItemTotal)}</div>
                                                 </div>
                                                 <div className="flex items-center justify-between pb-2 border-b border-gray-300 text-sm pb-10 mb-2">
                                                     <div>Phí vận chuyển</div>
                                                     <div>{CurrencyFormat(transportedFee)}</div>
                                                 </div>
-                                                <div className="flex items-center justify-between pb-2 border-b border-gray-300 text-sm pb-10 mb-6">
+                                                <div className="flex items-center justify-between pb-2 border-b border-gray-300 text-sm pb-10 mb-3">
                                                     <div>Giảm giá</div>
                                                     <div>-{CurrencyFormat(discountValue)}</div>
                                                 </div>
-                                                <div className="flex items-center justify-between text-lg font-medium">
+                                                <div className="flex justify-between text-lg font-medium">
                                                     <div>Tổng cộng</div>
-                                                    <div className="text-red-500 text-xl font-bold">{CurrencyFormat(orderCost)}</div>
+                                                    <div className="text-end">
+                                                        <div className="text-red-500 text-xl">{CurrencyFormat(orderCost)}</div>
+                                                        <div className="text-gray-600 font-normal text-sm">(Đã bao gồm VAT nếu có)</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <Button styles="bg-[#FCB800] px-5 py-3 w-full mt-6 cursor-pointer hover:opacity-80 text-center font-bold" OnClick={() => handlePayment()}>Thanh toán</Button>
                                         </div>
                                     </div>
-                                </>
-                                :
-                                <div className="w-full text-gray-500 text-center text-lg border border-gray-300 bg-gray-100 py-2">Chưa có sản phẩm cần thanh toán !</div>
+                                </div>
                             }
-
+                            {
+                                paymentStep === 3 &&
+                                (
+                                    (createOrder) ?
+                                        <div className="absolute w-full h-full bg-black opacity-30 z-[100] inset-0 flex items-center justify-center">
+                                            <RotatingLines
+                                                width="80"
+                                                strokeWidth="5"
+                                                strokeColor="white"
+                                                animationDuration="0.75"
+                                                ariaLabel="rotating-lines-loading"
+                                                visible={true}
+                                            />
+                                        </div>
+                                        :
+                                        <div className="flex items-center justify-center">
+                                            <SuccessAnnouncement />
+                                        </div>
+                                )
+                            }
                         </div>
                 }
             </div>
