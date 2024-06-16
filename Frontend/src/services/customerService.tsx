@@ -40,14 +40,6 @@ interface IUpdateAddress {
     province: string
 }
 
-export const getCustomerOrderAddress = async (customer_id: number) => {
-    let result: APIResponse = await axios.get(`/api/customer/order-info?id=${customer_id}`);
-    if (result && result.EC === 0) {
-        return result.DT;
-    }
-    return null;
-}
-
 export const saveCustomerSearch = async (content: string) => {
     let result: APIResponse = await axios.post('/api/search-history', { content: content });
     return result;

@@ -10,7 +10,7 @@ module.exports = {
                 type: Sequelize.BIGINT
             },
             status: {
-                type: Sequelize.STRING
+                type: Sequelize.TINYINT
             },
             updatedDate: {
                 type: Sequelize.DATE

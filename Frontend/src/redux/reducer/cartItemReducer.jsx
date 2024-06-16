@@ -1,4 +1,4 @@
-import { ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM } from '../actions/type';
+import { ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM, CLEAR_ALL_CART_ITEM } from '../actions/type';
 
 const INITIAL_STATE = {
     cart_item_count: 0,
@@ -58,6 +58,13 @@ const cartItemReducer = (state = INITIAL_STATE, action) => {
                 cart_item_list: [...newCartItemList],
             };
 
+        case CLEAR_ALL_CART_ITEM:
+
+            return {
+                ...state,
+                cart_item_count: 0,
+                cart_item_list: [],
+            };
         default: return state;
 
     }

@@ -6,24 +6,24 @@ module.exports = {
         await queryInterface.bulkInsert('ShippingMethod', [
             {
                 //id: 1
-                nameMethod: "Nhanh",
-                price: 30000,
-                description: "Giao Hàng Nhanh của Đơn vị Giao Hàng Nhanh",
-                unitID: 1
+                nameMethod: "Giao hàng Tiêu Chuẩn",
+                price: 0,
+                description: "Giao hàng tiêu chuẩn",
+                status: 1
             },
             {
                 //id: 2
-                nameMethod: "Tiết Kiệm",
+                nameMethod: "Giao hàng Tiết Kiệm",
                 price: 15000,
-                description: "Giao Hàng Tiết Kiệm của Đơn vị Giao Hàng Tiết Kiệm",
-                unitID: 2
+                description: "Giao Hàng Tiết Kiệm",
+                status: 1
             },
             {
                 //id: 3
-                nameMethod: "Hỏa Tốc",
+                nameMethod: "Giao hàng Hỏa Tốc",
                 price: 50000,
-                description: "Giao Hàng Nhanh của Đơn vị Giao Hàng Vietnam Post",
-                unitID: 3
+                description: "Giao hàng Hỏa Tốc",
+                status: 1
             },
         ], {});
     },

@@ -43,6 +43,44 @@ const getOrderByCustomer = async (req, res) => {
     }
 }
 
+const getShippingMethod = async (req, res) => {
+    try {
+        let result = await orderServices.getShippingMethod();
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getPaymentMethod = async (req, res) => {
+    try {
+        let result = await orderServices.getPaymentMethod();
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
-    createNewOrder, getOrderByCustomer
+    createNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod
 }

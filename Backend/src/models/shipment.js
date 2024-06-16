@@ -6,10 +6,11 @@ module.exports = (sequelize, DataTypes) => {
   class Shipment extends Model {
     static associate(models) {
       Shipment.belongsTo(models.Order, { foreignKey: 'orderID' });
+      Shipment.belongsTo(models.ShipmentStatus, { foreignKey: 'status' });
     }
   }
   Shipment.init({
-    status: DataTypes.STRING,
+    status: DataTypes.TINYINT,
     updatedDate: DataTypes.DATE,
     orderID: DataTypes.BIGINT
   }, {

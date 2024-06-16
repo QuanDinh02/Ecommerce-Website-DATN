@@ -6,44 +6,6 @@ const { checkPassword, hashPassword } = require("./LoginRegisterService.js");
 import dotenv from 'dotenv';
 dotenv.config();
 
-const getCustomerInfoForOrder = async (customer_id) => {
-    try {
-        let customerInfo = await db.Customer.findOne({
-            raw: true,
-            nest: true,
-            include: {
-                model: db.Address,
-                attributes: ['fullname', 'mobile', 'street', 'ward', 'district', 'province', 'country'],
-                where: {
-                    type: {
-                        [Op.eq]: 1
-                    }
-                }
-            },
-            where: {
-                id: {
-                    [Op.eq]: +customer_id
-                }
-            }
-        })
-
-        let orderAddressInfo = customerInfo.Addresses;
-
-        return {
-            EC: 0,
-            DT: orderAddressInfo,
-            EM: 'Customer Order Info !'
-        }
-    } catch (error) {
-        console.log(error);
-        return {
-            EC: -2,
-            DT: [],
-            EM: 'Something is wrong on services !',
-        }
-    }
-}
-
 const getCustomerInfo = async (customer_id) => {
     try {
         let customerInfo = await db.Customer.findOne({
@@ -493,7 +455,7 @@ const handleOTPVertification = async (data) => {
 }
 
 module.exports = {
-    getCustomerInfoForOrder, handleCreateVertificationCode,
+    handleCreateVertificationCode,
     handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword,
     getCustomerAddresses, updateCustomerDefaultAddress,
     createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress

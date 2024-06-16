@@ -2,7 +2,7 @@ import {
     INCREMENT, DECREMENT, 
     USER_LOGIN, USER_LOGOUT,
     ADD_CART_ITEM, UPDATE_CART_ITEM, DELETE_CART_ITEM,
-    ADD_WISHLIST_ITEM, DELETE_WISHLIST_ITEM
+    ADD_WISHLIST_ITEM, DELETE_WISHLIST_ITEM, CLEAR_ALL_CART_ITEM
 } from './type';
 
 export const increaseCounter = () => {
@@ -50,6 +50,12 @@ export const DeleteCartItem = (data) => {
     return {
         type: DELETE_CART_ITEM,
         cart_item_id: +data.id
+    };
+};
+
+export const ClearAllCartItem = () => {
+    return {
+        type: CLEAR_ALL_CART_ITEM
     };
 };
 

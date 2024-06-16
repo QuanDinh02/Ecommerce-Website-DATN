@@ -36,7 +36,6 @@ const ApiRoute = (app) => {
 
     router.put('/user/password', userController.handleChangeUserPassword);
 
-    router.get('/customer/order-info', customerController.getCustomerInfoForOrder);
     router.get('/customer/info', customerController.getCustomerInfo);
     router.put('/customer/info', customerController.updateCustomerInfo);
     router.put('/customer/info/password', checkUserJWT, customerController.changeCustomerPassword);
@@ -88,6 +87,8 @@ const ApiRoute = (app) => {
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
+    router.get('/order/shipping-method', orderController.getShippingMethod);
+    router.get('/order/payment-method', orderController.getPaymentMethod);
 
     router.get('/provinces', cacheMiddleware(300), locationController.getAllProvinces);
     router.get('/districts/province/:province_code', cacheMiddleware(300), locationController.getDistrictsByProvince);

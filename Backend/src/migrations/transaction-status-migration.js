@@ -2,22 +2,19 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('TransactionPaymentMethod', {
+        await queryInterface.createTable('TransactionStatus', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
-                type: Sequelize.SMALLINT
+                type: Sequelize.INTEGER
             },
-            method_name: {
+            name: {
                 type: Sequelize.STRING
-            },
-            status: {
-                type: Sequelize.TINYINT(1)
             }
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('TransactionPaymentMethod');
+        await queryInterface.dropTable('TransactionStatus');
     }
 };

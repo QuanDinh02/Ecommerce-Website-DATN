@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   TransactionPaymentMethod.init({
     method_name: DataTypes.STRING,
+    status: DataTypes.TINYINT(1)
   }, {
     sequelize,
     modelName: 'TransactionPaymentMethod',

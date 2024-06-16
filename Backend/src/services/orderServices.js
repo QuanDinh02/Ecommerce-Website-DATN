@@ -27,7 +27,7 @@ const addNewOrder = async (orderData, session_id) => {
             orderDate: new Date(),
             shipFee: orderData.shipFee,
             totalPrice: orderData.totalPrice,
-            shipMethod: null,
+            shipMethod: orderData.shipMethod,
             address: orderData.address,
             note: orderData.note,
             customerID: orderData.customerID,
@@ -56,17 +56,28 @@ const addNewOrder = async (orderData, session_id) => {
 
             await db.SessionActivity.bulkCreate(buyItemsBuild);
 
-            let shippingStatus = await db.Shipment.create({
-                status: "ĐANG XỬ LÝ",
+            await db.Shipment.create({
+                status: 1,
                 updatedDate: orderInfo.orderDate,
                 orderID: orderInfo.id
             });
 
-            if (shippingStatus) {
+            let transactionInfo = await db.Transaction.create({
+                orderID: orderInfo.id,
+                payment: orderData.paymentMethod,
+                amount: orderData.totalPrice,
+                status: 1,
+                createdAt: orderInfo.orderDate,
+                updatedAt: orderInfo.orderDate,
+            });
+
+            if (transactionInfo) {
 
                 return {
                     EC: 0,
-                    DT: '',
+                    DT: {
+                        order_id: orderInfo.id
+                    },
                     EM: 'Thêm đơn hàng thành công !'
                 }
             }
@@ -99,7 +110,7 @@ const getOrderByCustomer = async (customer_id) => {
 
         let order_list = await db.Order.findAll({
             raw: true,
-            attributes: ['id', 'orderDate', 'totalPrice', 'note','shipFee'],
+            attributes: ['id', 'orderDate', 'totalPrice', 'note', 'shipFee'],
             where: {
                 customerID: {
                     [Op.eq]: customer_id,
@@ -146,7 +157,7 @@ const getOrderByCustomer = async (customer_id) => {
                 //     Bucket: bucketName,
                 //     Key: `${productInfo.id}.jpeg`
                 // }
-        
+
                 // const command = new GetObjectCommand(getObjectParams);
                 // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
@@ -161,7 +172,7 @@ const getOrderByCustomer = async (customer_id) => {
             }));
 
             return {
-                ...order, 
+                ...order,
                 status: orderStatus.status,
                 order_item_list: order_item_list_format
             }
@@ -183,6 +194,54 @@ const getOrderByCustomer = async (customer_id) => {
     }
 }
 
+const getShippingMethod = async () => {
+    try {
+
+        let shipping_method_list = await db.ShippingMethod.findAll({
+            raw: true,
+            attributes: ['id', 'nameMethod', 'price', 'status'],
+        });
+
+        return {
+            EC: 0,
+            DT: shipping_method_list,
+            EM: 'Shipping method'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getPaymentMethod = async () => {
+    try {
+
+        let payment_method_list = await db.TransactionPaymentMethod.findAll({
+            raw: true,
+            attributes: ['id', 'method_name', 'status'],
+        });
+
+        return {
+            EC: 0,
+            DT: payment_method_list,
+            EM: 'Payment method'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    addNewOrder, getOrderByCustomer
+    addNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod
 }

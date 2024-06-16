@@ -50,7 +50,7 @@ const ShoppingCartPage = () => {
     const cartItemCount: number = useSelector<RootState, number>(state => state.cartItem.cart_item_count);
 
     const [cartItemTotal, setCartItemTotal] = React.useState<number>(0);
-    const [transportedFee, setTransportedFee] = React.useState<number>(20000);
+    const [transportedFee, setTransportedFee] = React.useState<number>(0);
     const [orderCost, setOrderCost] = React.useState<number>(0);
     const [discountValue, setDiscountValue] = React.useState<number>(0);
 

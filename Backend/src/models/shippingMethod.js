@@ -5,7 +5,6 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class ShippingMethod extends Model {
     static associate(models) {
-        ShippingMethod.belongsTo(models.ShippingUnit, { foreignKey: 'unitID' });
         ShippingMethod.hasMany(models.Order, { foreignKey: 'shipMethod' });
     }
   }
@@ -13,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     nameMethod: DataTypes.STRING,
     price: DataTypes.INTEGER,
     description: DataTypes.TEXT("medium"),
-    unitID: DataTypes.BIGINT,
+    status: DataTypes.TINYINT(1)
   }, {
     sequelize,
     modelName: 'ShippingMethod',
