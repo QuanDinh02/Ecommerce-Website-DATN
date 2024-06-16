@@ -118,6 +118,8 @@ const getOrderByCustomer = async (customer_id) => {
             },
         });
 
+        order_list.reverse();
+
         let order_detail_list = await Promise.all(order_list.map(async order => {
 
             let order_item_list = await db.OrderItem.findAll({
@@ -153,6 +155,16 @@ const getOrderByCustomer = async (customer_id) => {
 
                 delete orderItem.Product;
 
+                let productType = await db.ProductType.findOne({
+                    raw: true,
+                    attributes: ['id', 'price', 'quantity'],
+                    where: {
+                        productID: {
+                            [Op.eq]: productInfo.id
+                        }
+                    }
+                });
+
                 // const getObjectParams = {
                 //     Bucket: bucketName,
                 //     Key: `${productInfo.id}.jpeg`
@@ -165,6 +177,7 @@ const getOrderByCustomer = async (customer_id) => {
                     ...orderItem,
                     product_id: productInfo.id,
                     product_name: productInfo.name,
+                    product_price: productType.price,
                     //product_image: url
                     product_image: ""
                 }

@@ -16,31 +16,18 @@
             border-left    : 3px solid transparent;
 
             &:hover {
-                background-image: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.04), transparent);
+                background-color: rgb(244 244 245);
             }
         }
 
         .menu-container.active {
-            color           : black;
-            font-weight     : 500;
-            background-color: white !important;
-            border-left     : 3px solid #FCB800;
-
-            .side-bar-icon {
-                color: #FCB800;
-            }
+            color: black;
+            background-color: rgb(244 244 245);
+            border-left: 3px solid #FCB800;
         }
 
         .sub-menu-container {
             transition: height .4s ease-in-out;
-
-            .sub-menu-content {
-                background-color: white;
-            }
-        }
-
-        .sub-menu-container.active {
-            color: #FCB800;
         }
 
         .arrow {

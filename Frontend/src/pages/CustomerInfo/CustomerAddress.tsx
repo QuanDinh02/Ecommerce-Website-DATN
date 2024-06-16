@@ -322,7 +322,7 @@ const CustomerAddress = () => {
 
     return (
         <>
-            <div className="address-container">
+            <div className="address-container w-full py-5 px-10 bg-white h-full">
                 <div className="customer-address__title pb-5 border-b border-gray-300 flex items-center justify-between w-full">
                     <div>
                         <div className="title text-xl mb-2">Địa chỉ của tôi</div>

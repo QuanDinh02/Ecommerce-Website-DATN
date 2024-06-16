@@ -366,11 +366,6 @@ const PaymentPage = () => {
                                             )
                                         })
                                     }
-                                    {/* <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">1</div>
-                                <div className="w-60 h-2 bg-gray-200"></div>
-                                <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">2</div>
-                                <div className="w-60 h-2 bg-gray-200"></div>
-                                <div className="w-8 h-8 border-2 border-gray-200 rounded-full flex items-center justify-center text-xl">3</div> */}
                                 </div>
                             </div>
                             {

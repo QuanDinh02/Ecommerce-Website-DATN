@@ -3,7 +3,7 @@ import { NOTIFICATION_SAMPLE_DATA } from "./CustomerOrder/OrderDataSample";
 
 const CustomerNotification = () => {
     return (
-        <div className="customer-notification-container">
+        <div className="customer-notification-container w-full py-5 px-10 bg-white h-full">
             <div className="customer-notification__title mb-6">
                 <div className="title text-xl">Thông báo</div>
             </div>

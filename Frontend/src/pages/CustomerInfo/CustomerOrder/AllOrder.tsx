@@ -8,55 +8,9 @@ import { getAllOrderByCustomer } from "@/services/orderServices";
 import { IOrder } from "./OrderType";
 import { dateFormat } from "@/utils/dateFormat";
 import { ThreeDots } from "react-loader-spinner";
-import { MdStorefront } from "react-icons/md";
 import LoadImageS3 from "@/components/LoadImageS3";
 import { useNavigate } from "react-router-dom";
 import LoadImage from "@/components/LoadImage";
-
-export const STATUS_STYLE = {
-    'ĐANG XỬ LÝ': {
-        style: "text-blue-500",
-        actions: [
-            {
-                path: "",
-                title: "Liên Hệ Người Bán"
-            },
-            {
-                path: "",
-                title: "Hủy Đơn Hàng"
-            },
-        ]
-
-    },
-    'CHỜ GIAO HÀNG': {
-        style: "text-yellow-500",
-        actions: [
-            {
-                path: "",
-                title: "Đã Nhận Hàng"
-            },
-            {
-                path: "",
-                title: "Liên Hệ Người Bán"
-            },
-        ]
-
-    },
-    'GIAO HÀNG THÀNH CÔNG': {
-        style: "text-green-500",
-        actions: [
-            {
-                path: "",
-                title: "Mua Lại"
-            },
-            {
-                path: "",
-                title: "Trả Hàng/ Hoàn Tiền"
-            },
-        ]
-
-    }
-}
 
 const AllOrder = () => {
 
@@ -64,7 +18,7 @@ const AllOrder = () => {
 
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
 
-    const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+    const [dataLoading, setDataLoading] = React.useState<boolean>(false);
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
@@ -72,6 +26,7 @@ const AllOrder = () => {
     const fetchAllOrder = async (customer_id: number) => {
         let response: any = await getAllOrderByCustomer(customer_id);
         if (response && response.EC === 0) {
+            console.log(response.DT);
             setOrderList(response.DT);
             setTimeout(() => {
                 setDataLoading(false);
@@ -86,8 +41,14 @@ const AllOrder = () => {
         });
     }
 
+    const handleTrackingOrderDetail = (order_id: number) => {
+        navigate({
+            pathname: "/customer-info/order/tracking-detail",
+            search: `?code=${order_id}`,
+        });
+    }
+
     React.useEffect(() => {
-        //setOrderList(ORDER_SAMPLE_DATA);
         if (account && isAuthenticated) {
             fetchAllOrder(account.customer_id);
         }
@@ -101,7 +62,7 @@ const AllOrder = () => {
 
     return (
         <div className="all-order-container">
-            <div className="text-xl pb-4 border-b border-gray-300 mb-4">Tất cả đơn hàng</div>
+            <div className="text-lg pb-4 text-gray-600">Tất cả đơn hàng</div>
             {
                 dataLoading ?
                     <div className="flex items-center justify-center w-full h-screen">
@@ -124,59 +85,61 @@ const AllOrder = () => {
                                     {
                                         orderList.map((item, index) => {
                                             return (
-                                                <div className="order-item rounded-[4px] shadow-lg mb-12" key={`order-item-${index}`}>
-                                                    <div className="order-item__header px-3 py-2 flex items-center justify-between border-b border-gray-200 bg-[#F2F3F7]">
-                                                        <div className="shop-name flex items-center gap-x-4">
-                                                            <div className="font-medium">#{item.id}</div>
-                                                            <div className="shop-name__link flex items-center justify-center gap-x-1 py-1 px-3 border border-gray-300 bg-white text-gray-500 cursor-pointer"><MdStorefront /> Xem shop</div> 
-                                                            <div className="tracking-wide font-medium">{dateFormat(`${item.orderDate}`)}</div>
-                                                        </div>
-                                                        <div className={`order-status font-medium ${STATUS_STYLE[item.status].style}`}>{item.status}</div>
-                                                    </div>
-                                                    <div className="order-item__product-list px-5 py-3 bg-[#F2F3F7]">
-                                                        {
-                                                            item.order_item_list && item.order_item_list.length > 0 &&
-                                                            item.order_item_list.map((product, product_index) => {
-                                                                return (
-                                                                    <div className="order-product flex items-center justify-between pb-4 mb-4 border-b border-gray-300" key={`order-product-${index}-${product_index}`}>
-                                                                        <div className="order-product__info flex gap-x-4">
-                                                                            {/* <LoadImageS3 img_style="w-24 h-24" img_url={product.product_image}/> */}
-                                                                            <LoadImage img_style="w-24 h-24" product_id={product.product_id}/>
-                                                                            <div className="flex flex-col gap-y-1">
-                                                                                <div className="font-medium cursor-pointer hover:underline hover:text-[#FCB800]" onClick={() => handleProductDetailNavigation(product.product_id)}>{product.product_name}</div>
-                                                                                <div>x{product.quantity}</div>
-                                                                                <div className="px-2 py-1 border border-green-500 text-green-500 w-fit">Hoàn trả miễn phí 15 ngày</div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="order-product__price flex items-center gap-x-2">
-                                                                            <div className="current_price text-lg text-[#FCB800] font-medium">{CurrencyFormat(product.price)}</div>
-                                                                        </div>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                    </div>
-                                                    <div className="order-item__bottom bg-[#FFFEFA] px-3 py-2">
-                                                        <div className="flex items-center justify-end my-3 text-gray-500">
-                                                            <div>Phí vận chuyển: <span>{CurrencyFormat(item.shipFee)}</span></div>
-                                                        </div>
-                                                        <div className="mb-6 text-end w-full text-xl">Thành tiền: <span className="text-xl text-[#FCB800] font-medium">{CurrencyFormat(item.totalPrice)}</span></div>
-                                                        <div className="flex items-center justify-between py-3">
-                                                            <div className="text-sm text-gray-500 tracking-wide w-[30rem]">{item.note}</div>
-                                                            <div className="flex items-center gap-x-3 transition-all">
-                                                                <Button styles="px-3 py-2 rounded-[4px] bg-[#FCB800] text-black hover:opacity-80">{STATUS_STYLE[item.status].actions[0].title}</Button>
-                                                                <Button styles="px-3 py-2 rounded-[4px] bg-white text-black border-gray-300 border hover:bg-gray-200">{STATUS_STYLE[item.status].actions[1].title}</Button>
+                                                <div className="order-item bg-white mb-12 p-5" key={`order-item-${item.id}`}>
+                                                    <div className="order-item__header flex items-center justify-between">
+                                                        <div className="info flex items-center gap-x-12">
+                                                            <div className="order-item__id">
+                                                                <div className="text-gray-600 mb-1 font-medium">Mã đơn hàng</div>
+                                                                <div className="text-[#FCB800] font-medium">{item.id}</div>
+                                                            </div>
+                                                            <div className="order-item__date">
+                                                                <div className="text-gray-600 mb-1 font-medium">Ngày mua</div>
+                                                                <div>{dateFormat(`${item.orderDate ? item.orderDate : ""}`)}</div>
+                                                            </div>
+                                                            <div className="order-item__total-price">
+                                                                <div className="text-gray-600 mb-1 font-medium">Tổng tiền</div>
+                                                                <div className="font-medium">{CurrencyFormat(item.totalPrice)}</div>
+                                                            </div>
+                                                            <div className="order-item__shipping-fee">
+                                                                <div className="text-gray-600 mb-1 font-medium">Phí vận chuyển</div>
+                                                                <div>{CurrencyFormat(item.shipFee)}</div>
                                                             </div>
                                                         </div>
+                                                        <Button styles="px-6 py-2 bg-[#FCB800] font-medium w-fit cursor-pointer opacity-80 hover:opacity-100 rounded" OnClick={() => handleTrackingOrderDetail(item.id)}>Theo dõi chi tiết</Button>
                                                     </div>
+                                                    <div className="order-item__main mt-12 mb-8">
+                                                        <div className="flex flex-col gap-y-6">
+                                                            {
+                                                                item.order_item_list && item.order_item_list.length > 0 &&
+                                                                item.order_item_list.map((product, product_idx) => {
+                                                                    return (
+                                                                        <div className="flex gap-x-6" key={`product-item-${item.id}-${product_idx}`} onClick={() => handleProductDetailNavigation(product.product_id)}>
+                                                                            <LoadImage img_style="w-24 h-24" product_id={product.product_id} />
+                                                                            <div className="flex flex-col gap-y-2">
+                                                                                <div className="opacity-90 line-clamp-1 cursor-pointer hover:underline hover:text-blue-600">{product.product_name}</div>
+                                                                                <div className="order-item__price flex items-center gap-x-2">
+                                                                                    <div className="font-medium">{CurrencyFormat(product.price)}</div>
+                                                                                    <div className="line-through text-gray-400">{CurrencyFormat(product.product_price)}</div>
+                                                                                </div>
+                                                                                <div className="text-gray-500">Số lượng: {product.quantity}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    )
+                                                                })
+                                                            }
+
+                                                        </div>
+                                                    </div>
+
                                                 </div>
                                             )
                                         })
                                     }
                                 </>
                                 :
-                                <div className="w-full text-gray-500 text-center border border-gray-100 bg-gray-100 py-2">Chưa có đơn hàng nào !</div>
+                                <div className="w-full text-gray-500 text-center text-lg font-medium py-2">Chưa có đơn hàng !</div>
                         }
+
                     </>
             }
         </div>

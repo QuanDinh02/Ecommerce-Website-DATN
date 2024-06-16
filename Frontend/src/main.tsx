@@ -42,6 +42,7 @@ import ShippingOrder from '@/pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx'
 import CustomerAccountInfo from '@/pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
 import VoucherAll from '@/pages/CustomerInfo/Voucher/VoucherAll.tsx';
 import VoucherHistory from '@/pages/CustomerInfo/Voucher/VoucherHistory.tsx';
+import OrderTracking from '@/pages/CustomerInfo/CustomerOrder/OrderTracking.tsx';
 
 import SellerInfo from '@/pages/SellerInfo/SellerInfo.tsx';
 import SellerAllOrder from '@/pages/SellerInfo/SellerOrder/AllOrder.tsx';
@@ -60,6 +61,7 @@ import SellerProfile from '@/pages/SellerInfo/SellerProfile.tsx';
 import RegisterPage from '@/pages/RegisterPage.tsx';
 import SellerSignUpPage from '@/pages/Register/SellerSignUpPage.tsx';
 import ShopInfo from '@/pages/SellerInfo/ShopInfo.tsx';
+import ShopManagement from '@/pages/SellerInfo/ShopManagement.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -84,8 +86,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import ShopManagement from './pages/SellerInfo/ShopManagement.tsx';
-
 
 const router = createBrowserRouter(
   [
@@ -243,8 +243,12 @@ const router = createBrowserRouter(
                 {
                   path: "return",
                   element: <ReturnOrder />,
-                },
+                }
               ]
+            },
+            {
+              path: "order/tracking-detail",
+              element: <OrderTracking/>,
             },
             {
               path: "voucher",

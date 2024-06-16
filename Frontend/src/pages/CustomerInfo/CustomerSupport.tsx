@@ -4,7 +4,7 @@ import { VscMail } from "react-icons/vsc";
 
 const CustomerSupport = () => {
     return (
-        <div className="customer-support-container">
+        <div className="customer-support-container w-full py-5 px-10 bg-white h-full">
             <div className="customer-support__title text-2xl mb-6 pb-5 border-b border-gray-300 text-center">Hỗ trợ khách hàng</div>
             <div className="customer-support__category mb-6">
                 <div className="text-xl font-medium mb-4 tracking-wide">Danh mục</div>
