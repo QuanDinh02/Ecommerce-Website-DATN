@@ -28,6 +28,8 @@ const addNewOrder = async (orderData, session_id) => {
             shipFee: orderData.shipFee,
             totalPrice: orderData.totalPrice,
             shipMethod: orderData.shipMethod,
+            fullName: orderData.fullName,
+            phone: orderData.phone,
             address: orderData.address,
             note: orderData.note,
             customerID: orderData.customerID,
@@ -139,16 +141,6 @@ const getOrderByCustomer = async (customer_id) => {
                 }
             });
 
-            let orderStatus = await db.Shipment.findOne({
-                raw: true,
-                attributes: ['status'],
-                where: {
-                    orderID: {
-                        [Op.eq]: order.id
-                    }
-                }
-            })
-
             let order_item_list_format = await Promise.all(order_item_list.map(async order_item => {
                 let orderItem = order_item;
                 let productInfo = orderItem.Product;
@@ -186,7 +178,6 @@ const getOrderByCustomer = async (customer_id) => {
 
             return {
                 ...order,
-                status: orderStatus.status,
                 order_item_list: order_item_list_format
             }
         }))
@@ -195,6 +186,229 @@ const getOrderByCustomer = async (customer_id) => {
             EC: 0,
             DT: order_detail_list,
             EM: 'Tất cả đơn hàng của khách hàng !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getOrderSearchByCustomer = async (order_id) => {
+    try {
+
+        let order_info = await db.Order.findOne({
+            raw: true,
+            attributes: ['id', 'orderDate', 'totalPrice', 'note', 'shipFee'],
+            where: {
+                id: {
+                    [Op.eq]: order_id,
+                },
+            },
+        });
+
+        if (order_info) {
+            let order_item_list = await db.OrderItem.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'quantity', 'price'],
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: order_id
+                    }
+                }
+            });
+
+            let order_item_list_format = await Promise.all(order_item_list.map(async order_item => {
+                let orderItem = order_item;
+                let productInfo = orderItem.Product;
+
+                delete orderItem.Product;
+
+                let productType = await db.ProductType.findOne({
+                    raw: true,
+                    attributes: ['id', 'price', 'quantity'],
+                    where: {
+                        productID: {
+                            [Op.eq]: productInfo.id
+                        }
+                    }
+                });
+
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${productInfo.id}.jpeg`
+                // }
+
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                return {
+                    ...orderItem,
+                    product_id: productInfo.id,
+                    product_name: productInfo.name,
+                    product_price: productType.price,
+                    //product_image: url
+                    product_image: ""
+                }
+
+            }));
+
+            return {
+                EC: 0,
+                DT: 
+                [
+                    {
+                        ...order_info,
+                        order_item_list: order_item_list_format
+                    }
+                ],
+                EM: 'Đơn hàng tìm kiếm !'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: [],
+                EM: 'Đơn hàng tìm kiếm !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getCustomerOrderDetail = async (order_id) => {
+    try {
+
+        let order_status_history_raw = await db.Shipment.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'status', 'updatedDate'],
+            include:
+            {
+                model: db.ShipmentStatus,
+                attributes: ['id', 'name'],
+            },
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id,
+                },
+            },
+        });
+
+        let order_status_history = order_status_history_raw.map(item => {
+            return {
+                id: item.ShipmentStatus.id,
+                name: item.ShipmentStatus.name,
+                date: item.updatedDate
+            }
+        });
+
+        order_status_history.reverse();
+
+        let transaction_info = await db.Transaction.findOne({
+            raw: true,
+            nest: true,
+            attributes: [],
+            include:
+            {
+                model: db.TransactionPaymentMethod,
+                attributes: ['id', 'method_name'],
+            }
+            ,
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id,
+                },
+            },
+        });
+
+        let transactionPaymentMethod = transaction_info.TransactionPaymentMethod;
+
+        let order_info = await db.Order.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'orderDate', 'totalPrice', 'shipFee', 'address', 'fullName', 'phone'],
+            include:
+            {
+                model: db.ShippingMethod,
+                attributes: ['id', 'nameMethod', 'price'],
+            }
+            ,
+            where: {
+                id: {
+                    [Op.eq]: +order_id,
+                },
+            },
+        });
+
+        let shippingMethod = order_info.ShippingMethod;
+
+        let order_item_list = await db.OrderItem.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'quantity', 'price'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name'],
+                }
+            ],
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id
+                }
+            }
+        });
+
+        let order_item_list_format = await order_item_list.map(order_item => {
+            let orderItem = order_item;
+            let productInfo = orderItem.Product;
+
+            delete orderItem.Product;
+
+            return {
+                ...orderItem,
+                product_id: productInfo.id,
+                product_name: productInfo.name
+            }
+
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                id: order_info.id,
+                orderDate: order_info.orderDate,
+                totalPrice: order_info.totalPrice,
+                shipFee: order_info.shipFee,
+                shipping_location: {
+                    address: order_info.address,
+                    fullName: order_info.fullName,
+                    phone: order_info.phone,
+                },
+                payment_method: transactionPaymentMethod.method_name,
+                shipping_method: shippingMethod.nameMethod,
+                order_item_list: order_item_list_format,
+                order_status_history: order_status_history
+            },
+            EM: 'Order Detail !'
         }
 
     } catch (error) {
@@ -256,5 +470,6 @@ const getPaymentMethod = async () => {
 }
 
 module.exports = {
-    addNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod
+    addNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod,
+    getCustomerOrderDetail, getOrderSearchByCustomer
 }

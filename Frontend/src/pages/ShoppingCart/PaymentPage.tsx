@@ -217,6 +217,8 @@ const PaymentPage = () => {
             totalPrice: orderCost,
             shipMethod: selectShippingMethod.id,
             paymentMethod: selectPaymentMethod.id,
+            fullName: orderAddress.fullname,
+            phone: orderAddress.mobile,
             address: orderAddress.address,
             note: orderNote,
             customerID: account.customer_id,

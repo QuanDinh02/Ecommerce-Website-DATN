@@ -3,7 +3,7 @@ export const getDayMonthYear = (date_input: string) => {
     let day = date.getDate();
     let month = date.getMonth();
     let year = date.getFullYear();
-    
+
     return {
         day: day,
         month: month,
@@ -17,6 +17,19 @@ export const dateFormat = (date_input: string) => {
     let month = date.getUTCMonth();
     let year = date.getUTCFullYear();
     return `${day}/${month + 1}/${year}`;
+}
+
+export const dateTimeFormat = (date_input: string) => {
+    let date = new Date(date_input);
+
+    let new_date = date.toLocaleString('vi-VN', { hour: 'numeric', minute: 'numeric', second: 'numeric', day: 'numeric', month: 'numeric', year: 'numeric', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
+    return `${new_date}`;
+}
+
+export const timeFormat = (date_input: string) => {
+    let date = new Date(date_input);
+    let new_date = date.toLocaleString('vi-VN', { hour: 'numeric', minute: 'numeric', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
+    return `${new_date}`;
 }
 
 export const getRangeOfYears = (startYear: number) => {

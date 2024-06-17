@@ -21,6 +21,12 @@ module.exports = {
             shipMethod: {
                 type: Sequelize.BIGINT
             },
+            fullName: {
+                type: Sequelize.STRING
+            },
+            phone: {
+                type: Sequelize.STRING
+            },
             address: {
                 type: Sequelize.STRING
             },

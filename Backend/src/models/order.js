@@ -18,6 +18,8 @@ module.exports = (sequelize, DataTypes) => {
     shipFee: DataTypes.INTEGER,
     totalPrice: DataTypes.INTEGER,
     shipMethod: DataTypes.BIGINT,
+    fullName: DataTypes.STRING,
+    phone: DataTypes.STRING,
     address: DataTypes.STRING,
     note: DataTypes.TEXT,
     customerID: DataTypes.BIGINT,

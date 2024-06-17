@@ -14,6 +14,5 @@ export interface IOrder {
     totalPrice: number
     note: string
     shipFee: number
-    status: string
     order_item_list: IOrderItem[]
 }

@@ -10,34 +10,38 @@ module.exports = {
             },
             {
                 //id: 2
-                name: "Đang đóng gói"
+                name: "Đã xác nhận"
             },
             {
                 //id: 3
-                name: "Lấy hàng"
+                name: "Đang đóng gói"
             },
             {
                 //id: 4
-                name: "Lấy hàng thất bại"
+                name: "Lấy hàng"
             },
             {
                 //id: 5
-                name: "Đang giao hàng"
+                name: "Lấy hàng thất bại"
             },
             {
                 //id: 6
-                name: "Giao hàng thành công"
+                name: "Đang giao hàng"
             },
             {
                 //id: 7
-                name: "Giao hàng thất bại"
+                name: "Giao hàng thành công"
             },
             {
                 //id: 8
-                name: "Đang trả hàng về cho nhà bán"
+                name: "Giao hàng thất bại"
             },
             {
                 //id: 9
+                name: "Đang trả hàng về cho nhà bán"
+            },
+            {
+                //id: 10
                 name: "Đã hủy(Chưa giao hàng)"
             },
         ], {});

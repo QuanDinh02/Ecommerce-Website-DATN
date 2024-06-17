@@ -87,6 +87,8 @@ const ApiRoute = (app) => {
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
+    router.get('/order/search', orderController.getOrderSearchByCustomer);
+    router.get('/order/detail', orderController.getCustomerOrderDetail);
     router.get('/order/shipping-method', orderController.getShippingMethod);
     router.get('/order/payment-method', orderController.getPaymentMethod);
 

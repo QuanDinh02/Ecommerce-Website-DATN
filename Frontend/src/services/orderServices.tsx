@@ -13,6 +13,8 @@ interface IOrder {
     totalPrice: number
     shipMethod: number
     paymentMethod: number
+    phone: string
+    fullName: string
     address: string
     note: string
     customerID: number
@@ -27,6 +29,19 @@ export const createNewOrder = async (data: IOrder) => {
 export const getAllOrderByCustomer = async (customer_id: number) => {
     let result: APIResponse = await axios.get(`/api/order?id=${customer_id}`);
     return result;
+}
+
+export const getSearchCustomerOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/order/search?id=${order_id}`);
+    return result;
+}
+
+export const getCustomerOrderDetail = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/order/detail?id=${order_id}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
 }
 
 export const getAllShippingMethod = async () => {

@@ -604,21 +604,29 @@ const Header = () => {
                                             >
                                                 {
                                                     userRole === "customer" &&
-                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) => {
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer w-full' onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowInfoSettingBox(false);
                                                         navigate("/customer-info/account/info");
                                                     }}>Thông Tin Tài Khoản</div>
                                                 }
                                                 {
+                                                    userRole === "customer" &&
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer w-full' onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setShowInfoSettingBox(false);
+                                                        navigate("/customer-info/order/all");
+                                                    }}>Đơn Hàng Của Tôi</div>
+                                                }
+                                                {
                                                     userRole === "seller" &&
-                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer w-full' onClick={(e) => {
+                                                    <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer w-full' onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowInfoSettingBox(false);
                                                         navigate("/seller-info/dashboard");
                                                     }}>Thông Tin Người Bán</div>
                                                 }
-                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-emerald-400 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
+                                                <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
                                             </div>
                                         }
                                     </>

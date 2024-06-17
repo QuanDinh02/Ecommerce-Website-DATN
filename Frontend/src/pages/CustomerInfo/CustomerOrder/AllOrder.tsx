@@ -4,21 +4,23 @@ import React from "react";
 import { IAccount } from "@/pages/Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
-import { getAllOrderByCustomer } from "@/services/orderServices";
+import { getAllOrderByCustomer, getSearchCustomerOrder } from "@/services/orderServices";
 import { IOrder } from "./OrderType";
 import { dateFormat } from "@/utils/dateFormat";
 import { ThreeDots } from "react-loader-spinner";
 import LoadImageS3 from "@/components/LoadImageS3";
 import { useNavigate } from "react-router-dom";
 import LoadImage from "@/components/LoadImage";
+import { IoSearch } from "react-icons/io5";
 
 const AllOrder = () => {
 
     const navigate = useNavigate();
 
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
+    const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
-    const [dataLoading, setDataLoading] = React.useState<boolean>(false);
+    const [search, setSearch] = React.useState<string>("");
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
@@ -26,11 +28,33 @@ const AllOrder = () => {
     const fetchAllOrder = async (customer_id: number) => {
         let response: any = await getAllOrderByCustomer(customer_id);
         if (response && response.EC === 0) {
-            console.log(response.DT);
             setOrderList(response.DT);
             setTimeout(() => {
                 setDataLoading(false);
             }, 1000);
+        }
+    }
+
+    const searchOrderByOrderID = async (order_id: number) => {
+        let response: any = await getSearchCustomerOrder(order_id);
+        if (response && response.EC === 0) {
+            setOrderList(response.DT);
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 1000);
+        }
+    }
+
+    const handleKeyPress = async (event) => {
+
+        if (event.key === 'Enter') {
+            if (search === "") {
+                fetchAllOrder(account.customer_id);
+            }
+            else {
+                setDataLoading(true);
+                searchOrderByOrderID(+search);
+            }
         }
     }
 
@@ -55,14 +79,23 @@ const AllOrder = () => {
     }, []);
 
     React.useEffect(() => {
-        window.onbeforeunload = function () {
-            window.scrollTo(0, 0);
-        }
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);
 
     return (
         <div className="all-order-container">
-            <div className="text-lg pb-4 text-gray-600">Tất cả đơn hàng</div>
+            <div className="text-xl mb-4">Tất cả đơn hàng</div>
+            <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 mb-8">
+                <IoSearch className="text-gray-500 w-6 h-6" />
+                <input
+                    value={search}
+                    type="text"
+                    placeholder="Bạn có thể tìm kiếm theo ID đơn hàng..."
+                    className="outline-none bg-white w-full"
+                    onChange={(e) => setSearch(e.target.value)}
+                    onKeyDown={(event) => handleKeyPress(event)}
+                />
+            </div>
             {
                 dataLoading ?
                     <div className="flex items-center justify-center w-full h-screen">
@@ -85,7 +118,7 @@ const AllOrder = () => {
                                     {
                                         orderList.map((item, index) => {
                                             return (
-                                                <div className="order-item bg-white mb-12 p-5" key={`order-item-${item.id}`}>
+                                                <div className="order-item bg-white mb-6 p-5" key={`order-item-${item.id}`}>
                                                     <div className="order-item__header flex items-center justify-between">
                                                         <div className="info flex items-center gap-x-12">
                                                             <div className="order-item__id">
@@ -137,7 +170,7 @@ const AllOrder = () => {
                                     }
                                 </>
                                 :
-                                <div className="w-full text-gray-500 text-center text-lg font-medium py-2">Chưa có đơn hàng !</div>
+                                <div className="w-full text-gray-500 text-center text-lg font-medium py-2">Không có dữ liệu !</div>
                         }
 
                     </>
