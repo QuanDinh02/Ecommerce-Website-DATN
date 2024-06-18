@@ -36,6 +36,9 @@ module.exports = {
             customerID: {
                 type: Sequelize.BIGINT
             },
+            sellerID: {
+                type: Sequelize.BIGINT
+            },
         });
     },
     async down(queryInterface, Sequelize) {

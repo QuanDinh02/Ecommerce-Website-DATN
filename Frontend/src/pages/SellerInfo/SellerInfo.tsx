@@ -49,16 +49,8 @@ const SideBar: ISideBarItem[] = [
         children: [
             {
                 path: "/all",
-                name: "Tất Cả",
-            },
-            {
-                path: "/cancel",
-                name: "Đơn hủy",
-            },
-            {
-                path: "/return",
-                name: "Trả hàng/ Hoàn tiền",
-            },
+                name: "Trạng thái đơn hàng",
+            }
         ]
     },
     {
@@ -149,9 +141,9 @@ const SellerInfo = () => {
                     </div>
                     :
                     <>
-                        <div className="px-[30px] w-full mx-auto py-8 flex">
-                            <div className="seller-info__sidebar w-1/3 flex flex-col gap-x-2 w-60 bg-gray-100">
-                                <div className="p-3 flex items-center gap-x-2 mb-2 bg-gray-200">
+                        <div className="px-[30px] min-w-[92rem] mx-auto py-8 flex gap-x-4">
+                            <div className="seller-info__sidebar w-1/3 flex flex-col gap-x-2 w-60">
+                                <div className="p-3 flex items-center gap-x-2 mb-2">
                                     <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
                                     <div>
                                         <div className="user_name font-bold">{account.username}</div>
@@ -160,7 +152,7 @@ const SellerInfo = () => {
                                 </div>
                                 <Accordion data={SideBar} user_type="seller" />
                             </div>
-                            <div className="seller-info__content w-2/3 flex-1 py-5 px-10 bg-white">
+                            <div className="seller-info__content w-2/3 flex-1 py-4 px-5 bg-white">
                                 <Outlet />
                             </div>
                         </div>

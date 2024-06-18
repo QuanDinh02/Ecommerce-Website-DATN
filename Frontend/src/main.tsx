@@ -46,12 +46,6 @@ import OrderTracking from '@/pages/CustomerInfo/CustomerOrder/OrderTracking.tsx'
 
 import SellerInfo from '@/pages/SellerInfo/SellerInfo.tsx';
 import SellerAllOrder from '@/pages/SellerInfo/SellerOrder/AllOrder.tsx';
-import SellerPendingPaymentOrder from '@/pages/SellerInfo/SellerOrder/PendingPaymentOrder.tsx';
-import SellerPendingShippingOrder from '@/pages/SellerInfo/SellerOrder/PendingShippingOrder.tsx';
-import SellerCompletedShippingOrder from '@/pages/SellerInfo/SellerOrder/CompletedShippingOrder.tsx';
-import SellerCancelOrder from '@/pages/SellerInfo/SellerOrder/CancelOrder.tsx';
-import SellerReturnOrder from '@/pages/SellerInfo/SellerOrder/ReturnOrder.tsx';
-import SellerShippingOrder from '@/pages/SellerInfo/SellerOrder/ShippingOrder.tsx';
 import SellerOrder from '@/pages/SellerInfo/SellerOrder.tsx';
 import SellerDashboard from '@/pages/SellerInfo/SellerDashboard.tsx';
 import SellerProduct from '@/pages/SellerInfo/SellerProduct.tsx';
@@ -62,6 +56,7 @@ import RegisterPage from '@/pages/RegisterPage.tsx';
 import SellerSignUpPage from '@/pages/Register/SellerSignUpPage.tsx';
 import ShopInfo from '@/pages/SellerInfo/ShopInfo.tsx';
 import ShopManagement from '@/pages/SellerInfo/ShopManagement.tsx';
+import OrderDetail from '@/pages/SellerInfo/SellerOrder/OrderDetail.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -125,32 +120,12 @@ const router = createBrowserRouter(
                 {
                   path: "all",
                   element: <SellerAllOrder />,
-                },
-                {
-                  path: "pending-payment",
-                  element: <SellerPendingPaymentOrder />,
-                },
-                {
-                  path: "shipping",
-                  element: <SellerShippingOrder />,
-                },
-                {
-                  path: "pending-shipping",
-                  element: <SellerPendingShippingOrder />,
-                },
-                {
-                  path: "completed-shipping",
-                  element: <SellerCompletedShippingOrder />,
-                },
-                {
-                  path: "cancel",
-                  element: <SellerCancelOrder />,
-                },
-                {
-                  path: "return",
-                  element: <SellerReturnOrder />,
-                },
+                }
               ]
+            },
+            {
+              path: "order/detail",
+              element: <OrderDetail/>
             },
             { path: "profile", element: <SellerProfile /> },
             {

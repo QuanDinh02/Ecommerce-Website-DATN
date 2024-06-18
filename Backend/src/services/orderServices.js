@@ -23,78 +23,105 @@ const _ = require("lodash");
 const addNewOrder = async (orderData, session_id) => {
     try {
 
-        let newOrder = await db.Order.create({
-            orderDate: new Date(),
-            shipFee: orderData.shipFee,
-            totalPrice: orderData.totalPrice,
-            shipMethod: orderData.shipMethod,
-            fullName: orderData.fullName,
-            phone: orderData.phone,
-            address: orderData.address,
-            note: orderData.note,
-            customerID: orderData.customerID,
-        });
+        let { order_items } = orderData;
 
-        if (newOrder) {
-            let orderInfo = newOrder.dataValues;
+        let product_detail_list = await Promise.all(order_items.map(async item => {
 
-            let { order_items } = orderData;
-
-            let orderItemBuild = order_items.map(item => {
-                return {
-                    ...item, orderID: orderInfo.id
+            let product_info = await db.Product.findOne({
+                raw: true,
+                attributes: ['id', 'shop_id'],
+                where: {
+                    id: {
+                        [Op.eq]: item.productID
+                    }
                 }
-            });
-
-            await db.OrderItem.bulkCreate(orderItemBuild);
-
-            let buyItemsBuild = order_items.map(item => {
-                return {
-                    sessionID: session_id,
-                    productID: item.productID,
-                    type: 1
-                }
-            });
-
-            await db.SessionActivity.bulkCreate(buyItemsBuild);
-
-            await db.Shipment.create({
-                status: 1,
-                updatedDate: orderInfo.orderDate,
-                orderID: orderInfo.id
-            });
-
-            let transactionInfo = await db.Transaction.create({
-                orderID: orderInfo.id,
-                payment: orderData.paymentMethod,
-                amount: orderData.totalPrice,
-                status: 1,
-                createdAt: orderInfo.orderDate,
-                updatedAt: orderInfo.orderDate,
-            });
-
-            if (transactionInfo) {
-
-                return {
-                    EC: 0,
-                    DT: {
-                        order_id: orderInfo.id
-                    },
-                    EM: 'Thêm đơn hàng thành công !'
-                }
-            }
+            })
 
             return {
-                EC: -1,
-                DT: '',
-                EM: 'Thêm đơn hàng thất bại !'
+                ...item,
+                shop_id: product_info.shop_id
             }
-        }
+        }))
+
+        let shop_id_list = await product_detail_list.map(item => {
+            return {
+                shop_id: item.shop_id
+            }
+        });
+
+        let remove_dup_list = _.uniqBy(shop_id_list, (e) => e.shop_id);
+
+        let order_data_list = remove_dup_list.map((shop) => {
+            let order_item_list = product_detail_list.filter(product => product.shop_id === shop.shop_id);
+            return {
+                seller_id: shop.shop_id,
+                order_item_list: order_item_list
+            }
+        })
+
+        await Promise.all(order_data_list.map(async (order_by_shop) => {
+
+            let order_items = order_by_shop.order_item_list;
+            let total_order_price = _.sumBy(order_items, (o) => o.price * o.quantity);
+
+            let newOrder = await db.Order.create({
+                orderDate: new Date(),
+                shipFee: orderData.shipFee,
+                totalPrice: total_order_price + orderData.shipFee,
+                shipMethod: orderData.shipMethod,
+                fullName: orderData.fullName,
+                phone: orderData.phone,
+                address: orderData.address,
+                note: orderData.note,
+                customerID: orderData.customerID,
+                sellerID: order_by_shop.seller_id
+            });
+
+            if (newOrder) {
+                let orderInfo = newOrder.dataValues;
+
+                let orderItemBuild = order_items.map(item => {
+                    return {
+                        productID: item.productID,
+                        price: item.price,
+                        quantity: item.quantity,
+                        orderID: orderInfo.id
+                    }
+                });
+
+                await db.OrderItem.bulkCreate(orderItemBuild);
+
+                let buyItemsBuild = order_items.map(item => {
+                    return {
+                        sessionID: session_id,
+                        productID: item.productID,
+                        type: 1
+                    }
+                });
+
+                await db.SessionActivity.bulkCreate(buyItemsBuild);
+
+                await db.Shipment.create({
+                    status: 1,
+                    updatedDate: orderInfo.orderDate,
+                    orderID: orderInfo.id
+                });
+
+                await db.Transaction.create({
+                    orderID: orderInfo.id,
+                    payment: orderData.paymentMethod,
+                    amount: orderData.totalPrice,
+                    status: 1,
+                    createdAt: orderInfo.orderDate,
+                    updatedAt: orderInfo.orderDate,
+                });
+            }
+        }));
 
         return {
-            EC: -1,
-            DT: '',
-            EM: 'Thêm đơn hàng thất bại !'
+            EC: 0,
+            DT: "",
+            EM: 'Thêm đơn hàng thành công !'
         }
 
     } catch (error) {
@@ -266,13 +293,13 @@ const getOrderSearchByCustomer = async (order_id) => {
 
             return {
                 EC: 0,
-                DT: 
-                [
-                    {
-                        ...order_info,
-                        order_item_list: order_item_list_format
-                    }
-                ],
+                DT:
+                    [
+                        {
+                            ...order_info,
+                            order_item_list: order_item_list_format
+                        }
+                    ],
                 EM: 'Đơn hàng tìm kiếm !'
             }
         } else {

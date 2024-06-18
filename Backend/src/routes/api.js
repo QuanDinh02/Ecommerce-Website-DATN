@@ -116,6 +116,7 @@ const ApiRoute = (app) => {
     router.post('/seller/register/verify', sellerController.handleCodeVertification);
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
+    router.get('/seller/order/all', checkUserJWT, sellerController.getOrderAllPagination)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);

@@ -320,7 +320,7 @@ const SellerProductAll = () => {
     return (
         <>
             <div className="flex items-center justify-between mb-8">
-                <div className="text-xl font-bold text-gray-600">Sản phẩm <span className="text-lg text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
+                <div className="text-xl">Sản phẩm <span className="text-lg text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
                 <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit" OnClick={() => { navigate("/seller-info/product/new"); }}>Thêm Sản Phẩm</Button>
             </div>
             <div className="w-full flex items-center justify-between mb-6">

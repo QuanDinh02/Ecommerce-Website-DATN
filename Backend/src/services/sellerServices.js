@@ -534,9 +534,84 @@ const updateSellerInfo = async (data) => {
     }
 }
 
+const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let orderListRaw = await db.Order.findAll({
+                raw: true,
+                attributes: ['id', 'orderDate', 'totalPrice'],
+                where: {
+                    sellerID: {
+                        [Op.eq]: shop_seller_id,
+                    },
+                }
+            });
+
+            const listLength = orderListRaw.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            orderListRaw.reverse();
+            orderListRaw = _(orderListRaw).drop(offSet).take(item_limit).value();
+
+            let order_list_data = await Promise.all(orderListRaw.map(async item => {
+
+                let order_status_list = await db.Shipment.findAll({
+                    nest: true,
+                    raw: true,
+                    attributes: ['id','status', 'updatedDate'],
+                    include: {
+                        model: db.ShipmentStatus,
+                        attributes: ['id', 'name']
+                    },
+                    where: {
+                        orderID: {
+                            [Op.eq]: item.id,
+                        },
+                    }
+                });
+
+                order_status_list = _.orderBy(order_status_list, i => i.updatedDate, 'desc');
+
+                let order_status = order_status_list[0].ShipmentStatus.name;
+
+                return {
+                    ...item,
+                    status: order_status
+                }
+            }));
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    order_list: order_list_data
+                },
+                EM: 'Get all orders !'
+            }
+        }
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, 
     getAllCategories, getSubCategoriesByCategory,updateProduct,
     handleCreateVertificationCode, handleOTPVertification, 
-    getSellerInfo, updateSellerInfo
+    getSellerInfo, updateSellerInfo, getOrderAllPagination
 }

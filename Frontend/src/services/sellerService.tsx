@@ -36,6 +36,14 @@ export const getProductsPagination = async (product_display_limit: number, page:
     return null;
 }
 
+export const getOrderAll = async (order_display_limit: number, page: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/order/all?limit=${order_display_limit}&page=${page}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
 export const deleteProduct = async (product_id: number) => {
     let result: APIResponse = await axios.delete(`/api/seller/product/${product_id}`);
     return result

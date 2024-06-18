@@ -72,11 +72,7 @@ interface IPaymentMethod {
     status: number
 }
 
-interface IAnnouncementProps {
-    order_id: number
-}
-
-const SuccessAnnouncement = (props: IAnnouncementProps) => {
+const SuccessAnnouncement = () => {
 
     const navigate = useNavigate();
 
@@ -86,10 +82,6 @@ const SuccessAnnouncement = (props: IAnnouncementProps) => {
                 <div className="w-full flex item-center justify-center"><FaRegCircleCheck className="w-16 h-16 text-[#6acd03]" /></div>
             </div>
             <div className="announcement__title text-black text-xl mb-4 text-center text-gray-600 font-medium">Cám ơn bạn đã mua hàng tại FoxMart !</div>
-            <div className="text-center mb-2">Mã đơn hàng của bạn:</div>
-            <div className="flex items-center justify-center mb-5">
-                <div className="bg-[#6acd03] text-white px-5 py-2 w-32 text-center">{props.order_id}</div>
-            </div>
             <div className="text-center">Bạn có thể xem lại <span className="text-blue-600 hover:underline cursor-pointer">đơn hàng của tôi</span></div>
         </div>
     )
@@ -123,8 +115,6 @@ const PaymentPage = () => {
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
     const [paymentStep, setPaymentStep] = React.useState<number>(1);
-
-    const [createOrderID, setCreateOrderID] = React.useState<number>(0);
 
     const [createOrder, setCreateOrder] = React.useState<boolean>(false);
 
@@ -226,10 +216,11 @@ const PaymentPage = () => {
         });
 
         if (create_res && create_res.EC === 0) {
+            // setPaymentStep(paymentStep + 1);
+            // setCreateOrder(false);
             let delete_res = await deleteAllCartItem(account.customer_id);
             if (delete_res && delete_res.EC === 0) {
                 dispatch(ClearAllCartItem());
-                setCreateOrderID(create_res.DT.order_id);
 
                 setTimeout(() => {
                     setPaymentStep(paymentStep + 1);
@@ -550,7 +541,7 @@ const PaymentPage = () => {
                             {
                                 paymentStep === 3 &&
                                 <div className="flex items-center justify-center">
-                                    <SuccessAnnouncement order_id={createOrderID} />
+                                    <SuccessAnnouncement/>
                                 </div>
                             }
                         </div>

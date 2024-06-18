@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Order.belongsTo(models.ShippingMethod, { foreignKey: 'shipMethod' });
       Order.belongsTo(models.Customer, { foreignKey: 'customerID' });
+      Order.belongsTo(models.Seller, { foreignKey: 'sellerID' });
       Order.hasMany(models.Transaction, { foreignKey: 'orderID' });
       Order.hasMany(models.Shipment, { foreignKey: 'orderID' });
       Order.hasMany(models.OrderItem, { foreignKey: 'orderID' });
@@ -23,6 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     address: DataTypes.STRING,
     note: DataTypes.TEXT,
     customerID: DataTypes.BIGINT,
+    sellerID: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'Order',
