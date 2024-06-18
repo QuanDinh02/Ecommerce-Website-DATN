@@ -51,6 +51,7 @@ const ApiRoute = (app) => {
 
     router.get('/categories', cacheMiddleware(300), categoryController.getCategoryList);
     router.get('/category', categoryController.getCategoryInfo);
+    router.get('/categories-only', categoryController.getOnlyCategory);
 
     router.get('/product/detail', productController.getProductDetail);
     router.get('/product/detail/review', productController.getProductReviews);

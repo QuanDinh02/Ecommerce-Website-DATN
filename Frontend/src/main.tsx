@@ -71,6 +71,7 @@ import SystemReport from '@/pages/Management/SystemReport.tsx';
 
 import SellerRoute from '@/components/SellerRoute.tsx';
 import CustomerRoute from '@/components/CustomerRoute.tsx';
+import NewCustomer from '@/pages/NewCustomer.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -350,6 +351,10 @@ const router = createBrowserRouter(
           ]
         },
       ]
+    },
+    {
+      path: "/new-customer",
+      element: <NewCustomer/>
     },
     {
       path: "/fms/login",

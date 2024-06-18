@@ -133,6 +133,28 @@ const getCategoryInfo = async (category_id) => {
     }
 }
 
+const getCategoryList = async () => {
+    try {
+        let categoryData = await db.Category.findAll({
+            raw: true,
+            attributes: ['id', 'title'],
+        });
+
+        return {
+            EC: 0,
+            DT: categoryData,
+            EM: 'Get all categories success !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getAllCategories, getCategoryInfo
+    getAllCategories, getCategoryInfo, getCategoryList
 }

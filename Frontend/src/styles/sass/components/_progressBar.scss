@@ -1,0 +1,12 @@
+.progress-bar {
+    @apply w-1/3;
+    transition: width 1s;
+
+    &.step_2 {
+        @apply w-2/3;
+    }
+
+    &.step_3 {
+        @apply w-full;
+    }
+}
