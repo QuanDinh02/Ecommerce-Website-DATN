@@ -284,9 +284,77 @@ const handleCodeVertification = async (req, res) => {
     }
 }
 
+const handleCheckNewCustomer = async (req, res) => {
+    try {
+        let { id } = req.query;
+        let result = await customerServices.handleCheckNewUser(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleRemoveCheckNewCustomer = async (req, res) => {
+    try {
+        let { id } = req.params;
+        let result = await customerServices.removeNewCustomer(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const trainingNewCustomer = async (req, res) => {
+    try {
+        let { data, customer_id } = req.body;
+        let { user } = req;
+
+        let session_id = user.session ? user.session.id : null;
+
+        let result = await customerServices.trainingNewCustomer(session_id, data, customer_id);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     sendVertificatedCode,
     handleCodeVertification, getCustomerInfo, updateCustomerInfo,
     changeCustomerPassword, getAllCustomerAddress, updateCustomerDefaultAddress,
-    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress
+    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress,
+    handleCheckNewCustomer, handleRemoveCheckNewCustomer, trainingNewCustomer
 }

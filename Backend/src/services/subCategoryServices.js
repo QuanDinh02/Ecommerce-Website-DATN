@@ -134,6 +134,46 @@ const getSubCategoryInfo = async (sub_category_id) => {
     }
 }
 
+const getRecommendSubCategory = async (category_list) => {
+    try {
+        let recommend_sub_category_data = await Promise.all(category_list.map(async item => {
+
+            let subCategoryList = await db.SubCategory.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'title'],
+                where: {
+                    categoryID: {
+                        [Op.eq]: item.id,
+                    },
+                }
+            });
+
+            let suffle_sub_category_list = _.shuffle(subCategoryList);
+
+            return {
+                ...item, 
+                sub_category_list: _(suffle_sub_category_list).take(20).value()
+            }
+
+        }));
+
+        return {
+            EC: 0,
+            DT: recommend_sub_category_data,
+            EM: 'Get sub-categories for new user!'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getSubCategoryByCategory, getSubCategoryInfo
+    getSubCategoryByCategory, getSubCategoryInfo, getRecommendSubCategory
 }

@@ -454,9 +454,134 @@ const handleOTPVertification = async (data) => {
     }
 }
 
+const handleCheckNewUser = async (customer_id) => {
+    try {
+        let customer_info = await db.NewCustomer.findOne({
+            where: {
+                customerID: {
+                    [Op.eq]: customer_id,
+                },
+            }
+        })
+
+        if (customer_info) {
+            return {
+                EC: 0,
+                DT: {
+                    new_customer: true
+                },
+                EM: 'Khách hàng mới'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: {
+                new_customer: false
+            },
+            EM: 'Khách hàng cũ !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const removeNewCustomer = async (customer_id) => {
+    try {
+        await db.NewCustomer.destroy({
+            where: {
+                customerID: {
+                    [Op.eq]: +customer_id
+                }
+            },
+        });
+
+        return {
+            EC: 0,
+            DT: '',
+            EM: 'Change into old customer'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const trainingNewCustomer = async (session_id, data, customer_id) => {
+    try {
+        if (session_id) {
+
+            let session = await db.Session.findOne({
+                where: {
+                    id: {
+                        [Op.eq]: session_id
+                    }
+                }
+            });
+
+            if (session) {
+
+                await Promise.all(data.map(async item => {
+
+                    await db.SearchSession.create({
+                        sessionID: session_id,
+                        content: item.title,
+                        searchTime: new Date()
+                    });
+        
+                })); 
+
+                await db.NewCustomer.destroy({
+                    where: {
+                        customerID: {
+                            [Op.eq]: +customer_id
+                        }
+                    },
+                });
+
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Training new customer'
+                }
+            } else {
+                return {
+                    EC: -1,
+                    DT: '',
+                    EM: 'Sesion không hợp lệ !'
+                }
+            }
+        } else {
+            return {
+                EC: -2,
+                DT: '',
+                EM: 'Sesion không hợp lệ !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     handleCreateVertificationCode,
     handleOTPVertification, getCustomerInfo, updateCustomerInfo, changeCustomerPassword,
     getCustomerAddresses, updateCustomerDefaultAddress,
-    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress
+    createNewCustomerAddress, deleteCustomerAddress, updateCustomerAddress, handleCheckNewUser,
+    removeNewCustomer, trainingNewCustomer
 }

@@ -104,18 +104,33 @@ const userRegister = async (userData) => {
                 if (userInfo) {
                     let user_info = userInfo.dataValues;
 
-                    await db.Customer.create({
+                    let customerInfo = await db.Customer.create({
                         mobile: userData.phone,
                         email: userData.email,
                         userID: user_info.id,
                         gender: 0,
                         birth: new_birth
-                    })
+                    });
 
-                    return {
-                        EC: 0,
-                        DT: '',
-                        EM: 'Đăng ký thành công !',
+                    if (customerInfo) {
+                        let customer_info = customerInfo.dataValues;
+
+                        await db.NewCustomer.create({
+                            customerID: customer_info.id
+                        });
+
+                        await db.TrainingWebData.create({
+                            customerID: customer_info.id,
+                            activePredict: 0,
+                            activePredict3Session: 0,
+                            lastTrainingTime: null,
+                        });
+
+                        return {
+                            EC: 0,
+                            DT: '',
+                            EM: 'Đăng ký thành công !',
+                        }
                     }
                 }
             }

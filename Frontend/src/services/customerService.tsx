@@ -40,6 +40,11 @@ interface IUpdateAddress {
     province: string
 }
 
+interface ISubCategory {
+    id: number
+    title: string
+}
+
 export const saveCustomerSearch = async (content: string) => {
     let result: APIResponse = await axios.post('/api/search-history', { content: content });
     return result;
@@ -93,5 +98,26 @@ export const updateCustomerInfo = async (data: IUpdateCustomerInfo) => {
 
 export const updateCustomerPassword = async (data: IUpdateCustomerPassword) => {
     let result: APIResponse = await axios.put('/api/customer/info/password', data);
+    return result;
+}
+
+export const checkNewCustomer = async (customer_id: number) => {
+    let result: APIResponse = await axios.get(`/api/new-customer/check?id=${customer_id}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const trainingNewCustomer = async (data: ISubCategory[], customer_id: number) => {
+    let result: APIResponse = await axios.post('/api/new-customer/training', {
+        data: data,
+        customer_id: customer_id
+    });
+    return result;
+}
+
+export const deleteNewCustomer = async (customer_id: number) => {
+    let result: APIResponse = await axios.delete(`/api/new-customer/remove/${customer_id}`);
     return result;
 }

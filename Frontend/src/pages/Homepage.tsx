@@ -20,7 +20,7 @@ import CategoryMenu from "@/components/CategoryMenu";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
 import ProductRating from "./Category/ProductRating";
-import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
+import { checkNewCustomer, saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 
 import _ from 'lodash';
 import { INewCartItem, createCartItem, fetchCartItem } from "@/services/cartItemService";
@@ -36,6 +36,7 @@ import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import Button from "@/components/Button";
 import { getProductsHistoryNoPagination } from "@/services/productService";
+
 interface IRecommendProduct {
     id: number
     current_price: number
@@ -558,6 +559,15 @@ const Homepage = () => {
         }
     }
 
+    const checkIsNewCustomer = async (customer_id: number) => {
+        let result = await checkNewCustomer(customer_id);
+        if (result) {
+            if (result.new_customer) {
+                navigate("/new-customer");
+            }
+        }
+    }
+
     React.useEffect(() => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
@@ -577,6 +587,14 @@ const Homepage = () => {
             fetchHistoryItems(old_data);
         }
     }, []);
+
+    React.useEffect(() => {
+        setTimeout(() => {
+            if (account && isAuthenticated && account.role === "customer") {
+                checkIsNewCustomer(account.customer_id);
+            }
+        }, 1000);
+    }, [isAuthenticated]);
 
     return (
         <>

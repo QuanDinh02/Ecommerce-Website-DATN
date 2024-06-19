@@ -49,6 +49,10 @@ const ApiRoute = (app) => {
     router.post('/customer/register/verification-code', customerController.sendVertificatedCode);
     router.post('/customer/register/verify', customerController.handleCodeVertification);
 
+    router.get('/new-customer/check', customerController.handleCheckNewCustomer);
+    router.delete('/new-customer/remove/:id', customerController.handleRemoveCheckNewCustomer);
+    router.post('/new-customer/training', checkUserJWT, customerController.trainingNewCustomer);
+
     router.get('/categories', cacheMiddleware(300), categoryController.getCategoryList);
     router.get('/category', categoryController.getCategoryInfo);
     router.get('/categories-only', categoryController.getOnlyCategory);
@@ -68,6 +72,7 @@ const ApiRoute = (app) => {
     router.get('/products/search-page', cacheMiddleware(300), productController.handleGetSearchProductsWithPagination);
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
+    router.post('/sub-category/recommend', subCategoryController.getRecommendSubCategory);
     router.get('/sub-category', subCategoryController.getSubCategoryInfo);
 
     router.put('/product', upload.single('image'), productController.handleUpdateProductImage);
