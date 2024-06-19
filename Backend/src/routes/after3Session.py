@@ -6,16 +6,14 @@ from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 import mysql.connector
 import json
-from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search.field import TextField, NumericField, VectorField
 from redis.commands.search.query import Query
 import timeit
 import requests
 import sys
 
-INDEX_NAME = 'idx:product-name1'
+INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
-    
+
 
 def create_query_table(query, queries, encoded_queries, extra_params = {}):
     results_list = []
@@ -26,12 +24,12 @@ def create_query_table(query, queries, encoded_queries, extra_params = {}):
         for doc in result_docs:
             vector_score = round(1 - float(doc.vector_score), 2)
             # print(doc.name)
-            results_list.append({
-                'query': queries[i], 
-                'score': vector_score, 
-                'id': doc.id,
-                'name': doc.name,
-            })
+            # results_list.append({
+            #     'query': queries[i], 
+            #     'score': vector_score, 
+            #     'id': doc.id,
+            #     # 'name': doc.name,
+            # })
             description_embeddings = client.json().get(f'{doc.id}', '$.name_embeddings')
             itemRealSearch.append((description_embeddings[0], (doc.id).split(":")[-1]))
 
@@ -134,32 +132,8 @@ def getSearhContent(cusID, mysql_config={}):
     for i in range(len(searchContent)):
         res.append(searchContent[i]['content'])
     return res
-    
-def checkIndex(client):
-    VECTOR_DIMENSION = 768
-    try:
-        client.ft(INDEX_NAME).info()
-        print('Index already exists!')
-    except:
-        schema = (
-            NumericField("$.id", as_name = "id"),
-            TextField("$.name", as_name = "name", no_stem=True),
-            TextField("$.summary", as_name = "summary", no_stem=True),
-            NumericField("$.shop_id", as_name = "shop_id"),
-            VectorField('$.name_embeddings', 'FLAT', {
-                'TYPE': 'FLOAT32',
-                'DIM': VECTOR_DIMENSION,
-                'DISTANCE_METRIC': 'COSINE',
-                },  as_name='vector_name'),
-        )
 
-        # index Definition
-        definition = IndexDefinition(prefix=[DOC_PREFIX], index_type=IndexType.JSON)
-
-        # create Index
-        client.ft(INDEX_NAME).create_index(fields=schema, definition=definition)
-
-def get_predicted_ratings(user_id, item_ids, redis_host='localhost', redis_port=6379, mysql_config={}):
+def get_predicted_ratings(user_id, item_ids, mysql_config={}):
     # Connect to MySQL
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
