@@ -129,7 +129,7 @@ const ApiRoute = (app) => {
 
     router.get('/seller/categories', cacheMiddleware(300), sellerController.getCategoryList);
     router.get('/seller/subcategories/:category_id', cacheMiddleware(300), sellerController.getSubCategoryList);
- 
+
     router.get('/seller/info', checkUserJWT, sellerController.getSellerInfo);
     router.put('/seller/info', checkUserJWT, sellerController.updateSellerInfo);
 

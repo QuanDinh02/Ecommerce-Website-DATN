@@ -166,21 +166,35 @@ const simulatingCreateRecommendProducts = async (req, res) => {
         let customerID = data.customer_id;
         let list = JSON.parse(data.list);
 
-        let dataFormat = list.map(item => {
-            return {
-                product_id: +item.product_id,
-                predict_rating: +item.predict_rating,
-                customerID: +customerID
-            }
-        })
+        console.log(">>> check data predict.py: ", list);
+        if (list.length > 0) {
 
-        let result = await recommendProductServices.createRecommendProducts(customerID, dataFormat);
+            let dataFormat = list.map(item => {
+                return {
+                    product_id: +item.product_id,
+                    predict_rating: +item.predict_rating,
+                    customerID: +customerID
+                }
+            })
 
-        return res.status(200).json({
-            EC: result.EC,
-            DT: result.DT,
-            EM: result.EM
-        })
+            let result = await recommendProductServices.createRecommendProducts(customerID, dataFormat);
+
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+
+        else {
+            await recommendProductServices.updateTrainingRecommendItemStatus(customerID, 0);
+
+            return res.status(200).json({
+                EC: 0,
+                DT: "",
+                EM: "No new data training !"
+            })
+        }
 
     } catch (error) {
         console.log(error);

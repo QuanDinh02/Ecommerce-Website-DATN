@@ -69,11 +69,11 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
     const handleNextStep = async () => {
         if (isValidEmail(email)) {
             let check = await checkCustomerEmailExist(email);
-            if(check) {
-                if(check.EC === 0) {
+            if (check) {
+                if (check.EC === 0) {
                     errorToast1(check.EM);
                     return;
-                } else if(check.EC === 1) {
+                } else if (check.EC === 1) {
                     let result = await sendOTPCustomerSignUp(email);
                     if (result && result.EC === 0) {
                         setStep(step + 1);
@@ -271,12 +271,12 @@ const CustomerRegister = (props: IRegisterProp) => {
         }
 
         let result = await userRegister(register_customer_info);
-        if(result) {
-            if(result.EC === 0) {
+        if (result) {
+            if (result.EC === 0) {
                 successToast1(result.EM);
                 setTimeout(() => {
-                    navigate("/login");
-                },1500);
+                    navigate("/");
+                }, 1500);
             } else {
                 errorToast1(result.EM);
                 return;
@@ -349,7 +349,7 @@ const CustomerSignUpPage = () => {
             }
         }
     }
-    
+
     React.useEffect(() => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }, []);

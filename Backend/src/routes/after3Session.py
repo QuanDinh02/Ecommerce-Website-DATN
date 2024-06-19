@@ -31,7 +31,7 @@ def create_query_table(query, queries, encoded_queries, extra_params = {}):
             #     # 'name': doc.name,
             # })
             description_embeddings = client.json().get(f'{doc.id}', '$.name_embeddings')
-            itemRealSearch.append((description_embeddings[0], (doc.id).split(":")[-1]))
+            itemRealSearch.append((description_embeddings[0], (doc.id).split(":")[-1], vector_score))
 
     return itemRealSearch
 
@@ -41,7 +41,7 @@ def ranking_items(itemSessionVector, itemRealSearch):
     if len(itemSessionVector) == 0:
         for i in itemRealSearch:
             itemScoreList.append(i[1])
-        return itemScoreList
+        return itemScoreList[:50]
     
     for i in itemRealSearch:
         for j in itemSessionVector:
@@ -155,44 +155,54 @@ def get_predicted_ratings(user_id, item_ids, mysql_config={}):
         from Sim
         where user_u = {user_id};
     '''
+    
     cursor.execute(query_get_sim)
     similar_users = cursor.fetchall()
-    similar_users_tuples = [(int(user['user_v']), user['sim']) for user in similar_users]
-    similar_users_tuples = sorted(similar_users_tuples, key=lambda x: x[1], reverse=True)
-    
-    cursor.close()
-    cnx.close()
-    # Function to calculate predicted rating
-    def calculate_predict_rating(product_id):
-        numerator = 0
-        denominator = 0
-        k = 0
-        for user_v, sim in similar_users_tuples:
-            if k == 50:
-                break
-            if (str(user_v), str(product_id)) in training_data_dict:
-                rv_i = training_data_dict[(str(user_v), str(product_id))]
-                mu_v = avg_ratings_dict.get(str(user_v), 0)
-                numerator += float(sim) * (rv_i - mu_v)
-                denominator += abs(float(sim))
-                k+=1
+    if len(similar_users) != 0:
+        similar_users_tuples = [(int(user['user_v']), user['sim']) for user in similar_users]
+        similar_users_tuples = sorted(similar_users_tuples, key=lambda x: x[1], reverse=True)
+        
+        cursor.close()
+        cnx.close()
+        # Function to calculate predicted rating
+        def calculate_predict_rating(product_id):
+            numerator = 0
+            denominator = 0
+            k = 0
+            for user_v, sim in similar_users_tuples:
+                if k == 50:
+                    break
+                if (str(user_v), str(product_id)) in training_data_dict:
+                    rv_i = training_data_dict[(str(user_v), str(product_id))]
+                    mu_v = avg_ratings_dict.get(str(user_v), 0)
+                    numerator += float(sim) * (rv_i - mu_v)
+                    denominator += abs(float(sim))
+                    k+=1
 
-        user_avg_rating = avg_ratings_dict.get(str(user_id), 0)
-        predict_sim = user_avg_rating + numerator / denominator if denominator != 0 else user_avg_rating
-        predict_sim = max(1, min(predict_sim, 5))
-        return predict_sim
+            user_avg_rating = avg_ratings_dict.get(str(user_id), 0)
+            predict_sim = user_avg_rating + numerator / denominator if denominator != 0 else user_avg_rating
+            predict_sim = max(1, min(predict_sim, 5))
+            return predict_sim
 
-    # Calculate predicted ratings for the provided item_ids
-    unrated_products = []
-    for product_id in item_ids:
-        predicted_rating = calculate_predict_rating(product_id)
-        unrated_products.append({'product_id': str(product_id), 'predict_rating': str(predicted_rating)})
+        # Calculate predicted ratings for the provided item_ids
+        unrated_products = []
+        for product_id in item_ids:
+            predicted_rating = calculate_predict_rating(product_id)
+            unrated_products.append({'product_id': str(product_id), 'predict_rating': str(predicted_rating)})
 
-    sorted_result = sorted(unrated_products, key=lambda x: float(x['predict_rating']), reverse=True)
-    json_result = json.dumps(sorted_result[:25], ensure_ascii=False, indent=4)
-    res ={'customer_id': user_id, 'list': json_result}
-    res_json = json.dumps(res, ensure_ascii=False, indent=4)
-    return res_json
+        sorted_result = sorted(unrated_products, key=lambda x: float(x['predict_rating']), reverse=True)
+        json_result = json.dumps(sorted_result[:25], ensure_ascii=False, indent=4)
+        res ={'customer_id': user_id, 'list': json_result}
+        res_json = json.dumps(res, ensure_ascii=False, indent=4)
+        return res_json
+    else:
+        rec_product = []
+        for product_id in item_ids:
+            rec_product.append({'product_id': str(product_id), 'predict_rating': '5'})
+        json_result = json.dumps(rec_product, ensure_ascii=False, indent=4)
+        res ={'customer_id': user_id, 'list': json_result}
+        res_json = json.dumps(res, ensure_ascii=False, indent=4)
+        return res_json
 
 
 if __name__ == "__main__":
@@ -206,7 +216,7 @@ if __name__ == "__main__":
 
     params = sys.argv[1]
     customerID = params
-    # customerID = '10577013'
+    # customerID = '10577015'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -226,15 +236,8 @@ if __name__ == "__main__":
     print(search_content)
     
     if(search_content): 
-        a = timeit.default_timer()
-        start = timeit.default_timer()
         print("Load model...")
         embedder = SentenceTransformer('keepitreal/vietnamese-sbert')
-        
-        print(embedder)
-        stop = timeit.default_timer()
-        print("Load model:", stop - start)
-        
         query = (
             Query('(*)=>[KNN 100 @vector_name $query_vector AS vector_score]')
                 .sort_by('vector_score')
@@ -273,12 +276,7 @@ if __name__ == "__main__":
         print(ListPredict)
         
         print("Predict rating...")
-        start_1 = timeit.default_timer()
         result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
-        stop_1 = timeit.default_timer()
-        print("Predict:", stop_1 - start_1)
-        b = timeit.default_timer()
-        print('Total time:', b - a)
 
         data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
