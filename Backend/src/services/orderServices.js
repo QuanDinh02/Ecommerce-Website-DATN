@@ -570,7 +570,7 @@ const cancelOrderByCustomer = async (order_id) => {
 
         let order_status_info = order_status[0];
 
-        if (order_status_info.id === 1) {
+        if (order_status_info.id > 1) {
 
             let update_date = new Date();
 

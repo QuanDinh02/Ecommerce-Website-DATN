@@ -41,13 +41,13 @@ const getProductPagination = async (req, res) => {
     }
 }
 
-const getOrderAllPagination = async (req, res) => {
+const getOrderPagination = async (req, res) => {
     try {
 
-        let { limit, page } = req.query;
+        let { limit, page, status } = req.query;
         let { user } = req;
 
-        let result = await sellerServices.getOrderAllPagination(+user.seller_id, +limit, +page);
+        let result = await sellerServices.getOrderPagination(+user.seller_id, +limit, +page, +status);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -284,6 +284,28 @@ const getSellerInfo = async (req, res) => {
     }
 }
 
+const confirmCustomerOrder = async (req, res) => {
+    try {
+        let { id } = req.body;
+        let result = await sellerServices.confirmCustomerOrder(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const updateSellerInfo = async (req, res) => {
     try {
         let { user } = req;
@@ -336,5 +358,5 @@ const getOrderDetail = async (req, res) => {
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
-    getOrderAllPagination, getOrderDetail
+    getOrderPagination, getOrderDetail, confirmCustomerOrder
 }

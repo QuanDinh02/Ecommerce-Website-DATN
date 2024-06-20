@@ -48,8 +48,12 @@ const SideBar: ISideBarItem[] = [
         skip: true,
         children: [
             {
-                path: "/all",
+                path: "/order-status",
                 name: "Trạng thái đơn hàng",
+            },
+            {
+                path: "/control-order-delivery",
+                name: "Đối soát hàng giao",
             }
         ]
     },

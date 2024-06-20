@@ -534,7 +534,7 @@ const updateSellerInfo = async (data) => {
     }
 }
 
-const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
+const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
     try {
         if (item_limit > 0) {
 
@@ -558,24 +558,27 @@ const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
 
             let order_list_data = await Promise.all(orderListRaw.map(async item => {
 
-                let order_status_list = await db.Shipment.findAll({
-                    nest: true,
+                let order_status_raw = await db.Shipment.findAll({
+                    limit: 1,
                     raw: true,
-                    attributes: ['id', 'status', 'updatedDate'],
-                    include: {
+                    nest: true,
+                    attributes: ['id', 'updatedDate'],
+                    include:
+                    {
                         model: db.ShipmentStatus,
-                        attributes: ['id', 'name']
+                        attributes: ['id', 'name'],
                     },
                     where: {
                         orderID: {
-                            [Op.eq]: item.id,
+                            [Op.eq]: +item.id,
                         },
-                    }
+                    },
+                    order: [['updatedDate', 'DESC']]
                 });
 
-                order_status_list = _.orderBy(order_status_list, i => i.updatedDate, 'desc');
+                let order_status_info = order_status_raw[0];
 
-                let order_status = order_status_list[0].ShipmentStatus.name;
+                let order_status = order_status_info.ShipmentStatus;
 
                 return {
                     ...item,
@@ -583,17 +586,32 @@ const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
                 }
             }));
 
-            return {
-                EC: 0,
-                DT: {
-                    page: page,
-                    page_total: pageTotal,
-                    total_items: listLength,
-                    order_list: order_list_data
-                },
-                EM: 'Get all orders !'
-            }
+            if(status === 0) {
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        order_list: order_list_data
+                    },
+                    EM: 'Get all orders !'
+                }
+            } else {
+                let filter_order_list_data = order_list_data.filter(item => item.status.id === status);
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        order_list: filter_order_list_data
+                    },
+                    EM: 'Get orders by status !'
+                }
+            } 
         }
+
         return {
             EC: 0,
             DT: [],
@@ -617,16 +635,16 @@ const getOrderDetail = async (order_id) => {
             nest: true,
             attributes: ['id', 'orderDate', 'totalPrice', 'shipFee', 'fullName', 'phone', 'address'],
             include:
-            [
-                {
-                    model: db.ShippingMethod,
-                    attributes: ['id', 'nameMethod', 'price'],
-                },
-                {
-                    model: db.Customer,
-                    attributes: ['name'],
-                },
-            ],
+                [
+                    {
+                        model: db.ShippingMethod,
+                        attributes: ['id', 'nameMethod', 'price'],
+                    },
+                    {
+                        model: db.Customer,
+                        attributes: ['name'],
+                    },
+                ],
             where: {
                 id: {
                     [Op.eq]: order_id,
@@ -738,10 +756,45 @@ const getOrderDetail = async (order_id) => {
     }
 }
 
+const confirmCustomerOrder = async (order_id) => {
+    try {
+
+        let result = await db.Shipment.create({
+            status: 2,
+            updatedDate: new Date(),
+            orderID: order_id
+        });
+
+        if(result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Xác nhận đơn hàng thành công'
+            }
+        }
+
+        else {
+            return {
+                EC: -1,
+                DT: '',
+                EM: 'Xác nhận đơn hàng thất bại'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
     handleCreateVertificationCode, handleOTPVertification,
-    getSellerInfo, updateSellerInfo, getOrderAllPagination,
-    getOrderDetail
+    getSellerInfo, updateSellerInfo, getOrderPagination,
+    getOrderDetail, confirmCustomerOrder
 }

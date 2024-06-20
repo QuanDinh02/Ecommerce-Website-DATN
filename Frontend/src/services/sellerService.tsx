@@ -36,8 +36,8 @@ export const getProductsPagination = async (product_display_limit: number, page:
     return null;
 }
 
-export const getOrderAll = async (order_display_limit: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/seller/order/all?limit=${order_display_limit}&page=${page}`);
+export const getOrderAll = async (order_display_limit: number, page: number, status: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/order?limit=${order_display_limit}&page=${page}&status=${status}`);
     if (result && result?.DT) {
         return result.DT;
     }
@@ -65,11 +65,6 @@ export const getSubCategoryByCategory = async (category_id: number) => {
     return null;
 }
 
-// export const createNewProduct = async (data:any ) => {
-//     let result: APIResponse = await axios.post('/api/seller/product');
-//     return result;
-// }
-
 export const createNewProduct = async (data: INewProduct) => {
 
     const build_data = new FormData();
@@ -81,7 +76,7 @@ export const createNewProduct = async (data: INewProduct) => {
     build_data.append('image', data.image);
     build_data.append('sub_category_id', `${data.sub_category_id}`);
 
-    let result: APIResponse =  await axios.post(`/api/seller/product`, build_data, {
+    let result: APIResponse = await axios.post(`/api/seller/product`, build_data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
@@ -92,7 +87,7 @@ export const createNewProduct = async (data: INewProduct) => {
 
 export const updateProduct = async (data: IUpdateProduct) => {
 
-    let result: APIResponse =  await axios.put(`/api/seller/product`, data);
+    let result: APIResponse = await axios.put(`/api/seller/product`, data);
     return result;
 }
 
@@ -111,6 +106,11 @@ export const getSellerInfo = async () => {
 
 export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
     let result: APIResponse = await axios.put('/api/seller/info', data);
+    return result;
+}
+
+export const confirmCustomerOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.put('/api/seller/order/confirm', { id: order_id });
     return result;
 }
 

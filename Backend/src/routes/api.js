@@ -118,12 +118,16 @@ const ApiRoute = (app) => {
     router.post('/image', upload.single('image'), imageController.uploadImage);
     router.delete('/image/:id', imageController.deleteImage);
 
+
+    //SELLER:
+
     router.get('/seller/register/email-validate', userController.checkSellerEmailExist);
     router.post('/seller/register/verification-code', sellerController.sendVertificatedCode);
     router.post('/seller/register/verify', sellerController.handleCodeVertification);
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
-    router.get('/seller/order/all', checkUserJWT, sellerController.getOrderAllPagination)
+    router.get('/seller/order', checkUserJWT, sellerController.getOrderPagination)
+    router.put('/seller/order/confirm', checkUserJWT, sellerController.confirmCustomerOrder)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);

@@ -22,7 +22,7 @@ export const dateFormat = (date_input: string) => {
 export const dateTimeFormat = (date_input: string) => {
     let date = new Date(date_input);
 
-    let new_date = date.toLocaleString('vi-VN', { hour: 'numeric', minute: 'numeric', second: 'numeric', day: 'numeric', month: 'numeric', year: 'numeric', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
+    let new_date = date.toLocaleString('vi-VN', { day: 'numeric', month: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
     return `${new_date}`;
 }
 
