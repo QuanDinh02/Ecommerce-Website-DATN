@@ -1,3 +1,5 @@
+import React from "react";
+import { CiImageOn } from "react-icons/ci";
 interface ILoadImage {
     img_style: string
     product_id: number
@@ -6,9 +8,21 @@ interface ILoadImage {
 const LoadImage = (props: ILoadImage) => {
 
     let { img_style, product_id } = props;
+    const [error, setError] = React.useState<boolean>(false);
 
     return (
-        <img src={`/src/assets/img/products/${product_id}.jpeg`} alt='' className={img_style} />
+        <>
+            {
+                !error ?
+                    <img
+                        src={`/src/assets/img/products/${product_id}.jpeg`}
+                        alt=''
+                        className={img_style}
+                        onError={() => setError(true)}
+                    /> :
+                    <CiImageOn className={`text-gray-300 ${img_style}`}/>
+            }
+        </>
     )
 }
 
