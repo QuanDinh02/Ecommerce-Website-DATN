@@ -8,11 +8,16 @@ interface IOrderItem {
     product_price: number
 }
 
+interface IOrderStatus {
+    id: number
+    name: string
+    date: Date
+}
+
 export interface IOrder {
     id: number
     orderDate: Date
     totalPrice: number
-    note: string
-    shipFee: number
+    status: IOrderStatus
     order_item_list: IOrderItem[]
 }

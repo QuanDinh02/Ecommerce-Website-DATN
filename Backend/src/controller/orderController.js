@@ -121,7 +121,27 @@ const getPaymentMethod = async (req, res) => {
     }
 }
 
+const cancelOrderByCustomer = async (req, res) => {
+    try {
+        let { id } = req.params;
+        let result = await orderServices.cancelOrderByCustomer(id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     createNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod, 
-    getCustomerOrderDetail, getOrderSearchByCustomer
+    getCustomerOrderDetail, getOrderSearchByCustomer, cancelOrderByCustomer
 }

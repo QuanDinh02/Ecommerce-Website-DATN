@@ -93,6 +93,7 @@ const ApiRoute = (app) => {
 
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
+    router.delete('/order/cancel/:id', orderController.cancelOrderByCustomer);
     router.get('/order/search', orderController.getOrderSearchByCustomer);
     router.get('/order/detail', orderController.getCustomerOrderDetail);
     router.get('/order/shipping-method', orderController.getShippingMethod);
@@ -132,6 +133,8 @@ const ApiRoute = (app) => {
 
     router.get('/seller/info', checkUserJWT, sellerController.getSellerInfo);
     router.put('/seller/info', checkUserJWT, sellerController.updateSellerInfo);
+
+    router.get('/seller/order/detail', checkUserJWT, sellerController.getOrderDetail);
 
     return app.use('/api', router);
 }

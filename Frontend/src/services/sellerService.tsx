@@ -113,3 +113,11 @@ export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
     let result: APIResponse = await axios.put('/api/seller/info', data);
     return result;
 }
+
+export const getOrderDetail = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/order/detail?id=${order_id}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}

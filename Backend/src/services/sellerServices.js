@@ -561,7 +561,7 @@ const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
                 let order_status_list = await db.Shipment.findAll({
                     nest: true,
                     raw: true,
-                    attributes: ['id','status', 'updatedDate'],
+                    attributes: ['id', 'status', 'updatedDate'],
                     include: {
                         model: db.ShipmentStatus,
                         attributes: ['id', 'name']
@@ -609,9 +609,139 @@ const getOrderAllPagination = async (shop_seller_id, item_limit, page) => {
     }
 }
 
+const getOrderDetail = async (order_id) => {
+    try {
+
+        let order_info = await db.Order.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'orderDate', 'totalPrice', 'shipFee', 'fullName', 'phone', 'address'],
+            include:
+            [
+                {
+                    model: db.ShippingMethod,
+                    attributes: ['id', 'nameMethod', 'price'],
+                },
+                {
+                    model: db.Customer,
+                    attributes: ['name'],
+                },
+            ],
+            where: {
+                id: {
+                    [Op.eq]: order_id,
+                },
+            }
+        });
+
+        let shippingMethod = order_info.ShippingMethod.nameMethod;
+        let customer_name = order_info.Customer.name;
+
+        let order_item_list = await db.OrderItem.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'quantity', 'price'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name'],
+                }
+            ],
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id
+                }
+            }
+        });
+
+        let order_item_list_format = await order_item_list.map(order_item => {
+            let orderItem = order_item;
+            let productInfo = orderItem.Product;
+
+            delete orderItem.Product;
+
+            return {
+                ...orderItem,
+                product_id: productInfo.id,
+                product_name: productInfo.name
+            }
+
+        });
+
+        let transaction_info = await db.Transaction.findOne({
+            raw: true,
+            nest: true,
+            attributes: [],
+            include:
+            {
+                model: db.TransactionPaymentMethod,
+                attributes: ['id', 'method_name'],
+            }
+            ,
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id,
+                },
+            },
+        });
+
+        let transactionPaymentMethod = transaction_info.TransactionPaymentMethod.method_name;
+
+        let order_status_info = await db.Shipment.findAll({
+            limit: 1,
+            raw: true,
+            nest: true,
+            attributes: ['id', 'updatedDate'],
+            include:
+            {
+                model: db.ShipmentStatus,
+                attributes: ['id', 'name'],
+            },
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id,
+                },
+            },
+            order: [['updatedDate', 'DESC']]
+        });
+
+        let order_status = order_status_info[0].ShipmentStatus.name;
+
+        return {
+            EC: 0,
+            DT: {
+                id: order_info.id,
+                orderDate: order_info.orderDate,
+                totalPrice: order_info.totalPrice,
+                shipFee: order_info.shipFee,
+                order_address: {
+                    customer_name: customer_name,
+                    name: order_info.fullName,
+                    phone: order_info.phone,
+                    address: order_info.address
+                },
+                order_item_list: order_item_list_format,
+                payment_method: transactionPaymentMethod,
+                shipping_method: shippingMethod,
+                status: order_status
+            },
+            EM: 'Get order detail'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getProductPagination, createNewProduct, deleteProduct, 
-    getAllCategories, getSubCategoriesByCategory,updateProduct,
-    handleCreateVertificationCode, handleOTPVertification, 
-    getSellerInfo, updateSellerInfo, getOrderAllPagination
+    getProductPagination, createNewProduct, deleteProduct,
+    getAllCategories, getSubCategoriesByCategory, updateProduct,
+    handleCreateVertificationCode, handleOTPVertification,
+    getSellerInfo, updateSellerInfo, getOrderAllPagination,
+    getOrderDetail
 }

@@ -101,7 +101,7 @@ const SellerProductAll = () => {
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
-
+        setDataLoading(true);
         // navigate({
         //     pathname: "/category",
         //     search: `?id=${categoryID}&page=${+event.selected + 1}`,
@@ -111,20 +111,15 @@ const SellerProductAll = () => {
         // });
     }
 
-    const setLoadingAnimation = () => {
-        setDataLoading(true);
-        setTimeout(() => {
-            setDataLoading(false);
-        }, 500);
-    }
-
     const fetchProductsPagination = async (limit: number, page: number) => {
         let response: IData = await getProductsPagination(limit, page);
         if (response) {
             setProductList(response.product_list);
             setTotalPages(response.page_total);
             setTotalItems(response.total_items);
-            setLoadingAnimation();
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 500);
         }
     }
 
@@ -133,8 +128,8 @@ const SellerProductAll = () => {
         if (result && result.EC === 0) {
             successToast1(result.EM);
             setShowDeleteBox(false);
-            setLoadingAnimation();
             setTimeout(() => {
+                setDataLoading(true);
                 fetchProductsPagination(showItem, 1);
             }, 1000);
         } else {

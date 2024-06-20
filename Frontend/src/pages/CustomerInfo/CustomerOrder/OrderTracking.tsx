@@ -1,6 +1,6 @@
 import LoadImage from "@/components/LoadImage";
 import { getCustomerOrderDetail } from "@/services/orderServices";
-import { dateFormat, dateTimeFormat, timeFormat } from "@/utils/dateFormat";
+import { dateFormat, dateTimeFormat } from "@/utils/dateFormat";
 import { CurrencyFormat } from "@/utils/numberFormat";
 import React from "react";
 import { ThreeDots } from "react-loader-spinner";
@@ -120,7 +120,7 @@ const OrderTracking = () => {
             setOrderShippingInfo(response.shipping_location);
             setOrderItemList(response.order_item_list);
             setOrderStatusList(order_status_list);
-            setOrderStatus(order_status_list[0].id);
+            setOrderStatus(order_status_list[0].id !== 10 ? order_status_list[0].id : 1);
             setOrderUpdateDate(order_status_list[0].date);
 
             setTimeout(() => {
@@ -276,21 +276,21 @@ const OrderTracking = () => {
                                         if (index === 0) {
                                             return (
                                                 <div className="bg-white px-3 py-4 border-t border-gray-300 font-medium flex items-center gap-x-6" key={`order-status-${orderID}-${order_status.id}`}>
-                                                    <span className="status__time">{timeFormat(`${order_status.date}`)}</span>
+                                                    <span className="status__time">{dateTimeFormat(`${order_status.date}`)}</span>
                                                     <span className="status__name">{order_status.name}</span>
                                                 </div>
                                             )
                                         }
                                         return (
-                                            <div className="bg-white px-3 py-4 border-t border-gray-300 font-medium flex items-center gap-x-6" key={`order-status-${orderID}-${order_status.id}`}>
-                                                <span className="status__time">{timeFormat(`${order_status.date}`)}</span>
+                                            <div className="bg-white px-3 py-4 border-t border-gray-300 flex items-center gap-x-6" key={`order-status-${orderID}-${order_status.id}`}>
+                                                <span className="status__time">{dateTimeFormat(`${order_status.date}`)}</span>
                                                 <span className="status__name">{order_status.name}</span>
                                             </div>
                                         )
                                     })
                                 }
                                 <div className="bg-white px-3 py-4 border-t border-gray-300 flex items-center gap-x-6 rounded-b">
-                                    <span className="status__time">{timeFormat(`${orderDetailInfo.orderDate}`)}</span>
+                                    <span className="status__time">{dateTimeFormat(`${orderDetailInfo.orderDate}`)}</span>
                                     <span className="status__name">Đặt hàng thành công</span>
                                 </div>
                             </div>

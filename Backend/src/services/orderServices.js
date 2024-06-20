@@ -139,7 +139,7 @@ const getOrderByCustomer = async (customer_id) => {
 
         let order_list = await db.Order.findAll({
             raw: true,
-            attributes: ['id', 'orderDate', 'totalPrice', 'note', 'shipFee'],
+            attributes: ['id', 'orderDate', 'totalPrice'],
             where: {
                 customerID: {
                     [Op.eq]: customer_id,
@@ -150,6 +150,26 @@ const getOrderByCustomer = async (customer_id) => {
         order_list.reverse();
 
         let order_detail_list = await Promise.all(order_list.map(async order => {
+
+            let order_status = await db.Shipment.findAll({
+                limit: 1,
+                raw: true,
+                nest: true,
+                attributes: ['id', 'updatedDate'],
+                include:
+                {
+                    model: db.ShipmentStatus,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    orderID: {
+                        [Op.eq]: +order.id,
+                    },
+                },
+                order: [['updatedDate', 'DESC']]
+            });
+
+            let order_status_info = order_status[0];
 
             let order_item_list = await db.OrderItem.findAll({
                 raw: true,
@@ -205,6 +225,11 @@ const getOrderByCustomer = async (customer_id) => {
 
             return {
                 ...order,
+                status: {
+                    id: order_status_info.ShipmentStatus.id,
+                    name: order_status_info.ShipmentStatus.name,
+                    date: order_status_info.updatedDate
+                },
                 order_item_list: order_item_list_format
             }
         }))
@@ -230,7 +255,7 @@ const getOrderSearchByCustomer = async (order_id) => {
 
         let order_info = await db.Order.findOne({
             raw: true,
-            attributes: ['id', 'orderDate', 'totalPrice', 'note', 'shipFee'],
+            attributes: ['id', 'orderDate', 'totalPrice'],
             where: {
                 id: {
                     [Op.eq]: order_id,
@@ -239,6 +264,27 @@ const getOrderSearchByCustomer = async (order_id) => {
         });
 
         if (order_info) {
+
+            let order_status = await db.Shipment.findAll({
+                limit: 1,
+                raw: true,
+                nest: true,
+                attributes: ['id', 'updatedDate'],
+                include:
+                {
+                    model: db.ShipmentStatus,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    orderID: {
+                        [Op.eq]: +order_id,
+                    },
+                },
+                order: [['updatedDate', 'DESC']]
+            });
+
+            let order_status_info = order_status[0];
+
             let order_item_list = await db.OrderItem.findAll({
                 raw: true,
                 nest: true,
@@ -297,6 +343,11 @@ const getOrderSearchByCustomer = async (order_id) => {
                     [
                         {
                             ...order_info,
+                            status: {
+                                id: order_status_info.ShipmentStatus.id,
+                                name: order_status_info.ShipmentStatus.name,
+                                date: order_status_info.updatedDate
+                            },
                             order_item_list: order_item_list_format
                         }
                     ],
@@ -496,7 +547,76 @@ const getPaymentMethod = async () => {
     }
 }
 
+const cancelOrderByCustomer = async (order_id) => {
+    try {
+
+        let order_status = await db.Shipment.findAll({
+            limit: 1,
+            raw: true,
+            nest: true,
+            attributes: ['id', 'updatedDate'],
+            include:
+            {
+                model: db.ShipmentStatus,
+                attributes: ['id', 'name'],
+            },
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id,
+                },
+            },
+            order: [['updatedDate', 'DESC']]
+        });
+
+        let order_status_info = order_status[0];
+
+        if (order_status_info.id === 1) {
+
+            let update_date = new Date();
+
+            await db.Shipment.create({
+                status: 10,
+                updatedDate: update_date,
+                orderID: order_id
+            });
+
+            await db.Transaction.update({
+                status: 3,
+                updatedAt: update_date
+            }, {
+                where: {
+                    orderID: {
+                        [Op.eq]: +order_id,
+                    }
+                },
+            });
+
+            return {
+                EC: 0,
+                DT: "",
+                EM: 'Hủy đơn hàng thành công'
+            }
+
+        } else {
+            return {
+                EC: -1,
+                DT: "",
+                EM: 'Đơn hàng không thể hủy'
+            }
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     addNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod,
-    getCustomerOrderDetail, getOrderSearchByCustomer
+    getCustomerOrderDetail, getOrderSearchByCustomer, cancelOrderByCustomer
 }

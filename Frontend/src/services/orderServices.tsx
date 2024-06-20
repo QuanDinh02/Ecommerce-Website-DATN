@@ -44,6 +44,11 @@ export const getCustomerOrderDetail = async (order_id: number) => {
     return null;
 }
 
+export const customerCancelOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.delete(`/api/order/cancel/${order_id}`);
+    return result;
+}
+
 export const getAllShippingMethod = async () => {
     let result: APIResponse = await axios.get('/api/order/shipping-method');
     if (result && result.EC === 0) {

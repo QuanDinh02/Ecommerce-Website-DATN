@@ -82,7 +82,7 @@ const SuccessAnnouncement = () => {
                 <div className="w-full flex item-center justify-center"><FaRegCircleCheck className="w-16 h-16 text-[#6acd03]" /></div>
             </div>
             <div className="announcement__title text-black text-xl mb-4 text-center text-gray-600 font-medium">Cám ơn bạn đã mua hàng tại FoxMart !</div>
-            <div className="text-center">Bạn có thể xem lại <span className="text-blue-600 hover:underline cursor-pointer">đơn hàng của tôi</span></div>
+            <div className="text-center">Bạn có thể xem lại <span className="text-blue-600 hover:underline cursor-pointer" onClick={() => navigate("/customer-info/order/all")}>đơn hàng của tôi</span></div>
         </div>
     )
 }
