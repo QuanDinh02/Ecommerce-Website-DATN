@@ -109,8 +109,13 @@ export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
     return result;
 }
 
-export const confirmCustomerOrder = async (order_id: number) => {
-    let result: APIResponse = await axios.put('/api/seller/order/confirm', { id: order_id });
+export const confirmCustomerOrder = async (order_id: number, packing: boolean) => {
+    let result: APIResponse = await axios.put('/api/seller/order/confirm', { id: order_id, packing: packing });
+    return result;
+}
+
+export const packingCustomerOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.put('/api/seller/order/packing', { id: order_id });
     return result;
 }
 

@@ -18,6 +18,7 @@ import { FaRegCircleCheck } from "react-icons/fa6";
 import classNames from "classnames";
 import { useDispatch } from "react-redux";
 import { ClearAllCartItem } from "@/redux/actions/action";
+import { getShippingUnits } from "@/services/shippingUnitService";
 
 const TEXT_DESCRIPTION_MAX = 500;
 
@@ -72,6 +73,11 @@ interface IPaymentMethod {
     status: number
 }
 
+interface IShippingUnit {
+    id: number
+    nameUnit: string
+}
+
 const SuccessAnnouncement = () => {
 
     const navigate = useNavigate();
@@ -123,6 +129,7 @@ const PaymentPage = () => {
     const [addressList, setAddressList] = React.useState<ICustomerAddress[]>([]);
     const [shippingMethodList, setShippingMethodList] = React.useState<IShippingMethod[]>([]);
     const [paymentMethodList, setPaymentMethodList] = React.useState<IPaymentMethod[]>([]);
+    const [shippingUnitList, setShippingUnitList] = React.useState<IShippingUnit[]>([]);
 
     const account: ICustomerAccount = useSelector<RootState, ICustomerAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
@@ -153,6 +160,11 @@ const PaymentPage = () => {
         status: 0,
     });
 
+    const [selectShippingUnit, setSelectShippingUnit] = useImmer<IShippingUnit>({
+        id: 1,
+        nameUnit: ""
+    });
+
     const [textCount, setTextCount] = React.useState<number>(0);
 
     const handleSetNote = (value: any) => {
@@ -171,6 +183,11 @@ const PaymentPage = () => {
         }
         return;
     }
+
+    const handleSelectShippingUnit= (unit: IShippingUnit) => {
+        setSelectShippingUnit(unit);
+    }
+
 
     const handleSelectPaymentMethod = (method: IPaymentMethod) => {
         if (method.status === 1) {
@@ -207,6 +224,7 @@ const PaymentPage = () => {
             totalPrice: orderCost,
             shipMethod: selectShippingMethod.id,
             paymentMethod: selectPaymentMethod.id,
+            shippingUnit: selectShippingUnit.id,
             fullName: orderAddress.fullname,
             phone: orderAddress.mobile,
             address: orderAddress.address,
@@ -268,6 +286,16 @@ const PaymentPage = () => {
         }
     }
 
+    const fetchAllShippingUnits = async () => {
+        let result = await getShippingUnits();
+        if (result) {
+            setShippingUnitList(result);
+
+            let unit = result[0];
+            setSelectShippingUnit(unit);
+        }
+    }
+
     React.useEffect(() => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
@@ -294,6 +322,7 @@ const PaymentPage = () => {
             fetchAllCustomerAddress();
             fetchAllShippingMethod();
             fetchAllPaymentMethod();
+            fetchAllShippingUnits();
         }
     }, [isAuthenticated]);
 
@@ -430,6 +459,7 @@ const PaymentPage = () => {
                                             <div className="border border-gray-300 rounded p-4 my-6">
                                                 <div className="flex flex-col gap-y-4">
                                                     {
+                                                        paymentMethodList && paymentMethodList.length > 0 &&
                                                         paymentMethodList.map((item, index) => {
                                                             return (
                                                                 <div className={item.status === 1 ? 'flex items-center gap-x-6 mb-2 cursor-pointer w-fit' : 'flex items-center gap-x-6 mb-2 cursor-not-allowed w-fit'} key={`shipping-method-select-${index}`} onClick={() => handleSelectPaymentMethod(item)}>
@@ -444,6 +474,24 @@ const PaymentPage = () => {
                                                                         }
 
                                                                     </div>
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div className="text-lg font-bold text-xl text-gray-600 my-4">3. Chọn đơn vị giao hàng</div>
+                                            <div className="border border-gray-300 rounded p-4 mb-6"> 
+                                                <div className="flex flex-col gap-y-4">
+                                                    {
+                                                        shippingUnitList && shippingUnitList.length > 0 &&
+                                                        shippingUnitList.map((item, index) => {
+                                                            return (
+                                                                <div className='flex items-center gap-x-6 mb-2 cursor-pointer w-fit' key={`shipping-unit-select-${index}`} onClick={() => handleSelectShippingUnit(item)}>
+                                                                    <div className={item.id === selectShippingUnit.id ? 'w-6 h-6 border-2 border-[#FCB800] rounded-full flex items-center justify-center' : 'w-6 h-6 border-2 border-gray-300 rounded-full'}>
+                                                                        <div className={item.id === selectShippingUnit.id ? 'w-2 h-2 bg-[#FCB800] rounded-full' : ""}></div>
+                                                                    </div>
+                                                                    <div className="flex gap-x-2 items-center">{item.nameUnit}</div>
                                                                 </div>
                                                             )
                                                         })
@@ -541,7 +589,7 @@ const PaymentPage = () => {
                             {
                                 paymentStep === 3 &&
                                 <div className="flex items-center justify-center">
-                                    <SuccessAnnouncement/>
+                                    <SuccessAnnouncement />
                                 </div>
                             }
                         </div>

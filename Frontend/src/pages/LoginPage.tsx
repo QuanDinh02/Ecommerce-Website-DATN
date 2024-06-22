@@ -213,7 +213,7 @@ const LoginPage = () => {
 
     return (
         <div className='login-container'>
-            <div className="flex justify-center pt-10 pb-20 px-3 bg-[#EEEEEE] min-h-screen">
+            <div className="flex justify-center pt-10 pb-20 px-3 bg-[#EEEEEE]">
                 <div className="login-form rounded-[4px] w-[25rem] bg-white p-8 shadow-xl">
                     <div className="login-form__title text-black text-xl text-xl mb-8 text-center">Đăng nhập</div>
                     <div className="login-form__main flex flex-col gap-2">

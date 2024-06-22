@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
       Order.belongsTo(models.ShippingMethod, { foreignKey: 'shipMethod' });
       Order.belongsTo(models.Customer, { foreignKey: 'customerID' });
       Order.belongsTo(models.Seller, { foreignKey: 'sellerID' });
+      Order.belongsTo(models.ShippingUnit, { foreignKey: 'shippingUnit' });
       Order.hasMany(models.Transaction, { foreignKey: 'orderID' });
       Order.hasMany(models.Shipment, { foreignKey: 'orderID' });
       Order.hasMany(models.OrderItem, { foreignKey: 'orderID' });
@@ -25,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     note: DataTypes.TEXT,
     customerID: DataTypes.BIGINT,
     sellerID: DataTypes.BIGINT,
+    shippingUnit: DataTypes.BIGINT,
   }, {
     sequelize,
     modelName: 'Order',

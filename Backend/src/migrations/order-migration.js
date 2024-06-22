@@ -39,6 +39,9 @@ module.exports = {
             sellerID: {
                 type: Sequelize.BIGINT
             },
+            shippingUnit: {
+                type: Sequelize.BIGINT
+            },
         });
     },
     async down(queryInterface, Sequelize) {

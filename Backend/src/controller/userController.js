@@ -1,5 +1,7 @@
 import LoginRegisterService from '../services/LoginRegisterService';
 import accountServices from '../services/accountServices';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const handleUserLogin = async (req, res) => {
     try {
@@ -8,7 +10,32 @@ const handleUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: 60 * 60 * 1000 })
+                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }) // 60 * 60 * 1000
+            }
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleSystemUserLogin = async (req, res) => {
+    try {
+        let data = req.body;
+
+        let result = await LoginRegisterService.userSystemLogin(data);
+        if (result) {
+            if (result.DT && result.DT.accessToken) {
+                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -95,7 +122,7 @@ const handleChangeUserPassword = async (req, res) => {
     }
 }
 
-const checkCustomerEmailExist = async (req,res) => {
+const checkCustomerEmailExist = async (req, res) => {
     try {
         let { email } = req.query;
 
@@ -117,7 +144,7 @@ const checkCustomerEmailExist = async (req,res) => {
     }
 }
 
-const checkSellerEmailExist = async (req,res) => {
+const checkSellerEmailExist = async (req, res) => {
     try {
         let { email } = req.query;
 
@@ -140,5 +167,5 @@ const checkSellerEmailExist = async (req,res) => {
 }
 module.exports = {
     handleUserLogin, handleUserRegister, handleUserLogout, handleFetchUserAccount,
-    handleChangeUserPassword, checkCustomerEmailExist, checkSellerEmailExist
+    handleChangeUserPassword, checkCustomerEmailExist, checkSellerEmailExist, handleSystemUserLogin
 }

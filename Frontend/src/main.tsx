@@ -23,6 +23,7 @@ import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
 import SearchPage from '@/pages/SearchPage.tsx';
 import HistoryViewProductPage from '@/pages/HistoryViewProductPage.tsx';
 
+//CUSTOMER
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
 import CustomerAccount from '@/pages/CustomerInfo/CustomerAccount.tsx';
 import PasswordModification from '@/pages/CustomerInfo/CustomerAccount/PasswordModification.tsx';
@@ -44,6 +45,7 @@ import VoucherAll from '@/pages/CustomerInfo/Voucher/VoucherAll.tsx';
 import VoucherHistory from '@/pages/CustomerInfo/Voucher/VoucherHistory.tsx';
 import OrderTracking from '@/pages/CustomerInfo/CustomerOrder/OrderTracking.tsx';
 
+//SELLER
 import SellerInfo from '@/pages/SellerInfo/SellerInfo.tsx';
 import SellerAllOrder from '@/pages/SellerInfo/SellerOrder/AllOrder.tsx';
 import SellerOrder from '@/pages/SellerInfo/SellerOrder.tsx';
@@ -58,6 +60,11 @@ import ShopInfo from '@/pages/SellerInfo/ShopInfo.tsx';
 import ShopManagement from '@/pages/SellerInfo/ShopManagement.tsx';
 import OrderDetail from '@/pages/SellerInfo/SellerOrder/OrderDetail.tsx';
 import SellerControlDelivery from '@/pages/SellerInfo/SellerControlDellivery.tsx';
+
+// SHIPPING UNIT
+import SUMain from '@/pages/ShippingUnit/SUMain.tsx';
+import SUDashboard from '@/pages/ShippingUnit/SUDashboard.tsx';
+import SUOrderManagement from '@/pages/ShippingUnit/SUOrderManagement.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -83,7 +90,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-
 
 const router = createBrowserRouter(
   [
@@ -353,6 +359,20 @@ const router = createBrowserRouter(
             {
               path: "report",
               element: <SystemReport />
+            },
+          ]
+        },
+        {
+          path: "su",
+          element: <SUMain/>,
+          children: [
+            {
+              path: "dashboard",
+              element: <SUDashboard/>
+            },
+            {
+              path: "order",
+              element: <SUOrderManagement/>
             },
           ]
         },

@@ -16,6 +16,7 @@ import imageController from '../controller/imageController';
 import sellerController from '../controller/sellerController';
 import { checkUserJWT } from '../middleware/jwt';
 import { cacheMiddleware } from '../middleware/cache';
+import shippingUnitController from '../controller/shippingUnitController';
 
 const router = express.Router();
 
@@ -30,6 +31,7 @@ const ApiRoute = (app) => {
     router.get('/user/register/email-validate', userController.checkCustomerEmailExist);
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
+    router.post('/user/sys/login', userController.handleSystemUserLogin);
     router.get('/user/logout', userController.handleUserLogout);
 
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
@@ -128,6 +130,7 @@ const ApiRoute = (app) => {
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
     router.get('/seller/order', checkUserJWT, sellerController.getOrderPagination)
     router.put('/seller/order/confirm', checkUserJWT, sellerController.confirmCustomerOrder)
+    router.put('/seller/order/packing', checkUserJWT, sellerController.packingCustomerOrder)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);
@@ -139,6 +142,9 @@ const ApiRoute = (app) => {
     router.put('/seller/info', checkUserJWT, sellerController.updateSellerInfo);
 
     router.get('/seller/order/detail', checkUserJWT, sellerController.getOrderDetail);
+
+    // SHIPPING UNIT
+    router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
 
     return app.use('/api', router);
 }

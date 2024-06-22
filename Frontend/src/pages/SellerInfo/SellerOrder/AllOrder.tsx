@@ -1,6 +1,6 @@
 import CopyClipboard from "@/components/CopyClipboard";
 import { CurrencyFormat } from "@/utils/numberFormat";
-import { confirmCustomerOrder, getOrderAll } from "@/services/sellerService";
+import { confirmCustomerOrder, getOrderAll, packingCustomerOrder } from "@/services/sellerService";
 import ReactPaginate from "react-paginate";
 import React from "react";
 import { dateTimeFormat } from "@/utils/dateFormat";
@@ -45,11 +45,11 @@ const tableHeaders = [
     },
     {
         name: "Tổng",
-        size: 2
+        size: 1
     },
     {
         name: "",
-        size: 1
+        size: 2
     }
 ];
 
@@ -122,6 +122,7 @@ const AllOrder = () => {
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [showConfirmBox, setShowConfirmBox] = React.useState<boolean>(false);
+    const [showPackingBox, setShowPackingBox] = React.useState<boolean>(false);
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
@@ -132,7 +133,7 @@ const AllOrder = () => {
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
 
     const [orderStatus, setOrderStatus] = useImmer(ORDER_STATUS);
-    const [confirmOrder, setConfirmOrder] = React.useState<number>(0);
+    const [updateOrder, setUpdateOrder] = React.useState<number>(0);
 
     const hanldeSetOrderStatus = (id: number) => {
         setOrderCurrentStatus(id);
@@ -171,20 +172,43 @@ const AllOrder = () => {
     }
 
     const handleShowConfirmBox = (order_id: number) => {
-        setConfirmOrder(order_id);
+        setUpdateOrder(order_id);
         setShowConfirmBox(true);
     }
 
-    const handleConfirmOrder = async (order_id: number) => {
-        let result = await confirmCustomerOrder(order_id);
+    const handleShowPackingBox = (order_id: number) => {
+        setUpdateOrder(order_id);
+        setShowPackingBox(true);
+    }
+
+    const handleConfirmOrder = async (order_id: number, packing: boolean) => {
+        let result = await confirmCustomerOrder(order_id, packing);
         if (result) {
             if (result.EC === 0) {
                 successToast1(result.EM);
                 setShowConfirmBox(false);
+                setUpdateOrder(0);
                 fetchAllOrder(showItem, currentPage, orderCurrentStatus);
             } else {
                 errorToast1(result.EM);
                 setShowConfirmBox(false);
+                setUpdateOrder(0);
+            }
+        }
+    }
+
+    const handlePackingOrder = async (order_id: number) => {
+        let result = await packingCustomerOrder(order_id);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setShowPackingBox(false);
+                setUpdateOrder(0);
+                fetchAllOrder(showItem, currentPage, orderCurrentStatus);
+            } else {
+                errorToast1(result.EM);
+                setShowPackingBox(false);
+                setUpdateOrder(0);
             }
         }
     }
@@ -306,6 +330,10 @@ const AllOrder = () => {
                                                             </span>
                                                         </td>
                                                         <td className="py-4 px-2" colSpan={2}>
+                                                            <span>{item.status.name}</span>
+                                                        </td>
+                                                        <td className="py-4 px-2 font-medium" colSpan={1}>{CurrencyFormat(item.totalPrice)}</td>
+                                                        <td className="py-4 px-2" colSpan={1}>
                                                             {
                                                                 item.status.id === 1 &&
                                                                 <Button
@@ -316,11 +344,18 @@ const AllOrder = () => {
                                                                 </Button>
                                                             }
                                                             {
-                                                                item.status.id !== 1 && <span>{item.status.name}</span>
+                                                                item.status.id === 2 &&
+                                                                <Button
+                                                                    styles="border border-blue-600 px-4 py-1.5 text-blue-600 transition duration-300 hover:bg-blue-600 hover:text-white w-fit cursor-pointer font-medium rounded"
+                                                                    OnClick={() => handleShowPackingBox(item.id)}
+                                                                >
+                                                                    <span>Đóng gói</span>
+                                                                </Button>
                                                             }
                                                         </td>
-                                                        <td className="py-4 px-2 font-medium" colSpan={2}>{CurrencyFormat(item.totalPrice)}</td>
-                                                        <td className="py-4 px-2 cursor-pointer hover:underline hover:text-blue-600" colSpan={1} onClick={() => handleShowOrderDetail(item.id)}>Xem chi tiết</td>
+                                                        <td className="py-4 px-2" colSpan={1} >
+                                                            <span className="cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleShowOrderDetail(item.id)}>Xem chi tiết</span>
+                                                        </td>
                                                     </tr>
                                                 )
                                             })}
@@ -367,10 +402,20 @@ const AllOrder = () => {
             </div>
             <Modal show={showConfirmBox} setShow={setShowConfirmBox} size="delete-confirmation-box">
                 <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
-                    <div className="text-xl">Xác nhận đơn hàng #{confirmOrder}</div>
+                    <div className="text-xl">Xác nhận đơn hàng #{updateOrder}</div>
                     <div className="flex items-center justify-end gap-x-2 transition-all">
                         <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowConfirmBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-green-600 text-white hover:bg-ưhite cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(confirmOrder)}>Xác nhận</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, true)}>Xác nhận & Đóng gói</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-green-500 text-white hover:bg-green-600 cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, false)}>Xác nhận</Button>
+                    </div>
+                </div>
+            </Modal>
+            <Modal show={showPackingBox} setShow={setShowPackingBox} size="delete-confirmation-box">
+                <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
+                    <div className="text-xl">Đóng gói đơn hàng #{updateOrder}</div>
+                    <div className="flex items-center justify-end gap-x-2 transition-all">
+                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowPackingBox(false)}>Hủy</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer duration-200 rounded" OnClick={() => handlePackingOrder(updateOrder)}>Đóng gói</Button>
                     </div>
                 </div>
             </Modal>

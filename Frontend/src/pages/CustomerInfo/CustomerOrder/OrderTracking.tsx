@@ -34,6 +34,7 @@ interface IOrderDetail {
     shipFee: number
     payment_method: string
     shipping_method: string
+    shipping_unit: string
 }
 
 interface IOrderDetailFetching {
@@ -42,6 +43,7 @@ interface IOrderDetailFetching {
     totalPrice: number
     shipFee: number
     shipping_location: IShippingLocation
+    shipping_unit: string
     payment_method: string
     shipping_method: string
     order_item_list: IOrderItem[]
@@ -92,7 +94,8 @@ const OrderTracking = () => {
         totalPrice: 0,
         shipFee: 0,
         payment_method: "",
-        shipping_method: ""
+        shipping_method: "",
+        shipping_unit: ""
     });
 
     const [orderShippingInfo, setOrderShippingInfo] = React.useState<IShippingLocation>({
@@ -113,6 +116,7 @@ const OrderTracking = () => {
                 draft.shipFee = response.shipFee;
                 draft.payment_method = response.payment_method;
                 draft.shipping_method = response.shipping_method;
+                draft.shipping_unit = response.shipping_unit;
             });
 
             let order_status_list = response.order_status_history;
@@ -188,12 +192,15 @@ const OrderTracking = () => {
                                 </div>
                             </div>
                             <div className="flex-1">
-                                <div className="text-sm font-medium text-gray-600 mb-4">PHƯƠNG THỨC VẬN CHUYỂN</div>
+                                <div className="text-sm font-medium text-gray-600 mb-4">THÔNG TIN VẬN CHUYỂN</div>
                                 <div className="p-4 bg-white flex flex-col gap-y-2 h-full">
-                                    <div>{orderDetailInfo.shipping_method}</div>
-                                    {
-                                        orderDetailInfo.shipFee === 0 && <div>Miễn phí vận chuyển</div>
-                                    }
+                                    <div>
+                                        {orderDetailInfo.shipping_method}
+                                        {
+                                            orderDetailInfo.shipFee === 0 && <span> (Miễn phí vận chuyển)</span>
+                                        }
+                                    </div>
+                                    <div>Đơn vị vận chuyển: <span className="font-medium">{orderDetailInfo.shipping_unit}</span></div>
                                 </div>
                             </div>
                             <div className="flex-1">

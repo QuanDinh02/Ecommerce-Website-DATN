@@ -20,6 +20,9 @@ module.exports = {
             },
             description: {
                 type: Sequelize.TEXT("medium")
+            },
+            userID: {
+                type: Sequelize.BIGINT
             }
         });
     },

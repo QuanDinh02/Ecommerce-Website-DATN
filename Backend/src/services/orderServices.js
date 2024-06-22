@@ -69,6 +69,7 @@ const addNewOrder = async (orderData, session_id) => {
                 shipFee: orderData.shipFee,
                 totalPrice: total_order_price + orderData.shipFee,
                 shipMethod: orderData.shipMethod,
+                shippingUnit: orderData.shippingUnit,
                 fullName: orderData.fullName,
                 phone: orderData.phone,
                 address: orderData.address,
@@ -424,11 +425,16 @@ const getCustomerOrderDetail = async (order_id) => {
             nest: true,
             attributes: ['id', 'orderDate', 'totalPrice', 'shipFee', 'address', 'fullName', 'phone'],
             include:
-            {
-                model: db.ShippingMethod,
-                attributes: ['id', 'nameMethod', 'price'],
-            }
-            ,
+            [
+                {
+                    model: db.ShippingMethod,
+                    attributes: ['id', 'nameMethod', 'price'],
+                },
+                {
+                    model: db.ShippingUnit,
+                    attributes: ['id', 'nameUnit'],
+                }
+            ],
             where: {
                 id: {
                     [Op.eq]: +order_id,
@@ -437,6 +443,7 @@ const getCustomerOrderDetail = async (order_id) => {
         });
 
         let shippingMethod = order_info.ShippingMethod;
+        let shippingUnit = order_info.ShippingUnit;
 
         let order_item_list = await db.OrderItem.findAll({
             raw: true,
@@ -483,6 +490,7 @@ const getCustomerOrderDetail = async (order_id) => {
                 },
                 payment_method: transactionPaymentMethod.method_name,
                 shipping_method: shippingMethod.nameMethod,
+                shipping_unit: shippingUnit.nameUnit,
                 order_item_list: order_item_list_format,
                 order_status_history: order_status_history
             },

@@ -55,6 +55,7 @@ interface IOrderDetail {
     order_item_list: IOrderItem[]
     payment_method: string
     shipping_method: string
+    shipping_unit: string
     status: string
 }
 
@@ -200,6 +201,10 @@ const OrderDetail = () => {
                                             </div>
                                             <div>
                                                 <div className="font-medium mb-2">Thông tin vận chuyển</div>
+                                                <div className="mb-2 text-sm flex items-center justify-between">
+                                                    <span className="text-gray-600">Đơn vị vận chuyển</span>
+                                                    <span className="font-medium">{orderDetailInfo.shipping_unit}</span>
+                                                </div>
                                                 <div className="mb-2 text-sm flex items-center justify-between">
                                                     <span className="text-gray-600">Gói cước vận chuyển</span>
                                                     <span className="font-medium">{orderDetailInfo.shipping_method}</span>

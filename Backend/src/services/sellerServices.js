@@ -540,53 +540,56 @@ const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
 
             let offSet = (page - 1) * item_limit;
 
-            let orderListRaw = await db.Order.findAll({
-                raw: true,
-                attributes: ['id', 'orderDate', 'totalPrice'],
-                where: {
-                    sellerID: {
-                        [Op.eq]: shop_seller_id,
-                    },
-                }
-            });
-
-            const listLength = orderListRaw.length;
-            const pageTotal = Math.ceil(listLength / item_limit);
-
-            orderListRaw.reverse();
-            orderListRaw = _(orderListRaw).drop(offSet).take(item_limit).value();
-
-            let order_list_data = await Promise.all(orderListRaw.map(async item => {
-
-                let order_status_raw = await db.Shipment.findAll({
-                    limit: 1,
+            if (status == 0) {
+                let orderListRaw = await db.Order.findAll({
                     raw: true,
-                    nest: true,
-                    attributes: ['id', 'updatedDate'],
-                    include:
-                    {
-                        model: db.ShipmentStatus,
-                        attributes: ['id', 'name'],
-                    },
+                    attributes: ['id', 'orderDate', 'totalPrice'],
                     where: {
-                        orderID: {
-                            [Op.eq]: +item.id,
+                        sellerID: {
+                            [Op.eq]: shop_seller_id,
                         },
-                    },
-                    order: [['updatedDate', 'DESC']]
+                    }
                 });
 
-                let order_status_info = order_status_raw[0];
+                const listLength = orderListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
 
-                let order_status = order_status_info.ShipmentStatus;
+                orderListRaw.reverse();
+                orderListRaw = _(orderListRaw).drop(offSet).take(item_limit).value();
 
-                return {
-                    ...item,
-                    status: order_status
-                }
-            }));
+                let order_list_data = await Promise.all(orderListRaw.map(async item => {
 
-            if(status === 0) {
+                    let order_status_raw = await db.Shipment.findAll({
+                        limit: 1,
+                        raw: true,
+                        nest: true,
+                        attributes: ['id', 'updatedDate'],
+                        include:
+                        {
+                            model: db.ShipmentStatus,
+                            attributes: ['id', 'name'],
+                        },
+                        where: {
+                            orderID: {
+                                [Op.eq]: +item.id,
+                            },
+                        },
+                        order: [
+                            ['updatedDate', 'DESC'],
+                            ['status', 'DESC'],
+                        ]
+                    });
+
+                    let order_status_info = order_status_raw[0];
+
+                    let order_status = order_status_info.ShipmentStatus;
+
+                    return {
+                        ...item,
+                        status: order_status
+                    }
+                }));
+
                 return {
                     EC: 0,
                     DT: {
@@ -597,19 +600,72 @@ const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
                     },
                     EM: 'Get all orders !'
                 }
-            } else {
+            }
+            else {
+                let orderListRaw = await db.Order.findAll({
+                    raw: true,
+                    attributes: ['id', 'orderDate', 'totalPrice'],
+                    where: {
+                        sellerID: {
+                            [Op.eq]: shop_seller_id,
+                        },
+                    }
+                });
+
+                const listLength = orderListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                orderListRaw.reverse();
+                //orderListRaw = _(orderListRaw).drop(offSet).take(item_limit).value();
+
+                let order_list_data = await Promise.all(orderListRaw.map(async item => {
+
+                    let order_status_raw = await db.Shipment.findAll({
+                        limit: 1,
+                        raw: true,
+                        nest: true,
+                        attributes: ['id', 'updatedDate'],
+                        include:
+                        {
+                            model: db.ShipmentStatus,
+                            attributes: ['id', 'name'],
+                        },
+                        where: {
+                            orderID: {
+                                [Op.eq]: +item.id,
+                            },
+                        },
+                        order: [
+                            ['updatedDate', 'DESC'],
+                            ['status', 'DESC'],
+                        ]
+                    });
+
+                    let order_status_info = order_status_raw[0];
+
+                    let order_status = order_status_info.ShipmentStatus;
+
+                    return {
+                        ...item,
+                        status: order_status
+                    }
+                }));
+
                 let filter_order_list_data = order_list_data.filter(item => item.status.id === status);
+
+                let paginate_order_list_data = _(filter_order_list_data).drop(offSet).take(item_limit).value();
+
                 return {
                     EC: 0,
                     DT: {
                         page: page,
                         page_total: pageTotal,
                         total_items: listLength,
-                        order_list: filter_order_list_data
+                        order_list: paginate_order_list_data
                     },
                     EM: 'Get orders by status !'
                 }
-            } 
+            }
         }
 
         return {
@@ -641,6 +697,10 @@ const getOrderDetail = async (order_id) => {
                         attributes: ['id', 'nameMethod', 'price'],
                     },
                     {
+                        model: db.ShippingUnit,
+                        attributes: ['id', 'nameUnit'],
+                    },
+                    {
                         model: db.Customer,
                         attributes: ['name'],
                     },
@@ -653,6 +713,7 @@ const getOrderDetail = async (order_id) => {
         });
 
         let shippingMethod = order_info.ShippingMethod.nameMethod;
+        let shippingUnit = order_info.ShippingUnit;
         let customer_name = order_info.Customer.name;
 
         let order_item_list = await db.OrderItem.findAll({
@@ -740,6 +801,7 @@ const getOrderDetail = async (order_id) => {
                 },
                 order_item_list: order_item_list_format,
                 payment_method: transactionPaymentMethod,
+                shipping_unit: shippingUnit.nameUnit,
                 shipping_method: shippingMethod,
                 status: order_status
             },
@@ -756,23 +818,94 @@ const getOrderDetail = async (order_id) => {
     }
 }
 
-const confirmCustomerOrder = async (order_id) => {
+const confirmCustomerOrder = async (order_id, packing) => {
     try {
 
-        let result = await db.Shipment.create({
-            status: 2,
-            updatedDate: new Date(),
-            orderID: order_id
-        });
+        // order_status: 2 - Chờ xác nhận, 3 - Đang đóng gói
 
-        if(result) {
-            return {
-                EC: 0,
-                DT: '',
-                EM: 'Xác nhận đơn hàng thành công'
+        let date = new Date();
+
+        if (!packing) {
+            let result = await db.Shipment.create({
+                status: 2,
+                updatedDate: date,
+                orderID: order_id
+            });
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Xác nhận đơn hàng thành công'
+                }
+            }
+            else {
+                return {
+                    EC: -1,
+                    DT: '',
+                    EM: 'Xác nhận đơn hàng thất bại'
+                }
+            }
+        } else {
+            let result = await db.Shipment.bulkCreate([
+                {
+                    status: 2,
+                    updatedDate: date,
+                    orderID: order_id
+                },
+                {
+                    status: 3,
+                    updatedDate: date,
+                    orderID: order_id
+                }
+            ]);
+
+            if (result) {
+                return {
+                    EC: 0,
+                    DT: '',
+                    EM: 'Đơn hàng đã xác nhận và đang đóng gói'
+                }
+            }
+            else {
+                return {
+                    EC: -1,
+                    DT: '',
+                    EM: 'Xác nhận đơn hàng thất bại'
+                }
             }
         }
 
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const packingCustomerOrder = async (order_id) => {
+    try {
+
+        // order_status: 2 - Chờ xác nhận, 3 - Đang đóng gói
+
+        let date = new Date();
+
+        let result = await db.Shipment.create({
+            status: 3,
+            updatedDate: date,
+            orderID: order_id
+        });
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Đơn hàng đang đóng gói'
+            }
+        }
         else {
             return {
                 EC: -1,
@@ -790,11 +923,10 @@ const confirmCustomerOrder = async (order_id) => {
         }
     }
 }
-
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
     handleCreateVertificationCode, handleOTPVertification,
     getSellerInfo, updateSellerInfo, getOrderPagination,
-    getOrderDetail, confirmCustomerOrder
+    getOrderDetail, confirmCustomerOrder, packingCustomerOrder
 }

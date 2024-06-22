@@ -12,6 +12,7 @@ interface IOrder {
     shipFee: number
     totalPrice: number
     shipMethod: number
+    shippingUnit: number
     paymentMethod: number
     phone: string
     fullName: string

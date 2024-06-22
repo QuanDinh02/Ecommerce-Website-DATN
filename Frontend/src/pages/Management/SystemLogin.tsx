@@ -20,9 +20,9 @@ const SystemLogin = () => {
 
     return (
         <div className='system-login-container'>
-            <div className="flex flex-col w-full h-screen relative bg-gradient-to-r from-cyan-500 to-blue-500">
+            <div className="flex flex-col w-full h-screen relative bg-[#E6E6E6]">
                 <div className="absolute w-full h-full z-10 flex items-center justify-center">
-                    <div className="login-form rounded-[4px] w-[25rem] bg-white p-10 h-fit">
+                    <div className="login-sys-form border border-gray-300 rounded-[4px] w-[25rem] bg-white p-10 h-fit">
                         <div className="login-form__title text-black text-2xl mb-5 text-center font-medium flex items-center justify-center gap-x-2"><FaUser/> Sign In</div>
                         <div className="w-full border border-gray-200 mb-4"></div>
                         <div className="login-form__main flex flex-col gap-2">

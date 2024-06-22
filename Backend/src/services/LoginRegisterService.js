@@ -347,8 +347,96 @@ const userLogin = async (userData) => {
     }
 }
 
+const userSystemLogin = async (userData) => {
+    try {
+        let checkUsername = await checkUserNameExist(userData.username);
+
+        if (checkUsername) {
+            let userExist = await db.User.findOne({
+                nest: true,
+                raw: true,
+                attributes: ['id', 'username', 'password', 'role'],
+                include: {
+                    model: db.UserRole,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    username: {
+                        [Op.eq]: userData.username
+                    }
+                }
+            })
+
+            if (userExist) {
+                let role = userExist.UserRole.name;
+                let user = {
+                    id: userExist.id,
+                    username: userExist.username,
+                    password: userExist.password,
+                    role: role
+                }
+
+                if (checkPassword(userData.password, user.password)) {
+
+                    let shipping_unit_id = 0;
+
+                    if (role === "shipping_unit") {
+                        let shippingUnitInfo = await db.ShippingUnit.findOne({
+                            raw: true,
+                            attributes: ['id'],
+                            where: {
+                                userID: {
+                                    [Op.eq]: user.id
+                                }
+                            }
+                        })
+
+                        shipping_unit_id = shippingUnitInfo.id;
+
+                        let payload = {
+                            shipping_unit_id: shipping_unit_id,
+                            username: user.username,
+                            role: user.role,
+                            isAuthenticated: true
+                        }
+
+                        let accessToken = createToken(payload);
+
+                        return {
+                            EC: 0,
+                            DT: {
+                                accessToken: accessToken,
+                                username: user.username,
+                                role: user.role,
+                                shipping_unit_id: shippingUnitInfo.id
+                            },
+                            EM: 'Login success !'
+                        }
+                    }
+                }
+
+            }
+        }
+
+        return {
+            EC: 1,
+            DT: '',
+            EM: 'Your username or password is incorrect !'
+
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: 2,
+            DT: '',
+            EM: "Some things is wrong at service!"
+        }
+    }
+}
+
 module.exports = {
     userRegister, userLogin, hashPassword,
     checkCustomerEmailExist, checkPassword,
-    checkSellerEmailExist
+    checkSellerEmailExist, userSystemLogin
 }
