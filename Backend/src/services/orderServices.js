@@ -59,6 +59,14 @@ const addNewOrder = async (orderData, session_id) => {
             }
         })
 
+        await Promise.all(order_items.map(async order_item => {
+
+            await db.ProductType.decrement('quantity', {
+                 by: order_item.quantity, 
+                 where: { productID: +order_item.productID } 
+            });
+        }));
+
         await Promise.all(order_data_list.map(async (order_by_shop) => {
 
             let order_items = order_by_shop.order_item_list;
@@ -507,6 +515,91 @@ const getCustomerOrderDetail = async (order_id) => {
     }
 }
 
+const getOrderItemInfoForRating = async (order_id) => {
+    try {
+
+        let order_item_list = await db.OrderItem.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'quantity', 'price'],
+            include: [
+                {
+                    model: db.Product,
+                    attributes: ['id', 'name'],
+                }
+            ],
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id
+                }
+            }
+        });
+
+        let product_review_data_raw = await db.OrderProductReview.findAll({
+            raw: true,
+            nest: true,
+            include: [
+                {
+                    model: db.ProductReview,
+                    attributes: ['id', 'rating','productID','comment'],
+                }
+            ],
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id
+                }
+            }
+        });
+
+        let product_review_data = await product_review_data_raw.map(item => {
+            return item.ProductReview;
+        })
+
+        let product_list = await order_item_list.map(order_item => {
+
+            let orderItem = order_item;
+            let productInfo = orderItem.Product;
+
+            let review = product_review_data.filter(item => item.productID === productInfo.id);
+
+            return {
+                id: productInfo.id,
+                name: productInfo.name,
+                review: review.length === 0 ? 
+                {
+                    id: 0,
+                    rating: 0,
+                    comment: ""
+                }
+                :
+                {
+                    id: review[0].id,
+                    rating: review[0].rating,
+                    comment: review[0].comment
+                }
+                
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                id: order_id,
+                product_list: product_list
+            },
+            EM: 'Order Items !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getShippingMethod = async () => {
     try {
 
@@ -626,5 +719,6 @@ const cancelOrderByCustomer = async (order_id) => {
 
 module.exports = {
     addNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod,
-    getCustomerOrderDetail, getOrderSearchByCustomer, cancelOrderByCustomer
+    getCustomerOrderDetail, getOrderSearchByCustomer, cancelOrderByCustomer,
+    getOrderItemInfoForRating
 }

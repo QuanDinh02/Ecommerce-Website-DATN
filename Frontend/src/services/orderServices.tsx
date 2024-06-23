@@ -45,6 +45,14 @@ export const getCustomerOrderDetail = async (order_id: number) => {
     return null;
 }
 
+export const getOrderItemInfoForRating = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/order/rating?id=${order_id}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
 export const customerCancelOrder = async (order_id: number) => {
     let result: APIResponse = await axios.delete(`/api/order/cancel/${order_id}`);
     return result;

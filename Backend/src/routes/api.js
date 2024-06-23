@@ -100,6 +100,7 @@ const ApiRoute = (app) => {
     router.delete('/order/cancel/:id', orderController.cancelOrderByCustomer);
     router.get('/order/search', orderController.getOrderSearchByCustomer);
     router.get('/order/detail', orderController.getCustomerOrderDetail);
+    router.get('/order/rating', orderController.getOrderItemInfoForRating);
     router.get('/order/shipping-method', orderController.getShippingMethod);
     router.get('/order/payment-method', orderController.getPaymentMethod);
 

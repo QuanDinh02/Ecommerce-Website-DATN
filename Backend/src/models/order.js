@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Order.hasMany(models.Shipment, { foreignKey: 'orderID' });
       Order.hasMany(models.OrderItem, { foreignKey: 'orderID' });
       Order.hasMany(models.PromotionOrder, { foreignKey: 'orderID' });
+      Order.hasMany(models.OrderProductReview, { foreignKey: 'orderID' });
     }
   }
   Order.init({

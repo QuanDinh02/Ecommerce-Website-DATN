@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         ProductReview.belongsTo(models.Customer, { foreignKey: 'customerID' });
         ProductReview.belongsTo(models.Seller, { foreignKey: 'shopID' });
         ProductReview.hasMany(models.Image, { foreignKey: 'productReviewID' });
+        ProductReview.hasOne(models.OrderProductReview, { foreignKey: 'productReviewID' });
     }
   }
   ProductReview.init({

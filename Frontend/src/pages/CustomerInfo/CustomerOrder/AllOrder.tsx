@@ -76,6 +76,13 @@ const AllOrder = () => {
         });
     }
 
+    const handleOrderItemRating = (order_id: number) => {
+        navigate({
+            pathname: "/customer-info/order/rating",
+            search: `?code=${order_id}`,
+        });
+    }
+
     const handleCancelOrder = async (order_id: number) => {
         if (order_id !== 0) {
             let result = await customerCancelOrder(order_id);
@@ -147,7 +154,7 @@ const AllOrder = () => {
                                         {
                                             orderList.map((item, index) => {
                                                 return (
-                                                    <div className="order-item bg-white mb-6 p-5" key={`order-item-${item.id}`}>
+                                                    <div className="order-item bg-white mb-6 p-5 shadow-md rounded" key={`order-item-${item.id}`}>
                                                         <div className="order-item__header flex items-center justify-between border-b border-gray-200 pb-3">
                                                             <div className="info flex items-center gap-x-4">
                                                                 <div className="order-item__id flex items-center gap-x-1">
@@ -197,6 +204,10 @@ const AllOrder = () => {
                                                                 {
                                                                     item.status.id === 1 &&
                                                                     <Button styles="px-5 py-2 border border-gray-300 rounded text-gray-600 font-medium cursor-pointer hover:bg-red-500 hover:text-white hover:border-red-500 transition duration-200" OnClick={() => handleShowCancelModal(item.id)}>Hủy đơn hàng</Button>
+                                                                }
+                                                                {
+                                                                    item.status.id === 7 &&
+                                                                    <Button styles="px-6 py-2 bg-[#FCB800] font-medium w-fit cursor-pointer opacity-80 hover:opacity-100 rounded" OnClick={() => handleOrderItemRating(item.id)}>Đánh giá</Button>
                                                                 }
                                                                 <Button styles="px-6 py-2 bg-[#FCB800] font-medium w-fit cursor-pointer opacity-80 hover:opacity-100 rounded" OnClick={() => handleTrackingOrderDetail(item.id)}>Theo dõi chi tiết</Button>
                                                             </div>

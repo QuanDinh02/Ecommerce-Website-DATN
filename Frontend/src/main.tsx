@@ -44,6 +44,7 @@ import CustomerAccountInfo from '@/pages/CustomerInfo/CustomerAccount/CustomerAc
 import VoucherAll from '@/pages/CustomerInfo/Voucher/VoucherAll.tsx';
 import VoucherHistory from '@/pages/CustomerInfo/Voucher/VoucherHistory.tsx';
 import OrderTracking from '@/pages/CustomerInfo/CustomerOrder/OrderTracking.tsx';
+import OrderRating from '@/pages/CustomerInfo/CustomerOrder/OrderItemRating/OrderRating.tsx';
 
 //SELLER
 import SellerInfo from '@/pages/SellerInfo/SellerInfo.tsx';
@@ -96,7 +97,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-
 
 const router = createBrowserRouter(
   [
@@ -244,6 +244,10 @@ const router = createBrowserRouter(
             {
               path: "order/tracking-detail",
               element: <OrderTracking />,
+            },
+            {
+              path: "order/rating",
+              element: <OrderRating/>,
             },
             {
               path: "voucher",

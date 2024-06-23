@@ -433,6 +433,17 @@ const handleConfirmCompleteShippingOrder = async (order_id) => {
 
         let date = new Date();
 
+        await db.Transaction.update({
+            status: 2,
+            updatedAt: date
+        }, {
+            where: {
+                orderID: {
+                    [Op.eq]: order_id,
+                },
+            }
+        });
+
         let result = await db.Shipment.create({
             status: 7, // 7 - Giao hàng thành công
             updatedDate: date,
@@ -465,6 +476,6 @@ const handleConfirmCompleteShippingOrder = async (order_id) => {
 }
 
 module.exports = {
-    getShippingUnitList, getOrderStatus, getOrderDetail, 
+    getShippingUnitList, getOrderStatus, getOrderDetail,
     confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder
 }
