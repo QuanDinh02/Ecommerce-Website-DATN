@@ -179,6 +179,7 @@ const LoginPage = () => {
                     }));
                 }
 
+                navigate('/');
             }
             else if (userData.role === "seller") {
                 let data = {
@@ -192,6 +193,7 @@ const LoginPage = () => {
                 }
 
                 dispatch(UserLogin(data));
+                navigate('/seller-info/dashboard');
             }
             else {
                 let data = {

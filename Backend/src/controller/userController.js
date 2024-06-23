@@ -10,7 +10,7 @@ const handleUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 }) // 60 * 60 * 1000
+                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: 86400000 }) // 60 * 60 * 1000
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -35,11 +35,11 @@ const handleSystemUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userSystemLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 })
+                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: 86400000 })
             }
             return res.status(200).json({
                 EC: result.EC,
-                DT: result.DT,
+                DT: "",
                 EM: result.EM
             })
         }
@@ -76,6 +76,25 @@ const handleUserRegister = async (req, res) => {
 const handleUserLogout = async (req, res) => {
     try {
         res.clearCookie("jwt");
+        return res.status(200).json({
+            EC: 0,
+            DT: "",
+            EM: 'Đăng xuất thành công !'
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "Error from server !"
+        })
+    }
+}
+
+const handleSystemUserLogout = async (req, res) => {
+    try {
+        res.clearCookie("jwtsys");
         return res.status(200).json({
             EC: 0,
             DT: "",
@@ -167,5 +186,6 @@ const checkSellerEmailExist = async (req, res) => {
 }
 module.exports = {
     handleUserLogin, handleUserRegister, handleUserLogout, handleFetchUserAccount,
-    handleChangeUserPassword, checkCustomerEmailExist, checkSellerEmailExist, handleSystemUserLogin
+    handleChangeUserPassword, checkCustomerEmailExist, checkSellerEmailExist, handleSystemUserLogin,
+    handleSystemUserLogout
 }

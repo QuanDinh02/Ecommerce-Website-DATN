@@ -14,7 +14,7 @@ import recommendProductController from '../controller/recommendProductController
 import locationController from '../controller/locationController';
 import imageController from '../controller/imageController';
 import sellerController from '../controller/sellerController';
-import { checkUserJWT } from '../middleware/jwt';
+import { checkUserJWT, checkSysUserJWT } from '../middleware/jwt';
 import { cacheMiddleware } from '../middleware/cache';
 import shippingUnitController from '../controller/shippingUnitController';
 
@@ -31,10 +31,12 @@ const ApiRoute = (app) => {
     router.get('/user/register/email-validate', userController.checkCustomerEmailExist);
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
-    router.post('/user/sys/login', userController.handleSystemUserLogin);
     router.get('/user/logout', userController.handleUserLogout);
 
+    router.post('/user/sys/login', userController.handleSystemUserLogin);
+    router.get('/user/sys/logout', userController.handleSystemUserLogout);
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
+    router.get('/user/sys/account', checkSysUserJWT, userController.handleFetchUserAccount);
 
     router.put('/user/password', userController.handleChangeUserPassword);
 
@@ -145,6 +147,8 @@ const ApiRoute = (app) => {
 
     // SHIPPING UNIT
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
+    router.get('/shipping-unit/order', checkSysUserJWT, shippingUnitController.getOrderStatus);
+    router.get('/shipping-unit/order/detail', checkSysUserJWT, shippingUnitController.getOrderDetail);
 
     return app.use('/api', router);
 }

@@ -8,10 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
 import { useImmer } from "use-immer";
 import Button from "@/components/Button";
-import Modal from "@/components/Modal";
-import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import DatePicker from "react-datepicker";
 import { IoSearch, IoFilterOutline } from "react-icons/io5";
+import { getOrderStatus } from "@/services/shippingUnitService";
 interface IOrderShipmentStatus {
     id: number
     name: string
@@ -21,6 +20,8 @@ interface IOrder {
     orderDate: Date
     status: IOrderShipmentStatus
     totalPrice: number
+    customer_name: string
+    seller_name: string
 }
 
 interface IData {
@@ -33,24 +34,32 @@ interface IData {
 const tableHeaders = [
     {
         name: "Ngày",
-        size: 2
+        size: 1
     },
     {
         name: "Mã đơn hàng",
+        size: 1
+    },
+    {
+        name: "Người bán",
+        size: 2
+    },
+    {
+        name: "Người mua",
         size: 2
     },
     {
         name: "Trạng thái đơn hàng",
-        size: 2
+        size: 3
     },
     {
         name: "Tổng",
-        size: 1
+        size: 2
     },
     {
         name: "",
-        size: 2
-    }
+        size: 1
+    },
 ];
 
 const ORDER_STATUS = [
@@ -60,23 +69,13 @@ const ORDER_STATUS = [
         selected: true
     },
     {
-        id: 1,
-        name: "Chờ xác nhận",
-        selected: false
-    },
-    {
-        id: 2,
-        name: "Đã xác nhận",
-        selected: false
-    },
-    {
         id: 3,
-        name: "Đang đóng gói",
+        name: "Chờ lấy hàng",
         selected: false
     },
     {
         id: 4,
-        name: "Lấy hàng",
+        name: "Đã Lấy hàng",
         selected: false
     },
     {
@@ -95,23 +94,13 @@ const ORDER_STATUS = [
         selected: false
     },
     {
-        id: 8,
-        name: "Giao hàng thất bại",
-        selected: false
-    },
-    {
         id: 9,
         name: "Đang trả hàng cho nhà bán",
         selected: false
-    },
-    {
-        id: 10,
-        name: "Đã hủy(Chưa giao hàng)",
-        selected: false
-    },
+    }
 ];
 
-const AllOrder = () => {
+const SUOrderStatus = () => {
 
     const navigate = useNavigate();
 
@@ -121,8 +110,6 @@ const AllOrder = () => {
     const [startDate, endDate] = dateRange;
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
-    const [showConfirmBox, setShowConfirmBox] = React.useState<boolean>(false);
-    const [showPackingBox, setShowPackingBox] = React.useState<boolean>(false);
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
@@ -133,7 +120,6 @@ const AllOrder = () => {
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
 
     const [orderStatus, setOrderStatus] = useImmer(ORDER_STATUS);
-    const [updateOrder, setUpdateOrder] = React.useState<number>(0);
 
     const hanldeSetOrderStatus = (id: number) => {
         setOrderCurrentStatus(id);
@@ -150,7 +136,7 @@ const AllOrder = () => {
 
     const handleShowOrderDetail = (order_id: number) => {
         navigate({
-            pathname: "/seller-info/order/detail",
+            pathname: "/fms/su/order/detail",
             search: `?code=${order_id}`,
         });
     }
@@ -161,55 +147,13 @@ const AllOrder = () => {
     }
 
     const fetchAllOrder = async (limit: number, page: number, status: number) => {
-        let response: IData = await getOrderAll(limit, page, status);
+        let response: IData = await getOrderStatus(limit, page, status);
         if (response) {
             setOrderList(response.order_list);
             setTotalPages(response.page_total);
             setTimeout(() => {
                 setDataLoading(false);
             }, 500);
-        }
-    }
-
-    const handleShowConfirmBox = (order_id: number) => {
-        setUpdateOrder(order_id);
-        setShowConfirmBox(true);
-    }
-
-    const handleShowPackingBox = (order_id: number) => {
-        setUpdateOrder(order_id);
-        setShowPackingBox(true);
-    }
-
-    const handleConfirmOrder = async (order_id: number, packing: boolean) => {
-        let result = await confirmCustomerOrder(order_id, packing);
-        if (result) {
-            if (result.EC === 0) {
-                successToast1(result.EM);
-                setShowConfirmBox(false);
-                setUpdateOrder(0);
-                fetchAllOrder(showItem, currentPage, orderCurrentStatus);
-            } else {
-                errorToast1(result.EM);
-                setShowConfirmBox(false);
-                setUpdateOrder(0);
-            }
-        }
-    }
-
-    const handlePackingOrder = async (order_id: number) => {
-        let result = await packingCustomerOrder(order_id);
-        if (result) {
-            if (result.EC === 0) {
-                successToast1(result.EM);
-                setShowPackingBox(false);
-                setUpdateOrder(0);
-                fetchAllOrder(showItem, currentPage, orderCurrentStatus);
-            } else {
-                errorToast1(result.EM);
-                setShowPackingBox(false);
-                setUpdateOrder(0);
-            }
         }
     }
 
@@ -259,17 +203,17 @@ const AllOrder = () => {
                             dateFormat="dd/MM/yyyy"
                         />
                     </div>
-                    <Button styles="bg-[#FCB800] px-4 py-1.5 rounded hover:opacity-80 cursor-pointer flex items-center gap-x-2 font-medium"><IoFilterOutline /> Xem</Button>
+                    <Button styles="bg-blue-600 text-white px-4 py-1.5 rounded hover:opacity-80 cursor-pointer flex items-center gap-x-2 font-medium"><IoFilterOutline /> Xem</Button>
                 </div>
             </div>
             <div className="tab-list w-full mb-2">
-                <div className="flex mb-5 border-b border-gray-200 w-full overflow-x-scroll pb-2">
+                <div className="flex mb-5 border-b border-gray-200 w-full overflow-x-auto">
                     {
                         orderStatus && orderStatus.length > 0 &&
                         orderStatus.map((item, index) => {
                             if (item.selected) {
                                 return (
-                                    <div className="shrink-0 px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-bold cursor-pointer flex gap-x-1 items-center justify-center" key={`detail-${item.id}`}>
+                                    <div className="shrink-0 px-5 py-2 border-b-2 border-blue-600 text-blue-600 font-medium cursor-pointer flex gap-x-1 items-center justify-center" key={`detail-${item.id}`}>
                                         <div>{item.name}</div>
                                     </div>
                                 )
@@ -323,46 +267,37 @@ const AllOrder = () => {
                                             {orderList.map((item, index) => {
                                                 return (
                                                     <tr className="border-b border-gray-200 text-sm hover:bg-gray-100" key={`product-${index}`}>
-                                                        <td className="py-4 px-2" colSpan={2}>{dateTimeFormat(`${item.orderDate}`)}</td>
-                                                        <td className="py-4 px-2 " colSpan={2}>
+                                                        <td className="py-4 px-3" colSpan={1}>{dateTimeFormat(`${item.orderDate}`)}</td>
+                                                        <td className="py-4 px-3 " colSpan={1}>
                                                             <span className="flex items-center gap-x-1">
                                                                 {item.id} <span className="cursor-pointer"><CopyClipboard value={item.id} /></span>
                                                             </span>
                                                         </td>
-                                                        <td className="py-4 px-2" colSpan={2}>
-                                                            <span>{item.status.name}</span>
+                                                        <td className="py-4 px-3" colSpan={2}>
+                                                            <span className="line-clamp-2">{item.seller_name}</span>
                                                         </td>
-                                                        <td className="py-4 px-2 font-medium" colSpan={1}>{CurrencyFormat(item.totalPrice)}</td>
-                                                        <td className="py-4 px-2" colSpan={1}>
+                                                        <td className="py-4 px-3" colSpan={2}>
+                                                            <span className="line-clamp-2">{item.customer_name}</span>
+                                                        </td>
+                                                        <td className="py-4 px-3" colSpan={3}>
                                                             {
-                                                                item.status.id === 1 &&
-                                                                <Button
-                                                                    styles="border border-green-600 px-4 py-1.5 text-green-600 transition duration-300 hover:bg-green-600 hover:text-white w-fit cursor-pointer font-medium rounded"
-                                                                    OnClick={() => handleShowConfirmBox(item.id)}
-                                                                >
-                                                                    <span>XN đơn hàng</span>
-                                                                </Button>
-                                                            }
-                                                            {
-                                                                item.status.id === 2 &&
-                                                                <Button
-                                                                    styles="border border-blue-600 px-4 py-1.5 text-blue-600 transition duration-300 hover:bg-blue-600 hover:text-white w-fit cursor-pointer font-medium rounded"
-                                                                    OnClick={() => handleShowPackingBox(item.id)}
-                                                                >
-                                                                    <span>Đóng gói</span>
-                                                                </Button>
+                                                                item.status.id === 3 ?
+                                                                    <span>Chờ lấy hàng</span>
+                                                                    :
+                                                                    <span>{item.status.name}</span>
                                                             }
                                                         </td>
-                                                        <td className="py-4 px-2" colSpan={1} >
+                                                        <td className="py-4 px-3 font-medium" colSpan={2}>{CurrencyFormat(item.totalPrice)}</td>
+                                                        <td className="py-4 px-3" colSpan={1} >
                                                             <span className="cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleShowOrderDetail(item.id)}>Xem chi tiết</span>
                                                         </td>
                                                     </tr>
                                                 )
                                             })}
                                             <tr>
-                                                <td colSpan={9}>
+                                                <td colSpan={12}>
                                                     {
-                                                        <div className='pagination-container my-4 flex justify-center'>
+                                                        <div className='pagination-sys-container my-4 flex justify-center'>
                                                             <ReactPaginate
                                                                 nextLabel=">"
                                                                 onPageChange={handlePageClick}
@@ -391,7 +326,7 @@ const AllOrder = () => {
                                         </>
                                         :
                                         <tr>
-                                            <td className="text-center py-3" colSpan={9}>
+                                            <td className="text-center py-3" colSpan={12}>
                                                 <div className="w-full text-gray-500 text-center py-2">Không có dữ liệu !</div>
                                             </td>
                                         </tr>
@@ -400,28 +335,9 @@ const AllOrder = () => {
                         </table>
                 }
             </div>
-            <Modal show={showConfirmBox} setShow={setShowConfirmBox} size="delete-confirmation-box">
-                <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
-                    <div className="text-xl">Xác nhận đơn hàng #{updateOrder}</div>
-                    <div className="flex items-center justify-end gap-x-2 transition-all">
-                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowConfirmBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, true)}>Xác nhận & Đóng gói</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-green-500 text-white hover:bg-green-600 cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, false)}>Xác nhận</Button>
-                    </div>
-                </div>
-            </Modal>
-            <Modal show={showPackingBox} setShow={setShowPackingBox} size="delete-confirmation-box">
-                <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
-                    <div className="text-xl">Đóng gói đơn hàng #{updateOrder}</div>
-                    <div className="flex items-center justify-end gap-x-2 transition-all">
-                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowPackingBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-blue-500 text-white hover:bg-blue-600 cursor-pointer duration-200 rounded" OnClick={() => handlePackingOrder(updateOrder)}>Đóng gói</Button>
-                    </div>
-                </div>
-            </Modal>
         </>
 
     )
 }
 
-export default AllOrder;
+export default SUOrderStatus;

@@ -65,6 +65,8 @@ import SellerControlDelivery from '@/pages/SellerInfo/SellerControlDellivery.tsx
 import SUMain from '@/pages/ShippingUnit/SUMain.tsx';
 import SUDashboard from '@/pages/ShippingUnit/SUDashboard.tsx';
 import SUOrderManagement from '@/pages/ShippingUnit/SUOrderManagement.tsx';
+import SUOrderStatus from '@/pages/ShippingUnit/SUOrderStatus.tsx';
+import SUOrderDetail from '@/pages/ShippingUnit/SUOrderDetail.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -80,6 +82,7 @@ import SystemReport from '@/pages/Management/SystemReport.tsx';
 import SellerRoute from '@/components/SellerRoute.tsx';
 import CustomerRoute from '@/components/CustomerRoute.tsx';
 import NewCustomer from '@/pages/NewCustomer.tsx';
+import ShippingUnitRoute from '@/components/ShippingUnitRoute.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -132,13 +135,13 @@ const router = createBrowserRouter(
                 },
                 {
                   path: "control-order-delivery",
-                  element: <SellerControlDelivery/>,
+                  element: <SellerControlDelivery />,
                 }
               ]
             },
             {
               path: "order/detail",
-              element: <OrderDetail/>
+              element: <OrderDetail />
             },
             { path: "profile", element: <SellerProfile /> },
             {
@@ -236,7 +239,7 @@ const router = createBrowserRouter(
             },
             {
               path: "order/tracking-detail",
-              element: <OrderTracking/>,
+              element: <OrderTracking />,
             },
             {
               path: "voucher",
@@ -364,23 +367,45 @@ const router = createBrowserRouter(
         },
         {
           path: "su",
-          element: <SUMain/>,
+          element:
+            <ShippingUnitRoute>
+              <SUMain />
+            </ShippingUnitRoute>
+          ,
           children: [
             {
               path: "dashboard",
-              element: <SUDashboard/>
+              element: <SUDashboard />
             },
             {
               path: "order",
-              element: <SUOrderManagement/>
+              element: <SUOrderManagement />,
+              children: [
+                {
+                  path: "order-status",
+                  element: <SUOrderStatus/>,
+                },
+                {
+                  path: "control-order-delivery",
+                  element: <SellerControlDelivery />,
+                },
+                {
+                  path: "detail",
+                  element: <SUOrderDetail/>
+                },
+              ]
             },
+            // {
+            //   path: "order/detail",
+            //   element: <SUOrderDetail/>
+            // },
           ]
         },
       ]
     },
     {
       path: "/new-customer",
-      element: <NewCustomer/>
+      element: <NewCustomer />
     },
     {
       path: "/fms/login",

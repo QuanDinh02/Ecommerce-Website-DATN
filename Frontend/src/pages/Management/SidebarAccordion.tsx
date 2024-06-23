@@ -46,7 +46,7 @@ const SidebarAccordionAccordionItem = ({ item, isOpen, onClick, parent_path }) =
             >
                 <p className="menu-content flex items-center gap-x-3">{sideBarItem.icon} {sideBarItem.name}</p>
                 {
-                    (parent_path === "/seller-info" && sideBarItem.children.length > 0) &&
+                    (parent_path === "/fms" && sideBarItem.children.length > 0) &&
                     <RiArrowDropDownLine className={`arrow ${isOpen ? "active" : ""}`} />
                 }
             </button>
@@ -65,7 +65,7 @@ const SidebarAccordionAccordionItem = ({ item, isOpen, onClick, parent_path }) =
                         sideBarItem.children && sideBarItem.children.length > 0 &&
                         sideBarItem.children.map(child_item => {
                             return (
-                                <div className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer text-[#FCB800]" : "py-3 pl-10 pr-4 cursor-pointer hover:text-[#FCB800] duration-200"} onClick={() => navigate(`${parent_path}${sideBarItem.path}${child_item.path}`)}>
+                                <div className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer text-blue-600 font-medium bg-gray-50" : "py-3 pl-10 pr-4 cursor-pointer hover:text-blue-600 duration-200 bg-gray-50"} onClick={() => navigate(`${parent_path}${sideBarItem.path}${child_item.path}`)}>
                                     {child_item.name}
                                 </div>
                             )
@@ -85,11 +85,7 @@ const SidebarAccordion = (props: IProps) => {
     const [activeIndex, setActiveIndex] = React.useState<number>(0);
 
     const handleItemClick = (index) => {
-        if(activeIndex === index) {
-            return;
-        } else {
-            setActiveIndex(index);
-        }
+        setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
     };
 
     React.useEffect(() => {

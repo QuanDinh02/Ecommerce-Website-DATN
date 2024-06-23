@@ -31,3 +31,37 @@ input::-ms-reveal,
 input::-ms-clear {
     display: none;
 }
+
+.pagination-sys-container {
+
+    .page-active-background {
+        background-color: #3b82f6 !important;
+        color           : white !important;
+        padding: 8px 12px;
+        border-radius: 4px;
+    }
+
+    .page-item {
+        padding: 6px;
+        border-radius: 4px;
+        font-size: 18px;
+        a {
+            color: rgb(88, 88, 88);
+        }
+        
+    }
+
+    .pre-next {
+        color: gray;
+    }
+
+    .page-background {
+        color           : black;
+        background-color: white;
+    }
+}
+
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}

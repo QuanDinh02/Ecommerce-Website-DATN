@@ -1,7 +1,11 @@
+import { Outlet } from "react-router-dom";
+import './SUOrderStatus.scss';
 
 const SUOrderManagement = () => {
     return (
-        <div className="bg-white">SU Order Management</div>
+        <div className="su-order-management-container py-4 px-5 bg-white">
+            <Outlet />
+        </div>
     )
 }
 

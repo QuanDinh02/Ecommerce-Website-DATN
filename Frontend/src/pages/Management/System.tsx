@@ -1,4 +1,4 @@
-; import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import { Toaster } from 'react-hot-toast';
 import 'swiper/css';
 import "react-datepicker/dist/react-datepicker.css";

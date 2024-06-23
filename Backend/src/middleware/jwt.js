@@ -54,4 +54,30 @@ const checkUserJWT = (req, res, next) => {
     }
 }
 
-module.exports = { createToken, verifyToken, checkUserJWT }
+const checkSysUserJWT = (req, res, next) => {
+    if (nonSecurePaths.includes(req.path)) {
+        return next();
+    }
+    let cookies = req.cookies;
+    if (cookies && cookies.jwtsys) {
+        let decoded = verifyToken(cookies.jwtsys);
+        if (decoded) {
+            req.user = decoded;
+            next();
+        } else {
+            return res.status(401).json({
+                EC: -1,
+                DT: {},
+                EM: "The user is unauthenticated !"
+            })
+        }
+    } else {
+        return res.status(401).json({
+            EC: -1,
+            DT: {},
+            EM: "The user is unauthenticated !"
+        })
+    }
+}
+
+module.exports = { createToken, verifyToken, checkUserJWT, checkSysUserJWT }

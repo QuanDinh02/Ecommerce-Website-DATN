@@ -405,10 +405,7 @@ const userSystemLogin = async (userData) => {
                         return {
                             EC: 0,
                             DT: {
-                                accessToken: accessToken,
-                                username: user.username,
-                                role: user.role,
-                                shipping_unit_id: shippingUnitInfo.id
+                                accessToken: accessToken
                             },
                             EM: 'Login success !'
                         }
