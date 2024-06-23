@@ -50,6 +50,10 @@ const tableHeaders = [
     {
         name: "",
         size: 2
+    },
+    {
+        name: "",
+        size: 1
     }
 ];
 
@@ -333,25 +337,27 @@ const AllOrder = () => {
                                                             <span>{item.status.name}</span>
                                                         </td>
                                                         <td className="py-4 px-2 font-medium" colSpan={1}>{CurrencyFormat(item.totalPrice)}</td>
-                                                        <td className="py-4 px-2" colSpan={1}>
-                                                            {
-                                                                item.status.id === 1 &&
-                                                                <Button
-                                                                    styles="border border-green-600 px-4 py-1.5 text-green-600 transition duration-300 hover:bg-green-600 hover:text-white w-fit cursor-pointer font-medium rounded"
-                                                                    OnClick={() => handleShowConfirmBox(item.id)}
-                                                                >
-                                                                    <span>XN đơn hàng</span>
-                                                                </Button>
-                                                            }
-                                                            {
-                                                                item.status.id === 2 &&
-                                                                <Button
-                                                                    styles="border border-blue-600 px-4 py-1.5 text-blue-600 transition duration-300 hover:bg-blue-600 hover:text-white w-fit cursor-pointer font-medium rounded"
-                                                                    OnClick={() => handleShowPackingBox(item.id)}
-                                                                >
-                                                                    <span>Đóng gói</span>
-                                                                </Button>
-                                                            }
+                                                        <td className="py-4 px-2" colSpan={2}>
+                                                            <div className="flex items-center justify-center">
+                                                                {
+                                                                    item.status.id === 1 &&
+                                                                    <Button
+                                                                        styles="border border-green-600 px-4 py-1.5 text-green-600 transition duration-300 hover:bg-green-600 hover:text-white w-fit cursor-pointer font-medium rounded"
+                                                                        OnClick={() => handleShowConfirmBox(item.id)}
+                                                                    >
+                                                                        <span>XN đơn hàng</span>
+                                                                    </Button>
+                                                                }
+                                                                {
+                                                                    item.status.id === 2 &&
+                                                                    <Button
+                                                                        styles="border border-blue-600 px-4 py-1.5 text-blue-600 transition duration-300 hover:bg-blue-600 hover:text-white w-fit cursor-pointer font-medium rounded"
+                                                                        OnClick={() => handleShowPackingBox(item.id)}
+                                                                    >
+                                                                        <span>Đóng gói</span>
+                                                                    </Button>
+                                                                }
+                                                            </div>
                                                         </td>
                                                         <td className="py-4 px-2" colSpan={1} >
                                                             <span className="cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleShowOrderDetail(item.id)}>Xem chi tiết</span>

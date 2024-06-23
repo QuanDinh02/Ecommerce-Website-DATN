@@ -67,6 +67,9 @@ import SUDashboard from '@/pages/ShippingUnit/SUDashboard.tsx';
 import SUOrderManagement from '@/pages/ShippingUnit/SUOrderManagement.tsx';
 import SUOrderStatus from '@/pages/ShippingUnit/SUOrderStatus.tsx';
 import SUOrderDetail from '@/pages/ShippingUnit/SUOrderDetail.tsx';
+import SUOrderReceipt from '@/pages/ShippingUnit/SUOrderReceipt.tsx';
+import SUOrderShipping from '@/pages/ShippingUnit/SUOrderShipping.tsx';
+import SUOrderComplete from '@/pages/ShippingUnit/SUOrderComplete.tsx';
 
 // FoxMart Management System
 import System from '@/pages/Management/System.tsx';
@@ -93,6 +96,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+
 
 const router = createBrowserRouter(
   [
@@ -386,8 +390,16 @@ const router = createBrowserRouter(
                   element: <SUOrderStatus/>,
                 },
                 {
-                  path: "control-order-delivery",
-                  element: <SellerControlDelivery />,
+                  path: "order-receipt",
+                  element: <SUOrderReceipt/>,
+                },
+                {
+                  path: "order-shipping",
+                  element: <SUOrderShipping/>,
+                },
+                {
+                  path: "order-complete",
+                  element: <SUOrderComplete/>,
                 },
                 {
                   path: "detail",
@@ -395,10 +407,6 @@ const router = createBrowserRouter(
                 },
               ]
             },
-            // {
-            //   path: "order/detail",
-            //   element: <SUOrderDetail/>
-            // },
           ]
         },
       ]

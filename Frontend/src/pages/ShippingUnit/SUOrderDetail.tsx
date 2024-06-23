@@ -113,7 +113,7 @@ const SUOrderDetail = () => {
                         <ThreeDots
                             height="80"
                             width="80"
-                            color="#FCB800"
+                            color="#9ca3af"
                             ariaLabel="three-dots-loading"
                             radius="1"
                             wrapperStyle={{}}

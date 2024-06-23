@@ -149,6 +149,9 @@ const ApiRoute = (app) => {
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
     router.get('/shipping-unit/order', checkSysUserJWT, shippingUnitController.getOrderStatus);
     router.get('/shipping-unit/order/detail', checkSysUserJWT, shippingUnitController.getOrderDetail);
+    router.put('/shipping-unit/order/received-confirmation', checkSysUserJWT, shippingUnitController.confirmReceiveOrderSeller);
+    router.put('/shipping-unit/order/shipping', checkSysUserJWT, shippingUnitController.handleShippingOrder);
+    router.put('/shipping-unit/order/complete-shipping', checkSysUserJWT, shippingUnitController.handleConfirmCompleteShippingOrder);
 
     return app.use('/api', router);
 }

@@ -309,21 +309,13 @@ const userLogin = async (userData) => {
                         }
                     }
 
-                    let payload = {
-                        username: user.username,
-                        role: user.role,
-                        isAuthenticated: true,
-                    }
+                    else {
+                        return {
+                            EC: 1,
+                            DT: '',
+                            EM: 'Your username or password is incorrect !'
 
-                    let accessToken = createToken(payload);
-                    return {
-                        EC: 0,
-                        DT: {
-                            accessToken: accessToken,
-                            username: user.username,
-                            role: user.role,
-                        },
-                        EM: 'Login success !'
+                        }
                     }
                 }
 
@@ -408,6 +400,14 @@ const userSystemLogin = async (userData) => {
                                 accessToken: accessToken
                             },
                             EM: 'Login success !'
+                        }
+                    }
+                    else {
+                        return {
+                            EC: 1,
+                            DT: '',
+                            EM: 'Your username or password is incorrect !'
+
                         }
                     }
                 }

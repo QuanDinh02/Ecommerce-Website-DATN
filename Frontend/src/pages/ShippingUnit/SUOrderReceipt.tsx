@@ -5,11 +5,12 @@ import React from "react";
 import { dateTimeFormat } from "@/utils/dateFormat";
 import { useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
-import { useImmer } from "use-immer";
 import Button from "@/components/Button";
 import DatePicker from "react-datepicker";
 import { IoSearch, IoFilterOutline } from "react-icons/io5";
-import { getOrderStatus } from "@/services/shippingUnitService";
+import { confirmReceiveOrderSeller, getOrderStatus } from "@/services/shippingUnitService";
+import Modal from "@/components/Modal";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 interface IOrderShipmentStatus {
     id: number
     name: string
@@ -61,45 +62,9 @@ const tableHeaders = [
     },
 ];
 
-const ORDER_STATUS = [
-    {
-        id: 0,
-        name: "Tất cả",
-        selected: true
-    },
-    {
-        id: 3,
-        name: "Chờ lấy hàng",
-        selected: false
-    },
-    {
-        id: 4,
-        name: "Đã Lấy hàng",
-        selected: false
-    },
-    {
-        id: 5,
-        name: "Lấy hàng thất bại",
-        selected: false
-    },
-    {
-        id: 6,
-        name: "Đang giao hàng",
-        selected: false
-    },
-    {
-        id: 7,
-        name: "Giao hàng thành công",
-        selected: false
-    },
-    {
-        id: 9,
-        name: "Đang trả hàng cho nhà bán",
-        selected: false
-    }
-];
+const ORDER_STATUS = 3
 
-const SUOrderStatus = () => {
+const SUOrderReceipt = () => {
 
     const navigate = useNavigate();
 
@@ -109,29 +74,14 @@ const SUOrderStatus = () => {
     const [startDate, endDate] = dateRange;
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+    const [showConfirmBox, setShowConfirmBox] = React.useState<boolean>(false);
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
     const [showItem, setShowItem] = React.useState<number>(10);
 
-    const [orderCurrentStatus, setOrderCurrentStatus] = React.useState<number>(0);
-
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
-
-    const [orderStatus, setOrderStatus] = useImmer(ORDER_STATUS);
-
-    const hanldeSetOrderStatus = (id: number) => {
-        setOrderCurrentStatus(id);
-        setOrderStatus(draft => {
-            draft.forEach(item => {
-                if (item.id === id) {
-                    item.selected = true;
-                } else {
-                    item.selected = false;
-                }
-            });
-        });
-    }
+    const [updateOrder, setUpdateOrder] = React.useState<number>(0);
 
     const handleShowOrderDetail = (order_id: number) => {
         navigate({
@@ -156,11 +106,35 @@ const SUOrderStatus = () => {
         }
     }
 
+    const handleShowConfirmBox = (order_id: number) => {
+        setUpdateOrder(order_id);
+        setShowConfirmBox(true);
+    }
+
+    const handleConfirmOrder = async (order_id: number, order_status: number) => {
+
+        // order_status: 4 - Đã lấy hàng, 5 - Lấy hàng thất bại
+
+        let result = await confirmReceiveOrderSeller(order_id, order_status);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setShowConfirmBox(false);
+                setUpdateOrder(0);
+                fetchAllOrder(showItem, currentPage, ORDER_STATUS);
+            } else {
+                errorToast1(result.EM);
+                setShowConfirmBox(false);
+                setUpdateOrder(0);
+            }
+        }
+    }
+
     React.useEffect(() => {
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         setDataLoading(true);
-        fetchAllOrder(showItem, currentPage, orderCurrentStatus);
+        fetchAllOrder(showItem, currentPage, ORDER_STATUS);
 
     }, [currentPage]);
 
@@ -169,14 +143,14 @@ const SUOrderStatus = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         setDataLoading(true);
         setCurrentPage(1);
-        fetchAllOrder(showItem, 1, orderCurrentStatus);
+        fetchAllOrder(showItem, 1, ORDER_STATUS);
 
-    }, [orderCurrentStatus]);
+    }, [ORDER_STATUS]);
 
     return (
         <>
             <div className="search-bar flex items-center justify-between mb-4">
-                <div className="text-xl w-1/3">Trạng thái đơn hàng</div>
+                <div className="text-xl w-1/3">Lấy hàng nhà bán</div>
                 <div className="flex items-center justify-between gap-x-16 w-2/3">
                     <div className="flex items-center gap-x-2 flex-1">
                         <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 rounded">
@@ -203,31 +177,6 @@ const SUOrderStatus = () => {
                         />
                     </div>
                     <Button styles="bg-blue-600 text-white px-4 py-1.5 rounded hover:opacity-80 cursor-pointer flex items-center gap-x-2 font-medium"><IoFilterOutline /> Xem</Button>
-                </div>
-            </div>
-            <div className="tab-list w-full mb-2">
-                <div className="flex mb-5 border-b border-gray-200 w-full overflow-x-auto">
-                    {
-                        orderStatus && orderStatus.length > 0 &&
-                        orderStatus.map((item, index) => {
-                            if (item.selected) {
-                                return (
-                                    <div className="shrink-0 px-5 py-2 border-b-2 border-blue-600 text-blue-600 font-medium cursor-pointer flex gap-x-1 items-center justify-center" key={`detail-${item.id}`}>
-                                        <div>{item.name}</div>
-                                    </div>
-                                )
-                            }
-                            return (
-                                <div
-                                    className="shrink-0 px-5 py-2 border-b-2 border-white cursor-pointer flex gap-x-1 items-center justify-center"
-                                    key={`detail-${item.id}`}
-                                    onClick={() => hanldeSetOrderStatus(item.id)}
-                                >
-                                    <div>{item.name}</div>
-                                </div>
-                            )
-                        })
-                    }
                 </div>
             </div>
             <div>
@@ -279,15 +228,12 @@ const SUOrderStatus = () => {
                                                             <span className="line-clamp-2">{item.customer_name}</span>
                                                         </td>
                                                         <td className="py-4 px-3" colSpan={3}>
-                                                            {
-                                                                item.status.id === 3 && <span>Chờ lấy hàng</span>
-                                                            }
-                                                            {
-                                                                item.status.id === 4 && <span>Đã lấy hàng</span>
-                                                            }
-                                                            {
-                                                                item.status.id !== 3 && item.status.id !== 4 && <span>{item.status.name}</span>
-                                                            }
+                                                            <Button
+                                                                styles="border border-green-600 px-4 py-1.5 text-green-600 transition duration-300 hover:bg-green-600 hover:text-white w-fit cursor-pointer font-medium rounded"
+                                                                OnClick={() => handleShowConfirmBox(item.id)}
+                                                            >
+                                                                <span>XN lấy hàng</span>
+                                                            </Button>
                                                         </td>
                                                         <td className="py-4 px-3 font-medium" colSpan={1}>{CurrencyFormat(item.totalPrice)}</td>
                                                         <td className="py-4 px-3 text-end" colSpan={2} >
@@ -337,9 +283,19 @@ const SUOrderStatus = () => {
                         </table>
                 }
             </div>
+            <Modal show={showConfirmBox} setShow={setShowConfirmBox} size="delete-confirmation-box">
+                <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
+                    <div className="text-xl">Xác nhận lấy đơn hàng #{updateOrder}</div>
+                    <div className="flex items-center justify-end gap-x-2 transition-all">
+                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowConfirmBox(false)}>Hủy</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, 5)}>Trả hàng</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-green-500 text-white hover:bg-green-600 cursor-pointer duration-200 rounded" OnClick={() => handleConfirmOrder(updateOrder, 4)}>Xác nhận</Button>
+                    </div>
+                </div>
+            </Modal>
         </>
 
     )
 }
 
-export default SUOrderStatus;
+export default SUOrderReceipt;

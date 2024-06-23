@@ -62,6 +62,73 @@ const getOrderDetail = async (req, res) => {
     }
 }
 
+const confirmReceiveOrderSeller = async (req, res) => {
+    try {
+        let { id, order_status } = req.body;
+        let result = await shippingUnitServices.confirmReceiveOrderSeller(+id, +order_status);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleShippingOrder = async (req, res) => {
+    try {
+        let { id } = req.body;
+        let result = await shippingUnitServices.handleShippingOrder(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const handleConfirmCompleteShippingOrder = async (req, res) => {
+    try {
+        let { id } = req.body;
+        let result = await shippingUnitServices.handleConfirmCompleteShippingOrder(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
-    getShippingUnitList, getOrderStatus, getOrderDetail
+    getShippingUnitList, getOrderStatus, getOrderDetail, 
+    confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder
 }

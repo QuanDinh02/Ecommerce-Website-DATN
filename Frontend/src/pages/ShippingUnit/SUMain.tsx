@@ -58,7 +58,7 @@ const SideBar: ISideBarItem[] = [
                 name: "Giao hàng",
             },
             {
-                path: "/order-shipping-confirm",
+                path: "/order-complete",
                 name: "Xác nhận giao hàng",
             }
         ]

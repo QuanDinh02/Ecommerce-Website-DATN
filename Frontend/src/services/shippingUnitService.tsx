@@ -24,3 +24,18 @@ export const getSUOrderDetail = async (order_id: number) => {
     }
     return null;
 }
+
+export const confirmReceiveOrderSeller = async (order_id: number, order_status: number) => {
+    let result: APIResponse = await axios.put('/api/shipping-unit/order/received-confirmation', { id: order_id, order_status: order_status });
+    return result;
+}
+
+export const handleShippingOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.put('/api/shipping-unit/order/shipping', { id: order_id });
+    return result;
+}
+
+export const handleCompleteShippingOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.put('/api/shipping-unit/order/complete-shipping', { id: order_id });
+    return result;
+}

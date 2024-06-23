@@ -6,13 +6,13 @@ import "react-datepicker/dist/react-datepicker.css";
 const System = () => {
 
   return (
-    <div>
+    <>
       <Outlet />
       <Toaster
         position="top-center"
         reverseOrder={false}
       />
-    </div>
+    </>
   )
 }
 

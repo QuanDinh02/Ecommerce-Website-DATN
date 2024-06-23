@@ -354,7 +354,117 @@ const getOrderDetail = async (order_id) => {
     }
 }
 
+const confirmReceiveOrderSeller = async (order_id, order_status) => {
+    try {
+
+        // order_status: 4 - Đã lấy hàng, 5 - Lấy hàng thất bại
+
+        let date = new Date();
+
+        let result = await db.Shipment.create({
+            status: order_status,
+            updatedDate: date,
+            orderID: order_id
+        });
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Xác nhận lấy hàng thành công'
+            }
+        }
+        else {
+            return {
+                EC: -1,
+                DT: '',
+                EM: 'Xác nhận lấy hàng thất bại'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const handleShippingOrder = async (order_id) => {
+    try {
+
+        let date = new Date();
+
+        let result = await db.Shipment.create({
+            status: 6, // 6 - Đang giao hàng
+            updatedDate: date,
+            orderID: order_id
+        });
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Đơn hàng đang giao'
+            }
+        }
+        else {
+            return {
+                EC: -1,
+                DT: '',
+                EM: 'Đơn hàng không thể giao'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const handleConfirmCompleteShippingOrder = async (order_id) => {
+    try {
+
+        let date = new Date();
+
+        let result = await db.Shipment.create({
+            status: 7, // 7 - Giao hàng thành công
+            updatedDate: date,
+            orderID: order_id
+        });
+
+        if (result) {
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Giao hàng thành công'
+            }
+        }
+        else {
+            return {
+                EC: -1,
+                DT: '',
+                EM: 'Lỗi xác nhận giao hàng'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
 
 module.exports = {
-    getShippingUnitList, getOrderStatus, getOrderDetail
+    getShippingUnitList, getOrderStatus, getOrderDetail, 
+    confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder
 }
