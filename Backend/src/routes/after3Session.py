@@ -208,7 +208,7 @@ def get_predicted_ratings(user_id, item_ids, mysql_config={}):
 if __name__ == "__main__":
     mysql_config = {
         'user': 'root',
-        'password': 'Password@123',
+        'password': '1234',
         'host': 'localhost',
         'database': 'ecommerce',
     }

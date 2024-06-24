@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     mysql_config = {
         'user': 'root',
-        'password': 'Password@123',
+        'password': '1234',
         'host': 'localhost',
         'database': 'ecommerce',
     }
