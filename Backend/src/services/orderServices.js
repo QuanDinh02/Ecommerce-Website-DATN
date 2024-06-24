@@ -143,7 +143,7 @@ const addNewOrder = async (orderData, session_id) => {
     }
 }
 
-const getOrderByCustomer = async (customer_id) => {
+const getOrderByCustomer = async (customer_id, status) => {
     try {
 
         let order_list = await db.Order.findAll({
@@ -243,10 +243,23 @@ const getOrderByCustomer = async (customer_id) => {
             }
         }))
 
-        return {
-            EC: 0,
-            DT: order_detail_list,
-            EM: 'Tất cả đơn hàng của khách hàng !'
+        if (status === 0) {
+            return {
+                EC: 0,
+                DT: order_detail_list,
+                EM: 'Tất cả đơn hàng của khách hàng !'
+            }
+        }
+
+        else {
+
+            let filter_order_list = order_detail_list.filter(order => order.status.id === status);
+
+            return {
+                EC: 0,
+                DT: filter_order_list,
+                EM: ''
+            }
         }
 
     } catch (error) {
@@ -537,7 +550,7 @@ const getOrderItemInfoForRating = async (order_id) => {
             }
         });
 
-        if(orderStatus) {
+        if (orderStatus) {
 
             let order_item_list = await db.OrderItem.findAll({
                 raw: true,
@@ -555,7 +568,7 @@ const getOrderItemInfoForRating = async (order_id) => {
                     }
                 }
             });
-    
+
             let product_review_data_raw = await db.OrderProductReview.findAll({
                 raw: true,
                 nest: true,
@@ -571,18 +584,18 @@ const getOrderItemInfoForRating = async (order_id) => {
                     }
                 }
             });
-    
+
             let product_review_data = await product_review_data_raw.map(item => {
                 return item.ProductReview;
             })
-    
+
             let product_list = await order_item_list.map(order_item => {
-    
+
                 let orderItem = order_item;
                 let productInfo = orderItem.Product;
-    
+
                 let review = product_review_data.filter(item => item.productID === productInfo.id);
-    
+
                 return {
                     id: productInfo.id,
                     name: productInfo.name,
@@ -598,10 +611,10 @@ const getOrderItemInfoForRating = async (order_id) => {
                             rating: review[0].rating,
                             comment: review[0].comment
                         }
-    
+
                 }
             });
-    
+
             return {
                 EC: 0,
                 DT: {
@@ -651,24 +664,24 @@ const customerRatingProduct = async (data, customer_id) => {
                 updatedAt: date
             });
 
-            if(review_info) {
+            if (review_info) {
                 let reviewInfo = review_info.dataValues;
 
                 await db.OrderProductReview.create({
                     orderID: +order_id,
                     productReviewID: +reviewInfo.id
                 })
-    
+
                 return {
                     EC: 0,
                     DT: {
-                        id: product_data.id, 
+                        id: product_data.id,
                         name: product_data.name,
                         review: {
                             id: +reviewInfo.id,
                             rating: +reviewInfo.rating,
                             comment: reviewInfo.comment
-                        } 
+                        }
                     },
                     EM: 'Đã đánh giá sản phẩm !'
                 }

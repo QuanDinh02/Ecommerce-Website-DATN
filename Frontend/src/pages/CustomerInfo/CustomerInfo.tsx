@@ -62,33 +62,9 @@ const SideBar: ISideBarItem[] = [
         skip: true,
         children: [
             {
-                path: "/all",
-                name: "Tất Cả",
-            },
-            {
-                path: "/pending-payment",
-                name: "Chờ thanh toán",
-            },
-            {
-                path: "/shipping",
-                name: "Vận chuyển",
-            },
-            {
-                path: "/pending-shipping",
-                name: "Chờ giao hàng",
-            },
-            {
-                path: "/completed-shipping",
-                name: "Đã giao hàng",
-            },
-            {
-                path: "/cancel",
-                name: "Đã hủy",
-            },
-            {
-                path: "/return",
-                name: "Trả hàng/ Hoàn tiền",
-            },
+                path: "/status",
+                name: "Trạng thái đơn hàng",
+            }
         ]
     },
     {

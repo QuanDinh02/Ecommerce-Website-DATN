@@ -34,12 +34,6 @@ import CustomerOrder from '@/pages/CustomerInfo/CustomerOrder.tsx';
 import VoucherPage from '@/pages/CustomerInfo/VoucherPage.tsx';
 import CustomerSupport from '@/pages/CustomerInfo/CustomerSupport.tsx';
 import AllOrder from '@/pages/CustomerInfo/CustomerOrder/AllOrder.tsx';
-import PendingPaymentOrder from '@/pages/CustomerInfo/CustomerOrder/PendingPaymentOrder.tsx';
-import PendingShippingOrder from '@/pages/CustomerInfo/CustomerOrder/PendingShippingOrder.tsx';
-import CompletedShippingOrder from '@/pages/CustomerInfo/CustomerOrder/CompletedShippingOrder.tsx';
-import CancelOrder from '@/pages/CustomerInfo/CustomerOrder/CancelOrder.tsx';
-import ReturnOrder from '@/pages/CustomerInfo/CustomerOrder/ReturnOrder.tsx';
-import ShippingOrder from '@/pages/CustomerInfo/CustomerOrder/ShippingOrder.tsx';
 import CustomerAccountInfo from '@/pages/CustomerInfo/CustomerAccount/CustomerAccountInfo.tsx';
 import VoucherAll from '@/pages/CustomerInfo/Voucher/VoucherAll.tsx';
 import VoucherHistory from '@/pages/CustomerInfo/Voucher/VoucherHistory.tsx';
@@ -212,32 +206,8 @@ const router = createBrowserRouter(
               element: <CustomerOrder />,
               children: [
                 {
-                  path: "all",
+                  path: "status",
                   element: <AllOrder />,
-                },
-                {
-                  path: "pending-payment",
-                  element: <PendingPaymentOrder />,
-                },
-                {
-                  path: "shipping",
-                  element: <ShippingOrder />,
-                },
-                {
-                  path: "pending-shipping",
-                  element: <PendingShippingOrder />,
-                },
-                {
-                  path: "completed-shipping",
-                  element: <CompletedShippingOrder />,
-                },
-                {
-                  path: "cancel",
-                  element: <CancelOrder />,
-                },
-                {
-                  path: "return",
-                  element: <ReturnOrder />,
                 }
               ]
             },

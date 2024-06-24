@@ -25,8 +25,9 @@ const createNewOrder = async (req, res) => {
 
 const getOrderByCustomer = async (req, res) => {
     try {
-        let { id } = req.query;
-        let result = await orderServices.getOrderByCustomer(id);
+        let { id, status } = req.query;
+
+        let result = await orderServices.getOrderByCustomer(+id, +status);
 
         return res.status(200).json({
             EC: result.EC,

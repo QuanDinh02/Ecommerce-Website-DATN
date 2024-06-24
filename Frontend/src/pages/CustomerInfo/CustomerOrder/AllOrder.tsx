@@ -5,19 +5,22 @@ import { IAccount } from "@/pages/Product/ProductDetailPage_types";
 import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
 import { customerCancelOrder, getAllOrderByCustomer, getSearchCustomerOrder } from "@/services/orderServices";
-import { IOrder } from "./OrderType";
+import { IOrder, ORDER_STATUS } from "./OrderType";
 import { dateFormat, dateTimeFormat } from "@/utils/dateFormat";
 import { ThreeDots } from "react-loader-spinner";
 import LoadImageS3 from "@/components/LoadImageS3";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LoadImage from "@/components/LoadImage";
 import { IoSearch } from "react-icons/io5";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
+import { useImmer } from "use-immer";
+import './CustomerOrder.scss';
 
 const AllOrder = () => {
 
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
 
     const [orderList, setOrderList] = React.useState<IOrder[]>([]);
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
@@ -26,16 +29,27 @@ const AllOrder = () => {
     const [search, setSearch] = React.useState<string>("");
     const [cancelOrder, setCancelOrder] = React.useState<number>(0);
 
+    const [orderStatus, setOrderStatus] = useImmer(ORDER_STATUS);
+    const [orderCurrentStatus, setOrderCurrentStatus] = React.useState<number>(0);
+
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
-    const fetchAllOrder = async (customer_id: number) => {
-        let response: any = await getAllOrderByCustomer(customer_id);
+    const hanldeSetOrderStatus = (id: number) => {
+
+        navigate({
+            pathname: "/customer-info/order/status",
+            search: `?status=${id}`,
+        });
+    }
+
+    const fetchOrder = async (customer_id: number, status: number) => {
+        let response: any = await getAllOrderByCustomer(customer_id, orderCurrentStatus);
         if (response && response.EC === 0) {
             setOrderList(response.DT);
             setTimeout(() => {
                 setDataLoading(false);
-            }, 1000);
+            }, 300);
         }
     }
 
@@ -53,7 +67,7 @@ const AllOrder = () => {
 
         if (event.key === 'Enter') {
             if (search === "") {
-                fetchAllOrder(account.customer_id);
+                fetchOrder(account.customer_id, orderCurrentStatus);
             }
             else {
                 setDataLoading(true);
@@ -91,7 +105,7 @@ const AllOrder = () => {
                     setShowCancelBox(false);
                     successToast1(result.EM);
                     setDataLoading(true);
-                    fetchAllOrder(account.customer_id);
+                    fetchOrder(account.customer_id, orderCurrentStatus);
                     setTimeout(() => {
                         setDataLoading(false);
                     }, 1000);
@@ -108,20 +122,65 @@ const AllOrder = () => {
     }
 
     React.useEffect(() => {
-        if (account && isAuthenticated) {
-            fetchAllOrder(account.customer_id);
+
+        let order_status = searchParams.get('status');
+        console.log("Check order status: ", order_status);
+
+        let activeOrderStatus: number = order_status ? +order_status : 0;
+        if (activeOrderStatus !== orderCurrentStatus) {
+            setOrderCurrentStatus(activeOrderStatus);
+            setOrderStatus(draft => {
+                draft.forEach(item => {
+                    if (item.id === activeOrderStatus) {
+                        item.selected = true;
+                    } else {
+                        item.selected = false;
+                    }
+                });
+            });
         }
-    }, []);
+
+    }, [searchParams.get('status')]);
 
     React.useEffect(() => {
+
+        setDataLoading(true);
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-    }, []);
+        if (account && isAuthenticated) {
+            fetchOrder(account.customer_id, orderCurrentStatus);
+        }
+
+    }, [orderCurrentStatus]);
 
     return (
         <>
-            <div className="all-order-container">
-                <div className="text-xl mb-4">Tất cả đơn hàng</div>
-                <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 mb-8">
+            <div className="customer-order-container">
+                <div className="tab-list w-full bg-white">
+                    <div className="flex w-full overflow-x-auto border-b border-gray-200 pb-2">
+                        {
+                            orderStatus && orderStatus.length > 0 &&
+                            orderStatus.map((item, index) => {
+                                if (item.selected) {
+                                    return (
+                                        <div className="shrink-0 px-8 py-3 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer flex gap-x-1 items-center justify-center" key={`detail-${item.id}`}>
+                                            <div>{item.name}</div>
+                                        </div>
+                                    )
+                                }
+                                return (
+                                    <div
+                                        className="shrink-0 px-8 py-3 border-b-2 border-white cursor-pointer flex gap-x-1 items-center justify-center"
+                                        key={`detail-${item.id}`}
+                                        onClick={() => hanldeSetOrderStatus(item.id)}
+                                    >
+                                        <div>{item.name}</div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+                <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 my-3">
                     <IoSearch className="text-gray-500 w-6 h-6" />
                     <input
                         value={search}
@@ -228,8 +287,8 @@ const AllOrder = () => {
                 <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
                     <div className="text-xl mt-2">Bạn muốn hủy đơn hàng này ?</div>
                     <div className="flex items-center justify-end gap-x-2 transition-all">
-                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowCancelBox(false)}>Hủy</Button>
-                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer duration-200" OnClick={() => handleCancelOrder(cancelOrder)}>Xóa</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowCancelBox(false)}>Trờ lại</Button>
+                        <Button styles="rounded-[4px] px-8 py-2 bg-red-500 text-white hover:bg-red-600 cursor-pointer duration-200" OnClick={() => handleCancelOrder(cancelOrder)}>Hủy đơn hàng</Button>
                     </div>
                 </div>
             </Modal>

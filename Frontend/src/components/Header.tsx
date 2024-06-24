@@ -615,7 +615,7 @@ const Header = () => {
                                                     <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer w-full' onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowInfoSettingBox(false);
-                                                        navigate("/customer-info/order/all");
+                                                        navigate("/customer-info/order/status");
                                                     }}>Đơn Hàng Của Tôi</div>
                                                 }
                                                 {

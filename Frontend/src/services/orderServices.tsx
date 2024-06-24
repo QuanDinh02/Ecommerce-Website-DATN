@@ -39,8 +39,8 @@ export const createNewOrder = async (data: IOrder) => {
     return result;
 }
 
-export const getAllOrderByCustomer = async (customer_id: number) => {
-    let result: APIResponse = await axios.get(`/api/order?id=${customer_id}`);
+export const getAllOrderByCustomer = async (customer_id: number, status: number) => {
+    let result: APIResponse = await axios.get(`/api/order?id=${customer_id}&status=${status}`);
     return result;
 }
 
