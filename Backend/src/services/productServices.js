@@ -844,6 +844,7 @@ const getProductReviews = async (product_id, item_limit, page) => {
                     model: db.Customer,
                     attributes: ['id', 'name']
                 },
+                order: [['createdAt', 'DESC']],
                 where: {
                     productID: {
                         [Op.eq]: product_id,
@@ -867,12 +868,13 @@ const getProductReviews = async (product_id, item_limit, page) => {
 
             const pageTotal = Math.ceil(productReviewList.length / item_limit);
 
-            let productListRaw = [];
+            let productReviewListRaw = [];
 
-            productListRaw = _.cloneDeep(productReviewList);
-            productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+            productReviewListRaw = _.cloneDeep(productReviewList);
+            
+            productReviewListRaw = _(productReviewListRaw).drop(offSet).take(item_limit).value();
 
-            let finalData = productListRaw.map(item => {
+            let finalData = productReviewListRaw.map(item => {
                 let customer = item.Customer;
                 if (!customer.id) {
                     delete item.Customer;

@@ -518,77 +518,109 @@ const getCustomerOrderDetail = async (order_id) => {
 const getOrderItemInfoForRating = async (order_id) => {
     try {
 
-        let order_item_list = await db.OrderItem.findAll({
+        let orderStatus = await db.Shipment.findOne({
             raw: true,
-            nest: true,
-            attributes: ['id', 'quantity', 'price'],
-            include: [
-                {
-                    model: db.Product,
-                    attributes: ['id', 'name'],
-                }
-            ],
             where: {
-                orderID: {
-                    [Op.eq]: +order_id
-                }
+                [Op.and]: [
+                    {
+                        status: {
+                            [Op.eq]: 7
+                        }
+                    },
+                    {
+                        orderID: {
+                            [Op.eq]: +order_id
+                        }
+                    }
+                ]
+
             }
         });
 
-        let product_review_data_raw = await db.OrderProductReview.findAll({
-            raw: true,
-            nest: true,
-            include: [
-                {
-                    model: db.ProductReview,
-                    attributes: ['id', 'rating', 'productID', 'comment'],
+        if(orderStatus) {
+
+            let order_item_list = await db.OrderItem.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'quantity', 'price'],
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: +order_id
+                    }
                 }
-            ],
-            where: {
-                orderID: {
-                    [Op.eq]: +order_id
+            });
+    
+            let product_review_data_raw = await db.OrderProductReview.findAll({
+                raw: true,
+                nest: true,
+                include: [
+                    {
+                        model: db.ProductReview,
+                        attributes: ['id', 'rating', 'productID', 'comment'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: +order_id
+                    }
                 }
-            }
-        });
-
-        let product_review_data = await product_review_data_raw.map(item => {
-            return item.ProductReview;
-        })
-
-        let product_list = await order_item_list.map(order_item => {
-
-            let orderItem = order_item;
-            let productInfo = orderItem.Product;
-
-            let review = product_review_data.filter(item => item.productID === productInfo.id);
-
+            });
+    
+            let product_review_data = await product_review_data_raw.map(item => {
+                return item.ProductReview;
+            })
+    
+            let product_list = await order_item_list.map(order_item => {
+    
+                let orderItem = order_item;
+                let productInfo = orderItem.Product;
+    
+                let review = product_review_data.filter(item => item.productID === productInfo.id);
+    
+                return {
+                    id: productInfo.id,
+                    name: productInfo.name,
+                    review: review.length === 0 ?
+                        {
+                            id: 0,
+                            rating: 0,
+                            comment: ""
+                        }
+                        :
+                        {
+                            id: review[0].id,
+                            rating: review[0].rating,
+                            comment: review[0].comment
+                        }
+    
+                }
+            });
+    
             return {
-                id: productInfo.id,
-                name: productInfo.name,
-                review: review.length === 0 ?
-                    {
-                        id: 0,
-                        rating: 0,
-                        comment: ""
-                    }
-                    :
-                    {
-                        id: review[0].id,
-                        rating: review[0].rating,
-                        comment: review[0].comment
-                    }
-
+                EC: 0,
+                DT: {
+                    id: order_id,
+                    product_list: product_list
+                },
+                EM: 'Order Items !'
             }
-        });
-
-        return {
-            EC: 0,
-            DT: {
-                id: order_id,
-                product_list: product_list
-            },
-            EM: 'Order Items !'
+        } else {
+            return {
+                EC: 0,
+                DT: {
+                    id: order_id,
+                    product_list: []
+                },
+                EM: 'Order Items !'
+            }
         }
+
 
     } catch (error) {
         console.log(error);
