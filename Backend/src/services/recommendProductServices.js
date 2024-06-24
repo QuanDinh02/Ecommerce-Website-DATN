@@ -788,8 +788,6 @@ const getRelevantRecommendProducts = async (item_id) => {
             }
         });
 
-        console.log(relevant_product_list)
-
         let productList = await Promise.all(relevant_product_list.map(async item => {
 
             let productInfo = await db.Product.findOne({

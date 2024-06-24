@@ -103,6 +103,28 @@ const getOrderItemInfoForRating = async (req, res) => {
     }
 }
 
+const customerRatingProduct = async (req, res) => {
+    try {
+        let { user } = req;
+        let data = req.body;
+
+        let result = await orderServices.customerRatingProduct(data, +user.customer_id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const getShippingMethod = async (req, res) => {
     try {
         let result = await orderServices.getShippingMethod();
@@ -162,7 +184,7 @@ const cancelOrderByCustomer = async (req, res) => {
 }
 
 module.exports = {
-    createNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod, 
+    createNewOrder, getOrderByCustomer, getShippingMethod, getPaymentMethod,
     getCustomerOrderDetail, getOrderSearchByCustomer, cancelOrderByCustomer,
-    getOrderItemInfoForRating
+    getOrderItemInfoForRating, customerRatingProduct
 }

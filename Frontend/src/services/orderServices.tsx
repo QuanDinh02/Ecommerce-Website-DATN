@@ -22,6 +22,18 @@ interface IOrder {
     order_items: IOrderItemInfo[]
 }
 
+interface IProductReview {
+    id: number
+    rating: number
+    comment: string
+}
+
+interface IProduct {
+    id: number
+    name: string
+    review: IProductReview
+}
+
 export const createNewOrder = async (data: IOrder) => {
     let result: APIResponse = await axios.post('/api/order', data);
     return result;
@@ -51,6 +63,17 @@ export const getOrderItemInfoForRating = async (order_id: number) => {
         return result.DT;
     }
     return null;
+}
+
+export const customerRatingProduct = async (product_data: IProduct, order_id: number) => {
+
+    let data = {
+        order_id: order_id,
+        product_data: product_data
+    }
+    
+    let result: APIResponse = await axios.post('/api/order/rating', data);
+    return result;
 }
 
 export const customerCancelOrder = async (order_id: number) => {

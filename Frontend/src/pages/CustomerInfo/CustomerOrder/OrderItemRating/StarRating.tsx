@@ -11,7 +11,6 @@ const StarRating = (props: IProps) => {
 
     const { product_id, rating, setRating } = props;
 
-    const [updateRating, setUpdateRating] = React.useState<number>(0);
     const [activeIndex, setActiveIndex] = React.useState<number>(-1);
 
     const handleRating = (index: number) => {
@@ -20,8 +19,7 @@ const StarRating = (props: IProps) => {
     }
 
     React.useEffect(() => {
-        setUpdateRating(rating);
-        setActiveIndex(updateRating - 1);
+        setActiveIndex(rating - 1);
     }, []);
 
     return (

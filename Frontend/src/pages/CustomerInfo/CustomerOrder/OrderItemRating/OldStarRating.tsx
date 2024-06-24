@@ -22,11 +22,11 @@ const OldStarRating = (props: IProps) => {
 
                     if (index <= activeIndex) {
                         return (
-                            <GoStarFill className="text-[#FCB800] w-6 h-6" key={`star-${index}`}/>
+                            <GoStarFill className="text-[#FCB800] w-5 h-5" key={`star-${index}`}/>
                         )
                     }
                     return (
-                        <GoStarFill className="text-gray-300 w-6 h-6" key={`no-star-${index}`}/>
+                        <GoStarFill className="text-gray-300 w-5 h-5" key={`no-star-${index}`}/>
                     )
                 })
             }
