@@ -7,29 +7,21 @@ from sentence_transformers import SentenceTransformer
 import mysql.connector
 import json
 from redis.commands.search.query import Query
-import timeit
 import requests
 import sys
+import re
 
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
 
 
 def create_query_table(query, queries, encoded_queries, extra_params = {}):
-    results_list = []
     itemRealSearch = []
         
     for i, encoded_query in enumerate(encoded_queries):
         result_docs = client.ft(INDEX_NAME).search(query, {'query_vector': np.array(encoded_query, dtype=np.float32).tobytes()} | extra_params).docs
         for doc in result_docs:
             vector_score = round(1 - float(doc.vector_score), 2)
-            # print(doc.name)
-            # results_list.append({
-            #     'query': queries[i], 
-            #     'score': vector_score, 
-            #     'id': doc.id,
-            #     # 'name': doc.name,
-            # })
             description_embeddings = client.json().get(f'{doc.id}', '$.name_embeddings')
             itemRealSearch.append((description_embeddings[0], (doc.id).split(":")[-1], vector_score))
 
@@ -95,7 +87,6 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
 
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
-    # itemSessionVector = [(item['productID'], type_to_weight[item['type']]) for item in res4Session]
     itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['name_embeddings'], type_to_weight[item['type']]) for item in res4Session]
     return itemSessionVector
 
@@ -204,6 +195,46 @@ def get_predicted_ratings(user_id, item_ids, mysql_config={}):
         res_json = json.dumps(res, ensure_ascii=False, indent=4)
         return res_json
 
+def get_all_keys(pattern, redis_client):
+    cursor = '0'
+    keys = []
+    while cursor != 0:
+        cursor, partial_keys = redis_client.scan(cursor=cursor, match=pattern)
+        keys.extend([key for key in partial_keys])
+    return keys
+
+def extract_ids(keys):
+    pattern = re.compile(r'ecommerce:product:(\d+)')
+    ids = [pattern.search(str(key)).group(1) for key in keys if pattern.search(key)]
+    return ids
+
+def update_product(redis_client, cursor, embedder):
+    pattern = 'ecommerce:product:*'
+    all_keys = get_all_keys(pattern, redis_client)
+
+    redis_product_ids = extract_ids(all_keys)
+    
+    query_get_product_mysql = '''
+        select distinct id, name from Product
+    '''
+    cursor.execute(query_get_product_mysql)
+    product_mysql_dict = [data for data in cursor.fetchall()]
+    new_products = [product for product in product_mysql_dict if str(product['id']) not in redis_product_ids]
+
+    pipeline = redis_client.pipeline(transaction=False)
+    i = 0
+    for product in new_products:
+        name_embedding = embedder.encode(product['name']).astype(np.float32).tolist()  
+        product_key = f"ecommerce:product:{product['id']}"
+        product_data = {
+            'id': product['id'],
+            'name': product['name'],
+            'name_embeddings': name_embedding
+        }
+        print(f"{i}. New product added - ID: {product['id']}, Name: {product['name']}")
+        pipeline.json().set(product_key, '$', product_data)
+        pipeline.execute()
+        i += 1
 
 if __name__ == "__main__":
     mysql_config = {
@@ -212,11 +243,14 @@ if __name__ == "__main__":
         'host': 'localhost',
         'database': 'ecommerce',
     }
+    cnx = mysql.connector.connect(**mysql_config)
+    cursor = cnx.cursor(dictionary=True)
+        
     client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
 
     params = sys.argv[1]
     customerID = params
-    # customerID = '10577015'
+    # customerID = '10577013'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -229,8 +263,6 @@ if __name__ == "__main__":
         2: weight['w_favorite']  # type 2 -> w_favorite
     }
     
-    print("Get items 4 SS...")
-    itemSessionVector = getInfo4Session(customerID, client, mysql_config)
     print("Get search content...")
     search_content = getSearhContent(customerID, mysql_config)
     print(search_content)
@@ -245,7 +277,13 @@ if __name__ == "__main__":
                 .paging(0, 100)
                 .dialect(2)
         )
-
+        
+        print("Updating new product embeddings...")
+        update_product(client, cursor, embedder)
+        
+        print("Get items 4 SS...")
+        itemSessionVector = getInfo4Session(customerID, client, mysql_config)
+        
         while(True):
             print("Encode search...")
             encoded_queries = embedder.encode(search_content)
@@ -261,8 +299,7 @@ if __name__ == "__main__":
         print(tuple(rankingItems))
         
         print("Check items...")
-        cnx = mysql.connector.connect(**mysql_config)
-        cursor = cnx.cursor(dictionary=True)
+        
         query_rated_item = f'''
             select distinct productID
             from ProductReview
