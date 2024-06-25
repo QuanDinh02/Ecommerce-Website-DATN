@@ -112,9 +112,6 @@ const ShopCategoryDetail = () => {
         if (result) {
             if (result.EC === 0) {
                 successToast1(result.EM);
-                setProductList(draft => {
-                    return draft.filter(product => product.id !== product_id);
-                })
             } else {
                 errorToast1(result.EM);
             }
