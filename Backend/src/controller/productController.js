@@ -21,6 +21,27 @@ const getProductDetail = async (req, res) => {
     }
 }
 
+const getProductDetailShopInfo = async (req, res) => {
+    try {
+
+        let { id } = req.query;
+
+        let result = await productServices.getProductDetailShopInfo(+id);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const getHistoryProductsSwiper = async (req, res) => {
     try {
 
@@ -201,5 +222,5 @@ module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     handleUpdateProductImage, handleGetSearchProducts,
     getProductDetail, getProductReviews, handleGetSearchProductsWithPagination,
-    getProductsHistory, getHistoryProductsSwiper
+    getProductsHistory, getHistoryProductsSwiper, getProductDetailShopInfo
 }

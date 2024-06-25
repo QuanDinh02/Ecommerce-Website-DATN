@@ -62,6 +62,7 @@ const ApiRoute = (app) => {
     router.get('/categories-only', categoryController.getOnlyCategory);
 
     router.get('/product/detail', productController.getProductDetail);
+    router.get('/product/detail/shop_info', cacheMiddleware(300), productController.getProductDetailShopInfo);
     router.get('/product/detail/review', productController.getProductReviews);
 
     router.post('/products/history', productController.getProductsHistory);

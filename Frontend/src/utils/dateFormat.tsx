@@ -73,3 +73,31 @@ export const isValidDate = (day: number, month: number, year: number) => {
     }
     return true;
 }
+
+export const dateSpan = (date_input: string) => {
+    let now = new Date();
+    let date = new Date(date_input);
+
+    let diff = now.getTime() - date.getTime();
+
+    let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    diff -= days * (1000 * 60 * 60 * 24);
+
+    let hours = Math.floor(diff / (1000 * 60 * 60));
+    diff -= hours * (1000 * 60 * 60);
+
+    let mins = Math.floor(diff / (1000 * 60));
+    diff -= mins * (1000 * 60);
+
+    if(days > 0) {
+        return `${days} ngày trước`;
+    } 
+
+    if(hours > 0) {
+        return `${hours} giờ trước`;
+    }
+
+    if(mins > 0) {
+        return `${mins} phút trước`;
+    }
+}

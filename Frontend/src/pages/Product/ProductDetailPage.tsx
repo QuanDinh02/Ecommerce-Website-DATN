@@ -23,7 +23,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Rating from "@/components/Rating";
-import { getProductDetailInfo, getProductReview, getProductsHistoryNoPagination } from "@/services/productService";
+import { getProductDetailInfo, getProductDetailShopInfo, getProductReview, getProductsHistoryNoPagination } from "@/services/productService";
 import { LiaCartPlusSolid } from "react-icons/lia";
 
 import { RootState } from "@/redux/reducer/rootReducer";
@@ -43,13 +43,14 @@ import {
 import { INewWishListItem, IWishList } from "../FavoriteProduct/FavoriteProductPage_types";
 import { createWishListItem, fetchWishList } from "@/services/wishListService";
 import ReactPaginate from "react-paginate";
-import { dateFormat } from "@/utils/dateFormat";
+import { dateFormat, dateSpan } from "@/utils/dateFormat";
 import { saveCustomerActivity, saveCustomerSearch } from "@/services/customerService";
 import { getRecommendRelevantProduct } from "@/services/recommendItemService";
 
 import ProductRating from "../Category/ProductRating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
+import { PiStorefrontLight } from "react-icons/pi";
 
 interface IRecommendProduct {
     id: number
@@ -90,6 +91,14 @@ interface IProductQuickView {
     summary: string
     seller_info: IShopInfo
     quantity: number
+}
+
+interface IShopInfoDetail {
+    id: number
+    image: string
+    shop_name: string
+    product_total: number
+    shop_join_date: Date
 }
 
 interface IProps {
@@ -469,6 +478,13 @@ const ProductDetailPage = () => {
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [productID, setProductID] = React.useState<number>(0);
+    const [shopInfo, setShopInfo] = React.useState<IShopInfoDetail>({
+        id: 0,
+        image: "",
+        shop_name: "Shop Name",
+        product_total: 0,
+        shop_join_date: new Date()
+    });
     const [historyProductList, setHistoryProductList] = React.useState<IRecommendProduct[]>([]);
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
@@ -638,6 +654,13 @@ const ProductDetailPage = () => {
         }
     }
 
+    const fetchShopInfoDetail = async (product_id: number) => {
+        let res: IShopInfoDetail = await getProductDetailShopInfo(product_id);
+        if (res) {
+            setShopInfo(res);
+        }
+    }
+
     const fetchProductDetail = async (product_id: number) => {
         let response: IProductDetail = await getProductDetailInfo(+product_id);
         if (response) {
@@ -770,6 +793,7 @@ const ProductDetailPage = () => {
         if (productID !== 0) {
             fetchProductDetail(productID);
             fetchProductReviews(productID);
+            fetchShopInfoDetail(productID);
         }
 
     }, [productID]);
@@ -849,29 +873,6 @@ const ProductDetailPage = () => {
                                                 {/* <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/> */}
                                                 <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
                                             </div>
-                                            {/* <div className="swiper-list w-80 mt-2 mb-5">
-                                                <Swiper
-                                                    spaceBetween={10}
-                                                    slidesPerView={4}
-                                                    navigation={true}
-                                                    modules={[Navigation]}
-                                                    className="mySwiper"
-                                                >
-                                                    {images && images.length > 0 && images.map((item, index) => {
-                                                        return (
-                                                            <SwiperSlide>
-                                                                <img
-                                                                    key={`image-${index}`}
-                                                                    src={item.image}
-                                                                    className={selectedImage.id === item.id ? "border-2 border-[#FCB800] cursor-pointer select-none" : "border-2 boder-gray-600 cursor-pointer select-none"}
-                                                                    onClick={() => setSelectedImage(item)}
-                                                                />
-                                                            </SwiperSlide>
-                                                        )
-                                                    })}
-
-                                                </Swiper>
-                                            </div> */}
                                         </div>
                                         <div className="product__informations flex-1">
                                             <div className="product__name font-medium text-2xl">{productDetailInfo.name}</div>
@@ -950,20 +951,38 @@ const ProductDetailPage = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="border-t border-gray-300 w-full my-4" ref={product_detail_ref}></div>
+                                    <div className="border-t border-gray-100 mt-6"></div>
+                                    <div className="p-5 flex items-center gap-x-4 bg-gray-50 border border-gray-300">
+                                        <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div>
+                                        <div className="pr-8 border-r border-gray-300 mr-4">
+                                            <div className="shop_name text-lg mb-2">{shopInfo.shop_name}</div>
+                                            <div className="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-100 cursor-pointer flex items-center justify-center gap-x-2"><PiStorefrontLight className="w-5 h-5" /> Xem Shop</div>
+                                        </div>
+                                        <div className="flex-1 flex item-center gap-x-10">
+                                            <div className="flex items-center gap-x-10">
+                                                <span className="text-gray-500">Sản Phẩm</span>
+                                                <span className="text-red-500">{shopInfo.product_total}</span>
+                                            </div>
+                                            <div className="flex items-center gap-x-10">
+                                                <span className="text-gray-500">Tham Gia</span>
+                                                <span className="text-red-500">{dateSpan(`${shopInfo.shop_join_date}`)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="border-t border-gray-100 w-full mb-6" ref={product_detail_ref}></div>
                                     <div className="product__info-detail">
-                                        <div className="flex items-center mb-5">
+                                        <div className="flex items-center mb-5 border-b-2 border-gray-200">
                                             {
                                                 productDetail && productDetail.length > 0 &&
                                                 productDetail.map((item, index) => {
                                                     if (item.selected) {
                                                         return (
-                                                            <div className="px-5 py-2 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer" key={`detail-${item.id}`}>{item.name}</div>
+                                                            <div className="px-5 py-2.5 border-b-2 border-[#FCB800] text-[#FCB800] font-medium cursor-pointer" key={`detail-${item.id}`}>{item.name}</div>
                                                         )
                                                     }
                                                     return (
                                                         <div
-                                                            className="px-5 py-2 border-b-2 border-gray-300 text-gray-400 font-medium cursor-pointer"
+                                                            className="px-5 py-2.5 text-gray-400 font-medium cursor-pointer"
                                                             key={`detail-${item.id}`}
                                                             onClick={() => hanldeSetProductDetail(item.id)}
                                                         >{item.name}</div>

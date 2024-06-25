@@ -584,7 +584,7 @@ const SubCategoryPage = () => {
                                                             <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
                                                                 <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />
                                                             </div>
-                                                            <div className="absolute top-100 border border-gray-300 hidden group-hover:block">
+                                                            <div className="absolute top-100 border border-gray-300 hidden group-hover:block z-10">
                                                                 {
                                                                     PRODUCT_PRICE_SORT_LIST.map(item => {
                                                                         return (

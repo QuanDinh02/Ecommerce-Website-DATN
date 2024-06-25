@@ -121,6 +121,87 @@ const getProductDetail = async (product_id) => {
     }
 }
 
+const getProductDetailShopInfo = async (product_id) => {
+    try {
+
+        let productInfo = await db.Product.findOne({
+            raw: true,
+            attributes: ['shop_id'],
+            where: {
+                id: {
+                    [Op.eq]: product_id,
+                },
+            },
+        });
+
+        if (productInfo) {
+            let shopID = productInfo.shop_id;
+
+            let shop_info = await db.Seller.findOne({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'shopName'],
+                include: [
+                    {
+                        model: db.User,
+                        attributes: ['registeredAt'],
+                    },
+                ],
+                where: {
+                    id: {
+                        [Op.eq]: shopID,
+                    },
+                },
+            });
+
+            let { count } = await db.Product.findAndCountAll({
+                raw: true,
+                where: {
+                    shop_id: {
+                        [Op.eq]: shopID,
+                    },
+                }
+            });
+
+            let shop_join_date = shop_info.User.registeredAt;
+
+            // const getObjectParams = {
+            //     Bucket: bucketName,
+            //     Key: `${product_id}.jpeg`
+            // }
+
+            // const command = new GetObjectCommand(getObjectParams);
+            // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+            return {
+                EC: 0,
+                DT: {
+                    id: shopID,
+                    image: "",
+                    shop_name: shop_info.shopName,
+                    product_total: count,
+                    shop_join_date: shop_join_date
+                },
+                EM: 'Shop info summary !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: null,
+            EM: 'Shop info summary !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductsHistory = async (item_limit, page, data) => {
     try {
 
@@ -871,7 +952,7 @@ const getProductReviews = async (product_id, item_limit, page) => {
             let productReviewListRaw = [];
 
             productReviewListRaw = _.cloneDeep(productReviewList);
-            
+
             productReviewListRaw = _(productReviewListRaw).drop(offSet).take(item_limit).value();
 
             let finalData = productReviewListRaw.map(item => {
@@ -921,5 +1002,5 @@ module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
     getProductDetail, getProductReviews, getSearchProductsWithPagination,
-    getProductsHistory, getProductsHistorySwiper
+    getProductsHistory, getProductsHistorySwiper, getProductDetailShopInfo
 }
