@@ -923,10 +923,341 @@ const packingCustomerOrder = async (order_id) => {
         }
     }
 }
+
+const getShopCategory = async (seller_id) => {
+    try {
+        let categoryList = await db.SubCategory.findAll({
+            raw: true,
+            attributes: ['id', 'title'],
+            where: {
+                shopID: {
+                    [Op.eq]: +seller_id
+                }
+            }
+        })
+
+        if (categoryList.length === 0) {
+            return {
+                EC: 0,
+                DT: [],
+                EM: 'Shop Category is emtpy !'
+            }
+        } else {
+
+            let format_category_list = await Promise.all(categoryList.map(async item => {
+
+                let { count } = await db.ProductSubCategory.findAndCountAll({
+                    raw: true,
+                    where: {
+                        subCategoryID: {
+                            [Op.eq]: item,
+                        },
+                    }
+                });
+
+                return {
+                    ...item,
+                    quantity: count
+                }
+            }));
+
+            return {
+                EC: 0,
+                DT: format_category_list,
+                EM: 'Shop Category !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getShopCategoryDetailExist = async (category_id, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let productListRaw = await db.ProductSubCategory.findAll({
+                raw: true,
+                nest: true,
+                include: {
+                    model: db.Product,
+                    attributes: ['id', 'name']
+                },
+                where: {
+                    subCategoryID: {
+                        [Op.eq]: category_id,
+                    },
+                }
+            });
+
+            const listLength = productListRaw.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            productListRaw.reverse();
+            productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+            let product_list_format = productListRaw.map(item => {
+                return item.Product;
+            })
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    product_list: product_list_format
+                },
+                EM: 'Get products by shop category !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let categoryList = await db.SubCategory.findAll({
+                raw: true,
+                attributes: ['id', 'title'],
+                where: {
+                    shopID: {
+                        [Op.eq]: +seller_id
+                    }
+                }
+            })
+
+            if (categoryList.length === 0) {
+                let category_id_list = categoryList.map(item => item.id);
+
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: seller_id
+                            }
+                        }
+                    },
+                    where: {
+                        subCategoryID: {
+                            [Op.notIn]: category_id_list,
+                        },
+                    },
+                    order: [['id', 'DESC']]
+                });
+
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let product_list_format = productListRaw.map(item => item.Product);
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: product_list_format
+                    },
+                    EM: 'Get products not exist in shop category !'
+                }
+            } else {
+                let category_id_list = categoryList.map(item => item.id);
+
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: seller_id
+                            }
+                        }
+                    },
+                    order: [['id', 'DESC']]
+                });
+
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let product_list_format = productListRaw.map(item => item.Product);
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: product_list_format
+                    },
+                    EM: 'Get products not exist in shop category !'
+                }
+
+            }
+
+            // return {
+            //     EC: 0,
+            //     DT: {
+            //         page: page,
+            //         page_total: pageTotal,
+            //         total_items: listLength,
+            //         product_list: product_list_format
+            //     },
+            //     EM: 'Get products by shop category !'
+            // } 
+
+
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const createShopCategory = async (seller_id, category_title) => {
+    try {
+        let result = await db.SubCategory.create({
+            title: category_title,
+            shopID: seller_id
+        });
+
+        if (result) {
+            let category_info = result.dataValues;
+            return {
+                EC: 0,
+                DT: {
+                    ...category_info,
+                    quantity: 0
+                },
+                EM: 'Đã thêm danh mục thành công'
+            }
+        }
+
+        return {
+            EC: -1,
+            DT: "",
+            EM: 'Lỗi thêm danh mục'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateShopCategory = async (category_id, category_title) => {
+    try {
+
+        await db.SubCategory.update({
+            title: category_title
+        }, {
+            where: {
+                id: category_id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Chỉnh sửa danh mục thành công'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const deleteShopCategory = async (category_id) => {
+    try {
+
+        await db.SubCategory.destroy({
+            where: {
+                id: {
+                    [Op.eq]: category_id,
+                },
+            }
+        });
+
+        await db.ProductSubCategory.destroy({
+            where: {
+                subCategoryID: {
+                    [Op.eq]: category_id,
+                },
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: "Xóa danh mục thành công"
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
     handleCreateVertificationCode, handleOTPVertification,
     getSellerInfo, updateSellerInfo, getOrderPagination,
-    getOrderDetail, confirmCustomerOrder, packingCustomerOrder
+    getOrderDetail, confirmCustomerOrder, packingCustomerOrder,
+    getShopCategory, createShopCategory, updateShopCategory,
+    deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist
 }

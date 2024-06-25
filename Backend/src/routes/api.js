@@ -146,6 +146,12 @@ const ApiRoute = (app) => {
     router.put('/seller/info', checkUserJWT, sellerController.updateSellerInfo);
 
     router.get('/seller/order/detail', checkUserJWT, sellerController.getOrderDetail);
+    router.get('/seller/shop/category', checkUserJWT, sellerController.getShopCategory);
+    router.post('/seller/shop/category', checkUserJWT, sellerController.createShopCategory);
+    router.put('/seller/shop/category', checkUserJWT, sellerController.editShopCategory);
+    router.delete('/seller/shop/category/:id', checkUserJWT, sellerController.removeShopCategory);
+    router.get('/seller/shop/category/detail/exist', checkUserJWT, sellerController.getShopCategoryDetailExist);
+    router.get('/seller/shop/category/detail/not-exist', checkUserJWT, sellerController.getShopCategoryDetailNotExist);
 
     // SHIPPING UNIT
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);

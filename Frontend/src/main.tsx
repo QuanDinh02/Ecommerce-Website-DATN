@@ -51,10 +51,11 @@ import SellerAddNewProduct from '@/pages/SellerInfo/SellerProduct/SellerAddNewPr
 import SellerProfile from '@/pages/SellerInfo/SellerProfile.tsx';
 import RegisterPage from '@/pages/RegisterPage.tsx';
 import SellerSignUpPage from '@/pages/Register/SellerSignUpPage.tsx';
-import ShopInfo from '@/pages/SellerInfo/ShopInfo.tsx';
+import ShopInfo from '@/pages/SellerInfo/Shop/ShopInfo.tsx';
 import ShopManagement from '@/pages/SellerInfo/ShopManagement.tsx';
 import OrderDetail from '@/pages/SellerInfo/SellerOrder/OrderDetail.tsx';
 import SellerControlDelivery from '@/pages/SellerInfo/SellerControlDellivery.tsx';
+import ShopCategory from '@/pages/SellerInfo/Shop/ShopCategory.tsx';
 
 // SHIPPING UNIT
 import SUMain from '@/pages/ShippingUnit/SUMain.tsx';
@@ -81,6 +82,7 @@ import SellerRoute from '@/components/SellerRoute.tsx';
 import CustomerRoute from '@/components/CustomerRoute.tsx';
 import NewCustomer from '@/pages/NewCustomer.tsx';
 import ShippingUnitRoute from '@/components/ShippingUnitRoute.tsx';
+import ShopCategoryDetail from '@/pages/SellerInfo/Shop/ShopCategoryDetail.tsx';
 
 //REDUX
 import { Provider } from 'react-redux';
@@ -148,9 +150,16 @@ const router = createBrowserRouter(
                 {
                   path: "info",
                   element: <ShopInfo />
-                }
+                },
+                {
+                  path: "category",
+                  element: <ShopCategory/>
+                },
+                {
+                  path: "category/detail",
+                  element: <ShopCategoryDetail/>
+                },
               ]
-
             },
             {
               path: "product",

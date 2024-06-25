@@ -126,3 +126,44 @@ export const getOrderDetail = async (order_id: number) => {
     }
     return null;
 }
+
+export const getShopCategory = async () => {
+    let result: APIResponse = await axios.get('/api/seller/shop/category');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const createShopCategory = async (category_title: string) => {
+    let result: APIResponse = await axios.post('/api/seller/shop/category', { title: category_title });
+    return result;
+}
+
+export const editShopCategory = async (category_id: number, category_title: string) => {
+    let result: APIResponse = await axios.put('/api/seller/shop/category', { category_id: category_id, title: category_title });
+    return result;
+}
+
+export const removeShopCategory = async (category_id: number) => {
+    let result: APIResponse = await axios.delete(`/api/seller/shop/category/${category_id}`);
+    return result;
+}
+
+export const getShopCategoryDetailExist = async (category_id: number, page: number, limit: number) => {
+
+    let result: APIResponse = await axios.get(`/api/seller/shop/category/detail/exist?id=${category_id}&page=${page}&limit=${limit}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const getShopCategoryDetailNotExist = async (page: number, limit: number) => {
+
+    let result: APIResponse = await axios.get(`/api/seller/shop/category/detail/not-exist?page=${page}&limit=${limit}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}

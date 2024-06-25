@@ -90,6 +90,10 @@ const SideBar: ISideBarItem[] = [
                 path: "/info",
                 name: "Thông Tin Shop",
             },
+            {
+                path: "/category",
+                name: "Danh mục sản phẩm",
+            },
         ]
     },
     {

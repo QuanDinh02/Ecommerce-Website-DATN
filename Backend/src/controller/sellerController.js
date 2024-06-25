@@ -377,8 +377,144 @@ const getOrderDetail = async (req, res) => {
     }
 }
 
+const getShopCategory = async (req, res) => {
+    try {
+        let { user } = req;
+        let result = await sellerServices.getShopCategory(+user.seller_id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getShopCategoryDetailExist = async (req, res) => {
+    try {
+        let { id, limit, page } = req.query;
+        let result = await sellerServices.getShopCategoryDetailExist(+id, +limit, +page);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getShopCategoryDetailNotExist = async (req, res) => {
+    try {
+        let { user } = req;
+        let { limit, page } = req.query;
+        let result = await sellerServices.getShopCategoryDetailNotExist(+user.seller_id, +limit, +page);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const createShopCategory = async (req, res) => {
+    try {
+        let { user } = req;
+        let { title } = req.body;
+        let result = await sellerServices.createShopCategory(+user.seller_id, title);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const editShopCategory = async (req, res) => {
+    try {
+        let { category_id, title } = req.body;
+        let result = await sellerServices.updateShopCategory(+category_id, title);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const removeShopCategory = async (req, res) => {
+    try {
+        let { id } = req.params;
+        let result = await sellerServices.deleteShopCategory(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
-    getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder
+    getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
+    createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
+    getShopCategoryDetailNotExist
 }
