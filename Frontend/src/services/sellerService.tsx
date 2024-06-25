@@ -167,3 +167,13 @@ export const getShopCategoryDetailNotExist = async (page: number, limit: number)
     }
     return null;
 }
+
+export const addProductToCategoryShop = async (category_id: number, product_id: number) => {
+    let result: APIResponse = await axios.post('/api/seller/shop/category/product', { category_id: category_id, product_id: product_id });
+    return result;
+}
+
+export const removeProductOutCategoryShop = async (id: number) => {
+    let result: APIResponse = await axios.delete(`/api/seller/shop/category/product/${id}`);
+    return result;
+}

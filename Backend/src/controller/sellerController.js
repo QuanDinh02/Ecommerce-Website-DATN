@@ -467,6 +467,50 @@ const createShopCategory = async (req, res) => {
     }
 }
 
+const addProductToCategoryShop = async (req, res) => {
+    try {
+        let { product_id, category_id } = req.body;
+        let result = await sellerServices.addProductToCategoryShop(+category_id, +product_id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const removeProductOutCategoryShop = async (req, res) => {
+    try {
+        let { id } = req.params;
+        let result = await sellerServices.removeProductOutCategoryShop(+id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const editShopCategory = async (req, res) => {
     try {
         let { category_id, title } = req.body;
@@ -516,5 +560,5 @@ module.exports = {
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
     getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
-    getShopCategoryDetailNotExist
+    getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop
 }

@@ -950,7 +950,7 @@ const getShopCategory = async (seller_id) => {
                     raw: true,
                     where: {
                         subCategoryID: {
-                            [Op.eq]: item,
+                            [Op.eq]: item.id,
                         },
                     }
                 });
@@ -987,6 +987,7 @@ const getShopCategoryDetailExist = async (category_id, item_limit, page) => {
             let productListRaw = await db.ProductSubCategory.findAll({
                 raw: true,
                 nest: true,
+                attributes: ['id'],
                 include: {
                     model: db.Product,
                     attributes: ['id', 'name']
@@ -1005,7 +1006,11 @@ const getShopCategoryDetailExist = async (category_id, item_limit, page) => {
             productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
             let product_list_format = productListRaw.map(item => {
-                return item.Product;
+                return {
+                    id: item.Product.id,
+                    name: item.Product.name,
+                    index: item.id
+                };
             })
 
             return {
@@ -1051,7 +1056,7 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
                 }
             })
 
-            if (categoryList.length === 0) {
+            if (categoryList.length !== 0) {
                 let category_id_list = categoryList.map(item => item.id);
 
                 let productListRaw = await db.ProductSubCategory.findAll({
@@ -1092,7 +1097,6 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
                     EM: 'Get products not exist in shop category !'
                 }
             } else {
-                let category_id_list = categoryList.map(item => item.id);
 
                 let productListRaw = await db.ProductSubCategory.findAll({
                     raw: true,
@@ -1252,6 +1256,84 @@ const deleteShopCategory = async (category_id) => {
     }
 }
 
+const addProductToCategoryShop = async (category_id, product_id) => {
+    try {
+
+        let item = await db.ProductSubCategory.findOne({
+            raw: true,
+            where: {
+                [Op.and]: [
+                    { subCategoryID: category_id },
+                    { productID: product_id }
+                ],
+            }
+        });
+
+        if (item) {
+            return {
+                EC: -1,
+                DT: "",
+                EM: 'Sản phẩm đã có trong danh mục'
+            }
+        } else {
+            let result = await db.ProductSubCategory.create({
+                productID: product_id,
+                subCategoryID: category_id
+            });
+
+            if (result) {
+
+                return {
+                    EC: 0,
+                    DT: "",
+                    EM: 'Đã thêm sản phẩm vào danh mục'
+                }
+            }
+
+            return {
+                EC: -1,
+                DT: "",
+                EM: 'Lỗi thêm sản phẩm vào danh mục'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const removeProductOutCategoryShop = async (id) => {
+    try {
+
+        await db.ProductSubCategory.destroy({
+            where: {
+                id: {
+                    [Op.eq]: +id,
+                },
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Đã xóa sản phẩm khỏi danh mục'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
@@ -1259,5 +1341,6 @@ module.exports = {
     getSellerInfo, updateSellerInfo, getOrderPagination,
     getOrderDetail, confirmCustomerOrder, packingCustomerOrder,
     getShopCategory, createShopCategory, updateShopCategory,
-    deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist
+    deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
+    addProductToCategoryShop, removeProductOutCategoryShop
 }

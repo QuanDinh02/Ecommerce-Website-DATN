@@ -1,16 +1,24 @@
 import LoadImage from "@/components/LoadImage";
-import { getShopCategoryDetailExist, getShopCategoryDetailNotExist } from "@/services/sellerService";
+import { addProductToCategoryShop, getShopCategoryDetailExist, getShopCategoryDetailNotExist, removeProductOutCategoryShop } from "@/services/sellerService";
 import React from "react";
 import { ThreeDots } from "react-loader-spinner";
 import ReactPaginate from "react-paginate";
 import { useSearchParams } from "react-router-dom";
 import { useImmer } from "use-immer";
+import { FiPlusCircle, FiMinusCircle } from "react-icons/fi";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 
 const PRODUCT_DISPLAY_LIMIT = 50;
 
 interface IProduct {
     id: number
     name: string
+}
+
+interface IExistProduct {
+    id: number
+    name: string
+    index: number
 }
 
 interface IProductListFetch {
@@ -25,7 +33,7 @@ const ShopCategoryDetail = () => {
     const [searchParams] = useSearchParams();
     const [dataLoading, setDataLoading] = React.useState<boolean>(false);
 
-    const [productList, setProductList] = useImmer<IProduct[]>([]);
+    const [productList, setProductList] = useImmer<IProduct[] | IExistProduct[]>([]);
 
     const [shopCategoryID, setShopCategoryID] = React.useState<number>(0);
     const [shopCategoryName, setShopCategoryName] = React.useState<string>("");
@@ -33,18 +41,20 @@ const ShopCategoryDetail = () => {
     const [currentPageExist, setCurrentPageExist] = React.useState<number>(1);
     const [currentPageNotExist, setCurrentPageNotExist] = React.useState<number>(1);
 
+    const [isExist, setIsExist] = React.useState<boolean>(true);
+
     const [totalPages, setTotalPages] = React.useState<number>(20);
     const [totalItems, setTotalItems] = React.useState<number>(0);
 
     const [tabs, setTabs] = useImmer([
         {
             id: 1,
-            name: "Đã chọn",
+            name: "Sản phẩm trong danh mục",
             selected: true
         },
         {
             id: 2,
-            name: "Chưa chọn",
+            name: "Sản phẩm của shop",
             selected: false
         }
     ]);
@@ -82,7 +92,9 @@ const ShopCategoryDetail = () => {
                     item.selected = false;
                 }
             });
-        })
+        });
+
+        setIsExist(id === 1 ? true : false);
     }
 
     const handlePageClickExist = (event) => {
@@ -93,6 +105,35 @@ const ShopCategoryDetail = () => {
     const handlePageClickNotExist = (event) => {
         setCurrentPageNotExist(+event.selected + 1);
         setDataLoading(true);
+    }
+
+    const handleAddProductToCategory = async (product_id: number) => {
+        let result = await addProductToCategoryShop(shopCategoryID, product_id);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setProductList(draft => {
+                    return draft.filter(product => product.id !== product_id);
+                })
+            } else {
+                errorToast1(result.EM);
+            }
+        }
+    }
+
+    const handleRemoveProductCategory = async (product_id: number, index: number) => {
+        let result = await removeProductOutCategoryShop(index);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setProductList(draft => {
+                    return draft.filter(product => product.id !== product_id);
+                });
+                setTotalItems(totalItems - 1);
+            } else {
+                errorToast1(result.EM);
+            }
+        }
     }
 
     React.useEffect(() => {
@@ -120,7 +161,7 @@ const ShopCategoryDetail = () => {
             window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
             fetchProductNotExistInCategory();
         }
-        
+
     }, [currentPageNotExist]);
 
     React.useEffect(() => {
@@ -185,74 +226,100 @@ const ShopCategoryDetail = () => {
                         />
                     </div>
                     :
-                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 mt-5">
+                    <>
                         {
-                            productList && productList.length > 0 &&
-                            productList.map((product, index) => {
-                                return (
-                                    <div key={`product-${product.id}`} className="flex items-center justify-between border-b border-gray-200 p-2 cursor-pointer hover:bg-gray-50">
-                                        <div className="flex gap-x-2">
-                                            <LoadImage img_style="w-12 h-12" product_id={product.id} />
-                                            <div><span className="text-sm line-clamp-2">{product.name}</span></div>
-                                        </div>
+                            tabs[0].selected ?
+                                <>
+                                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 mt-5 mb-4">
+                                        {
+                                            productList && productList.length > 0 &&
+                                            productList.map((product, index) => {
+                                                return (
+                                                    <div key={`product-exist-${index}`} className="flex items-center justify-between border-b border-gray-200 p-2 hover:bg-gray-50">
+                                                        <div className="w-full flex items-center justify-between">
+                                                            <div className="flex gap-x-2 w-2/3">
+                                                                <LoadImage img_style="w-12 h-12" product_id={product.id} />
+                                                                <div><span className="text-sm line-clamp-2">{product.name}</span></div>
+                                                            </div>
+                                                            <FiMinusCircle className="w-6 h-6 transition duration-300 text-gray-400 hover:text-red-500 cursor-pointer hover:scale-110" onClick={() => handleRemoveProductCategory(product.id, product.index)} />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
                                     </div>
-                                )
-                            })
+                                    <div className='pagination-container my-4 flex justify-center'>
+                                        <ReactPaginate
+                                            nextLabel=">"
+                                            onPageChange={handlePageClickExist}
+                                            pageRangeDisplayed={5}
+                                            marginPagesDisplayed={0}
+                                            pageCount={totalPages}
+                                            previousLabel="<"
+                                            pageClassName="page-item"
+                                            pageLinkClassName="page-link page-background"
+                                            previousClassName="page-item"
+                                            previousLinkClassName="page-link pre-next"
+                                            nextClassName="page-item"
+                                            nextLinkClassName="page-link pre-next"
+                                            breakLabel=""
+                                            breakClassName="page-item"
+                                            breakLinkClassName="page-link"
+                                            containerClassName="pagination flex items-center gap-2 "
+                                            activeLinkClassName="page-active-background"
+                                            renderOnZeroPageCount={null}
+                                            forcePage={currentPageExist - 1}
+                                        />
+                                    </div>
+                                </>
+                                :
+                                <>
+                                    <div className="grid grid-cols-2 gap-y-4 gap-x-6 mt-5 mb-4">
+                                        {
+                                            productList && productList.length > 0 &&
+                                            productList.map((product, index) => {
+                                                return (
+                                                    <div key={`product-not-exist-${index}`} className="flex items-center justify-between border-b border-gray-200 p-2 hover:bg-gray-50">
+                                                        <div className="w-full flex items-center justify-between">
+                                                            <div className="flex gap-x-2 w-2/3">
+                                                                <LoadImage img_style="w-12 h-12" product_id={product.id} />
+                                                                <div><span className="text-sm line-clamp-2">{product.name}</span></div>
+                                                            </div>
+                                                            <FiPlusCircle className="w-6 h-6 transition duration-300 text-gray-400 hover:text-green-600 cursor-pointer hover:scale-110" onClick={() => handleAddProductToCategory(product.id)} />
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+                                    </div>
+                                    <div className='pagination-container my-4 flex justify-center'>
+                                        <ReactPaginate
+                                            nextLabel=">"
+                                            onPageChange={handlePageClickNotExist}
+                                            pageRangeDisplayed={5}
+                                            marginPagesDisplayed={0}
+                                            pageCount={totalPages}
+                                            previousLabel="<"
+                                            pageClassName="page-item"
+                                            pageLinkClassName="page-link page-background"
+                                            previousClassName="page-item"
+                                            previousLinkClassName="page-link pre-next"
+                                            nextClassName="page-item"
+                                            nextLinkClassName="page-link pre-next"
+                                            breakLabel=""
+                                            breakClassName="page-item"
+                                            breakLinkClassName="page-link"
+                                            containerClassName="pagination flex items-center gap-2 "
+                                            activeLinkClassName="page-active-background"
+                                            renderOnZeroPageCount={null}
+                                            forcePage={currentPageNotExist - 1}
+                                        />
+                                    </div>
+                                </>
                         }
-                    </div>
+                    </>
             }
-            {
-                tabs[0].selected &&
-                <div className='pagination-container my-4 flex justify-center'>
-                    <ReactPaginate
-                        nextLabel=">"
-                        onPageChange={handlePageClickExist}
-                        pageRangeDisplayed={5}
-                        marginPagesDisplayed={0}
-                        pageCount={totalPages}
-                        previousLabel="<"
-                        pageClassName="page-item"
-                        pageLinkClassName="page-link page-background"
-                        previousClassName="page-item"
-                        previousLinkClassName="page-link pre-next"
-                        nextClassName="page-item"
-                        nextLinkClassName="page-link pre-next"
-                        breakLabel=""
-                        breakClassName="page-item"
-                        breakLinkClassName="page-link"
-                        containerClassName="pagination flex items-center gap-2 "
-                        activeLinkClassName="page-active-background"
-                        renderOnZeroPageCount={null}
-                        forcePage={currentPageExist - 1}
-                    />
-                </div>
-            }
-            {
-                tabs[1].selected &&
-                <div className='pagination-container my-4 flex justify-center'>
-                    <ReactPaginate
-                        nextLabel=">"
-                        onPageChange={handlePageClickNotExist}
-                        pageRangeDisplayed={5}
-                        marginPagesDisplayed={0}
-                        pageCount={totalPages}
-                        previousLabel="<"
-                        pageClassName="page-item"
-                        pageLinkClassName="page-link page-background"
-                        previousClassName="page-item"
-                        previousLinkClassName="page-link pre-next"
-                        nextClassName="page-item"
-                        nextLinkClassName="page-link pre-next"
-                        breakLabel=""
-                        breakClassName="page-item"
-                        breakLinkClassName="page-link"
-                        containerClassName="pagination flex items-center gap-2 "
-                        activeLinkClassName="page-active-background"
-                        renderOnZeroPageCount={null}
-                        forcePage={currentPageNotExist - 1}
-                    />
-                </div>
-            }
+
         </div>
     )
 }
