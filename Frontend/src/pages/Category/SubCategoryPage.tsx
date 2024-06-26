@@ -48,7 +48,7 @@ interface ICategory {
     name: string
 }
 
-interface ICateogryProduct {
+interface ICategoryProduct {
     id: number
     current_price: number
     price: number
@@ -64,7 +64,7 @@ interface ICateogryProduct {
 interface IData {
     page: number
     page_total: number
-    product_list: ICateogryProduct[]
+    product_list: ICategoryProduct[]
     total_items: number
 }
 
@@ -113,7 +113,7 @@ const SubCategoryPage = () => {
         title: ""
     });
 
-    const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
+    const [productList, setProductList] = React.useState<ICategoryProduct[]>([]);
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
@@ -324,7 +324,7 @@ const SubCategoryPage = () => {
         }
     }
 
-    const handleQuickView = (item: ICateogryProduct) => {
+    const handleQuickView = (item: ICategoryProduct) => {
 
         setProductQuickView(draft => {
             draft.id = item.id;
@@ -504,9 +504,9 @@ const SubCategoryPage = () => {
                                 <div className="font-medium cursor-pointer hover:underline">{activeSubCategory.title}</div>
                             </div>
                         </div>
-                        <div className="category__content bg-[#F5F5F5] pt-4 mb-24">
+                        <div className="category__content bg-[#F5F5F5] pt-4 pb-4">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
-                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
+                                <div className="main__filter-sidebar w-60 pr-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
                                     <div className="section">
                                         <div className="section__title text-lg mb-3 font-medium">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">

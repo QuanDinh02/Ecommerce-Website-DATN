@@ -48,7 +48,7 @@ interface ICategory {
     name: string
 }
 
-interface ICateogryProduct {
+interface ICategoryProduct {
     id: number
     current_price: number
     price: number
@@ -64,7 +64,7 @@ interface ICateogryProduct {
 interface IData {
     page: number
     page_total: number
-    product_list: ICateogryProduct[]
+    product_list: ICategoryProduct[]
     total_items: number
 }
 
@@ -127,7 +127,7 @@ const CategoryPage = () => {
         }
     })
 
-    const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
+    const [productList, setProductList] = React.useState<ICategoryProduct[]>([]);
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
     const [totalPages, setTotalPages] = React.useState<number>(20);
@@ -284,7 +284,7 @@ const CategoryPage = () => {
         }
     }
 
-    const handleQuickView = (item: ICateogryProduct) => {
+    const handleQuickView = (item: ICategoryProduct) => {
         setProductQuickView(draft => {
             draft.id = item.id;
             draft.name = item.name;
@@ -396,7 +396,7 @@ const CategoryPage = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
-    
+
     React.useEffect(() => {
 
         let category_id = searchParams.get('id');
@@ -466,21 +466,23 @@ const CategoryPage = () => {
                                 <div className="font-medium cursor-pointer hover:underline" onClick={() => handleSelectCategory(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
                             </div>
                         </div>
-                        <div className="category__content bg-[#F5F5F5] pt-4 mb-24">
+                        <div className="category__content bg-[#F5F5F5] pt-4 pb-4">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
-                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
+                                <div className="main__filter-sidebar w-60 pr-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
                                     <div className="section">
-                                        <div className="section__title text-lg font-medium mb-3 flex items-center gap-x-2 pb-3 mb-2 border-b border-gray-300"><IoListOutline/> Danh mục sản phẩm</div>
-                                        {subCategoryList.map((item, index) => {
-                                            return (
-                                                <div
-                                                    key={`sub-category-item-${item.id}`}
-                                                    className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
-                                                    onClick={() => handleSelectSubCategory(item.id)}
-                                                >{item.title}</div>
-                                            )
-                                        })}
-                                        <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
+                                        <div className="section__title text-lg font-medium mb-3 flex items-center gap-x-2 pb-3 mb-2 border-b border-gray-300"><IoListOutline /> Danh Mục</div>
+                                        <div className="pl-2">
+                                            {subCategoryList.map((item, index) => {
+                                                return (
+                                                    <div
+                                                        key={`sub-category-item-${item.id}`}
+                                                        className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
+                                                        onClick={() => handleSelectSubCategory(item.id)}
+                                                    >{item.title}</div>
+                                                )
+                                            })}
+                                            <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
+                                        </div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">

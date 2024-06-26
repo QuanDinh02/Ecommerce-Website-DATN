@@ -22,6 +22,7 @@ import PaymentPage from '@/pages/ShoppingCart/PaymentPage.tsx';
 import SubCategoryPage from '@/pages/Category/SubCategoryPage.tsx';
 import SearchPage from '@/pages/SearchPage.tsx';
 import HistoryViewProductPage from '@/pages/HistoryViewProductPage.tsx';
+import ShopPage from '@/pages/Product/ShopPage.tsx';
 
 //CUSTOMER
 import CustomerInfo from '@/pages/CustomerInfo/CustomerInfo.tsx';
@@ -267,6 +268,10 @@ const router = createBrowserRouter(
         {
           path: "product",
           element: <ProductDetailPage />
+        },
+        {
+          path: "shop",
+          element: <ShopPage/>
         },
         {
           path: "cart",
