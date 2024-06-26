@@ -9,7 +9,7 @@ import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
 import { PiImageThin, PiShoppingCartLight } from "react-icons/pi";
-import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
+import { IoBagCheckOutline, IoEyeOutline, IoListOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
@@ -37,6 +37,7 @@ import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
+import classNames from "classnames";
 interface ISubCategory {
     id: number
     title: string
@@ -90,6 +91,8 @@ const CategoryPage = () => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+    const [scrollPosition, setScrollPosition] = React.useState(0);
 
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
@@ -158,6 +161,18 @@ const CategoryPage = () => {
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
     const [amount, setAmount] = React.useState<number>(1);
+
+    const handleScroll = () => {
+        const position = window.pageYOffset;
+        setScrollPosition(position);
+    };
+
+    const breadCrumbStickyStyle = classNames(
+        "category__breadcrumb bg-white border-b border-gray-300 bg-[#F1F1F1]",
+        {
+            'sticky top-[76px] z-40': scrollPosition > 144
+        }
+    );
 
     const handleProductPriceSort = (item_id: number) => {
 
@@ -375,6 +390,14 @@ const CategoryPage = () => {
     }
 
     React.useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+    
+    React.useEffect(() => {
 
         let category_id = searchParams.get('id');
 
@@ -435,19 +458,19 @@ const CategoryPage = () => {
                         />
                     </div>
                     :
-                    <div className="category-container">
-                        <div className="category__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+                    <div className="category-container relative">
+                        <div className={breadCrumbStickyStyle}>
                             <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                                 <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                 <MdOutlineArrowForwardIos />
                                 <div className="font-medium cursor-pointer hover:underline" onClick={() => handleSelectCategory(activeCategory.id, activeCategory.name)}>{activeCategory.name}</div>
                             </div>
                         </div>
-                        <div className="category__content mt-4 mb-24">
+                        <div className="category__content bg-[#F5F5F5] pt-4 mb-24">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
-                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
+                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
                                     <div className="section">
-                                        <div className="section__title text-lg mb-3">Danh mục sản phẩm</div>
+                                        <div className="section__title text-lg font-medium mb-3 flex items-center gap-x-2 pb-3 mb-2 border-b border-gray-300"><IoListOutline/> Danh mục sản phẩm</div>
                                         {subCategoryList.map((item, index) => {
                                             return (
                                                 <div
@@ -461,7 +484,7 @@ const CategoryPage = () => {
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">
-                                        <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
+                                        <div className="section__title text-lg font-medium mb-3">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
                                             <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối thiểu" />
                                             <div>-</div>
@@ -471,7 +494,7 @@ const CategoryPage = () => {
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">
-                                        <div className="section__title text-lg mb-3">Đánh giá</div>
+                                        <div className="section__title text-lg font-medium mb-3">Đánh giá</div>
                                         <div className="ratings-filter">
                                             <div className="5-stars flex items-center gap-x-4 cursor-pointer group mb-1">
                                                 <div className="flex items-center gap-x-1 bg-yellow-100 p-1 rounded-[4px] border border-[#FCB800]">
@@ -530,7 +553,7 @@ const CategoryPage = () => {
                                 </div>
                                 <div className="main__item-list flex-1">
                                     <div className="box">
-                                        <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
+                                        <div className="box__top rounded-t-[4px] bg-[#EDEDED] px-4 pt-2 pb-4">
                                             <div className="text-2xl my-2">{activeCategory.name}</div>
                                             <div className="flex items-center gap-x-1 mb-5">
                                                 <span className="font-medium">{totalItems}</span>
@@ -584,7 +607,7 @@ const CategoryPage = () => {
                                         <>
                                             {
                                                 productList && productList.length > 0 ?
-                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
+                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-8">
                                                         {
                                                             productListFetch ?
                                                                 <>
@@ -606,7 +629,7 @@ const CategoryPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product border border-white px-4 py-2" key={`category-loding-item-${index}`}>
+                                                                                        <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`category-loding-item-${index}`}>
                                                                                             <div className="product__image flex items-center justify-center">
                                                                                                 <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                             </div>
@@ -625,7 +648,7 @@ const CategoryPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
+                                                                                        <div className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                             <div className="product__image flex flex-col items-center justify-center relative">
                                                                                                 {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
                                                                                                 <LoadImage img_style="w-40 h-60" product_id={item.id} />
@@ -693,10 +716,10 @@ const CategoryPage = () => {
                                         </>
 
                                         :
-                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
+                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-4">
                                             {productList && productList.length > 0 && productList.map((item, index) => {
                                                 return (
-                                                    <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
+                                                    <div className="product bg-white flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`category-column-item-${index}`}
                                                         onClick={() => handleProductDetailNavigation(item.id, item.name)}
                                                     >
@@ -745,7 +768,7 @@ const CategoryPage = () => {
                                     }
                                     {
                                         productList && productList.length > 0 &&
-                                        <div className='pagination-container flex justify-center'>
+                                        <div className='pagination-container flex justify-center mb-6'>
                                             <ReactPaginate
                                                 nextLabel=">"
                                                 onPageChange={handlePageClick}

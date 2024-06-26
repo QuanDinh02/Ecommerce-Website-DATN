@@ -37,6 +37,7 @@ import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
+import classNames from "classnames";
 
 interface ISubCategoryActive {
     id: number
@@ -100,7 +101,7 @@ const SubCategoryPage = () => {
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
-    const [previewImage, setPreviewImage] = React.useState("");
+    const [scrollPosition, setScrollPosition] = React.useState(0);
 
     const [activeCategory, setActiveCategory] = React.useState<ICategory>({
         id: 0,
@@ -190,6 +191,18 @@ const SubCategoryPage = () => {
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
     const [amount, setAmount] = React.useState<number>(1);
+
+    const handleScroll = () => {
+        const position = window.pageYOffset;
+        setScrollPosition(position);
+    };
+
+    const breadCrumbStickyStyle = classNames(
+        "category__breadcrumb bg-white border-b border-gray-300 bg-[#F1F1F1]",
+        {
+            'sticky top-[76px] z-40': scrollPosition > 144
+        }
+    );
 
     const handleFilter = (id: number) => {
         setFilterItems(draft => {
@@ -312,7 +325,7 @@ const SubCategoryPage = () => {
     }
 
     const handleQuickView = (item: ICateogryProduct) => {
-        console.log(item);
+
         setProductQuickView(draft => {
             draft.id = item.id;
             draft.name = item.name;
@@ -345,7 +358,6 @@ const SubCategoryPage = () => {
     const fetchSubCategoryInfo = async (sub_category_id: number) => {
         let sub_category_info = await getSubCategoryInfo(sub_category_id);
         if (sub_category_info) {
-            console.log(sub_category_info);
 
             setActiveSubCategory({
                 ...activeSubCategory, id: sub_category_info.id, title: sub_category_info.title
@@ -415,6 +427,14 @@ const SubCategoryPage = () => {
     }
 
     React.useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
+    React.useEffect(() => {
 
         let sub_category_id = searchParams.get('id');
 
@@ -475,7 +495,7 @@ const SubCategoryPage = () => {
                     </div>
                     :
                     <div className="category-container">
-                        <div className="category__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+                        <div className={breadCrumbStickyStyle}>
                             <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                                 <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                 <MdOutlineArrowForwardIos />
@@ -484,11 +504,11 @@ const SubCategoryPage = () => {
                                 <div className="font-medium cursor-pointer hover:underline">{activeSubCategory.title}</div>
                             </div>
                         </div>
-                        <div className="category__content mt-4 mb-24">
+                        <div className="category__content bg-[#F5F5F5] pt-4 mb-24">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
-                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
+                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
                                     <div className="section">
-                                        <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
+                                        <div className="section__title text-lg mb-3 font-medium">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
                                             <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối thiểu" />
                                             <div>-</div>
@@ -498,7 +518,7 @@ const SubCategoryPage = () => {
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">
-                                        <div className="section__title text-lg mb-3">Đánh giá</div>
+                                        <div className="section__title text-lg mb-3 font-medium">Đánh giá</div>
                                         <div className="ratings-filter">
                                             <div className="5-stars flex items-center gap-x-4 cursor-pointer group mb-1">
                                                 <div className="flex items-center gap-x-1 bg-yellow-100 p-1 rounded-[4px] border border-[#FCB800]">
@@ -557,7 +577,7 @@ const SubCategoryPage = () => {
                                 </div>
                                 <div className="main__item-list flex-1">
                                     <div className="box">
-                                        <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
+                                        <div className="box__top rounded-t-[4px] bg-[#EDEDED] px-4 pt-2 pb-4">
                                             <div className="text-2xl my-2">{activeSubCategory.id !== 0 ? activeSubCategory.title : activeCategory.name}</div>
                                             <div className="flex items-center gap-x-1 mb-5">
                                                 <span className="font-medium">{totalItems}</span>
@@ -611,7 +631,7 @@ const SubCategoryPage = () => {
                                         <>
                                             {
                                                 productList && productList.length > 0 ?
-                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
+                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-8">
                                                         {
                                                             productListFetch ?
                                                                 <>
@@ -633,7 +653,7 @@ const SubCategoryPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product border border-white px-4 py-2" key={`sub-category-loading-item-${index}`}>
+                                                                                        <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`sub-category-loading-item-${index}`}>
                                                                                             <div className="product__image flex items-center justify-center">
                                                                                                 <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                             </div>
@@ -653,7 +673,7 @@ const SubCategoryPage = () => {
                                                                                 {productList && productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
                                                                                         <div
-                                                                                            className="product border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group"
+                                                                                            className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group"
                                                                                             key={`sub-category-item-${index}`}
                                                                                             onClick={() => {
                                                                                                 handleProductDetailNavigation(item.id, item.name);
@@ -725,10 +745,10 @@ const SubCategoryPage = () => {
                                         </>
 
                                         :
-                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
+                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-4">
                                             {productList && productList.length > 0 && productList.map((item, index) => {
                                                 return (
-                                                    <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
+                                                    <div className="product bg-white flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`sub-category-column-item-${index}`}
                                                         onClick={() => {
                                                             handleProductDetailNavigation(item.id, item.name);
@@ -779,7 +799,7 @@ const SubCategoryPage = () => {
                                     }
                                     {
                                         productList && productList.length > 0 &&
-                                        <div className='pagination-container flex justify-center'>
+                                        <div className='pagination-container flex justify-center mb-6'>
                                             <ReactPaginate
                                                 nextLabel=">"
                                                 onPageChange={handlePageClick}
