@@ -633,7 +633,7 @@ const CategoryPage = () => {
                                                                                     return (
                                                                                         <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`category-loding-item-${index}`}>
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
+                                                                                                <div className="w-40 h-52 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                             </div>
                                                                                             <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-1 mt-3"></div>
                                                                                             <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-2"></div>
@@ -652,8 +652,8 @@ const CategoryPage = () => {
                                                                                     return (
                                                                                         <div className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                             <div className="product__image flex flex-col items-center justify-center relative">
-                                                                                                {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                                {/* <LoadImageS3 img_style="w-40 h-52" img_url={item.image} /> */}
+                                                                                                <LoadImage img_style="w-40 h-52" product_id={item.id} />
                                                                                                 <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                                                                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                         e.stopPropagation();
@@ -727,7 +727,7 @@ const CategoryPage = () => {
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             {/* <LoadImageS3 img_style="w-40 h-40" img_url={item.image} /> */}
-                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                            <LoadImage img_style="w-40 h-52" product_id={item.id} />
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">

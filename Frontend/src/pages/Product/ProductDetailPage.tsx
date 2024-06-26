@@ -741,6 +741,13 @@ const ProductDetailPage = () => {
             search: `?id=${sub_category_id}&page=1`,
         });
     }
+    
+    const handleShopNavigation = (shop_id: number) => {
+        navigate({
+            pathname: "/shop",
+            search: `?shop=${shop_id}`,
+        });
+    }
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
@@ -956,12 +963,12 @@ const ProductDetailPage = () => {
                                         <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div>
                                         <div className="pr-8 border-r border-gray-300 mr-4">
                                             <div className="shop_name text-lg mb-2">{shopInfo.shop_name}</div>
-                                            <div className="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-100 cursor-pointer flex items-center justify-center gap-x-2"><PiStorefrontLight className="w-5 h-5" /> Xem Shop</div>
+                                            <div className="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-100 cursor-pointer flex items-center justify-center gap-x-2" onClick={() => handleShopNavigation(shopInfo.id)}><PiStorefrontLight className="w-5 h-5" /> Xem Shop</div>
                                         </div>
                                         <div className="flex-1 flex item-center gap-x-10">
                                             <div className="flex items-center gap-x-10">
                                                 <span className="text-gray-500">Sản Phẩm</span>
-                                                <span className="text-red-500">{shopInfo.product_total}</span>
+                                                <span className="text-red-500">{numberKFormat(shopInfo.product_total)}</span>
                                             </div>
                                             <div className="flex items-center gap-x-10">
                                                 <span className="text-gray-500">Tham Gia</span>

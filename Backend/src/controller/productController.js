@@ -1,4 +1,5 @@
 import productServices from '../services/productServices';
+import sellerServices from '../services/sellerServices';
 
 const getProductDetail = async (req, res) => {
     try {
@@ -88,6 +89,70 @@ const getProductsByCategory = async (req, res) => {
         let { id, limit, page } = req.query;
 
         let result = await productServices.getProductsByCategory(+id, +limit, +page);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getProductsByShopCategory = async (req, res) => {
+    try {
+
+        let { category_id, shop_id, limit, page } = req.query;
+
+        let result = await productServices.getProductsByShopCategory(+category_id, +shop_id, +limit, +page);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getShopCategories = async (req, res) => {
+    try {
+
+        let { shop_id } = req.query;
+
+        let result = await sellerServices.getShopCategory(+shop_id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getShopInfo = async (req, res) => {
+    try {
+
+        let { id } = req.query;
+
+        let result = await productServices.getShopInfo(+id);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -222,5 +287,6 @@ module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     handleUpdateProductImage, handleGetSearchProducts,
     getProductDetail, getProductReviews, handleGetSearchProductsWithPagination,
-    getProductsHistory, getHistoryProductsSwiper, getProductDetailShopInfo
+    getProductsHistory, getHistoryProductsSwiper, getProductDetailShopInfo,
+    getProductsByShopCategory, getShopCategories, getShopInfo
 }

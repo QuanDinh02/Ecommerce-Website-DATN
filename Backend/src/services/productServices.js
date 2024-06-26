@@ -202,6 +202,67 @@ const getProductDetailShopInfo = async (product_id) => {
     }
 }
 
+const getShopInfo = async (shop_id) => {
+    try {
+
+        let shop_info = await db.Seller.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'shopName'],
+            include: [
+                {
+                    model: db.User,
+                    attributes: ['registeredAt'],
+                },
+            ],
+            where: {
+                id: {
+                    [Op.eq]: shop_id,
+                },
+            },
+        });
+
+        let { count } = await db.Product.findAndCountAll({
+            raw: true,
+            where: {
+                shop_id: {
+                    [Op.eq]: shop_id,
+                },
+            }
+        });
+
+        let shop_join_date = shop_info.User.registeredAt;
+
+        // const getObjectParams = {
+        //     Bucket: bucketName,
+        //     Key: `${product_id}.jpeg`
+        // }
+
+        // const command = new GetObjectCommand(getObjectParams);
+        // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+        return {
+            EC: 0,
+            DT: {
+                id: shop_id,
+                image: "",
+                shop_name: shop_info.shopName,
+                product_total: count,
+                shop_join_date: shop_join_date
+            },
+            EM: 'Shop info summary !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getProductsHistory = async (item_limit, page, data) => {
     try {
 
@@ -560,6 +621,287 @@ const getProductsByCategory = async (category_id, item_limit, page) => {
                     product_list: productListFinalWithImage
                 },
                 EM: 'Get products by category !'
+            }
+        }
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getProductsByShopCategory = async (sub_category_id, shop_id, item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            if (sub_category_id === 0) {
+                let subCategoryByCategoryList = await db.SubCategory.findAll({
+                    raw: true,
+                    attributes: ['id', 'title'],
+                    where: {
+                        shopID: {
+                            [Op.eq]: shop_id,
+                        },
+                    },
+                });
+
+                let subCategoryIdList = await subCategoryByCategoryList.map(item => {
+                    return item.id;
+                })
+
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: [
+                        {
+                            model: db.Product,
+                            attributes: ['id', 'name', 'summary'],
+                            raw: true,
+                            nest: true,
+                            include: {
+                                model: db.Seller,
+                                attributes: ['id', 'shopName']
+                            }
+                        },
+                        {
+                            model: db.SubCategory,
+                            attributes: ['id', 'title'],
+                        }
+                    ],
+                    where: {
+                        subCategoryID: {
+                            [Op.in]: subCategoryIdList,
+                        },
+                    }
+                });
+
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                productListRaw.reverse();
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let productListFinal = await productListRaw.map(item => {
+
+                    let sub_category = {
+                        id: item.SubCategory.id,
+                        name: item.SubCategory.title
+                    }
+
+                    let seller_info = {
+                        id: item.Product.Seller.id,
+                        name: item.Product.Seller.shopName,
+                    }
+
+                    return {
+                        id: item.Product.id,
+                        name: item.Product.name,
+                        summary: item.Product.summary ? item.Product.summary : "",
+                        sub_category: sub_category,
+                        seller_info: seller_info
+                    }
+                });
+
+                let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+                    let productType = await db.ProductType.findOne({
+                        raw: true,
+                        attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                        where: {
+                            productID: {
+                                [Op.eq]: item.id
+                            }
+                        }
+                    });
+
+                    // const getObjectParams = {
+                    //     Bucket: bucketName,
+                    //     Key: `${item.id}.jpeg`
+                    // }
+
+                    // const command = new GetObjectCommand(getObjectParams);
+                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                        raw: true,
+                        nest: true,
+                        attributes: ['id', 'rating'],
+                        where: {
+                            productID: {
+                                [Op.eq]: item.id,
+                            },
+                        }
+                    });
+
+                    let star_ratings = {
+                        '1': 0,
+                        '2': 0,
+                        '3': 0,
+                        '4': 0,
+                        '5': 0,
+                    }
+
+                    await productReviewList.forEach(item => {
+                        star_ratings[`${item.rating}`] += 1;
+                    });
+
+                    let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                    return {
+                        ...item,
+                        //image: url,
+                        image: "",
+                        current_price: productType.currentPrice,
+                        price: productType.price,
+                        sold: productType.sold,
+                        rating: rating_average,
+                        quantity: productType.quantity
+                    }
+                }));
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: productListFinalWithImage
+                    },
+                    EM: 'Get products by all shop categories !'
+                }
+            }
+            else {
+
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: [
+                        {
+                            model: db.Product,
+                            attributes: ['id', 'name', 'summary'],
+                            raw: true,
+                            nest: true,
+                            include: {
+                                model: db.Seller,
+                                attributes: ['id', 'shopName']
+                            }
+                        },
+                        {
+                            model: db.SubCategory,
+                            attributes: ['id', 'title'],
+                        }
+                    ],
+                    where: {
+                        subCategoryID: {
+                            [Op.eq]: sub_category_id,
+                        },
+                    }
+                });
+
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                productListRaw.reverse();
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let productListFinal = await productListRaw.map(item => {
+
+                    let sub_category = {
+                        id: item.SubCategory.id,
+                        name: item.SubCategory.title
+                    }
+
+                    let seller_info = {
+                        id: item.Product.Seller.id,
+                        name: item.Product.Seller.shopName,
+                    }
+
+                    return {
+                        id: item.Product.id,
+                        name: item.Product.name,
+                        summary: item.Product.summary ? item.Product.summary : "",
+                        sub_category: sub_category,
+                        seller_info: seller_info
+                    }
+                });
+
+                let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
+
+                    let productType = await db.ProductType.findOne({
+                        raw: true,
+                        attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                        where: {
+                            productID: {
+                                [Op.eq]: item.id
+                            }
+                        }
+                    });
+
+                    // const getObjectParams = {
+                    //     Bucket: bucketName,
+                    //     Key: `${item.id}.jpeg`
+                    // }
+
+                    // const command = new GetObjectCommand(getObjectParams);
+                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                        raw: true,
+                        nest: true,
+                        attributes: ['id', 'rating'],
+                        where: {
+                            productID: {
+                                [Op.eq]: item.id,
+                            },
+                        }
+                    });
+
+                    let star_ratings = {
+                        '1': 0,
+                        '2': 0,
+                        '3': 0,
+                        '4': 0,
+                        '5': 0,
+                    }
+
+                    await productReviewList.forEach(item => {
+                        star_ratings[`${item.rating}`] += 1;
+                    });
+
+                    let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                    return {
+                        ...item,
+                        //image: url,
+                        image: "",
+                        current_price: productType.currentPrice,
+                        price: productType.price,
+                        sold: productType.sold,
+                        rating: rating_average,
+                        quantity: productType.quantity
+                    }
+                }));
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: productListFinalWithImage
+                    },
+                    EM: 'Get products by shop category !'
+                }
             }
         }
         return {
@@ -1002,5 +1344,6 @@ module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     putUpdateProductImage, getSearchProducts,
     getProductDetail, getProductReviews, getSearchProductsWithPagination,
-    getProductsHistory, getProductsHistorySwiper, getProductDetailShopInfo
+    getProductsHistory, getProductsHistorySwiper, getProductDetailShopInfo,
+    getProductsByShopCategory, getShopInfo
 }

@@ -9,6 +9,30 @@ export const getProductsByCategory = async (category_id: number, page: number) =
     return null;
 }
 
+export const getProductsByShopCategory = async (shop_id: number, category_id: number, page: number) => {
+    let result: APIResponse = await axios.get(`/api/shop/products/category?limit=${20}&category_id=${category_id}&page=${page}&shop_id=${shop_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const getShopCategories = async (shop_id: number) => {
+    let result: APIResponse = await axios.get(`/api/shop/categories?shop_id=${shop_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const getShopInfo = async (shop_id: number) => {
+    let result: APIResponse = await axios.get(`/api/shop/shop_info?id=${shop_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
 export const getProductsBySubCategory = async (sub_category_id: number, page: number) => {
     let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}`);
     if (result && result?.DT) {
@@ -72,7 +96,7 @@ interface IProductHistory {
 }
 
 export const getProductsHistory = async (data: IProductHistory) => {
-    let result: APIResponse = await axios.post('/api/products/history',data);
+    let result: APIResponse = await axios.post('/api/products/history', data);
     if (result && result?.DT) {
         return result.DT;
     }
@@ -80,7 +104,7 @@ export const getProductsHistory = async (data: IProductHistory) => {
 }
 
 export const getProductsHistoryNoPagination = async (data: number[]) => {
-    let result: APIResponse = await axios.post('/api/products/history/swiper',data);
+    let result: APIResponse = await axios.post('/api/products/history/swiper', data);
     if (result && result?.DT) {
         return result.DT;
     }

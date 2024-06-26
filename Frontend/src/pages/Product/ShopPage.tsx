@@ -1,11 +1,11 @@
 import LoadImage from "@/components/LoadImage";
-import { PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST } from "@/data/category";
+import { PRODUCT_PRICE_SORT, PRODUCT_PRICE_SORT_LIST, PRODUCT_PRICE_SORT_TIME } from "@/data/category";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
 import React from "react";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { IoBagCheckOutline, IoEyeOutline, IoListOutline } from "react-icons/io5";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { PiShoppingCartLight } from "react-icons/pi";
+import { PiShoppingCartLight, PiStorefrontLight } from "react-icons/pi";
 import { TailSpin, ThreeDots } from "react-loader-spinner";
 import ReactPaginate from "react-paginate";
 import { useDispatch } from "react-redux";
@@ -28,6 +28,11 @@ import { GoDotFill } from "react-icons/go";
 import ReactQuill from "react-quill";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { FaRegHeart } from "react-icons/fa6";
+import { getProductsByShopCategory, getShopCategories, getShopInfo } from "@/services/productService";
+import classNames from "classnames";
+import { dateSpan } from "@/utils/dateFormat";
+import { LiaUserCheckSolid } from "react-icons/lia";
+import { RiMessage2Line } from "react-icons/ri";
 
 interface IShopInfo {
     id: number
@@ -37,6 +42,7 @@ interface IShopInfo {
 interface ICategory {
     id: number
     title: string
+    quantity: number
 }
 
 interface ICategoryProduct {
@@ -65,32 +71,19 @@ interface IProductQuickView {
     quantity: number
 }
 
-const CATEGORY_LIST = [
-    {
-        id: 0,
-        title: "Tất Cả"
-    },
-    {
-        id: 1,
-        title: "KIT"
-    },
-    {
-        id: 2,
-        title: "Switch"
-    },
-    {
-        id: 3,
-        title: "Keycabs"
-    },
-    {
-        id: 4,
-        title: "Chuột và Lót chuột"
-    },
-    {
-        id: 5,
-        title: "Phím cơ Gaming"
-    }
-]
+interface IData {
+    page: number
+    page_total: number
+    product_list: ICategoryProduct[]
+}
+
+interface IShopInfoDetail {
+    id: number
+    image: string
+    shop_name: string
+    product_total: number
+    shop_join_date: Date
+}
 
 const ShopPage = () => {
 
@@ -108,12 +101,26 @@ const ShopPage = () => {
     const [totalPages, setTotalPages] = React.useState<number>(1);
     const [amount, setAmount] = React.useState<number>(1);
 
+    const [shopID, setShopID] = React.useState<number>(0);
     const [categoryID, setCategoryID] = React.useState<number>(0);
-    const [categoryList, setCategoryList] = React.useState<ICategory[]>(CATEGORY_LIST);
+
+    const [shopInfo, setShopInfo] = React.useState<IShopInfoDetail>({
+        id: 0,
+        image: "",
+        shop_name: "Shop Name",
+        product_total: 0,
+        shop_join_date: new Date()
+    });
+    const [categoryList, setCategoryList] = React.useState<ICategory[]>([{
+        id: 0,
+        title: "Tất Cả",
+        quantity: 0
+    },]);
+
     const [productList, setProductList] = React.useState<ICategoryProduct[]>([]);
 
-    const [productListLoading, setProductListLoading] = React.useState<boolean>(false);
-    const [productListFetch, setProductListFetch] = React.useState<boolean>(false);
+    const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
+    const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
     const [productQuickView, setProductQuickView] = useImmer<IProductQuickView>({
@@ -156,6 +163,10 @@ const ShopPage = () => {
         value: ""
     });
 
+    const categoryActiveStyle = (active: boolean) => classNames("mb-2 duration-300 cursor-pointer hover:text-[#FCB800]", {
+        'text-[#FCB800]': active
+    })
+
     const handleProductAmount = (num: any) => {
         if (!isNaN(num) && num > 0) {
             setAmount(num);
@@ -176,10 +187,10 @@ const ShopPage = () => {
     }
 
     const handleSelectSubCategory = (category_shop_id: number) => {
-        // navigate({
-        //     pathname: "/sub-category",
-        //     search: `?id=${sub_category_id}&page=1`,
-        // });
+        navigate({
+            pathname: "/shop",
+            search: `?shop=${shopID}&category=${category_shop_id}&page=1`,
+        });
     }
 
     const handleProductPriceSort = (item_id: number) => {
@@ -187,31 +198,31 @@ const ShopPage = () => {
         let sort_item = PRODUCT_PRICE_SORT[`${item_id}`];
         setPriceArrangement(sort_item);
 
-        // let sortProductListRaw = _.cloneDeep(productList);
+        let sortProductListRaw = _.cloneDeep(productList);
 
-        // if (sort_item.value !== "") {
+        if (sort_item.value !== "") {
 
-        //     let sortProductList = _.orderBy(sortProductListRaw, 'current_price', sort_item.value.toLowerCase());
-        //     setProductList(sortProductList);
+            let sortProductList = _.orderBy(sortProductListRaw, 'current_price', sort_item.value.toLowerCase());
+            setProductList(sortProductList);
 
-        //     setProductListLoading(true);
+            setProductListLoading(true);
 
-        //     setTimeout(() => {
-        //         setProductListLoading(false);
-        //     }, PRODUCT_PRICE_SORT_TIME);
-        // }
+            setTimeout(() => {
+                setProductListLoading(false);
+            }, PRODUCT_PRICE_SORT_TIME);
+        }
     }
 
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
 
-        // navigate({
-        //     pathname: "/category",
-        //     search: `?id=${categoryID}&page=${+event.selected + 1}`,
+        navigate({
+            pathname: "/shop",
+            search: `?shop=${shopID}&category=${categoryID}&page=${+event.selected + 1}`,
 
-        // }, {
-        //     replace: true
-        // });
+        }, {
+            replace: true
+        });
     }
 
     const hanldeAddShoppingCart = async (quantity: number, product_id: number) => {
@@ -315,6 +326,98 @@ const ShopPage = () => {
         });
     }
 
+    const setLoadingAnimation = () => {
+        setProductListFetch(false);
+        setProductListLoading(true);
+        setTimeout(() => {
+            setProductListLoading(false);
+        }, 1000);
+    }
+
+    const fetchShopCategories = async (shop_id: number) => {
+        let result = await getShopCategories(shop_id);
+        if (result) {
+            setCategoryList([...categoryList, ...result]);
+        }
+    }
+
+    const fetchProductsByCategory = async (shop_id: number, category_id: number) => {
+        let response: IData = await getProductsByShopCategory(shop_id, category_id, currentPage);
+        if (response) {
+            if (priceArrangement.value === "") {
+                setProductList(response.product_list);
+                setTotalPages(response.page_total);
+                setLoadingAnimation();
+            } else {
+                let product_list = response.product_list;
+                switch (priceArrangement.value) {
+                    case "ASC":
+                        let sortProductList1 = _.orderBy(product_list, 'current_price', "asc");
+                        setProductList(sortProductList1);
+                        setLoadingAnimation();
+                        return;
+                    case "DESC":
+                        let sortProductList2 = _.orderBy(product_list, 'current_price', "desc");
+                        setProductList(sortProductList2);
+                        setLoadingAnimation();
+                        return;
+                }
+            }
+        }
+    }
+
+    const fetchShopInfoDetail = async (shop_id: number) => {
+        let res: IShopInfoDetail = await getShopInfo(shop_id);
+        if (res) {
+            setShopInfo(res);
+        }
+    }
+
+    React.useEffect(() => {
+
+        let shop_id = searchParams.get('shop');
+
+        let activeShopID: number = shop_id ? +shop_id : 0;
+
+        if (activeShopID !== shopID) {
+            setShopID(activeShopID);
+            fetchProductsByCategory(activeShopID, categoryID);
+            fetchShopCategories(activeShopID);
+            fetchShopInfoDetail(activeShopID);
+        }
+
+    }, [searchParams.get('shop')]);
+
+    React.useEffect(() => {
+
+        let category_id = searchParams.get('category');
+
+        let activeCategoryID: number = category_id ? +category_id : 0;
+
+        if (activeCategoryID !== categoryID) {
+            setCategoryID(activeCategoryID);
+        }
+
+    }, [searchParams.get('category')]);
+
+    React.useEffect(() => {
+
+        let page = searchParams.get('page');
+
+        setCurrentPage(page ? +page : 1);
+
+    }, [searchParams.get('page')]);
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        if (shopID != 0 && currentPage != 0) {
+            fetchProductsByCategory(shopID, categoryID);
+        }
+
+    }, [categoryID, currentPage]);
+
     React.useEffect(() => {
 
         setTimeout(() => {
@@ -341,7 +444,28 @@ const ShopPage = () => {
                     </div>
                     :
                     <div className="shop-page-container">
-                        <div className="shop-page__info w-[80rem] mx-auto px-[30px] py-4">SHOP INFO</div>
+                        <div className="shop-page__info w-[80rem] mx-auto px-[30px] py-4">
+                            <div className="flex flex-col">
+                                <div className="flex items-center flex-col gap-y-2">
+                                    <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div>
+                                    <div className="shop_name text-2xl mb-2">{shopInfo.shop_name}</div>
+                                </div>
+                                <div className="flex items-center justify-center gap-x-10">
+                                    <div className="flex items-center gap-x-10">
+                                        <span className="flex items-center gap-x-2"><PiStorefrontLight className="w-5 h-5" /> Sản Phẩm</span>
+                                        <span className="text-red-500">{numberKFormat(shopInfo.product_total)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-x-10">
+                                        <span className="flex items-center gap-x-2"><LiaUserCheckSolid className="w-5 h-5" /> Tham Gia</span>
+                                        <span className="text-red-500">{dateSpan(`${shopInfo.shop_join_date}`)}</span>
+                                    </div>
+                                    <div className="flex items-center gap-x-10">
+                                        <span className="flex items-center gap-x-2"><RiMessage2Line className="w-5 h-5" /> Tỉ Lệ Phản Hổi Chat</span>
+                                        <span className="text-red-500">100%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <div className="shop-page__content bg-[#F5F5F5] pt-10 pb-4">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
                                 <div className="main__category-list w-60 pr-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
@@ -351,9 +475,11 @@ const ShopPage = () => {
                                             return (
                                                 <div
                                                     key={`shop-category-item-${index}`}
-                                                    className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
+                                                    className={categoryActiveStyle(item.id === categoryID)}
                                                     onClick={() => handleSelectSubCategory(item.id)}
-                                                >{item.title}</div>
+                                                >
+                                                    <div>{item.title} {item.quantity !== 0 && <span className="text-gray-500 text-sm">({item.quantity})</span>}</div>
+                                                </div>
                                             )
                                         })}
                                     </div>
@@ -423,7 +549,7 @@ const ShopPage = () => {
                                                                                 return (
                                                                                     <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`category-loding-item-${index}`}>
                                                                                         <div className="product__image flex items-center justify-center">
-                                                                                            <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
+                                                                                            <div className="w-40 h-52 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                         </div>
                                                                                         <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-1 mt-3"></div>
                                                                                         <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-2"></div>
@@ -443,7 +569,7 @@ const ShopPage = () => {
                                                                                     <div className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                         <div className="product__image flex flex-col items-center justify-center relative">
                                                                                             {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                            <LoadImage img_style="w-40 h-52" product_id={item.id} />
                                                                                             <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();

@@ -70,6 +70,10 @@ const ApiRoute = (app) => {
 
     router.get('/products/category', productController.getProductsByCategory);
 
+    router.get('/shop/products/category', productController.getProductsByShopCategory);
+    router.get('/shop/categories', productController.getShopCategories);
+    router.get('/shop/shop_info', cacheMiddleware(300), productController.getShopInfo);
+
     router.get('/products/sub-category', productController.getProductsBySubCategory);
 
     router.get('/products/search', productController.handleGetSearchProducts);
