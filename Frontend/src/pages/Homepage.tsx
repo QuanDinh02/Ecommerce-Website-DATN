@@ -495,6 +495,11 @@ const Homepage = () => {
 
     const [amount, setAmount] = React.useState<number>(1);
 
+    const handleCloseQuickView = (active: boolean) => {
+        setShowQuickView(active);
+        setAmount(1);
+    }
+
     const handleQuickView = (item: IRecommendProduct) => {
         setProductQuickView(draft => {
             draft.id = item.id;
@@ -523,6 +528,7 @@ const Homepage = () => {
             if (result && result.EC === 0) {
                 refetchCartItem();
                 successToast1(result.EM);
+                setAmount(1);
             }
         } else {
             navigate("/login");
@@ -710,7 +716,7 @@ const Homepage = () => {
 
                 </div>
             </div>
-            <Modal show={showQuickView} setShow={setShowQuickView} size="customize-h-auto">
+            <Modal show={showQuickView} setShow={handleCloseQuickView} size="customize-h-auto">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
                         {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
@@ -761,13 +767,13 @@ const Homepage = () => {
                         <div className="flex items-end gap-x-4">
                             <div>
                                 <div className="mb-1">Số lượng</div>
-                                <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 select-none px-2">
                                     <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
                                     <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
                                     <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
                                 </div>
                             </div>
-                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(1, productQuickView.id)}>Thêm vào giỏ hàng</div>
+                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(amount, productQuickView.id)}>Thêm vào giỏ hàng</div>
                             <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
                         </div>
                     </div>

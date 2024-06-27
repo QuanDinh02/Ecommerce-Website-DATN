@@ -179,7 +179,7 @@ const ShoppingCartPage = () => {
                                                                         </td>
                                                                         <td className="py-3 px-2 text-sm">{CurrencyFormat(item.price)}</td>
                                                                         <td className="py-3 px-2">
-                                                                            <div className="w-24 h-8 border border-gray-300 flex items-center hover:border-black duration-300 px-2">
+                                                                            <div className="w-24 h-8 border border-gray-300 flex items-center hover:border-black duration-300 select-none px-2">
                                                                                 <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity - 1)} />
                                                                                 <input type="text" className="w-1/2 text-center outline-none select-none" value={item.quantity} onChange={(e) => handleUpdateCartItem(item.id, +e.target.value)} />
                                                                                 <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={() => handleUpdateCartItem(item.id, item.quantity + 1)} />
