@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { IoIosArrowForward } from "react-icons/io";
 
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Autoplay, Navigation } from 'swiper/modules';
 
 // Import Swiper styles
 import 'swiper/css/navigation';
@@ -225,10 +225,15 @@ const RelevantRecommendItemList = (props: IProps) => {
         <>
             <Swiper
                 navigation={true}
-                modules={[Navigation]}
+                modules={[Navigation, Autoplay]}
                 className="mySwiper product-list"
                 spaceBetween={10}
                 slidesPerView={5}
+                loop={true}
+                autoplay={{
+                    delay: 2200,
+                    disableOnInteraction: false,
+                }}
             >
                 {
                     recommendItemList && recommendItemList.length > 0 &&
@@ -395,10 +400,15 @@ const HistoryItemList = (props: IHistoryItemProps) => {
         <>
             <Swiper
                 navigation={true}
-                modules={[Navigation]}
+                modules={[Navigation, Autoplay]}
                 className="mySwiper product-list"
                 spaceBetween={10}
                 slidesPerView={5}
+                loop={true}
+                autoplay={{
+                    delay: 2500,
+                    disableOnInteraction: false,
+                }}
             >
                 {
                     props.data && props.data.length > 0 &&
@@ -741,7 +751,7 @@ const ProductDetailPage = () => {
             search: `?id=${sub_category_id}&page=1`,
         });
     }
-    
+
     const handleShopNavigation = (shop_id: number) => {
         navigate({
             pathname: "/shop",
