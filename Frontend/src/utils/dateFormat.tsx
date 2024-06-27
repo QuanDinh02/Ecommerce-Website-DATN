@@ -65,8 +65,9 @@ export const isValidDate = (day: number, month: number, year: number) => {
     var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     // Adjust for leap years
-    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0))
+    if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
         monthLength[1] = 29;
+    }
 
     if (day > monthLength[month - 1]) {
         return false;

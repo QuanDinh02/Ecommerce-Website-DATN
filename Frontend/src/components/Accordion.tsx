@@ -64,9 +64,12 @@ const AccordionItem = ({ item, isOpen, onClick, parent_path }) => {
                 <div className="sub-menu-content transition-all">
                     {
                         sideBarItem.children && sideBarItem.children.length > 0 &&
-                        sideBarItem.children.map(child_item => {
+                        sideBarItem.children.map((child_item, index) => {
                             return (
-                                <div className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer font-medium" : "py-3 pl-10 pr-4 cursor-pointer hover:font-medium duration-200"} onClick={() => navigate(`${parent_path}${sideBarItem.path}${child_item.path}`)}>
+                                <div 
+                                key={`sidebar-child-item-${index}`}
+                                className={location.pathname.includes(child_item.path) ? "py-3 pl-10 pr-4 cursor-pointer font-medium" : "py-3 pl-10 pr-4 cursor-pointer hover:font-medium duration-200"} 
+                                onClick={() => navigate(`${parent_path}${sideBarItem.path}${child_item.path}`)}>
                                     {child_item.name}
                                 </div>
                             )

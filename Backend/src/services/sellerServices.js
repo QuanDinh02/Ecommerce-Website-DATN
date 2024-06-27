@@ -12,7 +12,7 @@ const singleFileUpload = async (fileObject, product_id) => {
     let extName = path.extname(fileObject.name);
 
     let uploadPath = path.resolve(__dirname, '../../../Frontend/src/assets/img/products');
-    let finalName = `${product_id}${extName}`;
+    let finalName = `${product_id}.jpeg`;
     let finalPath = `${uploadPath}/${finalName}`;
 
     try {

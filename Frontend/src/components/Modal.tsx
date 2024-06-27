@@ -29,8 +29,8 @@ const Modal = (props: MProps) => {
         <>
             {show &&
                 <>
-                    <div className="w-full h-screen fixed bg-gray-600 opacity-80 flex z-40 top-0 right-0 left-0"></div>
-                    <div className="h-screen fixed flex items-center justify-center z-50 top-0 right-0 left-0">
+                    <div className="w-full h-screen fixed bg-gray-600 opacity-80 flex z-50 top-0 right-0 left-0"></div>
+                    <div className="h-screen fixed flex items-center justify-center z-[60] top-0 right-0 left-0">
                         <div className={`${sizes[`${type}`]} relative`}>
                             <div className="bg-white rounded-lg p-5 h-full">
                                 <div className="w-full h-full overflow-y-auto">

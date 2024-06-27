@@ -366,7 +366,7 @@ const AllOrder = () => {
                                                 )
                                             })}
                                             <tr>
-                                                <td colSpan={9}>
+                                                <td colSpan={10}>
                                                     {
                                                         <div className='pagination-container my-4 flex justify-center'>
                                                             <ReactPaginate

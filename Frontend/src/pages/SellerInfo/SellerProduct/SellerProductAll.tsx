@@ -9,7 +9,7 @@ import { TiArrowUnsorted } from "react-icons/ti";
 import Button from "@/components/Button";
 import ReactPaginate from "react-paginate";
 import { Dropdown } from "@/components/Dropdown";
-import { CustomizeDropdown, MODULE } from "./SellerAddNewProduct";
+import CustomizeDropdown from "./CustomizeProduct";
 import { useImmer } from "use-immer";
 import { ThreeDots } from "react-loader-spinner";
 import { deleteProduct, getCategoryList, getProductsPagination, getSubCategoryByCategory, updateProduct } from "@/services/sellerService";
@@ -21,6 +21,31 @@ import FloatingInput from "@/components/Floating/FloatingInput";
 import { TfiReload } from "react-icons/tfi";
 import { getSubCategoryInfo } from "@/services/subCategoryService";
 import FloatingNumberInput from "@/components/Floating/FloatingNumberInput";
+
+const MODULE = {
+    toolbar: [
+        [{ header: [1, 2, 3, 4, 5, false] }],
+        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' },
+        { 'indent': '-1' }, { 'indent': '+1' }],
+        ['link'],
+        ['clean'],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }, {
+            'color': [
+                '#000000', '#e60000', '#ff9900', '#ffff00', '#008a00', '#0066cc',
+                '#9933ff', '#ffffff', '#facccc', '#ffebcc', '#ffffcc', '#cce8cc',
+                '#cce0f5', '#ebd6ff', '#bbbbbb', '#f06666', '#ffc266', '#ffff66',
+                '#66b966', '#66a3e0', '#c285ff', '#888888', '#a10000', '#b26b00',
+                '#b2b200', '#006100', '#0047b2', '#6b24b2', '#444444', '#5c0000',
+                '#663d00', '#666600', '#003700', '#002966', '#3d1466', 'custom-color'
+            ]
+        }, { 'background': [] }, 'link'],
+    ],
+    clipboard: {
+        // toggle to add extra line breaks when pasting HTML:
+        matchVisual: false,
+    }
+}
 
 interface IProduct {
     id: number

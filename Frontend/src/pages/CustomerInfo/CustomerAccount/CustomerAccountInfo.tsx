@@ -107,6 +107,8 @@ const CustomerAccountInfo = () => {
         new_birth.setDate(date.day);
         new_birth.setMonth(date.month - 1);
         new_birth.setFullYear(date.year);
+        
+        new_birth.setHours(0, 0, 0, 0);
 
         let updateData = {
             id: customerInfo.id,
