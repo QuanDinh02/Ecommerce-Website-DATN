@@ -197,7 +197,7 @@ const SubCategoryPage = () => {
     };
 
     const breadCrumbStickyStyle = classNames(
-        "category__breadcrumb bg-white border-b border-gray-200 bg-[#F1F1F1]",
+        "category__breadcrumb border-b border-gray-200 bg-white",
         {
             'sticky top-[76px] border-gray-300 z-40': scrollPosition > 144
         }

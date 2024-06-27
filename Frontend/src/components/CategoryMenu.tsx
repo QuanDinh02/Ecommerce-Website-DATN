@@ -97,7 +97,7 @@ const CategoryMenu = () => {
     }, []);
 
     return (
-        <div className="menu-sidebar w-60 bg-white relative"
+        <div className="menu-sidebar border border-gray-300 w-60 bg-white relative"
             onMouseLeave={() => handleShowSubmenu(false, true, [], 0, "")}>
             {menuData && menuData.length > 0 && menuData.map((item, index) => {
                 return (

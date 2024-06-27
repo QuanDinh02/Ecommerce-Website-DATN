@@ -51,6 +51,7 @@ import ProductRating from "../Category/ProductRating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import { PiStorefrontLight } from "react-icons/pi";
+import classNames from "classnames";
 
 interface IRecommendProduct {
     id: number
@@ -231,7 +232,7 @@ const RelevantRecommendItemList = (props: IProps) => {
                 slidesPerView={5}
                 loop={true}
                 autoplay={{
-                    delay: 2200,
+                    delay: 3000,
                     disableOnInteraction: false,
                 }}
             >
@@ -598,6 +599,8 @@ const ProductDetailPage = () => {
 
     const [ratingFilter, setRatingFilter] = React.useState<number>(0);
 
+    const [scrollPosition, setScrollPosition] = React.useState(0);
+
     const handleProductAmount = (num: any) => {
         if (!isNaN(num) && num > 0) {
             if (productAmount > 0 && num > productAmount) {
@@ -771,6 +774,26 @@ const ProductDetailPage = () => {
         }
     }
 
+    const handleScroll = () => {
+        const position = window.pageYOffset;
+        setScrollPosition(position);
+    };
+
+    const breadCrumbStickyStyle = classNames(
+        "product-detail__breadcrumb border-b border-gray-200 bg-white",
+        {
+            'sticky top-[76px] border-gray-300 z-40': scrollPosition > 144
+        }
+    );
+
+    React.useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     React.useEffect(() => {
         if (productID !== 0) {
             let history_product_view_list: string | null = localStorage.getItem("hpvl");
@@ -851,7 +874,7 @@ const ProductDetailPage = () => {
                         </div>
                         :
                         <>
-                            <div className="product-detail__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+                            <div className={breadCrumbStickyStyle}>
                                 <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-1">
                                     <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                                     {
