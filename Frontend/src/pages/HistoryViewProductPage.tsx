@@ -133,7 +133,7 @@ const HistoryViewProductPage = () => {
             setTotalPages(response.page_total);
             setTimeout(() => {
                 setDataLoading(false);
-            },300);
+            }, 300);
         }
     }
 
@@ -325,8 +325,15 @@ const HistoryViewProductPage = () => {
                                                     </div>
                                                     <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{product.name}</div>
                                                     <div className="product__price flex items-center gap-2 mb-2.5">
-                                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(product.current_price)}</div>
-                                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(product.price)}</div>
+                                                        {
+                                                            product.current_price === product.price ?
+                                                                <div className="price text-black font-medium">{CurrencyFormat(product.current_price)}</div>
+                                                                :
+                                                                <>
+                                                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(product.current_price)}</div>
+                                                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(product.price)}</div>
+                                                                </>
+                                                        }
                                                     </div>
                                                     <ProductRating
                                                         ratings={product.rating}
@@ -390,8 +397,15 @@ const HistoryViewProductPage = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
-                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
-                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                            {
+                                productQuickView.current_price === productQuickView.price ?
+                                    <div className="product__current-price text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                    :
+                                    <>
+                                        <div className="product__current-price text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                        <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                                    </>
+                            }
                         </div>
                         <div className="shop flex items-center gap-x-4 mb-4">
                             {

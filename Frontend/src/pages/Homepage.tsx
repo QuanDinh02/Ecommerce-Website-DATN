@@ -258,8 +258,15 @@ const RecommendItemList = (props: IProps) => {
                             </div>
                             <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                             <div className="product__price flex items-center gap-2 mb-2.5">
-                                <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
-                                <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                {
+                                    item.current_price === item.price ?
+                                        <div className="price text-black font-medium">{CurrencyFormat(item.current_price)}</div>
+                                        :
+                                        <>
+                                            <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                            <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                        </>
+                                }
                             </div>
                             <ProductRating
                                 ratings={item.rating}
@@ -430,8 +437,15 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                     </div>
                                     <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
-                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
-                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                        {
+                                            item.current_price === item.price ?
+                                                <div className="price text-black font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                :
+                                                <>
+                                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                                </>
+                                        }
                                     </div>
                                     <ProductRating
                                         ratings={item.rating}
@@ -713,8 +727,15 @@ const Homepage = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
-                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
-                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                            {
+                                productQuickView.current_price === productQuickView.price ?
+                                    <div className="product__current-price text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                    :
+                                    <>
+                                        <div className="product__current-price text-green-600 text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                        <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                                    </>
+                            }
                         </div>
                         <div className="shop flex items-center gap-x-4 mb-4">
                             {

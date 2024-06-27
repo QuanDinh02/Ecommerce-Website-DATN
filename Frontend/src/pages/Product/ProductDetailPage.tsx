@@ -244,7 +244,7 @@ const RelevantRecommendItemList = (props: IProps) => {
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                         {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`recommend-item-img-${item.id}`}/>
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`recommend-item-img-${item.id}`} />
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -283,8 +283,15 @@ const RelevantRecommendItemList = (props: IProps) => {
                                     </div>
                                     <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
-                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
-                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                        {
+                                            item.current_price === item.price ?
+                                                <div className="price text-black font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                :
+                                                <>
+                                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                                </>
+                                        }
                                     </div>
                                     <ProductRating
                                         ratings={item.rating}
@@ -419,7 +426,7 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                         {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`history-item-img-${item.id}`}/>
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`history-item-img-${item.id}`} />
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -458,8 +465,15 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                     </div>
                                     <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
-                                        <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
-                                        <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                        {
+                                            item.current_price === item.price ?
+                                                <div className="price text-black font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                :
+                                                <>
+                                                    <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                    <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                                </>
+                                        }
                                     </div>
                                     <ProductRating
                                         ratings={item.rating}
@@ -933,8 +947,15 @@ const ProductDetailPage = () => {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-x-3">
-                                                <div className="product__price text-3xl font-medium my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
-                                                <div className="product__price text-lg text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
+                                                {
+                                                    productDetailInfo.currentPrice === productDetailInfo.price ?
+                                                        <div className="product__price text-3xl font-medium my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
+                                                        :
+                                                        <>
+                                                            <div className="product__price text-green-600 text-3xl font-medium my-4">{CurrencyFormat(productDetailInfo.currentPrice)}</div>
+                                                            <div className="product__price text-lg text-gray-400 line-through my-4">{CurrencyFormat(productDetailInfo.price)}</div>
+                                                        </>
+                                                }
                                             </div>
                                             <div className="shop flex items-center gap-x-4">
                                                 {
@@ -1165,8 +1186,15 @@ const ProductDetailPage = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
-                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
-                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
+                            {
+                                productQuickView.current_price === productQuickView.price ?
+                                    <div className="product__current-price text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                    :
+                                    <>
+                                        <div className="product__current-price text-green-600 text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                        <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                                    </>
+                            }
                         </div>
                         <div className="shop flex items-center gap-x-4 mb-4">
                             {
