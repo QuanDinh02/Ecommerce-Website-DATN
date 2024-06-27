@@ -131,6 +131,9 @@ const HistoryViewProductPage = () => {
         if (response) {
             setHistoryProductList(response.product_list);
             setTotalPages(response.page_total);
+            setTimeout(() => {
+                setDataLoading(false);
+            },300);
         }
     }
 
@@ -244,6 +247,7 @@ const HistoryViewProductPage = () => {
         let history_product_view_list: string | null = localStorage.getItem("hpvl");
         if (history_product_view_list) {
             let old_data = JSON.parse(history_product_view_list);
+            setDataLoading(true);
             fetchHistoryItems(old_data);
         }
     }, [currentPage]);
@@ -387,7 +391,7 @@ const HistoryViewProductPage = () => {
                         </div>
                         <div className="flex items-center gap-2 my-4">
                             <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
-                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
+                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
                         </div>
                         <div className="shop flex items-center gap-x-4 mb-4">
                             {
