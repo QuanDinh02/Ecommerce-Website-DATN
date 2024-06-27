@@ -141,3 +141,30 @@ export const categoryIcon = [
         icon: <IoBookOutline className="w-5 h-5" />,
     }
 ];
+
+export const categoryIconLarge = [
+    {
+        icon: <CiMobile4 className="w-10 h-10" />,
+    },
+    {
+        icon: <CiSpeaker className="w-10 h-10" />,
+    },
+    {
+        icon: <HiOutlineComputerDesktop className="w-10 h-10" />,
+    },
+    {
+        icon: <MdOutlineElectricalServices className="w-10 h-10" />,
+    },
+    {
+        icon: <TbToolsKitchen className="w-10 h-10" />,
+    },
+    {
+        icon: <IoTennisballOutline className="w-10 h-10" />,
+    },
+    {
+        icon: <TbBabyBottle className="w-10 h-10" />,
+    },
+    {
+        icon: <IoBookOutline className="w-10 h-10" />,
+    }
+];

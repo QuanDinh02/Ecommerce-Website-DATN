@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdCancel, MdOutlineMessage } from "react-icons/md";
+import { MdOutlineArrowForwardIos, MdKeyboardArrowDown } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { BsGrid3X3 } from "react-icons/bs";
@@ -8,12 +8,11 @@ import { TfiViewListAlt } from "react-icons/tfi";
 import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
-import { PiImageThin, PiShoppingCartLight } from "react-icons/pi";
+import { PiShoppingCartLight } from "react-icons/pi";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
-import Product01 from '../../assets/img/products_by_category/product_01.svg';
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { getProductsBySubCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
@@ -198,9 +197,9 @@ const SubCategoryPage = () => {
     };
 
     const breadCrumbStickyStyle = classNames(
-        "category__breadcrumb bg-white border-b border-gray-300 bg-[#F1F1F1]",
+        "category__breadcrumb bg-white border-b border-gray-200 bg-[#F1F1F1]",
         {
-            'sticky top-[76px] z-40': scrollPosition > 144
+            'sticky top-[76px] border-gray-300 z-40': scrollPosition > 144
         }
     );
 

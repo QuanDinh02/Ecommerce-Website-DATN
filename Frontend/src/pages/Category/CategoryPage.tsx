@@ -168,9 +168,9 @@ const CategoryPage = () => {
     };
 
     const breadCrumbStickyStyle = classNames(
-        "category__breadcrumb bg-white border-b border-gray-300 bg-[#F1F1F1]",
+        "category__breadcrumb bg-white border-b border-gray-200 bg-[#F1F1F1]",
         {
-            'sticky top-[76px] z-40': scrollPosition > 144
+            'sticky top-[76px] border-gray-300 z-40': scrollPosition > 144
         }
     );
 

@@ -1,4 +1,23 @@
 .homepage-container {
+
+    .homepage-banner {
+        .mySwiper {
+            &:hover {
+
+                .swiper-button-prev,
+                .swiper-button-next {
+                    visibility: unset;
+                }
+            }
+
+            .swiper-button-prev,
+            .swiper-button-next {
+                visibility: hidden;
+            }
+        }
+    }
+
+
     .swiper-pagination {
         position  : unset !important;
         margin-top: 30px;

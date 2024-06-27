@@ -1,11 +1,10 @@
 
 import React from "react";
-import Banner from '../assets/img/homepage/Banner.svg';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation } from 'swiper/modules';
+import { Navigation, Autoplay } from 'swiper/modules';
 import { PiShoppingCartLight } from "react-icons/pi";
 import { successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
@@ -36,6 +35,18 @@ import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import Button from "@/components/Button";
 import { getProductsHistoryNoPagination } from "@/services/productService";
+
+import Banner_1 from '../assets/img/homepage/Banner_1.svg';
+import Banner_2 from '../assets/img/homepage/Banner_2.svg';
+import Banner_3 from '../assets/img/homepage/Banner_3.svg';
+import Banner_4 from '../assets/img/homepage/Banner_4.svg';
+import Banner_5 from '../assets/img/homepage/Banner_5.svg';
+import Banner_6 from '../assets/img/homepage/Banner_6.svg';
+import Banner_7 from '../assets/img/homepage/Banner_7.jpg';
+import Banner_8 from '../assets/img/homepage/Banner_8.jpg';
+import { getOnlyCategories } from "@/services/categoryService";
+
+import { categoryIconLarge } from "@/data/homepage";
 
 interface IRecommendProduct {
     id: number
@@ -599,16 +610,53 @@ const Homepage = () => {
     return (
         <>
             <div className="homepage-container w-full bg-[#EEEEEE]">
-                <div className='px-[30px] w-[80rem] mx-auto  py-8'>
-                    <div className="section flex">
+                <div className='px-[30px] w-[80rem] mx-auto py-8'>
+                    <div className="section w-full flex gap-x-3">
                         <CategoryMenu />
-                        <div className="banner flex-1 border border-gray-300 ml-[50px]">
-                            <img src={Banner} alt="" className="w-full h-full" />
+                        <div className="w-4/5 homepage-banner select-none ">
+                            <div className="h-[22rem] bg-white">
+                                <Swiper
+                                    slidesPerView={2}
+                                    navigation={true}
+                                    modules={[Navigation, Autoplay]}
+                                    loop={true}
+                                    autoplay={{
+                                        delay: 3000,
+                                        disableOnInteraction: false,
+                                    }}
+                                    className="mySwiper h-full"
+                                >
+                                    <SwiperSlide>
+                                        <img src={Banner_1} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                    <SwiperSlide>
+                                        <img src={Banner_2} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                    <SwiperSlide>
+                                        <img src={Banner_3} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                    <SwiperSlide>
+                                        <img src={Banner_4} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                    <SwiperSlide>
+                                        <img src={Banner_5} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                    <SwiperSlide>
+                                        <img src={Banner_6} className="w-full h-full px-1" alt="" />
+                                    </SwiperSlide>
+                                </Swiper>
+                            </div>
+                            <div className="w-full pt-2">
+                                <div className="w-full h-1/2 bg-white flex">
+                                    <img src={Banner_7} className="w-1/2 " alt="" />
+                                    <img src={Banner_8} className="w-1/2 " alt="" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {
                         historyProductList.length > 0 &&
-                        <div className="bg-white p-4 mt-6">
+                        <div className="bg-white p-4 mt-6 history-products">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-lg text-gray-500">SẢN PHẨM BẠN ĐÃ XEM</span>
                                 <div className="text-red-500 hover:underline cursor-pointer flex items-center gap-x-1" onClick={() => navigate("/history")}><span>Xem Tất Cả</span> <IoIosArrowForward /></div>

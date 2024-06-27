@@ -97,7 +97,7 @@ const CategoryMenu = () => {
     }, []);
 
     return (
-        <div className="menu-sidebar w-60 border border-gray-300 bg-white relative"
+        <div className="menu-sidebar w-60 bg-white relative"
             onMouseLeave={() => handleShowSubmenu(false, true, [], 0, "")}>
             {menuData && menuData.length > 0 && menuData.map((item, index) => {
                 return (
@@ -107,7 +107,7 @@ const CategoryMenu = () => {
                     >
                         <span>{categoryIcon[index].icon}</span>
                         <div className="flex-1 flex items-center justify-between">
-                            <span>{item.title}</span>
+                            <span className="text-gray-700">{item.title}</span>
                             <span>{item.sub_category_list.length > 0 ? <MdKeyboardArrowRight className="w-5 h-5 text-gray-400 group-hover:text-black" /> : ""}</span>
                         </div>
                     </div>
@@ -115,7 +115,7 @@ const CategoryMenu = () => {
             })}
             {
                 showSubmenu &&
-                <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[240px] border border-gray-400 bg-white px-8 py-6 flex gap-10">
+                <div className="sub-menu w-[33.25rem] h-full absolute top-0 left-[234px] border border-gray-400 bg-white px-8 py-6 flex gap-10 z-10">
                     <div className="sub-menu-category">
                         <div className="title font-bold mb-3">{hoverCategory.title}</div>
                         <div className="grid grid-cols-2 gap-y-2 gap-x-2">
