@@ -244,7 +244,7 @@ const RelevantRecommendItemList = (props: IProps) => {
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                         {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} />
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`recommend-item-img-${item.id}`}/>
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -419,7 +419,7 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                         {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} />
+                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`history-item-img-${item.id}`}/>
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -911,7 +911,7 @@ const ProductDetailPage = () => {
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
                                                 {/* <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/> */}
-                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} />
+                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} key={`product-img-${productDetailInfo.id}`} />
                                             </div>
                                         </div>
                                         <div className="product__informations flex-1">
