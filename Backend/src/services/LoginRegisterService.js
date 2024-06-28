@@ -240,25 +240,19 @@ const userLogin = async (userData) => {
 
                         let date = new Date();
 
-                        await db.Session.create({
+                        let sessionInfo = await db.Session.create({
                             createdAt: date,
                             expiredAt: date,
                             customerID: customer_id
                         });
 
-                        let sessionData = await db.Session.findAll({
-                            raw: true,
-                            attributes: ['id', 'createdAt'],
-                            order: [
-                                ['createdAt', 'DESC'],
-                            ],
-                        })
+                        let session_info = sessionInfo.dataValues;
 
                         let payload = {
                             customer_id: customer_id,
                             username: user.username,
                             role: user.role,
-                            session: sessionData.length > 0 ? sessionData[0] : null,
+                            session: session_info,
                             isAuthenticated: true
                         }
 

@@ -247,6 +247,12 @@ const sendVertificatedCode = async (req, res) => {
                     DT: '',
                     EM: `Send OTP code successfully !`
                 });
+            } else {
+                return res.status(200).json({
+                    EC: -1,
+                    DT: '',
+                    EM: `Send OTP failed !`
+                });
             }
         }
 

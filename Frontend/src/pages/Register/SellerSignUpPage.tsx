@@ -89,6 +89,12 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
         return isValidEmail(email);
     }
 
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            handleNextStep();
+        }
+    }
+
     const handleNextStep = async () => {
 
         if (isValidEmail(email)) {
@@ -118,29 +124,10 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
             <div className="signin-form__main flex flex-col gap-2 duration-800">
                 <div className='w-full'>
                     <div className='input_label'>Email</div>
-                    <input type="text" className="form_input" placeholder='Nhập địa chỉ email' onChange={(e) => setEmail(e.target.value)} value={email} />
+                    <input type="text" className="form_input" placeholder='Nhập địa chỉ email' onChange={(e) => setEmail(e.target.value)} value={email} onKeyPress={(event) => handleKeyPress(event)}/>
                 </div>
                 <div className='mt-6 w-full'>
                     <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleNextStep()}>TIẾP THEO</Button>
-                </div>
-                <div className='flex items-center my-2'>
-                    <div className='border-t border-gray-400 w-2/5'></div>
-                    <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
-                    <div className='border-t border-gray-400 w-2/5'></div>
-                </div>
-                <div className='others-login-method'>
-                    <div className='flex items-center justify-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
-                        <GoMail className="w-6 h-6" />
-                        <div>Đăng ký bằng email</div>
-                    </div>
-                    <div className='flex items-center justify-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
-                        <BsFacebook className="w-6 h-6 text-[#1877f2]" />
-                        <div>Tiếp tục với facebook</div>
-                    </div>
-                    <div className='flex items-center justify-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer hover:shadow-md'>
-                        <img src={Google_Icon} alt="" className="w-6 h-6" />
-                        <div>Tiếp tục với Google</div>
-                    </div>
                 </div>
                 <div className='text-center mt-4'>
                     <span className='text-gray-400'>Đã có tài khoản?</span>
@@ -164,7 +151,7 @@ const EmailVertification = (props: IEmailVertification) => {
         return fullOTP.length > 0;
     }
 
-    const resendOTPCustomerSignUp = async () => {
+    const resendOTPSignUp = async () => {
         setResendCodeTime(RESEND_CODE_TIME);
         if (resendCodeTime === 0) {
             setResendCodeTime(RESEND_CODE_TIME);
@@ -232,7 +219,7 @@ const EmailVertification = (props: IEmailVertification) => {
                 </div>
                 <div className="my-6 text-center">
                     <div className="text-sm mb-2">Bạn vẫn chưa nhận được mã ?</div>
-                    <div className={resendCodeStyle} onClick={() => resendOTPCustomerSignUp()}>
+                    <div className={resendCodeStyle} onClick={() => resendOTPSignUp()}>
                         {
                             resendCodeTime > 0 ?
 

@@ -4,7 +4,6 @@ import Button from '@/components/Button';
 import { useImmer } from 'use-immer';
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from '@/redux/reducer/rootReducer';
-import { GoMail } from "react-icons/go";
 import { BsFacebook } from "react-icons/bs";
 import _ from 'lodash';
 import Google_Icon from '../assets/img/login_page/google_icon.svg';
@@ -259,10 +258,6 @@ const LoginPage = () => {
                             <div className='border-t border-gray-400 w-2/5'></div>
                         </div>
                         <div className='others-login-method'>
-                            <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
-                                <GoMail className="w-6 h-6" />
-                                <div>Đăng nhập bằng email</div>
-                            </div>
                             <div className='pl-16 flex items-center gap-2 py-3 border border-gray-400 rounded-[4px] cursor-pointer mb-2 hover:shadow-md'>
                                 <BsFacebook className="w-6 h-6 text-[#1877f2]" />
                                 <div>Tiếp tục với facebook</div>
