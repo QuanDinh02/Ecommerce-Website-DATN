@@ -10,7 +10,7 @@ const handleUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: 86400000 }) // 60 * 60 * 1000
+                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -35,7 +35,7 @@ const handleSystemUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userSystemLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: 86400000 })
+                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
             }
             return res.status(200).json({
                 EC: result.EC,
