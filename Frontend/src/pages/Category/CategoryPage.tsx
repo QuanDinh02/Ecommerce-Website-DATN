@@ -8,7 +8,7 @@ import { TfiViewListAlt } from "react-icons/tfi";
 import { CurrencyFormat, numberKFormat } from '@/utils/numberFormat';
 import { FaRegHeart } from "react-icons/fa";
 import ReactPaginate from "react-paginate";
-import { PiImageThin, PiShoppingCartLight } from "react-icons/pi";
+import { PiShoppingCartLight } from "react-icons/pi";
 import { IoBagCheckOutline, IoEyeOutline, IoListOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
 import { successToast1 } from "@/components/Toast/Toast";
@@ -133,24 +133,6 @@ const CategoryPage = () => {
     const [totalPages, setTotalPages] = React.useState<number>(20);
     const [totalItems, setTotalItems] = React.useState<number>(0);
 
-    const [arrangement, setArrangement] = useImmer([
-        {
-            id: 1,
-            label: "Phổ Biến",
-            selected: true
-        },
-        {
-            id: 2,
-            label: "Mới Nhất",
-            selected: false
-        },
-        {
-            id: 3,
-            label: "Bán Chạy",
-            selected: false
-        },
-    ]);
-
     const [priceArrangement, setPriceArrangement] = React.useState({
         id: 0,
         label: "Tất Cả",
@@ -197,19 +179,6 @@ const CategoryPage = () => {
                 setProductListLoading(false);
             }, PRODUCT_PRICE_SORT_TIME);
         }
-    }
-
-    const handleArrangement = (id: number) => {
-        setArrangement(draft => {
-            draft.forEach(item => {
-                if (item.id === id) {
-                    item.selected = true;
-                }
-                else {
-                    item.selected = false;
-                }
-            })
-        })
     }
 
     const handlePageClick = (event) => {
@@ -569,20 +538,7 @@ const CategoryPage = () => {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
                                                     <div className="mr-4">Sắp xếp theo</div>
-                                                    <div className="flex items-center gap-x-2">
-                                                        {
-                                                            arrangement && arrangement.length > 0 && arrangement.map((item, index) => {
-                                                                if (item.selected) {
-                                                                    return (
-                                                                        <div key={`arrangement-${index}`} className="w-24 py-2 border text-center bg-[#FCB800] text-white border-[#FCB800] cursor-pointer">{item.label}</div>
-                                                                    )
-                                                                }
-                                                                return (
-                                                                    <div key={`arrangement-${index}`} className="w-24 py-2 border border-gray-400 text-center bg-white hover:bg-[#FCB800] hover:text-white hover:border-[#FCB800] cursor-pointer"
-                                                                        onClick={() => handleArrangement(item.id)}>{item.label}</div>
-                                                                )
-                                                            })
-                                                        }
+                                                    <div>
                                                         <div className="relative group">
                                                             <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
                                                                 <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />

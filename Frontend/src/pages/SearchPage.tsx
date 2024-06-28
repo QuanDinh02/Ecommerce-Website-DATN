@@ -35,6 +35,7 @@ import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
+import classNames from "classnames";
 
 interface ICateogryProduct {
     id: number
@@ -82,6 +83,8 @@ const SearchPage = () => {
     const account: IAccount = useSelector<RootState, IAccount>(state => state.user.account);
     const isAuthenticated = useSelector<RootState, boolean>(state => state.user.isAuthenticated);
 
+    const [scrollPosition, setScrollPosition] = React.useState(0);
+
     const [searchKeyword, setSearchKeyword] = React.useState<string>("");
     const [searchPage, setSearchPage] = React.useState<number>(0);
 
@@ -98,24 +101,6 @@ const SearchPage = () => {
     const [totalPages, setTotalPages] = React.useState<number>(20);
     const [amount, setAmount] = React.useState<number>(1);
     const [totalItems, setTotalItems] = React.useState<number>(0);
-
-    const [arrangement, setArrangement] = useImmer([
-        {
-            id: 1,
-            label: "Phổ Biến",
-            selected: true
-        },
-        {
-            id: 2,
-            label: "Mới Nhất",
-            selected: false
-        },
-        {
-            id: 3,
-            label: "Bán Chạy",
-            selected: false
-        },
-    ]);
 
     const [priceArrangement, setPriceArrangement] = React.useState({
         id: 0,
@@ -139,18 +124,17 @@ const SearchPage = () => {
         }
     })
 
-    const handleArrangement = (id: number) => {
-        setArrangement(draft => {
-            draft.forEach(item => {
-                if (item.id === id) {
-                    item.selected = true;
-                }
-                else {
-                    item.selected = false;
-                }
-            })
-        })
-    }
+    const handleScroll = () => {
+        const position = window.pageYOffset;
+        setScrollPosition(position);
+    };
+
+    const breadCrumbStickyStyle = classNames(
+        "category__breadcrumb border-b border-gray-200 bg-white",
+        {
+            'sticky top-[76px] border-gray-300 z-40': scrollPosition > 144
+        }
+    );
 
     const handleProductPriceSort = (item_id: number) => {
 
@@ -287,7 +271,7 @@ const SearchPage = () => {
         setProductListLoading(true);
         setTimeout(() => {
             setProductListLoading(false);
-        }, 1000);
+        }, 1500);
     }
 
     const fetchProductsBySearch = async (keyword: string, page: number) => {
@@ -327,6 +311,15 @@ const SearchPage = () => {
             replace: true
         });
     }
+
+    React.useEffect(() => {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
 
     React.useEffect(() => {
 
@@ -387,14 +380,14 @@ const SearchPage = () => {
                     </div>
                     :
                     <div className="category-container">
-                        <div className="category__breadcrumb border-b border-gray-300 bg-[#F1F1F1]">
+                        <div className={breadCrumbStickyStyle}>
                             <div className="breadcrumb-content w-[80rem] mx-auto px-[30px] py-4 flex items-center gap-2">
                                 <div onClick={() => navigate("/")} className="cursor-pointer hover:underline">Trang chủ</div>
                             </div>
                         </div>
-                        <div className="category__content mt-4 mb-24">
+                        <div className="category__content bg-[#F5F5F5] pt-4 pb-4">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
-                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#EEEEEE] h-fit">
+                                <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
@@ -477,20 +470,7 @@ const SearchPage = () => {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
                                                     <div className="mr-4">Sắp xếp theo</div>
-                                                    <div className="flex items-center gap-x-2">
-                                                        {
-                                                            arrangement && arrangement.length > 0 && arrangement.map((item, index) => {
-                                                                if (item.selected) {
-                                                                    return (
-                                                                        <div key={`arrangement-${index}`} className="w-24 py-2 border text-center bg-[#FCB800] text-white border-[#FCB800] cursor-pointer">{item.label}</div>
-                                                                    )
-                                                                }
-                                                                return (
-                                                                    <div key={`arrangement-${index}`} className="w-24 py-2 border border-gray-400 text-center bg-white hover:bg-[#FCB800] hover:text-white hover:border-[#FCB800] cursor-pointer"
-                                                                        onClick={() => handleArrangement(item.id)}>{item.label}</div>
-                                                                )
-                                                            })
-                                                        }
+                                                    <div className=""> 
                                                         <div className="relative group">
                                                             <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
                                                                 <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />
@@ -522,7 +502,7 @@ const SearchPage = () => {
                                         <>
                                             {
                                                 productList && productList.length > 0 ?
-                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-16">
+                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-8">
                                                         {
                                                             productListFetch ?
                                                                 <>
@@ -544,9 +524,9 @@ const SearchPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product border border-white px-4 py-2" key={`sub-category-loading-item-${index}`}>
+                                                                                        <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`sub-category-loading-item-${index}`}>
                                                                                             <div className="product__image flex items-center justify-center">
-                                                                                                <div className="w-40 h-60 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
+                                                                                                <div className="w-40 h-52 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                             </div>
                                                                                             <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-1 mt-3"></div>
                                                                                             <div className="product__name bg-gray-200 rounded-full dark:bg-gray-300 h-2 animate-pulse mb-2"></div>
@@ -564,7 +544,7 @@ const SearchPage = () => {
                                                                                 {productList && productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
                                                                                         <div
-                                                                                            className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group"
+                                                                                            className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group"
                                                                                             key={`sub-category-item-${index}`}
                                                                                             onClick={() => {
                                                                                                 handleProductDetailNavigation(item.id, item.name);
@@ -572,7 +552,7 @@ const SearchPage = () => {
                                                                                         >
                                                                                             <div className="product__image flex items-center justify-center relative">
                                                                                                 {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                                <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                                                                <LoadImage img_style="w-40 h-52" product_id={item.id} />
                                                                                                 <div className="product__utility w-full hidden absolute bottom-[-10px] bg-white items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                                                                                     <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                         e.stopPropagation();
@@ -643,10 +623,10 @@ const SearchPage = () => {
                                         </>
 
                                         :
-                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-16">
+                                        <div className="product-list flex flex-col gap-x-4 mt-8 mb-4">
                                             {productList && productList.length > 0 && productList.map((item, index) => {
                                                 return (
-                                                    <div className="product flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
+                                                    <div className="product bg-white flex border border-white border-b-gray-200 cursor-pointer mb-4 pb-4 hover:border hover:border-gray-400 p-4"
                                                         key={`sub-category-column-item-${index}`}
                                                         onClick={() => {
                                                             handleProductDetailNavigation(item.id, item.name);
@@ -654,7 +634,7 @@ const SearchPage = () => {
                                                     >
                                                         <div className="product__image w-44 mx-auto mb-12">
                                                             {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                            <LoadImage img_style="w-40 h-60" product_id={item.id} />
+                                                            <LoadImage img_style="w-40 h-52" product_id={item.id} />
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
