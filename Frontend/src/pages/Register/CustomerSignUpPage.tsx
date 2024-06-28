@@ -110,10 +110,15 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
                     setShowLoadingIcon(true);
                     let result = await sendOTPCustomerSignUp(email);
                     if (result && result.EC === 0) {
-                        setShowLoadingIcon(false);
+
+                        setTimeout(() => {
+                            setShowLoadingIcon(false);
+                            successToast1("Email hợp lệ");
+                        },1000);
+
                         setTimeout(() => {
                             setStep(step + 1);
-                        }, 1000);
+                        }, 2000);
                     }
                 } else {
                     return;

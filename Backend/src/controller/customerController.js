@@ -2,6 +2,9 @@ import customerServices from '../services/customerServices';
 import OTPGenerator from '../utils/OTPGenerator';
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
+import * as handlebars from 'handlebars';
+import * as fs from 'fs';
+import * as path from 'path';
 dotenv.config();
 
 let OTP;
@@ -224,36 +227,40 @@ const sendVertificatedCode = async (req, res) => {
 
         OTP = OTPGenerator(OTP_LIMIT);
 
-        let email_res = await transporter.sendMail({
-            from: '"FoxMart "', // sender address
+        const filePath = path.join(__dirname, '../templates/customer_otp_signup.html');
+        const source = fs.readFileSync(filePath, 'utf-8').toString();
+        const template = handlebars.compile(source);
+        const replacements = {
+            email: data.email,
+            otp: OTP
+        };
+
+        const htmlToSend = template(replacements);
+
+        transporter.sendMail({
+            from: `FoxMart 🦊 <${process.env.EMAIL_USERNAME}>`, // sender address
             to: `${data.email}`, // list of receivers
             subject: "FoxMart Ecommerce Verification Code", // Subject line
-            html: `
-            <p font-size: 16px;">Hi,</p>
-            <p font-size: 16px;">Here is the OTP code to verify your account: </p>
-            <p><strong style="font-size: 20px">${OTP}</strong></p>
-            <p font-size: 16px;">The code will expired in 10 minutes</p>`
+            html: htmlToSend
         });
 
-        if (email_res) {
-            let result = await customerServices.handleCreateVertificationCode({
-                code: OTP,
-                email: data.email
-            });
+        let result = await customerServices.handleCreateVertificationCode({
+            code: OTP,
+            email: data.email
+        });
 
-            if (result && result.EC === 0) {
-                return res.status(200).json({
-                    EC: 0,
-                    DT: '',
-                    EM: `Send OTP code successfully !`
-                });
-            } else {
-                return res.status(200).json({
-                    EC: -1,
-                    DT: '',
-                    EM: `Send OTP failed !`
-                });
-            }
+        if (result && result.EC === 0) {
+            return res.status(200).json({
+                EC: 0,
+                DT: '',
+                EM: `Send OTP code successfully !`
+            });
+        } else {
+            return res.status(200).json({
+                EC: -1,
+                DT: '',
+                EM: `Send OTP failed !`
+            });
         }
 
     } catch (error) {
