@@ -466,12 +466,12 @@ const SearchPage = () => {
                                 <div className="main__item-list flex-1">
                                     <div className="box">
                                         <div className="box__top rounded-t-[4px] bg-[#EEEEEE] px-4 pt-2 pb-4">
-                                            <div className="flex items-center gap-x-2 mt-2 mb-5">
-                                                <div className="flex items-center gap-x-1">
-                                                    <FaRegLightbulb className="w-4 h-4" /> Kết quả tìm kiếm cho từ khoá "{searchKeyword}":
+                                            <div className="mt-2 mb-5">
+                                                <div>
+                                                    <span className="line-clamp-1">Kết quả tìm kiếm cho từ khoá "{searchKeyword}":</span>
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">{totalItems}</span> kết quả
+                                                    <span className="font-medium flex items-center gap-x-1"><FaRegLightbulb className="w-4 h-4" /> {totalItems} kết quả</span>
                                                 </div>
                                             </div>
                                             <div className="flex items-center justify-between">
@@ -573,46 +573,53 @@ const SearchPage = () => {
                                                                                             <div className="product__image flex items-center justify-center relative">
                                                                                                 {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
                                                                                                 <LoadImage img_style="w-40 h-60" product_id={item.id} />
-                                                                                                <div className="product__utility hidden absolute bottom-[-10px] bg-white items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    hanldeAddShoppingCart(1, item.id);
-                                                                                                }}>
-                                                                                                    <PiShoppingCartLight className="w-6 h-6 " />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                                                <div className="product__utility w-full hidden absolute bottom-[-10px] bg-white items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        hanldeAddShoppingCart(1, item.id);
+                                                                                                    }}>
+                                                                                                        <PiShoppingCartLight className="w-6 h-6 " />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Thêm vào giỏ hàng</span>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        handleQuickView(item);
+                                                                                                    }}>
+                                                                                                        <IoEyeOutline className="w-6 h-6" />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Xem nhanh</span>
+                                                                                                            </div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        handleAddFavouriteItem(item.id);
+                                                                                                    }}>
+                                                                                                        <IoMdHeartEmpty className="w-6 h-6" />
+                                                                                                        <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
+                                                                                                            <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
+                                                                                                                <span className="text-sm">Yêu thích</span>
+                                                                                                            </div>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    handleQuickView(item);
-                                                                                                }}>
-                                                                                                    <IoEyeOutline className="w-6 h-6" />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Xem nhanh</span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                                <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
-                                                                                                    e.stopPropagation();
-                                                                                                    handleAddFavouriteItem(item.id);
-                                                                                                }}>
-                                                                                                    <IoMdHeartEmpty className="w-6 h-6" />
-                                                                                                    <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
-                                                                                                        <div className="tooltip bg-black text-white rounded-[4px] py-1 px-3 w-40 text-center">
-                                                                                                            <span className="text-sm">Yêu thích</span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                </div>
-                                                                                            </div>
                                                                                             </div>
                                                                                             <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
                                                                                             <div className="flex items-center gap-2 mb-2">
-                                                                                                <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
-                                                                                                <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
+                                                                                                {
+                                                                                                    item.current_price === item.price ?
+                                                                                                        <div className="price text-black font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                                                                        :
+                                                                                                        <>
+                                                                                                            <div className="price text-[#1A732E] font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                                                                            <div className="old-price text-sm text-gray-500 line-through">{CurrencyFormat(item.price)}</div>
+                                                                                                        </>
+                                                                                                }
                                                                                             </div>
                                                                                             <ProductRating
                                                                                                 ratings={item.rating}
@@ -670,8 +677,15 @@ const SearchPage = () => {
                                                             <div className="product__right-content w-60">
                                                                 {/* <div className="product__price font-medium text-xl mb-2 tracking-wide mb-2">{CurrencyFormat(item.current_price)}</div> */}
                                                                 <div className="flex items-center gap-2 mb-2">
-                                                                    <div className="product__current-price font-medium text-lg">{CurrencyFormat(item.current_price)}</div>
-                                                                    <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(item.current_price)}</div>
+                                                                    {
+                                                                        item.current_price === item.price ?
+                                                                            <div className="price text-black text-xl font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                                            :
+                                                                            <>
+                                                                                <div className="price text-[#1A732E] text-xl font-medium">{CurrencyFormat(item.current_price)}</div>
+                                                                                <div className="old-price text-gray-400 line-through">{CurrencyFormat(item.price)}</div>
+                                                                            </>
+                                                                    }
                                                                 </div>
                                                                 <div className="w-full py-3 text-black font-bold bg-[#FCB800] text-center rounded-[4px] hover:opacity-80" onClick={(e) => {
                                                                     e.stopPropagation();
@@ -737,8 +751,15 @@ const SearchPage = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-2 my-4">
-                            <div className="product__current-price  text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
-                            <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.current_price)}</div>
+                            {
+                                productQuickView.current_price === productQuickView.price ?
+                                    <div className="product__current-price text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                    :
+                                    <>
+                                        <div className="product__current-price text-green-600 text-2xl font-bold">{CurrencyFormat(productQuickView.current_price)}</div>
+                                        <div className="product__price text-gray-400 text-sm line-through">{CurrencyFormat(productQuickView.price)}</div>
+                                    </>
+                            }
                         </div>
                         <div className="shop flex items-center gap-x-4 mb-4">
                             {
