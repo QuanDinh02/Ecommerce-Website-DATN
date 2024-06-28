@@ -53,6 +53,8 @@ enum PATH {
 
 interface IRegisterProp {
     email: string
+    step: number
+    setStep: (step: number) => void
 }
 
 interface IAnnounce {
@@ -259,8 +261,7 @@ const EmailVertification = (props: IEmailVertification) => {
 
 const CustomerRegister = (props: IRegisterProp) => {
 
-    const navigate = useNavigate();
-    const { email } = props;
+    const { email,  setStep, step } = props;
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
     const [errorField, setErrorField] = React.useState<number>(0);
@@ -327,10 +328,7 @@ const CustomerRegister = (props: IRegisterProp) => {
         let result = await userRegister(register_customer_info);
         if (result) {
             if (result.EC === 0) {
-                successToast1(result.EM);
-                setTimeout(() => {
-                    navigate("/");
-                }, 1500);
+                setStep(step + 1);
             } else {
                 errorToast1(result.EM);
                 return;
@@ -395,7 +393,7 @@ const SuccessAnnouncement = (props: IAnnounce) => {
 
     React.useEffect(() => {
         if (backHomePageTime === 0) {
-            //navigate("/")
+            navigate("/")
         }
     }, [backHomePageTime]);
 
@@ -510,7 +508,7 @@ const CustomerSignUpPage = () => {
                     }
                     {
                         registerStep === 3 &&
-                        <CustomerRegister email={email} />
+                        <CustomerRegister email={email} step={registerStep} setStep={setRegisterStep}/>
                     }
                     {
                         registerStep === 4 &&

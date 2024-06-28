@@ -266,7 +266,7 @@ const SellerRegister = (props: IRegisterProp) => {
     }
 
 
-    const handleCustomerRegister = async () => {
+    const handleSellerRegister = async () => {
 
         if (!checkFullField()) {
             return;
@@ -335,7 +335,7 @@ const SellerRegister = (props: IRegisterProp) => {
                     {errorField === 4 && <div className='my-2 text-sm text-red-500'>Xác nhận mật khẩu không đúng</div>}
                 </div>
                 <div className='mt-6 w-full'>
-                    <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleCustomerRegister()}>Đăng ký</Button>
+                    <Button styles={checkFullField() ? 'form_button_valid' : 'form_button'} OnClick={() => handleSellerRegister()}>Đăng ký</Button>
                 </div>
             </div>
         </>
