@@ -502,7 +502,7 @@ const SearchPage = () => {
                                         <>
                                             {
                                                 productList && productList.length > 0 ?
-                                                    <div className="product-list grid grid-cols-4 gap-y-6 gap-x-2 px-4 mt-3 mb-8">
+                                                    <div className="product-list grid grid-cols-4 gap-y-2 gap-x-2 px-4 mt-3 mb-8">
                                                         {
                                                             productListFetch ?
                                                                 <>

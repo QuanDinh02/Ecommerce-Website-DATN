@@ -1149,10 +1149,7 @@ const ProductDetailPage = () => {
                                             </>
                                         }
                                         <div>
-                                            <div className="flex items-center justify-between mb-4">
-                                                <span className="text-lg text-gray-400">CÁC SẢN PHẨM LIÊN QUAN</span>
-                                                <div className="text-red-500 hover:underline cursor-pointer flex items-center gap-x-1"><span>Xem Tất Cả</span> <IoIosArrowForward /></div>
-                                            </div>
+                                            <div className="text-lg text-gray-400 mb-4">CÁC SẢN PHẨM LIÊN QUAN</div>
                                             <div className="banner w-full mb-5">
                                                 <RelevantRecommendItemList setShow_quick_view={handleQuickView} item_id={productID} />
                                             </div>
