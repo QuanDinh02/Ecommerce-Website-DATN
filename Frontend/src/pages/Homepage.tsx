@@ -111,9 +111,8 @@ const RecommendItemList = (props: IProps) => {
     const fetchRecommendItems = async (customer_id: number) => {
         let response: IData = await getRecommendItemByCustomer(customer_id);
         if (response) {
-            // let suffle_data = _.shuffle(response.product_list);
-            // setRecommendItemList(suffle_data);
-            setRecommendItemList(response.product_list);
+            let suffle_data = _.shuffle(response.product_list);
+            setRecommendItemList(suffle_data);
             startTrainingRecommendItemData(customer_id);
         }
     }
