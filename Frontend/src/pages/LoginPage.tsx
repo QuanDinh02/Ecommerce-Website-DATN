@@ -180,7 +180,8 @@ const LoginPage = () => {
 
                 navigate('/');
             }
-            else if (userData.role === "seller") {
+
+            if (userData.role === "seller") {
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
                     account: {
@@ -193,17 +194,6 @@ const LoginPage = () => {
 
                 dispatch(UserLogin(data));
                 navigate('/seller-info/dashboard');
-            }
-            else {
-                let data = {
-                    isAuthenticated: userData.isAuthenticated,
-                    account: {
-                        id: userData.id,
-                        username: userData.username,
-                        role: userData.role
-                    }
-                }
-                dispatch(UserLogin(data));
             }
         }
     }

@@ -79,6 +79,7 @@ import SellerManagement from '@/pages/Management/SellerManagement.tsx';
 import DepartmentManagement from '@/pages/Management/DepartmentManagement.tsx';
 import SystemReport from '@/pages/Management/SystemReport.tsx';
 
+import AdminRoute from '@/components/AdminRoute.tsx';
 import SellerRoute from '@/components/SellerRoute.tsx';
 import CustomerRoute from '@/components/CustomerRoute.tsx';
 import NewCustomer from '@/pages/NewCustomer.tsx';
@@ -154,11 +155,11 @@ const router = createBrowserRouter(
                 },
                 {
                   path: "category",
-                  element: <ShopCategory/>
+                  element: <ShopCategory />
                 },
                 {
                   path: "category/detail",
-                  element: <ShopCategoryDetail/>
+                  element: <ShopCategoryDetail />
                 },
               ]
             },
@@ -227,7 +228,7 @@ const router = createBrowserRouter(
             },
             {
               path: "order/rating",
-              element: <OrderRating/>,
+              element: <OrderRating />,
             },
             {
               path: "voucher",
@@ -271,7 +272,7 @@ const router = createBrowserRouter(
         },
         {
           path: "shop",
-          element: <ShopPage/>
+          element: <ShopPage />
         },
         {
           path: "cart",
@@ -328,8 +329,12 @@ const router = createBrowserRouter(
       errorElement: <ErrorPage />,
       children: [
         {
-          path: "",
-          element: <SystemMain />,
+          path: "admin",
+          element:
+            <AdminRoute>
+              <SystemMain />
+            </AdminRoute>
+          ,
           children: [
             {
               path: "dashboard",
@@ -375,23 +380,23 @@ const router = createBrowserRouter(
               children: [
                 {
                   path: "order-status",
-                  element: <SUOrderStatus/>,
+                  element: <SUOrderStatus />,
                 },
                 {
                   path: "order-receipt",
-                  element: <SUOrderReceipt/>,
+                  element: <SUOrderReceipt />,
                 },
                 {
                   path: "order-shipping",
-                  element: <SUOrderShipping/>,
+                  element: <SUOrderShipping />,
                 },
                 {
                   path: "order-complete",
-                  element: <SUOrderComplete/>,
+                  element: <SUOrderComplete />,
                 },
                 {
                   path: "detail",
-                  element: <SUOrderDetail/>
+                  element: <SUOrderDetail />
                 },
               ]
             },

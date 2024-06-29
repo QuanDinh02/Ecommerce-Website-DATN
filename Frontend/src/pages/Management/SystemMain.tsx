@@ -11,6 +11,16 @@ import { IoMdExit } from "react-icons/io";
 import { Outlet, useNavigate } from "react-router-dom";
 import React from "react";
 import classNames from "classnames";
+import { userSysLogout } from "@/services/userService";
+import { successToast1 } from "@/components/Toast/Toast";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/reducer/rootReducer";
+
+interface IAdminAccount {
+    asid: number
+    username: string
+    role: string
+}
 
 interface ISideBarChild {
     path: string
@@ -27,42 +37,42 @@ interface ISideBarItem {
 
 const SideBar: ISideBarItem[] = [
     {
-        path: "/dashboard",
+        path: "/admin/dashboard",
         name: "Dashboard",
         icon: <RxDashboard className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/employee",
+        path: "/admin/employee",
         name: "Employee",
         icon: <LuUsers className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/customer",
+        path: "/admin/customer",
         name: "Customer",
         icon: <AiOutlineUser className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/seller",
+        path: "/admin/seller",
         name: "Seller",
         icon: <PiStorefrontLight className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/department",
+        path: "/admin/department",
         name: "Department",
         icon: <FaRegBuilding className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/report",
+        path: "/admin/report",
         name: "Report",
         icon: <GoReport className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
@@ -73,6 +83,8 @@ const SideBar: ISideBarItem[] = [
 const SystemMain = () => {
 
     const navigate = useNavigate();
+
+    const account: IAdminAccount = useSelector<RootState, IAdminAccount>(state => state.user.account);
 
     const [showNotification, setShowNotification] = React.useState<boolean>(false);
     const [showInfoSettingBox, setShowInfoSettingBox] = React.useState<boolean>(false);
@@ -91,6 +103,18 @@ const SystemMain = () => {
         // }
     }
 
+    const handleUserSysLogout = async () => {
+        let result: any = await userSysLogout();
+        if (result && result.EC === 0) {
+            successToast1(result.EM);
+            setShowInfoSettingBox(false);
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        }
+    }
+
     React.useEffect(() => {
 
         const closeInfoSettingBox = (e) => {
@@ -107,7 +131,7 @@ const SystemMain = () => {
     }, []);
 
     React.useEffect(() => {
-        navigate("/fms/dashboard");
+        navigate("/fms/admin/dashboard");
     }, []);
 
     return (
@@ -131,7 +155,7 @@ const SystemMain = () => {
                         }}
                     >
                         <div className="flex items-center gap-x-2 cursor-pointer group">
-                            <span className="group-hover:text-blue-600">Welcome Admin</span> <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white">A</div>
+                            <span className="group-hover:text-blue-600">Xin chào {account.username}</span> <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center text-white">A</div>
                         </div>
                         {
                             showInfoSettingBox &&
@@ -145,8 +169,7 @@ const SystemMain = () => {
                                 }}><MdOutlineAccountCircle className="w-5 h-5"/> Quản lý Tài Khoản</div>
                                 <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer flex items-center gap-x-2' onClick={(e) => {
                                     e.stopPropagation();
-                                    setShowInfoSettingBox(false);
-                                    navigate("/fms/login");
+                                    handleUserSysLogout();
                                 }}><IoMdExit className="w-5 h-5"/> Đăng Xuất</div>
                             </div>
                         }

@@ -21,9 +21,9 @@ module.exports = {
             registeredAt: {
                 type: Sequelize.DATE
             },
-            lastLogin: {
-                type: Sequelize.DATE
-            },
+            refreshToken: {
+                type: Sequelize.STRING
+            }
         });
     },
     async down(queryInterface, Sequelize) {

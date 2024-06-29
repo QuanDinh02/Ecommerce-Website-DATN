@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import _ from 'lodash';
 import React from "react";
 
-const ShippingUnitRoute = ({ children }) => {
+const AdminRoute = ({ children }) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ const ShippingUnitRoute = ({ children }) => {
 
             let userData = result.DT;
 
-            if (userData.role === "shipping_unit") {
+            if (userData.role === "admin") {
                 let data = {
                     isAuthenticated: userData.isAuthenticated,
                     account: {
@@ -45,4 +45,4 @@ const ShippingUnitRoute = ({ children }) => {
     return <>{children}</>
 }
 
-export default ShippingUnitRoute;
+export default AdminRoute;

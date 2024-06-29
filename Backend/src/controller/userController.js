@@ -10,11 +10,13 @@ const handleUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
+
                 res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
+                res.cookie("rjwt", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN })
             }
             return res.status(200).json({
                 EC: result.EC,
-                DT: result.DT,
+                DT: "",
                 EM: result.EM
             })
         }
@@ -36,6 +38,7 @@ const handleSystemUserLogin = async (req, res) => {
         if (result) {
             if (result.DT && result.DT.accessToken) {
                 res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
+                res.cookie("rjwtsys", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN })
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -76,6 +79,7 @@ const handleUserRegister = async (req, res) => {
 const handleUserLogout = async (req, res) => {
     try {
         res.clearCookie("jwt");
+        res.clearCookie("rjwt");
         return res.status(200).json({
             EC: 0,
             DT: "",
@@ -95,6 +99,7 @@ const handleUserLogout = async (req, res) => {
 const handleSystemUserLogout = async (req, res) => {
     try {
         res.clearCookie("jwtsys");
+        res.clearCookie("rjwtsys");
         return res.status(200).json({
             EC: 0,
             DT: "",

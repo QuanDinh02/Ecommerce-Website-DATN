@@ -87,6 +87,21 @@ const SystemLogin = () => {
                 dispatch(UserLogin(data));
                 navigate("/fms/su/dashboard");
             }
+
+            if (userData.role === "admin") {
+
+                let data = {
+                    isAuthenticated: userData.isAuthenticated,
+                    account: {
+                        username: userData.username,
+                        role: userData.role,
+                        asid: userData.asid
+                    }
+                }
+
+                dispatch(UserLogin(data));
+                navigate("/fms/admin");
+            }
         }
     }
 

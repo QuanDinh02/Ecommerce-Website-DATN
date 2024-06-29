@@ -1,4 +1,5 @@
 import axios from 'axios';
+import axiosRetry from 'axios-retry';
 
 // Set config defaults when creating the instance
 const instance = axios.create({
@@ -6,6 +7,17 @@ const instance = axios.create({
 });
 
 instance.defaults.withCredentials = true;
+
+axiosRetry(instance, {
+    retries: 3,
+    retryCondition: (error) => {
+        return error.response?.status === 400 ||  error.response?.status === 405;
+    },
+    retryDelay: (retryCount) => {
+        return retryCount * 1000;
+    }
+});
+
 // Add a request interceptor
 instance.interceptors.request.use(function (config) {
     // Do something before request is sent
@@ -42,10 +54,17 @@ instance.interceptors.response.use(function (response) {
             return err.response.data;
         }
 
-        // bad request
-        case 400: {
-            return Promise.reject(err);
-        }
+        // case 405: {
+        //     // toast.error("You are unauthenticated !");
+        //     return err.response.data;
+
+        //     //Promise.reject(err)
+        // }
+
+        // // bad request
+        // case 400: {
+        //     return Promise.reject(err);
+        // }
 
         // not found
         case 404: {

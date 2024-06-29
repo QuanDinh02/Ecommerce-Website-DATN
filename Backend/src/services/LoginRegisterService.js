@@ -3,6 +3,7 @@ import db from '../models/index';
 const salt = bcrypt.genSaltSync(10);
 import { Op } from 'sequelize';
 import { createToken } from '../middleware/jwt';
+import { v4 as uuidv4 } from 'uuid';
 
 const hashPassword = (password) => {
     return bcrypt.hashSync(password, salt);
@@ -257,14 +258,15 @@ const userLogin = async (userData) => {
                         }
 
                         let accessToken = createToken(payload);
+                        let refreshToken = uuidv4();
+
+                        await updateUserRefreshToken(user.username, refreshToken);
 
                         return {
                             EC: 0,
                             DT: {
                                 accessToken: accessToken,
-                                username: user.username,
-                                role: user.role,
-                                customer_id: customer_id
+                                refreshToken: refreshToken,
                             },
                             EM: 'Login success !'
                         }
@@ -291,13 +293,15 @@ const userLogin = async (userData) => {
                         }
 
                         let accessToken = createToken(payload);
+                        let refreshToken = uuidv4();
+
+                        await updateUserRefreshToken(user.username, refreshToken);
+
                         return {
                             EC: 0,
                             DT: {
                                 accessToken: accessToken,
-                                username: sellerInfo.name,
-                                role: user.role,
-                                seller_id: seller_id
+                                refreshToken: refreshToken
                             },
                             EM: 'Login success !'
                         }
@@ -387,15 +391,55 @@ const userSystemLogin = async (userData) => {
                         }
 
                         let accessToken = createToken(payload);
+                        let refreshToken = uuidv4();
+
+                        await updateUserRefreshToken(user.username, refreshToken);
 
                         return {
                             EC: 0,
                             DT: {
-                                accessToken: accessToken
+                                accessToken: accessToken,
+                                refreshToken: refreshToken,
                             },
                             EM: 'Login success !'
                         }
+                        
                     }
+
+                    else if (role === "admin") {
+                        let adminInfo = await db.Employee.findOne({
+                            raw: true,
+                            attributes: ['id'],
+                            where: {
+                                userID: {
+                                    [Op.eq]: user.id
+                                }
+                            }
+                        })
+
+                        let payload = {
+                            asid: adminInfo.id,
+                            username: user.username,
+                            role: user.role,
+                            isAuthenticated: true
+                        }
+
+                        let accessToken = createToken(payload);
+                        let refreshToken = uuidv4();
+
+                        await updateUserRefreshToken(user.username, refreshToken);
+
+                        return {
+                            EC: 0,
+                            DT: {
+                                accessToken: accessToken,
+                                refreshToken: refreshToken,
+                            },
+                            EM: 'Login success !'
+                        }
+                        
+                    }
+
                     else {
                         return {
                             EC: 1,
@@ -405,7 +449,6 @@ const userSystemLogin = async (userData) => {
                         }
                     }
                 }
-
             }
         }
 
@@ -413,7 +456,6 @@ const userSystemLogin = async (userData) => {
             EC: 1,
             DT: '',
             EM: 'Your username or password is incorrect !'
-
         }
 
     } catch (error) {
@@ -426,8 +468,23 @@ const userSystemLogin = async (userData) => {
     }
 }
 
+const updateUserRefreshToken = async (username, token) => {
+    try {
+        await db.User.update({
+            refreshToken: token
+        }, {
+            where: {
+                username: username
+            }
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 module.exports = {
     userRegister, userLogin, hashPassword,
     checkCustomerEmailExist, checkPassword,
-    checkSellerEmailExist, userSystemLogin
+    checkSellerEmailExist, userSystemLogin,
+    updateUserRefreshToken
 }
