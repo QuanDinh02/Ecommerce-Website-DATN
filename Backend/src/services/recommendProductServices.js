@@ -343,6 +343,8 @@ const getBothRecommendProducts = async (customer_id) => {
             }
         });
 
+        handleSaveRecommendCount(productListFinal);
+
         let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
             let productType = await db.ProductType.findOne({
@@ -458,6 +460,8 @@ const getRecommendProducts = async (customer_id) => {
             }
         });
 
+        handleSaveRecommendCount(productListFinal);
+
         let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
             let productType = await db.ProductType.findOne({
@@ -572,6 +576,8 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 seller_info: seller_info
             }
         });
+
+        handleSaveRecommendCount(productListFinal);
 
         let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
@@ -690,6 +696,8 @@ const getHistoryRecommendProducts = async (customer_id) => {
             }
         });
 
+        handleSaveRecommendCount(productListFinal);
+
         let arrayOfObjAfter = _.map(
             _.uniq(
                 _.map(productListFinal, function (obj) {
@@ -788,6 +796,8 @@ const getRelevantRecommendProducts = async (item_id) => {
             }
         });
 
+        handleSaveRelevantItemRecommendCount(relevant_product_list);
+
         let productList = await Promise.all(relevant_product_list.map(async item => {
 
             let productInfo = await db.Product.findOne({
@@ -883,6 +893,30 @@ const getRelevantRecommendProducts = async (item_id) => {
             DT: [],
             EM: 'Something is wrong on services !',
         }
+    }
+}
+
+const handleSaveRecommendCount = (product_list) => {
+    try {
+        product_list.map(product => {
+            db.ProductTracking.increment({ recommend: 1 }, { where: { productID: product.id } });
+        });
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+const handleSaveRelevantItemRecommendCount = async (product_list) => {
+    try {
+        await Promise.all(product_list.map(async product => {
+            await db.ProductTracking.increment({ recommend: 1 }, { where: { productID: product.item_rec } });
+        }));
+
+    } catch (error) {
+        console.log(error);
+        return null;
     }
 }
 

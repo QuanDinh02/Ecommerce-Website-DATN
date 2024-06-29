@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
       Product.hasMany(models.SimItem, { foreignKey: 'item_id' });
       Product.hasMany(models.SimItem, { foreignKey: 'item_rec' });
+      Product.hasOne(models.ProductTracking, { foreignKey: 'productID' });
     }
   }
   Product.init({

@@ -47,6 +47,7 @@ import Banner_8 from '../assets/img/homepage/Banner_8.jpg';
 import { getOnlyCategories } from "@/services/categoryService";
 
 import { categoryIconLarge } from "@/data/homepage";
+import { updateProductRecommendClick } from "@/services/productTrackingService";
 
 interface IRecommendProduct {
     id: number
@@ -191,6 +192,8 @@ const RecommendItemList = (props: IProps) => {
 
             saveCustomerSearch(product_name);
 
+            updateProductRecommendClick(product_id);
+            
             navigate({
                 pathname: "/product",
                 search: `?id=${product_id}`,
@@ -701,9 +704,6 @@ const Homepage = () => {
                                         <div className="product-list grid grid-cols-5 gap-y-6 gap-x-2">
                                             <RecommendItemList setShow_quick_view={handleQuickView} />
                                         </div>
-                                    </div>
-                                    <div className="w-full flex items-center justify-center bg-[#EEEEEE]">
-                                        <div className="w-1/3 bg-white flex items-center justify-center py-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">Xem Thêm</div>
                                     </div>
                                 </div>
                             </>

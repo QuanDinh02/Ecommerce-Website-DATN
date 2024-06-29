@@ -116,6 +116,7 @@ const ApiRoute = (app) => {
 
     router.post('/recommend', recommendProductController.createRecommendProducts);
     router.get('/recommend', recommendProductController.getRecommendProducts);
+    router.put('/product/recommend', productController.updateProductRecommendClick);
 
     router.get('/training-recommend-item', recommendProductController.handleExecuteTrainingRecommendProduct);
 

@@ -1,12 +1,16 @@
 import productServices from '../services/productServices';
 import sellerServices from '../services/sellerServices';
+import productTrackingService from '../services/productTrackingServices';
 
 const getProductDetail = async (req, res) => {
     try {
 
         let { id } = req.query;
 
+        productTrackingService.updateProductView(id);
+
         let result = await productServices.getProductDetail(+id);
+
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -283,10 +287,26 @@ const getProductReviews = async (req, res) => {
     }
 }
 
+const updateProductRecommendClick = (req, res) => {
+    try {
+        let { id } = req.body;
+
+        productTrackingService.updateProductRecommendClick(+id);
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
     handleUpdateProductImage, handleGetSearchProducts,
     getProductDetail, getProductReviews, handleGetSearchProductsWithPagination,
     getProductsHistory, getHistoryProductsSwiper, getProductDetailShopInfo,
-    getProductsByShopCategory, getShopCategories, getShopInfo
+    getProductsByShopCategory, getShopCategories, getShopInfo, updateProductRecommendClick
 }

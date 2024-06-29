@@ -52,6 +52,7 @@ import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import { PiStorefrontLight } from "react-icons/pi";
 import classNames from "classnames";
+import { updateProductRecommendClick } from "@/services/productTrackingService";
 
 interface IRecommendProduct {
     id: number
@@ -203,6 +204,8 @@ const RelevantRecommendItemList = (props: IProps) => {
             });
 
             saveCustomerSearch(product_name);
+
+            updateProductRecommendClick(product_id);
 
             navigate({
                 pathname: "/product",
