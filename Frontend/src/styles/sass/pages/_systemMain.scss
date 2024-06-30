@@ -12,3 +12,9 @@
     scrollbar-width   : none;
     /* Firefox */
 }
+
+.system-dashboard {
+    .overview-item {
+        border-bottom-width: 6px;
+    }
+}

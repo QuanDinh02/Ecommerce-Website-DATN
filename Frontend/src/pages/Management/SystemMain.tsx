@@ -47,8 +47,13 @@ const SideBar: ISideBarItem[] = [
         path: "/admin/product",
         name: "Sản phẩm",
         icon: <BsBox className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
+        skip: true,
+        children: [
+            {
+                path: "/analysis",
+                name: "Phân tích sản phẩm",
+            },
+        ]
     },
     {
         path: "/admin/employee",
@@ -81,13 +86,6 @@ const SideBar: ISideBarItem[] = [
         path: "/admin/department",
         name: "Phòng ban",
         icon: <FaRegBuilding className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
-    },
-    {
-        path: "/admin/report",
-        name: "Báo cáo",
-        icon: <GoReport className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     }

@@ -180,6 +180,7 @@ const ApiRoute = (app) => {
     // ADMIN:
     router.get('/admin/analysis-product', checkSysUserJWT, adminController.getAnalysisProduct);
     router.get('/admin/analysis-product/search', checkSysUserJWT, adminController.getAnalysisProductSearch);
+    router.get('/admin/dashboard', checkSysUserJWT, adminController.getDashboardData);
 
     return app.use('/api', router);
 }

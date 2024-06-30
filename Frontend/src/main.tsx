@@ -77,10 +77,10 @@ import EmployeeManagement from '@/pages/Management/EmployeeManagement.tsx';
 import CustomerManagement from '@/pages/Management/Partners/CustomerManagement.tsx';
 import SellerManagement from '@/pages/Management/Partners/SellerManagement.tsx';
 import DepartmentManagement from '@/pages/Management/DepartmentManagement.tsx';
-import SystemReport from '@/pages/Management/SystemReport.tsx';
 import SystemPartner from '@/pages/Management/SystemPartner.tsx';
 import ShippingUnitManagement from '@/pages/Management/Partners/ShippingUnitManagement.tsx';
 import SystemProduct from '@/pages/Management/SystemProduct.tsx';
+import SystemProductAnalysis from '@/pages/Management/SystemProductAnalysis.tsx';
 
 import AdminRoute from '@/components/AdminRoute.tsx';
 import SellerRoute from '@/components/SellerRoute.tsx';
@@ -345,7 +345,13 @@ const router = createBrowserRouter(
             },
             {
               path: "product",
-              element: <SystemProduct/>
+              element: <SystemProduct />,
+              children: [
+                {
+                  path: "analysis",
+                  element: <SystemProductAnalysis />
+                }
+              ]
             },
             {
               path: "employee",
@@ -372,11 +378,7 @@ const router = createBrowserRouter(
             {
               path: "department",
               element: <DepartmentManagement />
-            },
-            {
-              path: "report",
-              element: <SystemReport />
-            },
+            }
           ]
         },
         {

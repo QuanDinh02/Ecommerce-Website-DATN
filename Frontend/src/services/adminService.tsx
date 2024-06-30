@@ -16,3 +16,11 @@ export const getAnalysisProductSearch = async (product_id: number) => {
     }
     return null;
 }
+
+export const getAdminDashboardData = async () => {
+    let result: APIResponse = await axios.get('/api/admin/dashboard');
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}

@@ -256,6 +256,63 @@ const getAnalysisProductSearch = async (product_id) => {
     }
 }
 
+const getDashboardData = async () => {
+    try {
+
+        let { count: staff } = await db.User.findAndCountAll({
+            raw: true,
+            where: {
+                role: {
+                    [Op.eq]: 1,
+                },
+            }
+        });
+
+        let { count: customer } = await db.User.findAndCountAll({
+            raw: true,
+            where: {
+                role: {
+                    [Op.eq]: 3,
+                },
+            }
+        });
+
+        let { count: seller } = await db.User.findAndCountAll({
+            raw: true,
+            where: {
+                role: {
+                    [Op.eq]: 2,
+                },
+            }
+        });
+
+        let { count: shipping_unit } = await db.User.findAndCountAll({
+            raw: true,
+            where: {
+                role: {
+                    [Op.eq]: 4,
+                },
+            }
+        });
+
+        let data = [customer, seller, staff, shipping_unit];
+
+        return {
+            EC: 0,
+            DT: data,
+            EM: 'Get admin dashboard data !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
-    getAnalysisProduct, getAnalysisProductSearch
+    getAnalysisProduct, getAnalysisProductSearch, getDashboardData
 }
