@@ -1,7 +1,5 @@
 import { RxDashboard } from "react-icons/rx";
 import { LuUsers } from "react-icons/lu";
-import { AiOutlineUser } from "react-icons/ai";
-import { PiStorefrontLight } from "react-icons/pi";
 import { FaRegBuilding } from "react-icons/fa";
 import { GoReport } from "react-icons/go";
 import SidebarAccordion from "./SidebarAccordion";
@@ -15,6 +13,8 @@ import { userSysLogout } from "@/services/userService";
 import { successToast1 } from "@/components/Toast/Toast";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/reducer/rootReducer";
+import { FaRegHandshake } from "react-icons/fa";
+import { BsBox } from "react-icons/bs";
 
 interface IAdminAccount {
     asid: number
@@ -44,36 +44,49 @@ const SideBar: ISideBarItem[] = [
         children: []
     },
     {
+        path: "/admin/product",
+        name: "Sản phẩm",
+        icon: <BsBox className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: false,
+        children: []
+    },
+    {
         path: "/admin/employee",
-        name: "Employee",
+        name: "Nhân viên",
         icon: <LuUsers className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
-        path: "/admin/customer",
-        name: "Customer",
-        icon: <AiOutlineUser className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
-    },
-    {
-        path: "/admin/seller",
-        name: "Seller",
-        icon: <PiStorefrontLight className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
+        path: "/admin/partner",
+        name: "Đối tác",
+        icon: <FaRegHandshake className="w-5 h-5 text-gray-500 side-bar-icon" />,
+        skip: true,
+        children: [
+            {
+                path: "/customer",
+                name: "Khách hàng",
+            },
+            {
+                path: "/seller",
+                name: "Người bán",
+            },
+            {
+                path: "/shipping_unit",
+                name: "Đơn vị vận chuyển",
+            },
+        ]
     },
     {
         path: "/admin/department",
-        name: "Department",
+        name: "Phòng ban",
         icon: <FaRegBuilding className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
     },
     {
         path: "/admin/report",
-        name: "Report",
+        name: "Báo cáo",
         icon: <GoReport className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
@@ -130,10 +143,6 @@ const SystemMain = () => {
         };
     }, []);
 
-    React.useEffect(() => {
-        navigate("/fms/admin/dashboard");
-    }, []);
-
     return (
         <div className="system-main w-full flex relative">
             <div className="system-main__sidebar w-1/6 h-screen absolute top-0 sticky bg-white relative">
@@ -146,7 +155,7 @@ const SystemMain = () => {
             </div>
 
             <div className="system-main__content w-5/6 bg-[#F5F5F5] h-fit min-h-screen realative ">
-                <div className="content__header w-full h-20 px-5 py-3 flex items-center justify-end absolute top-0 sticky bg-[#F5F5F5] gap-x-2">
+                <div className="content__header w-full h-20 px-5 py-3 flex items-center justify-end absolute top-0 z-20 sticky bg-[#F5F5F5] gap-x-2">
                     <div className={notificationStyle} onClick={() => setShowNotification(!showNotification)}><VscBell className="w-6 h-6" /></div>
                     <div
                         className="relative"

@@ -74,10 +74,13 @@ import SystemLogin from '@/pages/Management/SystemLogin.tsx';
 import SystemMain from '@/pages/Management/SystemMain.tsx';
 import SystemDashboard from '@/pages/Management/SystemDashboard.tsx';
 import EmployeeManagement from '@/pages/Management/EmployeeManagement.tsx';
-import CustomerManagement from '@/pages/Management/CustomerManagement.tsx';
-import SellerManagement from '@/pages/Management/SellerManagement.tsx';
+import CustomerManagement from '@/pages/Management/Partners/CustomerManagement.tsx';
+import SellerManagement from '@/pages/Management/Partners/SellerManagement.tsx';
 import DepartmentManagement from '@/pages/Management/DepartmentManagement.tsx';
 import SystemReport from '@/pages/Management/SystemReport.tsx';
+import SystemPartner from '@/pages/Management/SystemPartner.tsx';
+import ShippingUnitManagement from '@/pages/Management/Partners/ShippingUnitManagement.tsx';
+import SystemProduct from '@/pages/Management/SystemProduct.tsx';
 
 import AdminRoute from '@/components/AdminRoute.tsx';
 import SellerRoute from '@/components/SellerRoute.tsx';
@@ -341,16 +344,30 @@ const router = createBrowserRouter(
               element: <SystemDashboard />
             },
             {
+              path: "product",
+              element: <SystemProduct/>
+            },
+            {
               path: "employee",
               element: <EmployeeManagement />
             },
             {
-              path: "customer",
-              element: <CustomerManagement />
-            },
-            {
-              path: "seller",
-              element: <SellerManagement />
+              path: "partner",
+              element: <SystemPartner />,
+              children: [
+                {
+                  path: "customer",
+                  element: <CustomerManagement />
+                },
+                {
+                  path: "seller",
+                  element: <SellerManagement />
+                },
+                {
+                  path: "shipping_unit",
+                  element: <ShippingUnitManagement />,
+                },
+              ]
             },
             {
               path: "department",

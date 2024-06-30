@@ -17,6 +17,7 @@ import sellerController from '../controller/sellerController';
 import { checkUserJWT, checkSysUserJWT } from '../middleware/jwt';
 import { cacheMiddleware } from '../middleware/cache';
 import shippingUnitController from '../controller/shippingUnitController';
+import adminController from '../controller/adminController';
 
 const router = express.Router();
 
@@ -28,11 +29,13 @@ const ApiRoute = (app) => {
 
     router.get('/testAPI', apiController.testAPI);
 
+    // USER AUTHENTICATION
     router.get('/user/register/email-validate', userController.checkCustomerEmailExist);
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
     router.get('/user/logout', userController.handleUserLogout);
 
+    // SYSTEM USER AUTHENTICATION
     router.post('/user/sys/login', userController.handleSystemUserLogin);
     router.get('/user/sys/logout', userController.handleSystemUserLogout);
     router.get('/user/account', checkUserJWT, userController.handleFetchUserAccount);
@@ -40,6 +43,7 @@ const ApiRoute = (app) => {
 
     router.put('/user/password', userController.handleChangeUserPassword);
 
+    // CUSTOMER
     router.get('/customer/info', customerController.getCustomerInfo);
     router.put('/customer/info', customerController.updateCustomerInfo);
     router.put('/customer/info/password', checkUserJWT, customerController.changeCustomerPassword);
@@ -53,6 +57,7 @@ const ApiRoute = (app) => {
     router.post('/customer/register/verification-code', customerController.sendVertificatedCode);
     router.post('/customer/register/verify', customerController.handleCodeVertification);
 
+    // NEW CUSTOMER
     router.get('/new-customer/check', customerController.handleCheckNewCustomer);
     router.delete('/new-customer/remove/:id', customerController.handleRemoveCheckNewCustomer);
     router.post('/new-customer/training', checkUserJWT, customerController.trainingNewCustomer);
@@ -86,6 +91,7 @@ const ApiRoute = (app) => {
 
     router.put('/product', upload.single('image'), productController.handleUpdateProductImage);
 
+    // CUSTOMER CART ITEM
     router.get('/cart-item', cartItemController.getQuickCartItems);
     router.post('/cart-item', cartItemController.addCartItem);
     router.put('/cart-item', cartItemController.updateCartItem);
@@ -93,6 +99,7 @@ const ApiRoute = (app) => {
 
     router.delete('/cart-item/all/:id', cartItemController.deleteCartItemByCustomer);
 
+    // CUSTOMER WISH LIST
     router.get('/wish-list', wishListController.getWishListByCustomer);
     router.post('/wish-list', wishListController.addWishListItem);
     router.delete('/wish-list/:id', wishListController.deleteWishListItem);
@@ -100,6 +107,7 @@ const ApiRoute = (app) => {
     router.post('/search-history', checkUserJWT, searchController.customerSearchRecord);
     router.post('/session-activity', checkUserJWT, sessionController.handleSavingSessionActivity);
 
+    // CUSTOMER ORDER
     router.post('/order', checkUserJWT, orderController.createNewOrder);
     router.get('/order', orderController.getOrderByCustomer);
     router.delete('/order/cancel/:id', orderController.cancelOrderByCustomer);
@@ -110,10 +118,12 @@ const ApiRoute = (app) => {
     router.get('/order/shipping-method', orderController.getShippingMethod);
     router.get('/order/payment-method', orderController.getPaymentMethod);
 
+    // DATA FOR ADDRESS
     router.get('/provinces', cacheMiddleware(300), locationController.getAllProvinces);
     router.get('/districts/province/:province_code', cacheMiddleware(300), locationController.getDistrictsByProvince);
     router.get('/wards/district/:district_code', cacheMiddleware(300), locationController.getWardsByDistrict);
 
+    // RECOMMEND PRODUCT
     router.post('/recommend', recommendProductController.createRecommendProducts);
     router.get('/recommend', recommendProductController.getRecommendProducts);
     router.put('/product/recommend', productController.updateProductRecommendClick);
@@ -130,9 +140,7 @@ const ApiRoute = (app) => {
     router.post('/image', upload.single('image'), imageController.uploadImage);
     router.delete('/image/:id', imageController.deleteImage);
 
-
     //SELLER:
-
     router.get('/seller/register/email-validate', userController.checkSellerEmailExist);
     router.post('/seller/register/verification-code', sellerController.sendVertificatedCode);
     router.post('/seller/register/verify', sellerController.handleCodeVertification);
@@ -161,13 +169,17 @@ const ApiRoute = (app) => {
     router.post('/seller/shop/category/product', checkUserJWT, sellerController.addProductToCategoryShop);
     router.delete('/seller/shop/category/product/:id', checkUserJWT, sellerController.removeProductOutCategoryShop);
 
-    // SHIPPING UNIT
+    // SHIPPING UNIT:
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
     router.get('/shipping-unit/order', checkSysUserJWT, shippingUnitController.getOrderStatus);
     router.get('/shipping-unit/order/detail', checkSysUserJWT, shippingUnitController.getOrderDetail);
     router.put('/shipping-unit/order/received-confirmation', checkSysUserJWT, shippingUnitController.confirmReceiveOrderSeller);
     router.put('/shipping-unit/order/shipping', checkSysUserJWT, shippingUnitController.handleShippingOrder);
     router.put('/shipping-unit/order/complete-shipping', checkSysUserJWT, shippingUnitController.handleConfirmCompleteShippingOrder);
+
+    // ADMIN:
+    router.get('/admin/analysis-product', checkSysUserJWT, adminController.getAnalysisProduct);
+    router.get('/admin/analysis-product/search', checkSysUserJWT, adminController.getAnalysisProductSearch);
 
     return app.use('/api', router);
 }

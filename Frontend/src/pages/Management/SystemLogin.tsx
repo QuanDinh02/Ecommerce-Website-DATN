@@ -100,7 +100,7 @@ const SystemLogin = () => {
                 }
 
                 dispatch(UserLogin(data));
-                navigate("/fms/admin");
+                navigate("/fms/admin/dashboard");
             }
         }
     }
