@@ -55,13 +55,13 @@ const SideBar: ISideBarItem[] = [
             },
         ]
     },
-    {
-        path: "/admin/employee",
-        name: "Nhân viên",
-        icon: <LuUsers className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
-    },
+    // {
+    //     path: "/admin/employee",
+    //     name: "Nhân viên",
+    //     icon: <LuUsers className="w-5 h-5 text-gray-500 side-bar-icon" />,
+    //     skip: false,
+    //     children: []
+    // },
     {
         path: "/admin/partner",
         name: "Đối tác",
@@ -82,13 +82,13 @@ const SideBar: ISideBarItem[] = [
             },
         ]
     },
-    {
-        path: "/admin/department",
-        name: "Phòng ban",
-        icon: <FaRegBuilding className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
-    }
+    // {
+    //     path: "/admin/department",
+    //     name: "Phòng ban",
+    //     icon: <FaRegBuilding className="w-5 h-5 text-gray-500 side-bar-icon" />,
+    //     skip: false,
+    //     children: []
+    // }
 ]
 
 const SystemMain = () => {

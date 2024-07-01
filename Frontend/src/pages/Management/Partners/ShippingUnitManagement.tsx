@@ -1,6 +1,6 @@
 import Button from "@/components/Button"
 import CopyClipboard from "@/components/CopyClipboard"
-import { getShippingUnitList, getShippingUnitSearch } from "@/services/adminService"
+import { changePasswordShippingUnit, getShippingUnitList, getShippingUnitSearch, updateShippingUnit } from "@/services/adminService"
 import React from "react"
 import { IoSearch } from "react-icons/io5"
 import { ThreeDots } from "react-loader-spinner"
@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom"
 import Modal from "@/components/Modal"
 import { useImmer } from "use-immer"
 import { BiSave } from "react-icons/bi"
+import { errorToast1, successToast1 } from "@/components/Toast/Toast"
 
 interface IShippingUnit {
     id: number
@@ -99,6 +100,21 @@ const ShippingUnitManagement = () => {
         });
     }
 
+    const refreshNewForm = () => {
+        setUpdateSU({
+            id: 0,
+            nameUnit: "",
+            address: "",
+            mobile: "",
+            description: ""
+        });
+
+        setUpdatePassword({
+            old_password: "",
+            new_password: ""
+        });
+    }
+
     const handlePasswordOnChange = (field: string, value: string) => {
         setUpdatePassword(draft => {
             draft[field] = value;
@@ -158,6 +174,77 @@ const ShippingUnitManagement = () => {
     const handlePageClick = (event) => {
         setDataLoading(true);
         setCurrentPage(+event.selected + 1);
+    }
+
+    const handleUpdateSU = async () => {
+
+        if (updateSU.nameUnit.length === 0) {
+            errorToast1("Vui lòng nhập tên đơn vị !");
+            return;
+        }
+
+        if (updateSU.mobile.length === 0) {
+            errorToast1("Vui lòng nhập SĐT đơn vị !");
+            return;
+        }
+
+        if (updateSU.address.length === 0) {
+            errorToast1("Vui lòng nhập địa chỉ đơn vị !");
+            return;
+        }
+
+        if (updateSU.mobile.length < 10 || updateSU.mobile.length > 11) {
+            errorToast1("Số điện thoại không hợp lệ !");
+            return;
+        }
+
+        let result = await updateShippingUnit(updateSU);
+
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                fetchShippingUnitList(showItem, currentPage);
+                setTimeout(() => {
+                    setShowUpdateModal(false);
+                    refreshNewForm();
+                }, 1000);
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
+        }
+    }
+
+    const changeSUPassword = async () => {
+
+        if (updatePassword.old_password.length === 0) {
+            errorToast1("Vui lòng nhập mật khẩu cũ !");
+            return;
+        }
+
+        if (updatePassword.new_password.length === 0) {
+            errorToast1("Vui lòng nhập mật khẩu mới !");
+            return;
+        }
+
+        let result = await changePasswordShippingUnit({
+            su_id: updateSU.id,
+            old_password: updatePassword.old_password,
+            new_password: updatePassword.new_password,
+        });
+
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setTimeout(() => {
+                    setShowUpdateModal(false);
+                    refreshNewForm();
+                }, 1000);
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
+        }
     }
 
     React.useEffect(() => {
@@ -315,7 +402,7 @@ const ShippingUnitManagement = () => {
                             <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('description', e.target.value)} value={updateSU.description} placeholder="Nhập mô tả đơn vị vận chuyển" />
                         </div>
                     </div>
-                    <Button styles="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1"><BiSave /> Lưu</Button>
+                    <Button styles="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1" OnClick={() => handleUpdateSU()}><BiSave /> Lưu</Button>
                     <div className="text-lg my-4">Đổi mật khẩu</div>
                     <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
                         <div>
@@ -327,7 +414,7 @@ const ShippingUnitManagement = () => {
                             <input type="password" className="form_input" onChange={(e) => handlePasswordOnChange('new_password', e.target.value)} value={updatePassword.new_password} placeholder="Nhập mật khẩu mới" />
                         </div>
                     </div>
-                    <Button styles="px-4 py-2 rounded bg-red-500 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1">Đổi mật khẩu</Button>
+                    <Button styles="px-4 py-2 rounded bg-red-500 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1" OnClick={() => changeSUPassword()}>Đổi mật khẩu</Button>
                 </div>
             </Modal>
         </>

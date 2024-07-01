@@ -188,6 +188,8 @@ const ApiRoute = (app) => {
     router.get('/admin/shipping-unit', checkSysUserJWT, adminController.getShippingUnitData);
     router.get('/admin/shipping-unit/search', checkSysUserJWT, adminController.getShippingUnitSearch);
     router.post('/admin/shipping-unit', checkSysUserJWT, adminController.createShippingUnit);
+    router.put('/admin/shipping-unit', checkSysUserJWT, adminController.updateShippingUnit);
+    router.put('/admin/shipping-unit/password', checkSysUserJWT, adminController.updateShippingUnitPassword);
 
     return app.use('/api', router);
 }

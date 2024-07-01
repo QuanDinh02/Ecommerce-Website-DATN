@@ -1,7 +1,7 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
-import { hashPassword } from './LoginRegisterService.js';
+import { hashPassword, checkPassword } from './LoginRegisterService.js';
 
 //sort_id: 1 - "Lượt xem tăng dần"
 
@@ -663,9 +663,100 @@ const createShippingUnit = async (data) => {
     }
 }
 
+const updateShippingUnit = async (data) => {
+    try {
+
+        await db.ShippingUnit.update({
+            nameUnit: data.nameUnit,
+            address: data.address,
+            mobile: data.mobile,
+            description: data.description,
+        }, {
+            where: {
+                id: +data.id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Cập nhật đơn vị thành công!'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+const updateShippingUnitPassword = async (data) => {
+    try {
+
+        let { su_id, old_password, new_password } = data;
+        
+        let suInfo = await db.ShippingUnit.findOne({
+            raw: true,
+            attributes: ['userID'],
+            where: {
+                id: {
+                    [Op.eq]: +su_id
+                }
+            }
+        })
+
+        if (suInfo) {
+            let user_id = suInfo.userID;
+
+            let userInfo = await db.User.findOne({
+                raw: true,
+                attributes: ['password'],
+                where: {
+                    id: {
+                        [Op.eq]: +user_id
+                    }
+                }
+            });
+
+            let user_password = userInfo.password;
+            if (checkPassword(old_password, user_password)) {
+
+                await db.User.update({
+                    password: hashPassword(new_password),
+                }, {
+                    where: {
+                        id: {
+                            [Op.eq]: +user_id
+                        }
+                    }
+                });
+
+                return {
+                    EC: 0,
+                    DT: "",
+                    EM: 'Thay đổi mật khẩu thành công!'
+                }
+            } else {
+                return {
+                    EC: -1,
+                    DT: "",
+                    EM: 'Mật khẩu cũ không đúng!'
+                }
+            }
+        }
+        return {
+            EC: -1,
+            DT: "",
+            EM: 'Đơn vị vận chuyển không tồn tại!'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
 
 module.exports = {
     getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
-    getShippingUnitData, getShippingUnitSearch, createShippingUnit
+    getShippingUnitData, getShippingUnitSearch, createShippingUnit, updateShippingUnit, updateShippingUnitPassword
 }

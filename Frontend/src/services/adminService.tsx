@@ -10,6 +10,20 @@ interface INewSU {
     password: string
 }
 
+interface IUpdateSU {
+    id: number
+    nameUnit: string
+    address: string
+    mobile: string
+    description: string
+}
+
+interface IChangePassword {
+    su_id: number
+    old_password: string
+    new_password: string
+}
+
 export const getAnalysisProduct = async (product_display_limit: number, page: number, category: number, sub_category: number, sort: number) => {
     let result: APIResponse = await axios.get(`/api/admin/analysis-product?limit=${product_display_limit}&page=${page}&category_id=${category}&sub_category_id=${sub_category}&sort_id=${sort}`);
     if (result && result?.DT) {
@@ -84,5 +98,15 @@ export const getShippingUnitSearch = async (search: string) => {
 
 export const createNewShippingUnit = async (data: INewSU) => {
     let result: APIResponse = await axios.post('/api/admin/shipping-unit', data);
+    return result;
+}
+
+export const updateShippingUnit = async (data: IUpdateSU) => {
+    let result: APIResponse = await axios.put('/api/admin/shipping-unit', data);
+    return result;
+}
+
+export const changePasswordShippingUnit = async (data: IChangePassword) => {
+    let result: APIResponse = await axios.put('/api/admin/shipping-unit/password', data);
     return result;
 }

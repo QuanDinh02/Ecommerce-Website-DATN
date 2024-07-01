@@ -218,8 +218,53 @@ const createShippingUnit = async (req, res) => {
     }
 }
 
+const updateShippingUnit = async (req, res) => {
+    try {
+
+        let data = req.body;
+
+        let result = await adminServices.updateShippingUnit(data);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const updateShippingUnitPassword = async (req, res) => {
+    try {
+
+        let data = req.body;
+
+        let result = await adminServices.updateShippingUnitPassword(data);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
-    getShippingUnitData, getShippingUnitSearch, createShippingUnit
+    getShippingUnitData, getShippingUnitSearch, createShippingUnit,
+    updateShippingUnit, updateShippingUnitPassword
 }
