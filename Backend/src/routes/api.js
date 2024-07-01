@@ -181,6 +181,13 @@ const ApiRoute = (app) => {
     router.get('/admin/analysis-product', checkSysUserJWT, adminController.getAnalysisProduct);
     router.get('/admin/analysis-product/search', checkSysUserJWT, adminController.getAnalysisProductSearch);
     router.get('/admin/dashboard', checkSysUserJWT, adminController.getDashboardData);
+    router.get('/admin/customer', checkSysUserJWT, adminController.getCustomerData);
+    router.get('/admin/customer/search', checkSysUserJWT, adminController.getCustomerSearch);
+    router.get('/admin/seller', checkSysUserJWT, adminController.getSellerData);
+    router.get('/admin/seller/search', checkSysUserJWT, adminController.getSellerSearch);
+    router.get('/admin/shipping-unit', checkSysUserJWT, adminController.getShippingUnitData);
+    router.get('/admin/shipping-unit/search', checkSysUserJWT, adminController.getShippingUnitSearch);
+    router.post('/admin/shipping-unit', checkSysUserJWT, adminController.createShippingUnit);
 
     return app.use('/api', router);
 }

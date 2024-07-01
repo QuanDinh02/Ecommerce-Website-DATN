@@ -1,6 +1,7 @@
 const db = require('../models/index.js');
 const { Op } = require("sequelize");
 const _ = require("lodash");
+import { hashPassword } from './LoginRegisterService.js';
 
 //sort_id: 1 - "Lượt xem tăng dần"
 
@@ -313,6 +314,358 @@ const getDashboardData = async () => {
     }
 }
 
+const getCustomerData = async (item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let customerList = await db.Customer.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'name', 'mobile', 'email']
+            });
+
+            const listLength = customerList.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            customerList.reverse();
+
+            let customerDataPangination = _(customerList).drop(offSet).take(item_limit).value();
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    customer_list: customerDataPangination
+                },
+                EM: 'Get customer data !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+}
+
+const getCustomerSearch = async (search_content) => {
+    try {
+        let customerList = await db.Customer.findAll({
+            raw: true,
+            attributes: ['id', 'name', 'mobile', 'email'],
+            where: {
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.substring]: search_content
+                        }
+                    },
+                    {
+                        mobile: {
+                            [Op.substring]: search_content
+                        }
+                    }
+                ]
+
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                customer_list: customerList
+            },
+            EM: 'Get customer data search !'
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getSellerData = async (item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let sellerList = await db.Seller.findAll({
+                raw: true,
+                attributes: ['id', 'name', 'shopName', 'mobile', 'email']
+            });
+
+            const listLength = sellerList.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            sellerList.reverse();
+
+            let sellerDataPangination = _(sellerList).drop(offSet).take(item_limit).value();
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    seller_list: sellerDataPangination
+                },
+                EM: 'Get seller data !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+}
+
+const getSellerSearch = async (search_content) => {
+    try {
+        let seller_list = await db.Seller.findAll({
+            raw: true,
+            attributes: ['id', 'name', 'shopName', 'mobile', 'email'],
+            where: {
+                [Op.or]: [
+                    {
+                        shopName: {
+                            [Op.substring]: search_content
+                        }
+                    },
+                    {
+                        mobile: {
+                            [Op.substring]: search_content
+                        }
+                    }
+                ]
+
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                seller_list: seller_list
+            },
+            EM: 'Get shop data search !'
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getShippingUnitData = async (item_limit, page) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let suList = await db.ShippingUnit.findAll({
+                raw: true,
+                attributes: ['id', 'nameUnit', 'address', 'mobile', 'description']
+            });
+
+            const listLength = suList.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            suList.reverse();
+
+            let suPangination = _(suList).drop(offSet).take(item_limit).value();
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    su_list: suPangination
+                },
+                EM: 'Get shipping unit data !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+}
+
+const getShippingUnitSearch = async (search_content) => {
+    try {
+        let suList = await db.ShippingUnit.findAll({
+            raw: true,
+            attributes: ['id', 'nameUnit', 'address', 'mobile', 'description'],
+            where: {
+                [Op.or]: [
+                    {
+                        nameUnit: {
+                            [Op.substring]: search_content
+                        }
+                    },
+                    {
+                        mobile: {
+                            [Op.substring]: search_content
+                        }
+                    }
+                ]
+
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: {
+                su_list: suList
+            },
+            EM: 'Get shipping unit data search !'
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const createShippingUnit = async (data) => {
+    try {
+
+        if (data.mobile.length < 10 || data.mobile.length > 11) {
+            return {
+                EC: -1,
+                DT: "",
+                EM: "Số điện thoại không hợp lệ"
+            }
+        }
+
+        let existSUName = await db.ShippingUnit.findOne({
+            raw: true,
+            where: {
+                nameUnit: {
+                    [Op.eq]: data.nameUnit
+                }
+            }
+        });
+
+        if (existSUName) {
+            return {
+                EC: -1,
+                DT: "",
+                EM: "Tên đơn vị đã tồn tại"
+            }
+        }
+
+        let existUsername = await db.User.findOne({
+            raw: true,
+            where: {
+                username: {
+                    [Op.eq]: data.username
+                }
+            }
+        });
+
+        if (existUsername) {
+            return {
+                EC: -1,
+                DT: "",
+                EM: "Tên tài khoản đã tồn tại"
+            }
+        }
+
+        let userInfo = await db.User.create({
+            username: data.username,
+            password: hashPassword(data.password),
+            role: 4,
+            registeredAt: new Date()
+        });
+
+        if (userInfo) {
+            let user_info = userInfo.dataValues;
+
+            await db.ShippingUnit.create({
+                nameUnit: data.nameUnit,
+                address: data.address,
+                mobile: data.mobile,
+                description: data.description,
+                userID: user_info.id
+            });
+
+            return {
+                EC: 0,
+                DT: "",
+                EM: 'Thêm mới đơn vị thành công !'
+            }
+        }
+
+        return {
+            EC: -1,
+            DT: "",
+            EM: 'Lỗi thêm mới đơn vị !'
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+
 module.exports = {
-    getAnalysisProduct, getAnalysisProductSearch, getDashboardData
+    getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
+    getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
+    getShippingUnitData, getShippingUnitSearch, createShippingUnit
 }

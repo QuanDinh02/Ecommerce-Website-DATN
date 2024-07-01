@@ -81,6 +81,7 @@ import SystemPartner from '@/pages/Management/SystemPartner.tsx';
 import ShippingUnitManagement from '@/pages/Management/Partners/ShippingUnitManagement.tsx';
 import SystemProduct from '@/pages/Management/SystemProduct.tsx';
 import SystemProductAnalysis from '@/pages/Management/SystemProductAnalysis.tsx';
+import SUAddNew from '@/pages/Management/Partners/SUAddNew.tsx';
 
 import AdminRoute from '@/components/AdminRoute.tsx';
 import SellerRoute from '@/components/SellerRoute.tsx';
@@ -371,8 +372,12 @@ const router = createBrowserRouter(
                 },
                 {
                   path: "shipping_unit",
-                  element: <ShippingUnitManagement />,
+                  element: <ShippingUnitManagement />
                 },
+                {
+                  path: "shipping_unit/new",
+                  element: <SUAddNew/>,
+                }
               ]
             },
             {

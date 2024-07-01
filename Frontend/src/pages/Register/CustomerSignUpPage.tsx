@@ -114,7 +114,7 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
                         setTimeout(() => {
                             setShowLoadingIcon(false);
                             successToast1("Email hợp lệ");
-                        },1000);
+                        }, 1000);
 
                         setTimeout(() => {
                             setStep(step + 1);
@@ -135,7 +135,7 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
             <div className="signin-form__main flex flex-col gap-2 duration-800">
                 <div className='w-full'>
                     <div className='input_label'>Email</div>
-                    <input type="text" className="form_input" placeholder='Nhập địa chỉ email' onChange={(e) => setEmail(e.target.value)} value={email} onKeyPress={(event) => handleKeyPress(event)}/>
+                    <input type="text" className="form_input" placeholder='Nhập địa chỉ email' onChange={(e) => setEmail(e.target.value)} value={email} onKeyPress={(event) => handleKeyPress(event)} />
                 </div>
                 <div className='mt-6 w-full'>
                     <Button styles={(checkFullField() && !showLoadingIcon) ? 'form_button_valid' : 'form_button'} OnClick={() => handleNextStep()}>
@@ -266,7 +266,7 @@ const EmailVertification = (props: IEmailVertification) => {
 
 const CustomerRegister = (props: IRegisterProp) => {
 
-    const { email,  setStep, step } = props;
+    const { email, setStep, step } = props;
 
     const [showPassword, setShowPassword] = React.useState<boolean>(false);
     const [errorField, setErrorField] = React.useState<number>(0);
@@ -348,18 +348,18 @@ const CustomerRegister = (props: IRegisterProp) => {
             <div className="signin-form__main flex flex-col gap-2 duration-800">
                 <div className='w-full'>
                     <div className='input_label'>Tên đăng nhập</div>
-                    <input type="text" className="form_input" onChange={(e) => handleOnChange('username', e.target.value)} />
+                    <input type="text" className="form_input" onChange={(e) => handleOnChange('username', e.target.value)} value={newCustomerAccount.username} />
                     {errorField === 1 && <div className='my-2 text-sm text-red-500'>Tên đăng nhập đã tồn tại</div>}
                 </div>
                 <div className='w-full'>
                     <div className='input_label'>Số điện thoại</div>
-                    <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} />
+                    <input type="text" className="form_input" onChange={(e) => handleOnChange('phone', e.target.value)} value={newCustomerAccount.phone} />
                     {errorField === 2 && <div className='my-2 text-sm text-red-500'>Số điện thoại không đúng</div>}
                 </div>
                 <div className='w-full'>
                     <div className='input_label'>Mật khẩu</div>
                     <div className='relative'>
-                        <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} />
+                        <input type={showPassword ? "text" : "password"} className="form_input" onChange={(e) => handleOnChange('password', e.target.value)} value={newCustomerAccount.password} />
                         <div className='absolute top-3 right-2 ' onClick={() => setShowPassword(!showPassword)}>
                             {!showPassword ? <PiEyeSlash className="w-5 h-5 text-xl text-gray-500 cursor-pointer" /> : <PiEyeLight className="w-5 h-5 text-xl cursor-pointer" />}
                         </div>
@@ -369,7 +369,7 @@ const CustomerRegister = (props: IRegisterProp) => {
                 </div>
                 <div className='w-full'>
                     <div className='input_label'>Xác nhận mật khẩu</div>
-                    <input type="password" className="form_input" onChange={(e) => handleOnChange('confirm_password', e.target.value)} />
+                    <input type="password" className="form_input" onChange={(e) => handleOnChange('confirm_password', e.target.value)} value={newCustomerAccount.confirm_password} />
                     {errorField === 4 && <div className='my-2 text-sm text-red-500'>Xác nhận mật khẩu không đúng</div>}
                 </div>
                 <div className='mt-6 w-full'>
@@ -513,7 +513,7 @@ const CustomerSignUpPage = () => {
                     }
                     {
                         registerStep === 3 &&
-                        <CustomerRegister email={email} step={registerStep} setStep={setRegisterStep}/>
+                        <CustomerRegister email={email} step={registerStep} setStep={setRegisterStep} />
                     }
                     {
                         registerStep === 4 &&
