@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaCheck } from "react-icons/fa6";
 import classNames from 'classnames';
+import { IoBuildOutline } from 'react-icons/io5';
 
 const SettingItem = ({ style, title, sub_title }) => {
 
@@ -30,15 +31,14 @@ const SettingItem = ({ style, title, sub_title }) => {
 const NotificationSetting = () => {
 
     return (
-        <div className="notification-setting">
-            <div className="notification-setting__title pb-5 border-b border-gray-300">
-                <div className="title text-xl">Cài đặt thông báo</div>
-            </div>
-            <div className="notification-setting__main p-5 flex flex-col">
-                <SettingItem style={"mb-5 w-full"} title={"Thông báo qua Email"} sub_title={"Các thông tin sẽ được thông báo qua email"} />
-                <SettingItem style={"mb-5 w-full"} title={"Cập nhật đơn hàng"} sub_title={"Thông báo khi có cập nhật về đơn hàng của tôi, bao gồm cả việc cập nhật than toán"} />
-                <SettingItem style={"mb-5 w-full"} title={"Cập nhật sản phẩm"} sub_title={"Thông báo khi sản phẩm của tôi hết hàng, bị xóa hoặc bị khóa"} />
-                <SettingItem style={"mb-5 w-full"} title={"Bản tin"} sub_title={"Gửi tôi thông tin xu hướng, chương trình khuyến mãi & cập nhật mới nhất"} />
+        <div className="customer-notification-container w-full py-5 px-10 bg-white h-full">
+            <div className="w-full h-full flex flex-col items-center justify-center gap-y-2">
+                <div><IoBuildOutline className="w-12 h-12" /></div>
+                <div className="text-xl font-medium">THIS FEATURE UNDER MAINTENANCE</div>
+                <div className="text-center">
+                    <div className="text-sm text-gray-500">Our website is currenly undergoing scheduled maintenance</div>
+                    <div className="text-sm text-gray-500">We should be back shortly. Thank you for your patience</div>
+                </div>
             </div>
         </div>
     )

@@ -99,6 +99,8 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import SellerNotification from './pages/SellerInfo/SellerNotification.tsx';
+import SellerSupport from './pages/SellerInfo/SellerSupport.tsx';
 
 const router = createBrowserRouter(
   [
@@ -148,6 +150,14 @@ const router = createBrowserRouter(
             {
               path: "order/detail",
               element: <OrderDetail />
+            },
+            {
+              path: "notification",
+              element: <SellerNotification />
+            },
+            {
+              path: "supports",
+              element: <SellerSupport/>
             },
             { path: "profile", element: <SellerProfile /> },
             {
@@ -376,7 +386,7 @@ const router = createBrowserRouter(
                 },
                 {
                   path: "shipping_unit/new",
-                  element: <SUAddNew/>,
+                  element: <SUAddNew />,
                 }
               ]
             },

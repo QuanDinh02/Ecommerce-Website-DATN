@@ -41,7 +41,7 @@ const CustomerSupport = () => {
                     </div>
                     <div className="category-item h-[4.5rem] border border-gray-300 flex items-center justify-center gap-x-4 px-3 cursor-pointer">
                         <div className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center w-1/3"><VscMail/></div>
-                        <div className="w-2/3 text-sm">
+                        <div className="w-2/3 text-sm flex items-center gap-x-2">
                             <div className="font-medium">Email</div>
                             <div className="text-gray-400">Gửi câu hỏi của bạn!</div>
                         </div>

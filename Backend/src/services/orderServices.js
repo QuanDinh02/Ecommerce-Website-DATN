@@ -787,9 +787,9 @@ const cancelOrderByCustomer = async (order_id) => {
             order: [['updatedDate', 'DESC']]
         });
 
-        let order_status_info = order_status[0];
+        let order_status_info_id = order_status[0].ShipmentStatus.id;
 
-        if (order_status_info.id > 1) {
+        if (order_status_info_id === 1) {
 
             let update_date = new Date();
 
@@ -809,6 +809,30 @@ const cancelOrderByCustomer = async (order_id) => {
                     }
                 },
             });
+
+            let order_item_list = await db.OrderItem.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'quantity', 'price'],
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: +order_id
+                    }
+                }
+            });
+
+            await Promise.all(order_item_list.map(async order_item => {
+
+                let productInfo = order_item.Product;
+                await db.ProductType.increment({ quantity: order_item.quantity }, { where: { productID: productInfo.id } });
+
+            }));
 
             return {
                 EC: 0,

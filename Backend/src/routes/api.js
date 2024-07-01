@@ -141,6 +141,7 @@ const ApiRoute = (app) => {
     router.delete('/image/:id', imageController.deleteImage);
 
     //SELLER:
+    router.get('/seller/dashboard', checkUserJWT, sellerController.getDashboardData);
     router.get('/seller/register/email-validate', userController.checkSellerEmailExist);
     router.post('/seller/register/verification-code', sellerController.sendVertificatedCode);
     router.post('/seller/register/verify', sellerController.handleCodeVertification);

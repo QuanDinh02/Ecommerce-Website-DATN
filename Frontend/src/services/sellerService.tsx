@@ -177,3 +177,11 @@ export const removeProductOutCategoryShop = async (id: number) => {
     let result: APIResponse = await axios.delete(`/api/seller/shop/category/product/${id}`);
     return result;
 }
+
+export const getDashboardData = async () => {
+    let result: APIResponse = await axios.get('/api/seller/dashboard');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return [];
+}

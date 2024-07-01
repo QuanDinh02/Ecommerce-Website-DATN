@@ -1334,6 +1334,91 @@ const removeProductOutCategoryShop = async (id) => {
     }
 }
 
+const getDashboardData = async (seller_id) => {
+    try {
+
+        let pending_confirm = 0;
+        let pending_shipper_get = 0;
+        let shipping = 0;
+        let shipping_success = 0;
+        let cancel = 0;
+
+        let orderListRaw = await db.Order.findAll({
+            raw: true,
+            attributes: ['id', 'orderDate', 'totalPrice'],
+            where: {
+                sellerID: {
+                    [Op.eq]: seller_id,
+                },
+            }
+        });
+
+        await Promise.all(orderListRaw.map(async item => {
+
+            let order_status_raw = await db.Shipment.findAll({
+                limit: 1,
+                raw: true,
+                nest: true,
+                attributes: ['id', 'updatedDate'],
+                include:
+                {
+                    model: db.ShipmentStatus,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    orderID: {
+                        [Op.eq]: +item.id,
+                    },
+                },
+                order: [
+                    ['updatedDate', 'DESC'],
+                    ['status', 'DESC'],
+                ]
+            });
+
+            let order_status_info = order_status_raw[0];
+
+            let order_status_id = order_status_info.ShipmentStatus.id;
+
+            if (order_status_id === 1) {
+                pending_confirm = pending_confirm + 1;
+            }
+
+            if (order_status_id === 3) {
+                pending_shipper_get += 1;
+            }
+
+            if (order_status_id === 6) {
+                shipping += 1;
+            }
+
+            if (order_status_id === 7) {
+                shipping_success += 1;
+            }
+
+            if (order_status_id === 10) {
+                cancel += 1;
+            }
+        }));
+
+        let data = [pending_confirm, pending_shipper_get, shipping, shipping_success, cancel];
+
+        return {
+            EC: 0,
+            DT: data,
+            EM: 'Get seller dashboard data !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
@@ -1342,5 +1427,5 @@ module.exports = {
     getOrderDetail, confirmCustomerOrder, packingCustomerOrder,
     getShopCategory, createShopCategory, updateShopCategory,
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
-    addProductToCategoryShop, removeProductOutCategoryShop
+    addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData
 }

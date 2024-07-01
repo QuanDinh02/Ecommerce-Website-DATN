@@ -1,6 +1,6 @@
 import { IoBuildOutline } from "react-icons/io5";
 
-const CustomerNotification = () => {
+const SellerSupport = () => {
     return (
         <div className="customer-notification-container w-full py-5 px-10 bg-white h-full">
             <div className="w-full h-full flex flex-col items-center justify-center gap-y-2">
@@ -15,4 +15,4 @@ const CustomerNotification = () => {
     )
 }
 
-export default CustomerNotification;
+export default SellerSupport;

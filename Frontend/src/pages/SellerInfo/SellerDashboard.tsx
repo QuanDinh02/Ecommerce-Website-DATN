@@ -1,3 +1,5 @@
+import AnimatedNumber from '@/components/AnimatedNumber';
+import { getDashboardData } from '@/services/sellerService';
 import React from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import {
@@ -72,36 +74,34 @@ const order_data = [
         value: 0
     },
     {
-        label: "Đã Xử Lý",
+        label: "Đang giao hàng",
+        value: 0
+    },
+    {
+        label: "Đã giao hàng thành công",
         value: 0
     },
     {
         label: "Đơn Hủy",
         value: 0
-    },
-    {
-        label: "Trả Hàng/ Hoàn Tiền Chờ Xử Lý",
-        value: 0
-    },
-    {
-        label: "Sản Phẩm Bị Tạm Khóa",
-        value: 0
-    },
-    {
-        label: "Sản Phẩm Hết Hàng",
-        value: 0
-    },
-    {
-        label: "Chương Trình Khuyến Mãi Chờ Xử Lý",
-        value: 0
-    },
+    }
 ]
 
 const SellerDashboard = () => {
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
+    const [dashboardData, setDashboardData] = React.useState<number[]>([0, 0, 0, 0, 0]);
+
+    const fetchDashboardData = async () => {
+        let result = await getDashboardData();
+        if (result && result.length > 0) {
+            setDashboardData(result);
+        }
+    }
+
     React.useEffect(() => {
+        fetchDashboardData();
         setTimeout(() => {
             setDataLoading(false);
         }, 800);
@@ -133,7 +133,7 @@ const SellerDashboard = () => {
                                     order_data.map((item, index) => {
                                         return (
                                             <div className='flex flex-col gap-y-1 items-center justify-center border border-gray-20 py-2' key={`order-type-${index}`}>
-                                                <div className='text-blue-500 font-bold'>{item.value}</div>
+                                                <div className='text-blue-500 font-bold'><AnimatedNumber n={dashboardData[index]} /></div>
                                                 <div className='text-sm text-center line-clamp-1'>{item.label}</div>
                                             </div>
                                         )
@@ -141,7 +141,7 @@ const SellerDashboard = () => {
                                 }
                             </div>
                         </div>
-                        <div className='mb-4'>
+                        {/* <div className='mb-4'>
                             <div className='flex items-center gap-x-3'>
                                 <div className="text-black text-lg font-bold">Phân Tích Bán Hàng</div>
                                 <div className='text-gray-500 text-sm'>( Hôm nay 00:00 GMT +7 00:00 )</div>
@@ -194,7 +194,7 @@ const SellerDashboard = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
             }
         </>

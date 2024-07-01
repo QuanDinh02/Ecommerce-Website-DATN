@@ -242,8 +242,15 @@ const AllOrder = () => {
                                                                                 <div className="flex flex-col gap-y-2">
                                                                                     <div className="opacity-90 line-clamp-1 cursor-pointer hover:underline hover:text-blue-600">{product.product_name}</div>
                                                                                     <div className="order-item__price flex items-center gap-x-2">
-                                                                                        <div className="font-medium">{CurrencyFormat(product.price)}</div>
-                                                                                        <div className="line-through text-gray-400">{CurrencyFormat(product.product_price)}</div>
+                                                                                        {
+                                                                                            product.price === product.product_price ?
+                                                                                                <div className="font-medium">{CurrencyFormat(product.price)}</div>
+                                                                                                :
+                                                                                                <>
+                                                                                                    <div className="font-medium">{CurrencyFormat(product.price)}</div>
+                                                                                                    <div className="line-through text-gray-400">{CurrencyFormat(product.product_price)}</div>
+                                                                                                </>
+                                                                                        }
                                                                                     </div>
                                                                                     <div className="text-gray-500">Số lượng: {product.quantity}</div>
                                                                                 </div>

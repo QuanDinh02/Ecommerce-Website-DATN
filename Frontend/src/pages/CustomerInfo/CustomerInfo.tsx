@@ -74,36 +74,29 @@ const SideBar: ISideBarItem[] = [
         skip: false,
         children: []
     },
-    {
-        path: "/voucher",
-        name: "Kho Voucher",
-        icon: <PiTicket className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: true,
-        children: [
-            {
-                path: "/info",
-                name: "Voucher",
-            },
-            {
-                path: "/history",
-                name: "Lịch sử",
-            },
-        ]
-    },
+    // {
+    //     path: "/voucher",
+    //     name: "Kho Voucher",
+    //     icon: <PiTicket className="w-5 h-5 text-gray-500 side-bar-icon" />,
+    //     skip: true,
+    //     children: [
+    //         {
+    //             path: "/info",
+    //             name: "Voucher",
+    //         },
+    //         {
+    //             path: "/history",
+    //             name: "Lịch sử",
+    //         },
+    //     ]
+    // },
     {
         path: "/supports",
         name: "Hỗ trợ",
         icon: <GoQuestion className="w-5 h-5 text-gray-500 side-bar-icon" />,
         skip: false,
         children: []
-    },
-    {
-        path: "",
-        name: "Đăng xuất",
-        icon: <IoExitOutline className="w-5 h-5 text-gray-500 side-bar-icon" />,
-        skip: false,
-        children: []
-    },
+    }
 ]
 
 const CustomerInfo = () => {
