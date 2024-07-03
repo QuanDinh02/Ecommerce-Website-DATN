@@ -37,7 +37,7 @@ import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
-
+import ProductRatingFilter from "./ProductRatingFilter";
 interface ISubCategoryActive {
     id: number
     title: string
@@ -93,6 +93,10 @@ const SubCategoryPage = () => {
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [subCategoryID, setSubCategoryID] = React.useState<number>(0);
+
+    const [ratingSort, setRatingSort] = React.useState<number>(0);
+    const [minPrice, setMinPrice] = React.useState<number>(0);
+    const [maxPrice, setMaxPrice] = React.useState<number>(0);
 
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
     const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
@@ -187,7 +191,7 @@ const SubCategoryPage = () => {
 
         navigate({
             pathname: "/sub-category",
-            search: `?id=${subCategoryID}&page=${+event.selected + 1}`,
+            search: `?id=${subCategoryID}&page=${+event.selected + 1}&rating=${ratingSort}`,
 
         }, {
             replace: true
@@ -308,8 +312,8 @@ const SubCategoryPage = () => {
         }
     }
 
-    const fetchProductsBySubCategory = async (sub_category_id: number) => {
-        let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage);
+    const fetchProductsBySubCategory = async (sub_category_id: number, rating_sort: number) => {
+        let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage, rating_sort);
         if (response) {
             if (priceArrangement.value === "") {
                 setProductList(response.product_list);
@@ -332,6 +336,28 @@ const SubCategoryPage = () => {
                 }
             }
         }
+    }
+
+    const handleRatingFilter = (rating_value: number) => {
+        setCurrentPage(1);
+        setRatingSort(rating_value);
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${subCategoryID}&page=1&rating=${rating_value}`,
+        }, {
+            replace: true
+        });
+        window.scrollTo({ top: 0, left: 0 });
+    }
+
+    const handleRemoveFilter = () => {
+        navigate({
+            pathname: "/sub-category",
+            search: `?id=${subCategoryID}&page=1&rating=0`,
+
+        }, {
+            replace: true
+        });
     }
 
     const handleCategoryNavigation = (category_id: number) => {
@@ -396,13 +422,49 @@ const SubCategoryPage = () => {
 
     React.useEffect(() => {
 
+        let rating = searchParams.get('rating');
+
+        let activeRating: number = rating ? +rating : 0;
+
+        if (activeRating !== ratingSort) {
+            setRatingSort(activeRating);
+        }
+
+    }, [searchParams.get('rating')]);
+
+    React.useEffect(() => {
+
+        let max_price = searchParams.get('maxPrice');
+
+        let activeMaxPrice: number = max_price ? +max_price : 0;
+
+        if (activeMaxPrice !== maxPrice) {
+            setMaxPrice(activeMaxPrice);
+        }
+
+    }, [searchParams.get('maxPrice')]);
+
+    React.useEffect(() => {
+
+        let min_price = searchParams.get('minPrice');
+
+        let activeMinPrice: number = min_price ? +min_price : 0;
+
+        if (activeMinPrice !== minPrice) {
+            setMinPrice(activeMinPrice);
+        }
+
+    }, [searchParams.get('minPrice')]);
+
+    React.useEffect(() => {
+
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
         if (subCategoryID !== 0 && currentPage != 0) {
-            fetchProductsBySubCategory(subCategoryID);
+            fetchProductsBySubCategory(subCategoryID, ratingSort);
         }
 
-    }, [subCategoryID, currentPage]);
+    }, [subCategoryID, currentPage, ratingSort]);
 
     React.useEffect(() => {
 
@@ -455,60 +517,20 @@ const SubCategoryPage = () => {
                                     <div className="section">
                                         <div className="section__title text-lg mb-3 font-medium">Đánh giá</div>
                                         <div className="ratings-filter">
-                                            <div className="5-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 bg-yellow-100 p-1 rounded-[4px] border border-[#FCB800]">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 5 sao</div>
-                                            </div>
-                                            <div className="4-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 4 sao</div>
-                                            </div>
-                                            <div className="3-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 3 sao</div>
-                                            </div>
-                                            <div className="2-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 2 sao</div>
-                                            </div>
-                                            <div className="1-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 1 sao</div>
-                                            </div>
+                                            {
+                                                [...Array(5)].map((item, index) => {
+                                                    let starValue = 5 - index;
+                                                    return (
+                                                        <div onClick={() => handleRatingFilter(starValue)}>
+                                                            <ProductRatingFilter value={starValue} active={starValue === ratingSort} key={`rating-filter-${index}`} />
+                                                        </div>
+                                                    )
+                                                })
+                                            }
                                         </div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
-                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80">Xóa tất cả</div>
+                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80" onClick={() => handleRemoveFilter()}>Xóa tất cả</div>
                                 </div>
                                 <div className="main__item-list flex-1">
                                     <div className="box">

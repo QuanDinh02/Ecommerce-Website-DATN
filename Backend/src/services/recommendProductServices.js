@@ -290,10 +290,16 @@ const getBothRecommendProducts = async (customer_id) => {
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
                     nest: true,
-                    include: {
-                        model: db.Seller,
-                        attributes: ['id', 'shopName']
-                    },
+                    include: [
+                        {
+                            model: db.Seller,
+                            attributes: ['id', 'shopName']
+                        },
+                        {
+                            model: db.ProductRating,
+                            attributes: ['rating'],
+                        }
+                    ],
                 },
             ],
             where: {
@@ -313,10 +319,16 @@ const getBothRecommendProducts = async (customer_id) => {
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
                     nest: true,
-                    include: {
-                        model: db.Seller,
-                        attributes: ['id', 'shopName']
-                    },
+                    include: [
+                        {
+                            model: db.Seller,
+                            attributes: ['id', 'shopName']
+                        },
+                        {
+                            model: db.ProductRating,
+                            attributes: ['rating'],
+                        }
+                    ],
                 },
             ],
             where: {
@@ -339,7 +351,8 @@ const getBothRecommendProducts = async (customer_id) => {
                 id: item.Product.id,
                 name: item.Product.name,
                 summary: item.Product.summary ? item.Product.summary : "",
-                seller_info: seller_info
+                seller_info: seller_info,
+                rating: item.Product.ProductRating.rating
             }
         });
 
@@ -365,31 +378,6 @@ const getBothRecommendProducts = async (customer_id) => {
             // const command = new GetObjectCommand(getObjectParams);
             // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'rating'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.id,
-                    },
-                }
-            });
-
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
-            }
-
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
             return {
                 ...item,
                 //image: url,
@@ -397,7 +385,6 @@ const getBothRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average,
                 quantity: productType.quantity
             }
         }));
@@ -432,10 +419,15 @@ const getRecommendProducts = async (customer_id) => {
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
                     nest: true,
-                    include: {
+                    include: [{
                         model: db.Seller,
                         attributes: ['id', 'shopName']
                     },
+                    {
+                        model: db.ProductRating,
+                        attributes: ['rating'],
+                    }
+                    ],
                 },
             ],
             where: {
@@ -456,7 +448,8 @@ const getRecommendProducts = async (customer_id) => {
                 id: item.Product.id,
                 name: item.Product.name,
                 summary: item.Product.summary ? item.Product.summary : "",
-                seller_info: seller_info
+                seller_info: seller_info,
+                rating: item.Product.ProductRating.rating
             }
         });
 
@@ -482,31 +475,6 @@ const getRecommendProducts = async (customer_id) => {
             // const command = new GetObjectCommand(getObjectParams);
             // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'rating'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.id,
-                    },
-                }
-            });
-
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
-            }
-
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
             return {
                 ...item,
                 //image: url,
@@ -514,7 +482,6 @@ const getRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average,
                 quantity: productType.quantity
             }
         }));
@@ -549,10 +516,15 @@ const get3SessionRecommendProducts = async (customer_id) => {
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
                     nest: true,
-                    include: {
+                    include: [{
                         model: db.Seller,
                         attributes: ['id', 'shopName']
                     },
+                    {
+                        model: db.ProductRating,
+                        attributes: ['rating'],
+                    }
+                    ],
                 },
             ],
             where: {
@@ -573,7 +545,8 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 id: item.Product.id,
                 name: item.Product.name,
                 summary: item.Product.summary ? item.Product.summary : "",
-                seller_info: seller_info
+                seller_info: seller_info,
+                rating: item.Product.ProductRating.rating
             }
         });
 
@@ -599,31 +572,6 @@ const get3SessionRecommendProducts = async (customer_id) => {
             // const command = new GetObjectCommand(getObjectParams);
             // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'rating'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.id,
-                    },
-                }
-            });
-
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
-            }
-
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
             return {
                 ...item,
                 //image: url,
@@ -631,7 +579,6 @@ const get3SessionRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average,
                 quantity: productType.quantity
             }
         }));
@@ -666,10 +613,15 @@ const getHistoryRecommendProducts = async (customer_id) => {
                     attributes: ['id', 'name', 'summary'],
                     raw: true,
                     nest: true,
-                    include: {
+                    include: [{
                         model: db.Seller,
                         attributes: ['id', 'shopName']
                     },
+                    {
+                        model: db.ProductRating,
+                        attributes: ['rating'],
+                    }
+                    ],
                 },
             ],
             where: {
@@ -692,7 +644,8 @@ const getHistoryRecommendProducts = async (customer_id) => {
                 id: item.Product.id,
                 name: item.Product.name,
                 summary: item.Product.summary ? item.Product.summary : "",
-                seller_info: seller_info
+                seller_info: seller_info,
+                rating: item.Product.ProductRating.rating
             }
         });
 
@@ -728,31 +681,6 @@ const getHistoryRecommendProducts = async (customer_id) => {
             // const command = new GetObjectCommand(getObjectParams);
             // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'rating'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.id,
-                    },
-                }
-            });
-
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
-            }
-
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
             return {
                 ...item,
                 //image: url,
@@ -760,7 +688,6 @@ const getHistoryRecommendProducts = async (customer_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average,
                 quantity: productType.quantity
             }
         }));
@@ -804,10 +731,15 @@ const getRelevantRecommendProducts = async (item_id) => {
                 raw: true,
                 nest: true,
                 attributes: ['id', 'name', 'summary', 'shop_id'],
-                include: {
+                include: [{
                     model: db.Seller,
                     attributes: ['id', 'shopName']
                 },
+                {
+                    model: db.ProductRating,
+                    attributes: ['rating'],
+                }
+                ],
                 where: {
                     id: {
                         [Op.eq]: item.item_rec
@@ -838,31 +770,6 @@ const getRelevantRecommendProducts = async (item_id) => {
             // const command = new GetObjectCommand(getObjectParams);
             // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'rating'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.item_rec,
-                    },
-                }
-            });
-
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
-            }
-
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
             return {
                 id: productInfo.id,
                 name: productInfo.name,
@@ -873,7 +780,7 @@ const getRelevantRecommendProducts = async (item_id) => {
                 current_price: productType.currentPrice,
                 price: productType.price,
                 sold: productType.sold,
-                rating: rating_average,
+                rating: productInfo.ProductRating.rating,
                 quantity: productType.quantity
             }
         }));

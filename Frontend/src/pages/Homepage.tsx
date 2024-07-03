@@ -398,7 +398,7 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                     props.data.map((item, index) => {
                         return (
                             <SwiperSlide>
-                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group h-full" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
+                                <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group h-full" key={`history-item-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
                                         {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
                                         <LoadImage img_style="w-full h-40" product_id={item.id} />

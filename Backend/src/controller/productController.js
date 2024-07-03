@@ -90,9 +90,9 @@ const getProductsHistory = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
     try {
 
-        let { id, limit, page } = req.query;
+        let { id, limit, page, rating } = req.query;
 
-        let result = await productServices.getProductsByCategory(+id, +limit, +page);
+        let result = await productServices.getProductsByCategory(+id, +limit, +page, +rating);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -175,9 +175,9 @@ const getShopInfo = async (req, res) => {
 const getProductsBySubCategory = async (req, res) => {
     try {
 
-        let { id, limit, page } = req.query;
+        let { id, limit, page, rating } = req.query;
 
-        let result = await productServices.getProductsBySubCategory(+id, +limit, +page);
+        let result = await productServices.getProductsBySubCategory(+id, +limit, +page, +rating);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -246,9 +246,9 @@ const handleGetSearchProducts = async (req, res) => {
 const handleGetSearchProductsWithPagination = async (req, res) => {
     try {
 
-        let { content, limit, page } = req.query;
+        let { content, limit, page, rating } = req.query;
 
-        let result = await productServices.getSearchProductsWithPagination(content, +limit, +page);
+        let result = await productServices.getSearchProductsWithPagination(content, +limit, +page, +rating);
 
         return res.status(200).json({
             EC: result.EC,

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MdOutlineArrowForwardIos, MdKeyboardArrowDown } from "react-icons/md";
+import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
 import { BsGrid3X3 } from "react-icons/bs";
@@ -38,6 +38,7 @@ import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
+import ProductRatingFilter from "./ProductRatingFilter";
 interface ISubCategory {
     id: number
     title: string
@@ -85,6 +86,10 @@ interface IProductQuickView {
     quantity: number
 }
 
+enum LIMIT {
+    SubCategoryLimit = 10
+}
+
 const CategoryPage = () => {
 
     const [searchParams] = useSearchParams();
@@ -100,6 +105,9 @@ const CategoryPage = () => {
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
     const [categoryID, setCategoryID] = React.useState<number>(0);
+    const [ratingSort, setRatingSort] = React.useState<number>(0);
+    const [minPrice, setMinPrice] = React.useState<number>(0);
+    const [maxPrice, setMaxPrice] = React.useState<number>(0);
 
     const [productListLoading, setProductListLoading] = React.useState<boolean>(true);
     const [productListFetch, setProductListFetch] = React.useState<boolean>(true);
@@ -110,6 +118,7 @@ const CategoryPage = () => {
     });
 
     const [subCategoryList, setSubCategoryList] = useImmer<ISubCategory[]>([]);
+    const [subCategoryLimit, setSubCategoryLimit] = React.useState<number>(LIMIT.SubCategoryLimit);
 
     const [productQuickView, setProductQuickView] = useImmer<IProductQuickView>({
         id: 0,
@@ -142,6 +151,7 @@ const CategoryPage = () => {
     const [itemGrid, setItemGrid] = React.useState<boolean>(true);
 
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
+
     const [amount, setAmount] = React.useState<number>(1);
 
     const handleScroll = () => {
@@ -186,7 +196,7 @@ const CategoryPage = () => {
 
         navigate({
             pathname: "/category",
-            search: `?id=${categoryID}&page=${+event.selected + 1}`,
+            search: `?id=${categoryID}&page=${+event.selected + 1}&rating=${ratingSort}`,
 
         }, {
             replace: true
@@ -308,8 +318,8 @@ const CategoryPage = () => {
         }, 1500);
     }
 
-    const fetchProductsByCategory = async (category_id: number) => {
-        let response: IData = await getProductsByCategory(+category_id, +currentPage);
+    const fetchProductsByCategory = async (category_id: number, rating_sort: number) => {
+        let response: IData = await getProductsByCategory(+category_id, +currentPage, rating_sort);
         if (response) {
             if (priceArrangement.value === "") {
                 setProductList(response.product_list);
@@ -363,6 +373,41 @@ const CategoryPage = () => {
         }
     }
 
+    const handleSeeMoreSubCategory = () => {
+        if (subCategoryLimit + 10 <= subCategoryList.length) {
+            setSubCategoryLimit(limit => limit + 10);
+        }
+        else if (subCategoryLimit < subCategoryList.length) {
+            let value = subCategoryList.length - subCategoryLimit;
+            setSubCategoryLimit(limit => limit + value);
+        } else {
+            return;
+        }
+    }
+
+    const handleRatingFilter = (rating_value: number) => {
+        setCurrentPage(1);
+        setRatingSort(rating_value);
+        navigate({
+            pathname: "/category",
+            search: `?id=${categoryID}&page=1&rating=${rating_value}`,
+
+        }, {
+            replace: true
+        });
+        window.scrollTo({ top: 0, left: 0 });
+    }
+
+    const handleRemoveFilter = () => {
+        navigate({
+            pathname: "/category",
+            search: `?id=${categoryID}&page=1&rating=0`,
+
+        }, {
+            replace: true
+        });
+    }
+
     React.useEffect(() => {
         window.addEventListener('scroll', handleScroll, { passive: true });
 
@@ -398,22 +443,63 @@ const CategoryPage = () => {
 
     React.useEffect(() => {
 
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        let rating = searchParams.get('rating');
 
-        if (categoryID !== 0 && currentPage != 0) {
-            fetchSubCategory(categoryID);
-            fetchProductsByCategory(categoryID);
+        let activeRating: number = rating ? +rating : 0;
+
+        if (activeRating !== ratingSort) {
+            setRatingSort(activeRating);
         }
 
-    }, [categoryID, currentPage]);
+    }, [searchParams.get('rating')]);
 
     React.useEffect(() => {
 
+        let max_price = searchParams.get('maxPrice');
+
+        let activeMaxPrice: number = max_price ? +max_price : 0;
+
+        if (activeMaxPrice !== maxPrice) {
+            setMaxPrice(activeMaxPrice);
+        }
+
+    }, [searchParams.get('maxPrice')]);
+
+    React.useEffect(() => {
+
+        let min_price = searchParams.get('minPrice');
+
+        let activeMinPrice: number = min_price ? +min_price : 0;
+
+        if (activeMinPrice !== minPrice) {
+            setMinPrice(activeMinPrice);
+        }
+
+    }, [searchParams.get('minPrice')]);
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        if (categoryID !== 0 && currentPage != 0) {
+            fetchProductsByCategory(categoryID, ratingSort);
+        }
+
+    }, [categoryID, currentPage, ratingSort]);
+    
+
+    React.useEffect(() => {
+
+        if (categoryID !== 0) {
+            fetchSubCategory(categoryID);
+        }
+    }, [categoryID]);
+
+    React.useEffect(() => {
         setTimeout(() => {
             setDataLoading(false);
         }, 1000);
-
-    }, []);
+    },[]);
 
     return (
         <>
@@ -447,15 +533,21 @@ const CategoryPage = () => {
                                         <div className="section__title text-lg font-medium mb-3 flex items-center gap-x-2 pb-3 mb-2 border-b border-gray-300"><IoListOutline /> Danh Mục</div>
                                         <div className="pl-2">
                                             {subCategoryList.map((item, index) => {
-                                                return (
-                                                    <div
-                                                        key={`sub-category-item-${item.id}`}
-                                                        className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
-                                                        onClick={() => handleSelectSubCategory(item.id)}
-                                                    >{item.title}</div>
-                                                )
+                                                if (index < subCategoryLimit)
+                                                    return (
+                                                        <div
+                                                            key={`sub-category-item-${item.id}`}
+                                                            className="mb-2 duration-300 cursor-pointer hover:text-[#FCB800]"
+                                                            onClick={() => handleSelectSubCategory(item.id)}
+                                                        >{item.title}</div>
+                                                    )
                                             })}
-                                            <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline">Xem thêm <MdKeyboardArrowDown /></div>
+                                            {
+                                                subCategoryLimit < subCategoryList.length ?
+                                                    <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline w-fit" onClick={() => handleSeeMoreSubCategory()}>Xem thêm <MdKeyboardArrowDown /></div>
+                                                    :
+                                                    <div className="flex items-center gap-1 cursor-pointer font-medium text-[#FCB800] hover:underline w-fit" onClick={() => setSubCategoryLimit(LIMIT.SubCategoryLimit)}>Rút gọn <MdKeyboardArrowUp /></div>
+                                            }
                                         </div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
@@ -472,60 +564,20 @@ const CategoryPage = () => {
                                     <div className="section">
                                         <div className="section__title text-lg font-medium mb-3">Đánh giá</div>
                                         <div className="ratings-filter">
-                                            <div className="5-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 bg-yellow-100 p-1 rounded-[4px] border border-[#FCB800]">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 5 sao</div>
-                                            </div>
-                                            <div className="4-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 4 sao</div>
-                                            </div>
-                                            <div className="3-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 3 sao</div>
-                                            </div>
-                                            <div className="2-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 2 sao</div>
-                                            </div>
-                                            <div className="1-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 1 sao</div>
-                                            </div>
+                                            {
+                                                [...Array(5)].map((item, index) => {
+                                                    let starValue = 5 - index;
+                                                    return (
+                                                        <div onClick={() => handleRatingFilter(starValue)}>
+                                                            <ProductRatingFilter value={starValue} active={starValue === ratingSort} key={`rating-filter-${index}`} />
+                                                        </div>
+                                                    )
+                                                })
+                                            }
                                         </div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
-                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80">Xóa tất cả</div>
+                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80" onClick={() => handleRemoveFilter()}>Xóa tất cả</div>
                                 </div>
                                 <div className="main__item-list flex-1">
                                     <div className="box">

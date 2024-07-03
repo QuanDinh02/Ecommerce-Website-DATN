@@ -36,6 +36,7 @@ import Rating from "@/components/Rating";
 import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
+import ProductRatingFilter from "./Category/ProductRatingFilter";
 
 interface ICateogryProduct {
     id: number
@@ -95,6 +96,10 @@ const SearchPage = () => {
     const [showQuickView, setShowQuickView] = React.useState<boolean>(false);
 
     const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
+
+    const [ratingSort, setRatingSort] = React.useState<number>(0);
+    const [minPrice, setMinPrice] = React.useState<number>(0);
+    const [maxPrice, setMaxPrice] = React.useState<number>(0);
 
     const [itemGrid, setItemGrid] = React.useState<boolean>(true);
 
@@ -274,8 +279,8 @@ const SearchPage = () => {
         }, 1500);
     }
 
-    const fetchProductsBySearch = async (keyword: string, page: number) => {
-        let response: IData = await getProductListBySearch(keyword, page);
+    const fetchProductsBySearch = async (keyword: string, page: number, rating_sort: number) => {
+        let response: IData = await getProductListBySearch(keyword, page, rating_sort);
         if (response) {
             if (priceArrangement.value === "") {
                 setProductList(response.product_list);
@@ -300,12 +305,35 @@ const SearchPage = () => {
         }
     }
 
+    const handleRatingFilter = (rating_value: number) => {
+        setSearchPage(1);
+        setRatingSort(rating_value);
+        navigate({
+            pathname: "/search",
+            search: `?keyword=${searchKeyword}&page=1&rating=${rating_value}`,
+
+        }, {
+            replace: true
+        });
+        window.scrollTo({ top: 0, left: 0 });
+    }
+
+    const handleRemoveFilter = () => {
+        navigate({
+            pathname: "/search",
+            search: `?keyword=${searchKeyword}&page=1&rating=0`,
+
+        }, {
+            replace: true
+        });
+    }
+
     const handlePageClick = (event) => {
         setSearchPage(+event.selected + 1);
 
         navigate({
             pathname: "/search",
-            search: `?keyword=${searchKeyword}&page=${+event.selected + 1}`,
+            search: `?keyword=${searchKeyword}&page=${+event.selected + 1}&rating=${ratingSort}`,
 
         }, {
             replace: true
@@ -319,7 +347,6 @@ const SearchPage = () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
-
 
     React.useEffect(() => {
 
@@ -347,13 +374,49 @@ const SearchPage = () => {
 
     React.useEffect(() => {
 
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+        let rating = searchParams.get('rating');
 
-        if (searchKeyword !== "") {
-            fetchProductsBySearch(searchKeyword, searchPage);
+        let activeRating: number = rating ? +rating : 0;
+
+        if (activeRating !== ratingSort) {
+            setRatingSort(activeRating);
         }
 
-    }, [searchKeyword, searchPage]);
+    }, [searchParams.get('rating')]);
+
+    React.useEffect(() => {
+
+        let max_price = searchParams.get('maxPrice');
+
+        let activeMaxPrice: number = max_price ? +max_price : 0;
+
+        if (activeMaxPrice !== maxPrice) {
+            setMaxPrice(activeMaxPrice);
+        }
+
+    }, [searchParams.get('maxPrice')]);
+
+    React.useEffect(() => {
+
+        let min_price = searchParams.get('minPrice');
+
+        let activeMinPrice: number = min_price ? +min_price : 0;
+
+        if (activeMinPrice !== minPrice) {
+            setMinPrice(activeMinPrice);
+        }
+
+    }, [searchParams.get('minPrice')]);
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        if (searchKeyword !== "" && searchPage !== 0) {
+            fetchProductsBySearch(searchKeyword, searchPage, ratingSort);
+        }
+
+    }, [searchKeyword, searchPage, ratingSort]);
 
     React.useEffect(() => {
 
@@ -401,60 +464,20 @@ const SearchPage = () => {
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Đánh giá</div>
                                         <div className="ratings-filter">
-                                            <div className="5-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 bg-yellow-100 p-1 rounded-[4px] border border-[#FCB800]">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 5 sao</div>
-                                            </div>
-                                            <div className="4-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 4 sao</div>
-                                            </div>
-                                            <div className="3-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 3 sao</div>
-                                            </div>
-                                            <div className="2-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 2 sao</div>
-                                            </div>
-                                            <div className="1-stars flex items-center gap-x-4 cursor-pointer group mb-1">
-                                                <div className="flex items-center gap-x-1 p-1">
-                                                    <GoStarFill className="text-[#FCB800]" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                    <GoStarFill className="text-gray-400" />
-                                                </div>
-                                                <div className="text-gray-400">Từ 1 sao</div>
-                                            </div>
+                                            {
+                                                [...Array(5)].map((item, index) => {
+                                                    let starValue = 5 - index;
+                                                    return (
+                                                        <div onClick={() => handleRatingFilter(starValue)}>
+                                                            <ProductRatingFilter value={starValue} active={starValue === ratingSort} key={`search-rating-filter-${index}`} />
+                                                        </div>
+                                                    )
+                                                })
+                                            }
                                         </div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
-                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80">Xóa tất cả</div>
+                                    <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-[#FCB800] text-white cursor-pointer hover:opacity-80" onClick={() => handleRemoveFilter()}>Xóa tất cả</div>
                                 </div>
                                 <div className="main__item-list flex-1">
                                     <div className="box">
@@ -470,24 +493,22 @@ const SearchPage = () => {
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
                                                     <div className="mr-4">Sắp xếp theo</div>
-                                                    <div className=""> 
-                                                        <div className="relative group">
-                                                            <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
-                                                                <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />
-                                                            </div>
-                                                            <div className="absolute top-100 border border-gray-300 hidden group-hover:block">
-                                                                {
-                                                                    PRODUCT_PRICE_SORT_LIST.map(item => {
-                                                                        return (
-                                                                            <div
-                                                                                key={`sort-price-sub-category-item-${item.id}`}
-                                                                                className="px-2.5 py-2 w-52 bg-white cursor-pointer hover:text-[#FCB800]"
-                                                                                onClick={() => handleProductPriceSort(item.id)}
-                                                                            >{item.label}</div>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </div>
+                                                    <div className="relative group z-10">
+                                                        <div className="w-52 py-2 border border-gray-400 px-2.5 bg-white flex items-center justify-between cursor-pointer">
+                                                            <span>{priceArrangement.label}</span> <MdKeyboardArrowDown className="w-6 h-6" />
+                                                        </div>
+                                                        <div className="absolute top-100 border border-gray-300 hidden group-hover:block">
+                                                            {
+                                                                PRODUCT_PRICE_SORT_LIST.map(item => {
+                                                                    return (
+                                                                        <div
+                                                                            key={`sort-price-sub-category-item-${item.id}`}
+                                                                            className="px-2.5 py-2 w-52 bg-white cursor-pointer hover:text-[#FCB800]"
+                                                                            onClick={() => handleProductPriceSort(item.id)}
+                                                                        >{item.label}</div>
+                                                                    )
+                                                                })
+                                                            }
                                                         </div>
                                                     </div>
                                                 </div>
@@ -524,7 +545,7 @@ const SearchPage = () => {
                                                                             <>
                                                                                 {productList.length > 0 && productList.map((item, index) => {
                                                                                     return (
-                                                                                        <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`sub-category-loading-item-${index}`}>
+                                                                                        <div className="product bg-white shadow border border-[#EEEEEE] px-4 py-2" key={`search-loading-item-${index}`}>
                                                                                             <div className="product__image flex items-center justify-center">
                                                                                                 <div className="w-40 h-52 bg-gray-200 rounded-lg dark:bg-gray-300 animate-pulse"></div>
                                                                                             </div>
@@ -545,7 +566,7 @@ const SearchPage = () => {
                                                                                     return (
                                                                                         <div
                                                                                             className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group"
-                                                                                            key={`sub-category-item-${index}`}
+                                                                                            key={`search-item-${index}`}
                                                                                             onClick={() => {
                                                                                                 handleProductDetailNavigation(item.id, item.name);
                                                                                             }}

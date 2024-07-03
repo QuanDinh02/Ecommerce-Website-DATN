@@ -389,6 +389,7 @@ const Header = () => {
 
     const handleSearch = async () => {
         await handleSaveSearch();
+        setShowSearchList(false);
         navigate({
             pathname: "/search",
             search: `?keyword=${productSearch}&page=${1}`,

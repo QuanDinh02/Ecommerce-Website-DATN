@@ -1,8 +1,8 @@
 import axios from '../customization/axiosCustomization';
 import { APIResponse, LIMIT } from './common';
 
-export const getProductsByCategory = async (category_id: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/products/category?limit=${20}&id=${category_id}&page=${page}`);
+export const getProductsByCategory = async (category_id: number, page: number, rating_sort: number) => {
+    let result: APIResponse = await axios.get(`/api/products/category?limit=${20}&id=${category_id}&page=${page}&rating=${rating_sort}`);
     if (result && result?.DT) {
         return result.DT;
     }
@@ -33,8 +33,8 @@ export const getShopInfo = async (shop_id: number) => {
     return null;
 }
 
-export const getProductsBySubCategory = async (sub_category_id: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}`);
+export const getProductsBySubCategory = async (sub_category_id: number, page: number, rating_sort: number) => {
+    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}&rating=${rating_sort}`);
     if (result && result?.DT) {
         return result.DT;
     }
@@ -73,8 +73,8 @@ export const getProductReview = async (product_id: number, page: number) => {
     return null;
 }
 
-export const getProductListBySearch = async (search_content: string, search_page: number) => {
-    let result: APIResponse = await axios.get(`/api/products/search-page?limit=${20}&content=${search_content}&page=${search_page}`);
+export const getProductListBySearch = async (search_content: string, search_page: number, rating_sort: number) => {
+    let result: APIResponse = await axios.get(`/api/products/search-page?limit=${20}&content=${search_content}&page=${search_page}&rating=${rating_sort}`);
     if (result && result?.DT) {
         return result.DT;
     }

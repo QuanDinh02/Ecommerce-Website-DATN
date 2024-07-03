@@ -19,14 +19,14 @@ const ProductRating = (props: IProps) => {
                             {
                                 [...Array(Math.floor(props.ratings))].map((item, index) => {
                                     return (
-                                        <GoStarFill className="text-[#FCB800]" />
+                                        <GoStarFill className="text-[#FCB800]" key={`star-rating-${index}`}/>
                                     )
                                 })
                             }
                             {
                                 [...Array(5 - Math.floor(props.ratings))].map((item, index) => {
                                     return (
-                                        <GoStarFill className="text-gray-400" />
+                                        <GoStarFill className="text-gray-400" key={`no-star-rating-${index}`}/>
                                     )
                                 })
                             }
@@ -42,14 +42,14 @@ const ProductRating = (props: IProps) => {
                             {
                                 [...Array(Math.floor(props.ratings))].map((item, index) => {
                                     return (
-                                        <GoStarFill className="text-[#FCB800]" />
+                                        <GoStarFill className="text-[#FCB800]" key={`star-rating-${index}`}/>
                                     )
                                 })
                             }
                             {
                                 [...Array(5 - Math.floor(props.ratings))].map((item, index) => {
                                     return (
-                                        <GoStarFill className="text-gray-400" />
+                                        <GoStarFill className="text-gray-400" key={`no-star-rating-${index}`}/>
                                     )
                                 })
                             }
