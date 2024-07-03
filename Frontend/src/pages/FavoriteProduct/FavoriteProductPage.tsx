@@ -19,6 +19,7 @@ import { createCartItem, fetchCartItem, INewCartItem } from "@/services/cartItem
 import _ from 'lodash';
 import LoadImageS3 from "@/components/LoadImageS3";
 import LoadImage from "@/components/LoadImage";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 const tableHeaders = [
     "", "TÊN SẢN PHẨM", "GIÁ", "", ""
@@ -93,6 +94,13 @@ const FavoriteProductPage = () => {
         });
     }
 
+    const handleShopNavigation = (shop_id: number) => {
+        navigate({
+            pathname: "/shop",
+            search: `?shop=${shop_id}`,
+        });
+    }
+
     React.useEffect(() => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
@@ -151,14 +159,16 @@ const FavoriteProductPage = () => {
                                                                 <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                                     <td>
                                                                         {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} /> */}
-                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id}/>
+                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} />
                                                                     </td>
                                                                     <td className="py-3 px-2">
                                                                         <div
                                                                             className="cursor-pointer text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2"
                                                                             onClick={() => handleProductDetailNavigation(+item.product_info.id)}
-                                                                        >{item.product_info.name}</div>
-                                                                        <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
+                                                                        >
+                                                                            <LinkNewTabProductDetail id={item.product_info.id} name={item.product_info.name} />
+                                                                        </div>
+                                                                        <div>Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => handleShopNavigation(item.shop_info.id)}>{item.shop_info.name}</span></div>
                                                                     </td>
                                                                     <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
                                                                     <td className="py-3 px-2">

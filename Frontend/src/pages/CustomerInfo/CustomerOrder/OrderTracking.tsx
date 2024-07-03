@@ -1,3 +1,4 @@
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 import LoadImage from "@/components/LoadImage";
 import { getCustomerOrderDetail } from "@/services/orderServices";
 import { dateFormat, dateTimeFormat } from "@/utils/dateFormat";
@@ -326,7 +327,7 @@ const OrderTracking = () => {
                                                         <td className="py-3 px-2" colSpan={2}>
                                                             <div className="flex items-center gap-x-3">
                                                                 <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.product_id} />
-                                                                <div className="line-clamp-2 font-medium text-sm cursor-pointer hover:underline hover:text-blue-600 w-60" onClick={() => handleProductDetailNavigation(item.product_id)}>{item.product_name}</div>
+                                                                <div className="line-clamp-2 font-medium text-sm cursor-pointer hover:underline hover:text-blue-600 w-60" onClick={() => handleProductDetailNavigation(item.product_id)}><LinkNewTabProductDetail id={item.product_id} name={item.product_name} /></div>
                                                             </div>
                                                         </td>
                                                         <td className="py-3 px-2"><span className="text-sm text-gray-600 font-medium">{CurrencyFormat(item.price)}</span></td>

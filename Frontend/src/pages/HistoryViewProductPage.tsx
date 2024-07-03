@@ -26,6 +26,7 @@ import ReactQuill from "react-quill";
 import { FaRegHeart } from "react-icons/fa6";
 import _ from 'lodash';
 import ReactPaginate from "react-paginate";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 const ITEM_SHOW_LIMIT = 40;
 
@@ -329,7 +330,7 @@ const HistoryViewProductPage = () => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{product.name}</div>
+                                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10"><LinkNewTabProductDetail id={product.id} name={product.name} /></div>
                                                     <div className="product__price flex items-center gap-2 mb-2.5">
                                                         {
                                                             product.current_price === product.price ?

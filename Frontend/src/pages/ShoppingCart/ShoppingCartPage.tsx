@@ -16,6 +16,7 @@ import { DeleteCartItem, UpdateCartItem } from "@/redux/actions/action";
 import { deleteCartItem, updateCartItem } from "@/services/cartItemService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import LoadImage from "@/components/LoadImage";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 export interface ICartItemInfo {
     id: number
     name: string
@@ -96,6 +97,13 @@ const ShoppingCartPage = () => {
         }
     }
 
+    const handleShopNavigation = (shop_id: number) => {
+        navigate({
+            pathname: "/shop",
+            search: `?shop=${shop_id}`,
+        });
+    }
+
     React.useEffect(() => {
         window.onbeforeunload = function () {
             window.scrollTo(0, 0);
@@ -174,8 +182,10 @@ const ShoppingCartPage = () => {
                                                                             <LoadImage img_style="w-24 h-24" product_id={item.product_info.id} />
                                                                         </td>
                                                                         <td className="py-3 px-2">
-                                                                            <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>{item.product_info.name}</div>
-                                                                            <div className="text-sm">Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline">{item.shop_info.name}</span></div>
+                                                                            <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>
+                                                                                <LinkNewTabProductDetail id={item.product_info.id} name={item.product_info.name} />
+                                                                            </div>
+                                                                            <div className="text-sm">Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => handleShopNavigation(item.shop_info.id)}>{item.shop_info.name}</span></div>
                                                                         </td>
                                                                         <td className="py-3 px-2 text-sm">{CurrencyFormat(item.price)}</td>
                                                                         <td className="py-3 px-2">

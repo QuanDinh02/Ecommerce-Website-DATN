@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { MdOutlineArrowForwardIos, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { useImmer } from "use-immer";
 import { GoDotFill, GoStarFill } from "react-icons/go";
@@ -39,6 +39,7 @@ import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import ProductRatingFilter from "./ProductRatingFilter";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 interface ISubCategory {
     id: number
     title: string
@@ -486,7 +487,7 @@ const CategoryPage = () => {
         }
 
     }, [categoryID, currentPage, ratingSort]);
-    
+
 
     React.useEffect(() => {
 
@@ -499,7 +500,7 @@ const CategoryPage = () => {
         setTimeout(() => {
             setDataLoading(false);
         }, 1000);
-    },[]);
+    }, []);
 
     return (
         <>
@@ -703,7 +704,9 @@ const CategoryPage = () => {
                                                                                                     </div>
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                                                                            <div className="product__name text-blue-600 mt-3 mb-2 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">
+                                                                                                <LinkNewTabProductDetail id={item.id} name={item.name} />
+                                                                                            </div>
                                                                                             <div className="flex items-center gap-2 mb-2">
                                                                                                 {
                                                                                                     item.current_price === item.price ?
@@ -751,7 +754,7 @@ const CategoryPage = () => {
                                                         </div>
                                                         <div className="flex-1 flex justify-between">
                                                             <div className="product__left-content w-80">
-                                                                <div className="product__name text-blue-600 mb-2 line-clamp-2 duration-300 hover:text-[#FCB800]">{item.name}</div>
+                                                                <div className="product__name text-blue-600 mb-2 line-clamp-2 duration-300 hover:text-[#FCB800]"><LinkNewTabProductDetail id={item.id} name={item.name} /></div>
                                                                 <ProductRating
                                                                     ratings={item.rating}
                                                                     selling_count={item.sold}

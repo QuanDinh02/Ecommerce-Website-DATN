@@ -16,6 +16,7 @@ import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
 import { useImmer } from "use-immer";
 import './CustomerOrder.scss';
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 const AllOrder = () => {
 
@@ -240,7 +241,9 @@ const AllOrder = () => {
                                                                             <div className="flex gap-x-6" key={`product-item-${item.id}-${product_idx}`} onClick={() => handleProductDetailNavigation(product.product_id)}>
                                                                                 <LoadImage img_style="w-24 h-24" product_id={product.product_id} />
                                                                                 <div className="flex flex-col gap-y-2">
-                                                                                    <div className="opacity-90 line-clamp-1 cursor-pointer hover:underline hover:text-blue-600">{product.product_name}</div>
+                                                                                    <div className="opacity-90 line-clamp-1 cursor-pointer hover:underline hover:text-blue-600">
+                                                                                        <LinkNewTabProductDetail id={product.product_id} name={product.product_name} />
+                                                                                    </div>
                                                                                     <div className="order-item__price flex items-center gap-x-2">
                                                                                         {
                                                                                             product.price === product.product_price ?

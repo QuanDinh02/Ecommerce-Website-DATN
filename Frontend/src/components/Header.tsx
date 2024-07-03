@@ -25,6 +25,7 @@ import { fetchWishList } from "@/services/wishListService";
 import { saveCustomerSearch } from '@/services/customerService';
 import LoadImageS3 from './LoadImageS3';
 import LoadImage from "@components/LoadImage";
+import LinkNewTabProductDetail from './LinkNewTab';
 
 interface ICustomerAccount {
     customer_id: number
@@ -542,7 +543,7 @@ const Header = () => {
                                                                                         }
                                                                                         }
                                                                                     >
-                                                                                        {item.product_info.name}
+                                                                                        <LinkNewTabProductDetail id={item.product_info.id} name={item.product_info.name} />
                                                                                     </div>
                                                                                     <div className='flex items-center gap-x-1 text-black font-normal text-sm'>
                                                                                         <span>{item.quantity}</span>

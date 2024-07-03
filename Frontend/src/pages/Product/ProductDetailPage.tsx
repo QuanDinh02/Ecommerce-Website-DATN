@@ -53,6 +53,7 @@ import ReactQuill from "react-quill";
 import { PiStorefrontLight } from "react-icons/pi";
 import classNames from "classnames";
 import { updateProductRecommendClick } from "@/services/productTrackingService";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 interface IRecommendProduct {
     id: number
@@ -284,7 +285,7 @@ const RelevantRecommendItemList = (props: IProps) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10"><LinkNewTabProductDetail id={item.id} name={item.name} /></div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
                                         {
                                             item.current_price === item.price ?
@@ -466,7 +467,7 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10"><LinkNewTabProductDetail id={item.id} name={item.name} /></div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
                                         {
                                             item.current_price === item.price ?
@@ -1124,7 +1125,7 @@ const ProductDetailPage = () => {
                                                     }
                                                     {
                                                         productReviews && productReviews.length > 0 &&
-                                                        <div className='pagination-container flex justify-center mb-12'>
+                                                        <div className='pagination-review-container flex justify-center mb-12'>
                                                             <ReactPaginate
                                                                 nextLabel=">"
                                                                 onPageChange={handlePageClick}

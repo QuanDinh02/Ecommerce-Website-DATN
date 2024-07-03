@@ -9,7 +9,7 @@ import { PiShoppingCartLight } from "react-icons/pi";
 import { successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoIosArrowForward, IoMdHeartEmpty } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
@@ -48,6 +48,7 @@ import { getOnlyCategories } from "@/services/categoryService";
 
 import { categoryIconLarge } from "@/data/homepage";
 import { updateProductRecommendClick } from "@/services/productTrackingService";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 interface IRecommendProduct {
     id: number
@@ -259,7 +260,7 @@ const RecommendItemList = (props: IProps) => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                            <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10"><LinkNewTabProductDetail id={item.id} name={item.name} /></div>
                             <div className="product__price flex items-center gap-2 mb-2.5">
                                 {
                                     item.current_price === item.price ?
@@ -438,7 +439,7 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10">{item.name}</div>
+                                    <div className="product__name text-blue-600 mb-3 line-clamp-2 text-sm duration-300 hover:text-[#FCB800] h-10"><LinkNewTabProductDetail id={item.id} name={item.name} /></div>
                                     <div className="product__price flex items-center gap-2 mb-2.5">
                                         {
                                             item.current_price === item.price ?
