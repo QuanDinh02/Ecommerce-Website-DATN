@@ -670,7 +670,29 @@ const customerRatingProduct = async (data, customer_id) => {
                 await db.OrderProductReview.create({
                     orderID: +order_id,
                     productReviewID: +reviewInfo.id
-                })
+                });
+
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    attributes: ['rating'],
+                    where: {
+                        productID: {
+                            [Op.eq]: +product_data.id,
+                        },
+                    }
+                });
+
+                let newRating = Math.round(parseFloat((_.sumBy(productReviewList, 'rating')) / count) * 10) / 10;
+
+                await db.ProductRating.update({
+                    rating: newRating
+                }, {
+                    where: {
+                        productID: {
+                            [Op.eq]: +product_data.id,
+                        },
+                    }
+                });
 
                 return {
                     EC: 0,
@@ -698,6 +720,28 @@ const customerRatingProduct = async (data, customer_id) => {
                     id: {
                         [Op.eq]: +review.id
                     }
+                }
+            });
+
+            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                raw: true,
+                attributes: ['rating'],
+                where: {
+                    productID: {
+                        [Op.eq]: +product_data.id,
+                    },
+                }
+            });
+
+            let newRating = Math.round(parseFloat((_.sumBy(productReviewList, 'rating')) / count) * 10) / 10;
+
+            await db.ProductRating.update({
+                rating: newRating
+            }, {
+                where: {
+                    productID: {
+                        [Op.eq]: +product_data.id,
+                    },
                 }
             });
 

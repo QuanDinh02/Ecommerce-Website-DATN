@@ -8,6 +8,7 @@ import StarRating from "./StarRating";
 import OldStarRating from "./OldStarRating";
 import Button from "@/components/Button";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
+import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
 interface IProductReview {
     id: number
@@ -178,7 +179,7 @@ const OrderRating = () => {
                                                 <LoadImage img_style={"w-28 h-28 rounded border"} product_id={product.id} />
                                                 <div className="w-full">
                                                     <div className="w-full">
-                                                        <div className="line-clamp-1 mb-2 cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleProductDetailNavigation(product.id)}>{product.name}</div>
+                                                        <div className="line-clamp-1 mb-2 cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleProductDetailNavigation(product.id)}><LinkNewTabProductDetail id={product.id} name={product.name} /></div>
                                                         {
                                                             product.update ?
                                                                 <>

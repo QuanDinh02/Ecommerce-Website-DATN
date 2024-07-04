@@ -158,6 +158,11 @@ const createNewProduct = async (data, img_file) => {
                 subCategoryID: data.sub_category_id
             })
 
+            await db.ProductRating.create({
+                productID: product_info.id,
+                rating: 0
+            })
+
             let result = await singleFileUpload(img_file, product_info.id);
             if (result) {
                 if (result.EC === 0) {
