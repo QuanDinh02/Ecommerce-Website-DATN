@@ -99,8 +99,6 @@ const SearchPage = () => {
     const [productList, setProductList] = React.useState<ICateogryProduct[]>([]);
 
     const [ratingSort, setRatingSort] = React.useState<number>(0);
-    const [minPrice, setMinPrice] = React.useState<number>(0);
-    const [maxPrice, setMaxPrice] = React.useState<number>(0);
 
     const [itemGrid, setItemGrid] = React.useState<boolean>(true);
 
@@ -387,30 +385,6 @@ const SearchPage = () => {
 
     React.useEffect(() => {
 
-        let max_price = searchParams.get('maxPrice');
-
-        let activeMaxPrice: number = max_price ? +max_price : 0;
-
-        if (activeMaxPrice !== maxPrice) {
-            setMaxPrice(activeMaxPrice);
-        }
-
-    }, [searchParams.get('maxPrice')]);
-
-    React.useEffect(() => {
-
-        let min_price = searchParams.get('minPrice');
-
-        let activeMinPrice: number = min_price ? +min_price : 0;
-
-        if (activeMinPrice !== minPrice) {
-            setMinPrice(activeMinPrice);
-        }
-
-    }, [searchParams.get('minPrice')]);
-
-    React.useEffect(() => {
-
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
         if (searchKeyword !== "" && searchPage !== 0) {
@@ -452,16 +426,6 @@ const SearchPage = () => {
                         <div className="category__content bg-[#F5F5F5] pt-4 pb-4">
                             <div className="main w-[80rem] mx-auto px-[30px] flex gap-x-3">
                                 <div className="main__filter-sidebar w-60 px-4 py-3 rounded-[4px] bg-[#F5F5F5] h-fit">
-                                    <div className="section">
-                                        <div className="section__title text-lg mb-3">Chọn khoảng giá</div>
-                                        <div className="flex items-center gap-x-2">
-                                            <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối thiểu" />
-                                            <div>-</div>
-                                            <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối đa" />
-                                        </div>
-                                        <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-white text-[#FCB800] hover:bg-[#FCB800] hover:text-white cursor-pointer">Áp dụng</div>
-                                    </div>
-                                    <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">
                                         <div className="section__title text-lg mb-3">Đánh giá</div>
                                         <div className="ratings-filter">

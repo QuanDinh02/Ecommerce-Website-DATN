@@ -11,7 +11,7 @@ import ReactPaginate from "react-paginate";
 import { PiShoppingCartLight } from "react-icons/pi";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoMdHeartEmpty } from "react-icons/io";
-import { successToast1 } from "@/components/Toast/Toast";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
 import { FiMinus, FiPlus } from "react-icons/fi";
 import { getProductsBySubCategory } from "@/services/productService";
@@ -192,7 +192,7 @@ const SubCategoryPage = () => {
 
         navigate({
             pathname: "/sub-category",
-            search: `?id=${subCategoryID}&page=${+event.selected + 1}&rating=${ratingSort}`,
+            search: `?id=${subCategoryID}&page=${+event.selected + 1}&rating=${ratingSort}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
 
         }, {
             replace: true
@@ -313,8 +313,8 @@ const SubCategoryPage = () => {
         }
     }
 
-    const fetchProductsBySubCategory = async (sub_category_id: number, rating_sort: number) => {
-        let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage, rating_sort);
+    const fetchProductsBySubCategory = async (sub_category_id: number, rating_sort: number, min_price: number, max_price: number) => {
+        let response: IData = await getProductsBySubCategory(+sub_category_id, currentPage, rating_sort, min_price, max_price);
         if (response) {
             if (priceArrangement.value === "") {
                 setProductList(response.product_list);
@@ -327,11 +327,15 @@ const SubCategoryPage = () => {
                     case "ASC":
                         let sortProductList1 = _.orderBy(product_list, 'current_price', "asc");
                         setProductList(sortProductList1);
+                        setTotalPages(response.page_total);
+                        setTotalItems(response.total_items);
                         setLoadingAnimation();
                         return;
                     case "DESC":
                         let sortProductList2 = _.orderBy(product_list, 'current_price', "desc");
                         setProductList(sortProductList2);
+                        setTotalPages(response.page_total);
+                        setTotalItems(response.total_items);
                         setLoadingAnimation();
                         return;
                 }
@@ -340,21 +344,19 @@ const SubCategoryPage = () => {
     }
 
     const handleRatingFilter = (rating_value: number) => {
-        setCurrentPage(1);
-        setRatingSort(rating_value);
         navigate({
             pathname: "/sub-category",
-            search: `?id=${subCategoryID}&page=1&rating=${rating_value}`,
+            search: `?id=${subCategoryID}&page=1&rating=${rating_value}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
         }, {
             replace: true
         });
-        window.scrollTo({ top: 0, left: 0 });
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
     }
 
     const handleRemoveFilter = () => {
         navigate({
             pathname: "/sub-category",
-            search: `?id=${subCategoryID}&page=1&rating=0`,
+            search: `?id=${subCategoryID}&page=1&rating=0&minPrice=0&maxPrice=0`,
 
         }, {
             replace: true
@@ -386,6 +388,57 @@ const SubCategoryPage = () => {
             pathname: "/product",
             search: `?id=${product_id}`,
         });
+    }
+
+    const handlePriceFilter = () => {
+        if (maxPrice < minPrice && maxPrice !== 0) {
+            errorToast1("Vui lòng chọn khoảng giá hợp lệ");
+            return;
+        }
+
+        if (maxPrice !== 0 && minPrice === 0) {
+            navigate({
+                pathname: "/sub-category",
+                search: `?id=${subCategoryID}&page=1&rating=${ratingSort}&maxPrice=${maxPrice}`,
+
+            }, {
+                replace: true
+            });
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            fetchProductsBySubCategory(subCategoryID, ratingSort, minPrice, maxPrice);
+        } else if (maxPrice === 0 && minPrice !== 0) {
+            navigate({
+                pathname: "/sub-category",
+                search: `?id=${subCategoryID}&page=1&rating=${ratingSort}&minPrice=${minPrice}`,
+
+            }, {
+                replace: true
+            });
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            fetchProductsBySubCategory(subCategoryID, ratingSort, minPrice, maxPrice);
+        } else {
+            navigate({
+                pathname: "/sub-category",
+                search: `?id=${subCategoryID}&page=1&rating=${ratingSort}&minPrice=${minPrice}&maxPrice=${maxPrice}`,
+
+            }, {
+                replace: true
+            });
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            fetchProductsBySubCategory(subCategoryID, ratingSort, minPrice, maxPrice);
+        }
+    }
+
+    const handlePriceFilterOnChage = (field: string, value: any) => {
+        if (!isNaN(value) && value >= 0) {
+            if (field === "max") {
+                setMaxPrice(+value);
+            }
+
+            else {
+                setMinPrice(+value);
+            }
+        }
     }
 
     React.useEffect(() => {
@@ -462,7 +515,7 @@ const SubCategoryPage = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
         if (subCategoryID !== 0 && currentPage != 0) {
-            fetchProductsBySubCategory(subCategoryID, ratingSort);
+            fetchProductsBySubCategory(subCategoryID, ratingSort, minPrice, maxPrice);
         }
 
     }, [subCategoryID, currentPage, ratingSort]);
@@ -508,11 +561,23 @@ const SubCategoryPage = () => {
                                     <div className="section">
                                         <div className="section__title text-lg mb-3 font-medium">Chọn khoảng giá</div>
                                         <div className="flex items-center gap-x-2">
-                                            <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối thiểu" />
+                                            <input
+                                                type="number"
+                                                className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]"
+                                                placeholder="Tối thiểu"
+                                                value={minPrice}
+                                                onChange={(e) => handlePriceFilterOnChage("min", e.target.value)}
+                                            />
                                             <div>-</div>
-                                            <input type="text" className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]" placeholder="Tối đa" />
+                                            <input
+                                                type="number"
+                                                className="border border-gray-300 bg-white px-3 py-2 text-sm w-1/2 rounded-[4px]"
+                                                placeholder="Tối đa"
+                                                value={maxPrice}
+                                                onChange={(e) => handlePriceFilterOnChage("max", e.target.value)}
+                                            />
                                         </div>
-                                        <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-white text-[#FCB800] hover:bg-[#FCB800] hover:text-white cursor-pointer">Áp dụng</div>
+                                        <div className="my-2 w-full py-2 text-center border-2 rounded-[4px] border-[#FCB800] bg-white text-[#FCB800] hover:bg-[#FCB800] hover:text-white cursor-pointer select-none" onClick={() => handlePriceFilter()}>Áp dụng</div>
                                     </div>
                                     <div className="section-breakline border-t border-gray-300 my-4"></div>
                                     <div className="section">

@@ -1,8 +1,8 @@
 import axios from '../customization/axiosCustomization';
 import { APIResponse, LIMIT } from './common';
 
-export const getProductsByCategory = async (category_id: number, page: number, rating_sort: number) => {
-    let result: APIResponse = await axios.get(`/api/products/category?limit=${20}&id=${category_id}&page=${page}&rating=${rating_sort}`);
+export const getProductsByCategory = async (category_id: number, page: number, rating_sort: number, min_price: number, max_price: number) => {
+    let result: APIResponse = await axios.get(`/api/products/category?limit=${20}&id=${category_id}&page=${page}&rating=${rating_sort}&minPrice=${min_price}&maxPrice=${max_price}`);
     if (result && result?.DT) {
         return result.DT;
     }
@@ -33,8 +33,8 @@ export const getShopInfo = async (shop_id: number) => {
     return null;
 }
 
-export const getProductsBySubCategory = async (sub_category_id: number, page: number, rating_sort: number) => {
-    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}&rating=${rating_sort}`);
+export const getProductsBySubCategory = async (sub_category_id: number, page: number, rating_sort: number, min_price: number, max_price: number) => {
+    let result: APIResponse = await axios.get(`/api/products/sub-category?limit=${20}&id=${sub_category_id}&page=${page}&rating=${rating_sort}&minPrice=${min_price}&maxPrice=${max_price}`);
     if (result && result?.DT) {
         return result.DT;
     }

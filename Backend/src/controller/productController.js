@@ -90,9 +90,9 @@ const getProductsHistory = async (req, res) => {
 const getProductsByCategory = async (req, res) => {
     try {
 
-        let { id, limit, page, rating } = req.query;
+        let { id, limit, page, rating, minPrice, maxPrice } = req.query;
 
-        let result = await productServices.getProductsByCategory(+id, +limit, +page, +rating);
+        let result = await productServices.getProductsByCategory(+id, +limit, +page, +rating, +minPrice, +maxPrice);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -175,9 +175,9 @@ const getShopInfo = async (req, res) => {
 const getProductsBySubCategory = async (req, res) => {
     try {
 
-        let { id, limit, page, rating } = req.query;
+        let { id, limit, page, rating, minPrice, maxPrice } = req.query;
 
-        let result = await productServices.getProductsBySubCategory(+id, +limit, +page, +rating);
+        let result = await productServices.getProductsBySubCategory(+id, +limit, +page, +rating, +minPrice, +maxPrice);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
