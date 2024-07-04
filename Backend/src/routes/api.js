@@ -86,6 +86,8 @@ const ApiRoute = (app) => {
     router.get('/products/search-page', cacheMiddleware(300), productController.handleGetSearchProductsWithPagination);
 
     router.get('/sub-category/category', subCategoryController.getSubCategoryByCategory);
+    router.get('/sub-category/category-web', cacheMiddleware(300), subCategoryController.getSubCategoryByCategoryWeb);
+
     router.post('/sub-category/recommend', subCategoryController.getRecommendSubCategory);
     router.get('/sub-category', subCategoryController.getSubCategoryInfo);
 

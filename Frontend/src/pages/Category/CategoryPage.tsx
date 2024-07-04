@@ -14,7 +14,7 @@ import { IoMdHeartEmpty } from "react-icons/io";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import Modal from "@/components/Modal";
 import { FiMinus, FiPlus } from "react-icons/fi";
-import { getSubCategoryByCategory } from "@/services/subCategoryService";
+import { getSubCategoryByCategoryWebsite } from "@/services/subCategoryService";
 import { getProductsByCategory } from "@/services/productService";
 import ProductRating from "@pages/Category/ProductRating";
 import { TailSpin, ThreeDots } from 'react-loader-spinner';
@@ -305,7 +305,7 @@ const CategoryPage = () => {
     }
 
     const fetchSubCategory = async (category_id: number) => {
-        let response: ISubCategory[] = await getSubCategoryByCategory(+category_id);
+        let response: ISubCategory[] = await getSubCategoryByCategoryWebsite(+category_id);
         if (response) {
             setSubCategoryList(response);
         }

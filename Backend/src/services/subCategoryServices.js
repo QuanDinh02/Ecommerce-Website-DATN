@@ -32,6 +32,85 @@ const getSubCategoryByCategory = async (category_id) => {
     }
 }
 
+const getSubCategoryByCategoryWeb = async (category_id) => {
+    try {
+        let subCategoryList = await db.SubCategory.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'title'],
+            where: {
+                categoryID: {
+                    [Op.eq]: category_id,
+                },
+            }
+        });
+
+        let sub_category_list = await subCategoryList.map(item => item.id);
+
+        let data = await db.ProductSubCategory.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id'],
+            include: [
+                {
+                    model: db.SubCategory,
+                    attributes: ['id', 'title'],
+                }
+            ],
+            where: {
+                subCategoryID: {
+                    [Op.in]: sub_category_list,
+                },
+            }
+        });
+
+        let rebuildData = await data.map(item => {
+            return {
+                id: item.SubCategory.id,
+                title: item.SubCategory.title
+            }
+        })
+
+        let totalById = _.countBy(rebuildData, 'id');
+
+        let sortedData = _.chain(totalById).
+            map(function (cnt, id) {
+                return {
+                    id: id,
+                    count: cnt
+                }
+            }).sortBy('count', 'desc').orderBy("count", "desc").value();
+
+        let finalRecommendSubCategory = sortedData.map(item => +item.id);
+
+        let subCategoryFinalList = await Promise.all(finalRecommendSubCategory.map(async item => {
+            let sub_category_info = await db.SubCategory.findOne({
+                raw: true,
+                attributes: ['id', 'title'],
+                where: {
+                    id: {
+                        [Op.eq]: +item
+                    }
+                }
+            });
+            return sub_category_info;
+        }));
+
+        return {
+            EC: 0,
+            DT: subCategoryFinalList,
+            EM: 'Get sub-category by category!'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const getSubCategoryInfo = async (sub_category_id) => {
     try {
         let subCategoryData = await db.SubCategory.findOne({
@@ -104,7 +183,7 @@ const getRecommendSubCategory = async (category_list) => {
             let suffle_sub_category_list = _.shuffle(subCategoryList);
 
             return {
-                ...item, 
+                ...item,
                 sub_category_list: _(suffle_sub_category_list).take(20).value()
             }
 
@@ -127,5 +206,6 @@ const getRecommendSubCategory = async (category_list) => {
 }
 
 module.exports = {
-    getSubCategoryByCategory, getSubCategoryInfo, getRecommendSubCategory
+    getSubCategoryByCategory, getSubCategoryInfo, getRecommendSubCategory,
+    getSubCategoryByCategoryWeb
 }

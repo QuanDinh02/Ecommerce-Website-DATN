@@ -62,16 +62,18 @@ const getAllCategories = async () => {
     
             let finalRecommendSubCategory = sortedData.map(item => +item.id);
     
-            let subCategoryFinalList = await db.SubCategory.findAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'title'],
-                where: {
-                    id: {
-                        [Op.in]: finalRecommendSubCategory,
-                    },
-                }
-            });
+            let subCategoryFinalList = await Promise.all(finalRecommendSubCategory.map(async item => {
+                let sub_category_info = await db.SubCategory.findOne({
+                    raw: true,
+                    attributes: ['id', 'title'],
+                    where: {
+                        id: {
+                            [Op.eq]: +item
+                        }
+                    }
+                });
+                return sub_category_info;
+            }));
 
             return {
                 id: category_id,
