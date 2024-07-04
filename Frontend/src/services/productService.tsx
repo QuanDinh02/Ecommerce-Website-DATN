@@ -65,8 +65,8 @@ export const getProductDetailShopInfo = async (product_id: number) => {
     return null;
 }
 
-export const getProductReview = async (product_id: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/product/detail/review?limit=${10}&id=${product_id}&page=${page}`);
+export const getProductReview = async (product_id: number, page: number, rating: number) => {
+    let result: APIResponse = await axios.get(`/api/product/detail/review?limit=${10}&id=${product_id}&page=${page}&rating=${rating}`);
     if (result && result?.DT) {
         return result.DT;
     }

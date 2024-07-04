@@ -269,9 +269,9 @@ const handleGetSearchProductsWithPagination = async (req, res) => {
 const getProductReviews = async (req, res) => {
     try {
 
-        let { id, limit, page } = req.query;
+        let { id, limit, page, rating } = req.query;
 
-        let result = await productServices.getProductReviews(+id, +limit, +page);
+        let result = await productServices.getProductReviews(+id, +limit, +page, +rating);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,

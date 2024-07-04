@@ -1431,7 +1431,7 @@ const getSearchProductsWithPagination = async (content, item_limit, page, rating
                 const pageTotal = Math.ceil(listLength / item_limit);
 
                 productListFinal = _(productListFinal).drop(offSet).take(item_limit).value();
-                
+
                 let productListFinalWithImage = await Promise.all(productListFinal.map(async item => {
 
                     let productType = await db.ProductType.findOne({
@@ -1492,77 +1492,149 @@ const getSearchProductsWithPagination = async (content, item_limit, page, rating
     }
 }
 
-const getProductReviews = async (product_id, item_limit, page) => {
+const getProductReviews = async (product_id, item_limit, page, rating) => {
     try {
         if (item_limit > 0) {
 
             let offSet = (page - 1) * item_limit;
 
-            let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'comment', 'rating', 'createdAt'],
-                include: {
-                    model: db.Customer,
-                    attributes: ['id', 'name']
-                },
-                order: [['createdAt', 'DESC']],
-                where: {
-                    productID: {
-                        [Op.eq]: product_id,
+            if (rating === 0) {
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'comment', 'rating', 'createdAt'],
+                    include: {
+                        model: db.Customer,
+                        attributes: ['id', 'name']
                     },
-                }
-            });
+                    order: [['createdAt', 'DESC']],
+                    where: {
+                        productID: {
+                            [Op.eq]: product_id,
+                        },
+                    }
+                });
 
-            let star_ratings = {
-                '1': 0,
-                '2': 0,
-                '3': 0,
-                '4': 0,
-                '5': 0,
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                const pageTotal = Math.ceil(productReviewList.length / item_limit);
+
+                let productReviewListRaw = [];
+
+                productReviewListRaw = _.cloneDeep(productReviewList);
+
+                productReviewListRaw = _(productReviewListRaw).drop(offSet).take(item_limit).value();
+
+                let finalData = productReviewListRaw.map(item => {
+                    let customer = item.Customer;
+                    if (!customer.id) {
+                        delete item.Customer;
+
+                        return {
+                            ...item, customer: null
+                        }
+                    } else {
+                        return {
+                            ...item, customer: customer
+                        }
+                    }
+                })
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_ratings: count,
+                        rating_average: rating_average,
+                        ratings: star_ratings,
+                        product_reviews: finalData
+                    },
+                    EM: 'Get product reviews !'
+                }
+            }
+            else {
+                let { count, rows: productReviewList } = await db.ProductReview.findAndCountAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'comment', 'rating', 'createdAt'],
+                    include: {
+                        model: db.Customer,
+                        attributes: ['id', 'name']
+                    },
+                    order: [['createdAt', 'DESC']],
+                    where: {
+                        productID: {
+                            [Op.eq]: product_id,
+                        },
+                    }
+                });
+
+                let star_ratings = {
+                    '1': 0,
+                    '2': 0,
+                    '3': 0,
+                    '4': 0,
+                    '5': 0,
+                }
+
+                let product_rating_review = productReviewList.filter(review => review.rating === rating);
+
+                await productReviewList.forEach(item => {
+                    star_ratings[`${item.rating}`] += 1;
+                });
+
+                let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
+
+                const pageTotal = Math.ceil(product_rating_review.length / item_limit);
+
+                let productReviewListRaw = [];
+
+                productReviewListRaw = _.cloneDeep(product_rating_review);
+
+                productReviewListRaw = _(productReviewListRaw).drop(offSet).take(item_limit).value();
+
+                let finalData = productReviewListRaw.map(item => {
+                    let customer = item.Customer;
+                    if (!customer.id) {
+                        delete item.Customer;
+
+                        return {
+                            ...item, customer: null
+                        }
+                    } else {
+                        return {
+                            ...item, customer: customer
+                        }
+                    }
+                })
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_ratings: count,
+                        rating_average: rating_average,
+                        ratings: star_ratings,
+                        product_reviews: finalData
+                    },
+                    EM: 'Get product reviews !'
+                }
             }
 
-            await productReviewList.forEach(item => {
-                star_ratings[`${item.rating}`] += 1;
-            });
-
-            let rating_average = Math.round(parseFloat((star_ratings['1'] + star_ratings['2'] * 2 + star_ratings['3'] * 3 + star_ratings['4'] * 4 + star_ratings['5'] * 5) / count) * 10) / 10;
-
-            const pageTotal = Math.ceil(productReviewList.length / item_limit);
-
-            let productReviewListRaw = [];
-
-            productReviewListRaw = _.cloneDeep(productReviewList);
-
-            productReviewListRaw = _(productReviewListRaw).drop(offSet).take(item_limit).value();
-
-            let finalData = productReviewListRaw.map(item => {
-                let customer = item.Customer;
-                if (!customer.id) {
-                    delete item.Customer;
-
-                    return {
-                        ...item, customer: null
-                    }
-                } else {
-                    return {
-                        ...item, customer: customer
-                    }
-                }
-            })
-
-            return {
-                EC: 0,
-                DT: {
-                    page: page,
-                    page_total: pageTotal,
-                    total_ratings: count,
-                    rating_average: rating_average,
-                    ratings: star_ratings,
-                    product_reviews: finalData
-                },
-                EM: 'Get product reviews !'
-            }
         }
         return {
             EC: 0,

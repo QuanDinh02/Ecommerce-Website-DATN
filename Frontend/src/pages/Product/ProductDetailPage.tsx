@@ -733,7 +733,7 @@ const ProductDetailPage = () => {
     }
 
     const fetchProductReviews = async (product_id: number) => {
-        let response: IReviewData = await getProductReview(+product_id, +currentPage);
+        let response: IReviewData = await getProductReview(+product_id, +currentPage, ratingFilter);
         if (response) {
             setProductReviews(response.product_reviews);
             setTotalPages(response.page_total);
@@ -845,6 +845,8 @@ const ProductDetailPage = () => {
         let activeProductID: number = product_id ? +product_id : 0;
 
         if (activeProductID !== productID) {
+            setRatingFilter(0);
+            setCurrentPage(1);
             setProductID(activeProductID);
         }
 
@@ -863,14 +865,18 @@ const ProductDetailPage = () => {
     }, [productID]);
 
     React.useEffect(() => {
-        // 2876581
-        //fetchProductDetail(2876581);
-        //fetchProductReviews(2876581);
 
-        if (productDetailInfo.id !== 0) {
-            fetchProductReviews(productDetailInfo.id);
+        if (productID !== 0) {
+            fetchProductReviews(productID);
         }
     }, [currentPage]);
+
+    React.useEffect(() => {
+        if (productID !== 0) {
+            setCurrentPage(1);
+            fetchProductReviews(productID);
+        }
+    }, [ratingFilter])
 
     React.useEffect(() => {
 
