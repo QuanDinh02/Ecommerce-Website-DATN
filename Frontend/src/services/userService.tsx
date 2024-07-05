@@ -1,6 +1,11 @@
 import axios from '../customization/axiosCustomization';
 import { APIResponse, LIMIT } from './common';
 
+interface IUserChangePassword {
+    email: string
+    password: string
+}
+
 export const userLogin = async (username, password) => {
     let result: APIResponse = await axios.post("/api/user/login", {
         username, password
@@ -30,11 +35,20 @@ export const userRegister = async (data: any) => {
     return result;
 }
 
+export const userChangePassword = async (data: IUserChangePassword) => {
+    let result: APIResponse = await axios.put("/api/user/change-password", data);
+    return result;
+}
+
 export const checkCustomerEmailExist = async (email: string) => {
     let result: APIResponse = await axios.get(`/api/user/register/email-validate?email=${email}`);
     return result;
 }
 
+export const checkEmailWebsiteUserExist = async (email: string) => {
+    let result: APIResponse = await axios.get(`/api/user/change-password/email-validate?email=${email}`);
+    return result;
+}
 
 export const fetchAccount = async () => {
     let result: any = await axios.get("/api/user/account");

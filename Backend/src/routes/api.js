@@ -34,6 +34,10 @@ const ApiRoute = (app) => {
     router.post('/user/register', userController.handleUserRegister);
     router.post('/user/login', userController.handleUserLogin);
     router.get('/user/logout', userController.handleUserLogout);
+    router.put('/user/change-password', userController.handleUserChangePassword);
+    router.get('/user/change-password/email-validate', userController.checkEmailWebsiteUserExist);
+    router.post('/user/change-pasword/verification-code', userController.sendVertificationCode);
+    router.post('/user/change-pasword/verify', userController.handleCodeVertification);
 
     // SYSTEM USER AUTHENTICATION
     router.post('/user/sys/login', userController.handleSystemUserLogin);
