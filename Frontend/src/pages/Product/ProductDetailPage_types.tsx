@@ -50,10 +50,6 @@ export interface IProductType {
     price: number
 }
 
-export interface IShop {
-    id: number
-    name: string
-}
 export interface IProductDetail {
     id: number
     name: string
@@ -65,7 +61,6 @@ export interface IProductDetail {
     inventory_count: number
     sub_category: ISubCategoryActive
     category: ICategoryActive
-    shop_info: IShop
 }
 
 export interface ISelectType {

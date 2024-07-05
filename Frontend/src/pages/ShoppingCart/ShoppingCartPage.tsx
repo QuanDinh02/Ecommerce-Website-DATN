@@ -20,6 +20,7 @@ import LinkNewTabProductDetail from "@/components/LinkNewTab";
 export interface ICartItemInfo {
     id: number
     name: string
+    quantity: number
     image: string
 }
 
@@ -109,7 +110,12 @@ const ShoppingCartPage = () => {
             window.scrollTo(0, 0);
         }
 
-        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        let cartItemValueSum = _.sumBy(cartItemList, (o: ICartItem) => {
+            if (o.product_info.quantity !== 0) {
+                return o.price * o.quantity;
+            }
+            return 0;
+        });
 
         setCartItemTotal(cartItemValueSum);
         setOrderCost(cartItemValueSum + transportedFee);
@@ -121,7 +127,12 @@ const ShoppingCartPage = () => {
     }, []);
 
     React.useEffect(() => {
-        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        let cartItemValueSum = _.sumBy(cartItemList, (o: ICartItem) => {
+            if (o.product_info.quantity !== 0) {
+                return o.price * o.quantity;
+            }
+            return 0;
+        });
         setCartItemTotal(cartItemValueSum);
         setOrderCost(cartItemValueSum + transportedFee);
     }, [cartItemList]);
@@ -175,6 +186,32 @@ const ShoppingCartPage = () => {
                                                     <tbody>
                                                         {cartItemList && cartItemList.length > 0 &&
                                                             cartItemList.map((item, index) => {
+
+                                                                if (item.product_info.quantity === 0) {
+                                                                    return (
+                                                                        <tr key={`cart-item-${index}`} className="border-b border-gray-300">
+                                                                            <td>
+                                                                                {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
+                                                                                <LoadImage img_style="w-24 h-24 opacity-50" product_id={item.product_info.id} />
+                                                                            </td>
+                                                                            <td className="py-3 px-2 opacity-50">
+                                                                                <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>
+                                                                                    <LinkNewTabProductDetail id={item.product_info.id} name={item.product_info.name} />
+                                                                                </div>
+                                                                                <div className="text-sm">Shop: <span className="text-blue-600 font-medium cursor-pointer hover:underline" onClick={() => handleShopNavigation(item.shop_info.id)}>{item.shop_info.name}</span></div>
+                                                                            </td>
+                                                                            <td className="py-3 px-2 text-sm opacity-50">{CurrencyFormat(item.price)}</td>
+                                                                            <td className="py-3 px-2 text-center">
+                                                                                <span className="text-red-500 font-medium">Hết hàng</span>
+                                                                            </td>
+                                                                            <td className="py-3 px-2 font-medium opacity-50">{CurrencyFormat(item.price * item.quantity)}</td>
+                                                                            <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
+                                                                                setDeleteCartItemId(item.id);
+                                                                                setShowDeleteBox(true);
+                                                                            }} /></td>
+                                                                        </tr>
+                                                                    )
+                                                                }
                                                                 return (
                                                                     <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                         <td>
@@ -230,7 +267,7 @@ const ShoppingCartPage = () => {
                                                     </div>
                                                     <div className="bg-[#FCB800] px-5 py-3 w-[23rem] mt-4 cursor-pointer hover:opacity-80 text-center font-medium" onClick={() => navigate("/payment")}>Tiến hành đặt hàng</div>
                                                 </div>
-                                                <div className="border border-gray-200 bg-gray-100 py-4 px-8 w-[23rem]">
+                                                {/* <div className="border border-gray-200 bg-gray-100 py-4 px-8 w-[23rem]">
                                                     <div className="text-lg mb-2 font-medium">Mã giảm giá/ Quà tặng</div>
                                                     <div className="flex items-center  gap-x-1">
                                                         <div className="border border-gray-400 h-12 px-5 flex items-center flex-1 bg-white">
@@ -238,7 +275,7 @@ const ShoppingCartPage = () => {
                                                         </div>
                                                         <div className="bg-[#FCB800] px-5 py-3 w-fit font-medium cursor-pointer hover:opacity-80">Nhập Mã</div>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                         :

@@ -74,6 +74,7 @@ const getQuickCartItemsByCustomer = async (customer_id) => {
                 product_info: {
                     id: product.id,
                     name: product.name,
+                    quantity: productDetail.quantity,
                     //image: url,
                     image: "",
                 },

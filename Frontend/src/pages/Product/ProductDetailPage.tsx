@@ -539,11 +539,7 @@ const ProductDetailPage = () => {
         category: {
             id: 0,
             title: ""
-        },
-        shop_info: {
-            id: 0,
-            name: ""
-        },
+        }
     });
 
     const [productQuickView, setProductQuickView] = useImmer<IProductQuickView>({
@@ -713,7 +709,6 @@ const ProductDetailPage = () => {
                 draft.sold = response.sold;
                 draft.sub_category = response.sub_category;
                 draft.category = response.category;
-                draft.shop_info = response.shop_info;
             })
 
             setProductAmount(response.inventory_count);
@@ -975,8 +970,8 @@ const ProductDetailPage = () => {
                                             </div>
                                             <div className="shop flex items-center gap-x-4">
                                                 {
-                                                    productDetailInfo.shop_info.id &&
-                                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{productDetailInfo.shop_info.name}</span></div>
+                                                    shopInfo.id !== 0 &&
+                                                    <div>Shop: <span className="font-bold text-blue-500 cursor-pointer hover:underline">{shopInfo.shop_name}</span></div>
                                                 }
                                                 <div>Tình trạng:&nbsp;
                                                     {
@@ -999,7 +994,7 @@ const ProductDetailPage = () => {
                                                         </div>
                                                         :
                                                         <>
-                                                            <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 px-2 bg-gray-100">
+                                                            <div className="w-28 h-11 border border-gray-300 flex items-center px-2 bg-gray-100 opacity-50">
                                                                 <FiMinus className="w-6 h-6 text-gray-400" />
                                                                 <input type="text" className="w-1/2 text-center outline-none select-none bg-gray-100" value={0} disabled />
                                                                 <FiPlus className="w-6 h-6 text-gray-400" />
@@ -1007,18 +1002,29 @@ const ProductDetailPage = () => {
                                                         </>
 
                                                 }
-                                                <div className={productAmount > 0 ? "text-gray-500" : "text-red-500"}>
-                                                    {productAmount > 0 ? `${productAmount} sản phẩm có sẵn` : "Hết hàng !"}
-
-                                                </div>
+                                                {
+                                                    productAmount > 0 &&
+                                                    <div className="text-gray-500">
+                                                        <span>{productAmount} sản phẩm có sẵn</span>
+                                                    </div>
+                                                }
                                             </div>
                                             <div className="flex items-center gap-x-4 mt-6 mb-4">
-                                                <Button
-                                                    styles="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer flex items-center justify-center gap-x-2"
-                                                    OnClick={() => hanldeAddShoppingCart(amount, productDetailInfo.id)}
-                                                >
-                                                    <LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng
-                                                </Button>
+                                                {
+                                                    productDetailInfo.inventory_count > 0 ?
+                                                        <Button
+                                                            styles="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer flex items-center justify-center gap-x-2"
+                                                            OnClick={() => hanldeAddShoppingCart(amount, productDetailInfo.id)}
+                                                        >
+                                                            <LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng
+                                                        </Button>
+                                                        :
+                                                        <Button
+                                                            styles="w-52 py-3 font-medium bg-[#FCB800] opacity-50 text-center rounded-[4px] cursor-not-allowed flex items-center justify-center gap-x-2">
+                                                            <LiaCartPlusSolid className="w-7 h-7" /> Thêm vào giỏ hàng
+                                                        </Button>
+                                                }
+
                                                 <Button
                                                     styles="text-gray-600 hover:text-red-500 duration-300 cursor-pointer"
                                                     OnClick={() => handleAddFavouriteItem(productDetailInfo.id)}

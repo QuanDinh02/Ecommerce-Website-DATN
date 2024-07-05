@@ -43,16 +43,10 @@ const getProductDetail = async (product_id) => {
                     attributes: ['id', 'title'],
                     raw: true,
                     nest: true,
-                    include: [
-                        {
-                            model: db.Seller,
-                            attributes: ['id', 'shopName']
-                        },
-                        {
-                            model: db.Category,
-                            attributes: ['id', 'title']
-                        }
-                    ]
+                    include: {
+                        model: db.Category,
+                        attributes: ['id', 'title']
+                    }
                 },
             ],
             where: {
@@ -64,7 +58,6 @@ const getProductDetail = async (product_id) => {
 
         let sub_category = subCategoryInfo.SubCategory;
         let category = sub_category.Category;
-        let shopInfo = sub_category.Seller;
 
         delete sub_category.Category;
         delete sub_category.Seller;
@@ -99,10 +92,6 @@ const getProductDetail = async (product_id) => {
             inventory_count: productDetail.quantity,
             sub_category: sub_category,
             category: category,
-            shop_info: {
-                id: shopInfo.id,
-                name: shopInfo.shopName
-            }
         }
 
         return {

@@ -20,7 +20,7 @@ const LoadImage = (props: ILoadImage) => {
                         className={img_style}
                         onError={() => setError(true)}
                     /> :
-                    <CiImageOn className={`text-gray-300 ${img_style}`}/>
+                    <CiImageOn className={`text-gray-300 shrink-0 ${img_style}`}/>
             }
         </>
     )

@@ -184,7 +184,7 @@ const PaymentPage = () => {
         return;
     }
 
-    const handleSelectShippingUnit= (unit: IShippingUnit) => {
+    const handleSelectShippingUnit = (unit: IShippingUnit) => {
         setSelectShippingUnit(unit);
     }
 
@@ -215,8 +215,11 @@ const PaymentPage = () => {
                 price: item.price
             }
 
-            return order_item;
-        })
+            if (item.quantity <= item.product_info.quantity) {
+                return order_item;
+            }
+            return null;
+        }).filter(item => item !== null);
 
         let create_res: any = await createNewOrder({
             status: 0,
@@ -234,8 +237,7 @@ const PaymentPage = () => {
         });
 
         if (create_res && create_res.EC === 0) {
-            // setPaymentStep(paymentStep + 1);
-            // setCreateOrder(false);
+
             let delete_res = await deleteAllCartItem(account.customer_id);
             if (delete_res && delete_res.EC === 0) {
                 dispatch(ClearAllCartItem());
@@ -301,7 +303,12 @@ const PaymentPage = () => {
             window.scrollTo(0, 0);
         }
 
-        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        let cartItemValueSum = _.sumBy(cartItemList, (o: ICartItem) => {
+            if (o.product_info.quantity !== 0) {
+                return o.price * o.quantity;
+            }
+            return 0;
+        });
 
         setCartItemTotal(cartItemValueSum);
         setOrderCost(cartItemValueSum + transportedFee);
@@ -327,7 +334,12 @@ const PaymentPage = () => {
     }, [isAuthenticated]);
 
     React.useEffect(() => {
-        let cartItemValueSum = _.sumBy(cartItemList, function (o: ICartItem) { return o.price * o.quantity; });
+        let cartItemValueSum = _.sumBy(cartItemList, (o: ICartItem) => {
+            if (o.product_info.quantity !== 0) {
+                return o.price * o.quantity;
+            }
+            return 0;
+        });
         setCartItemTotal(cartItemValueSum);
         setOrderCost(cartItemValueSum + transportedFee);
     }, [cartItemList]);
@@ -481,7 +493,7 @@ const PaymentPage = () => {
                                                 </div>
                                             </div>
                                             <div className="text-lg font-bold text-xl text-gray-600 my-4">3. Chọn đơn vị giao hàng</div>
-                                            <div className="border border-gray-300 rounded p-4 mb-6"> 
+                                            <div className="border border-gray-300 rounded p-4 mb-6">
                                                 <div className="flex flex-col gap-y-4">
                                                     {
                                                         shippingUnitList && shippingUnitList.length > 0 &&
@@ -537,15 +549,17 @@ const PaymentPage = () => {
                                                     {
                                                         cartItemList && cartItemList.length > 0 &&
                                                         cartItemList.map((item, index) => {
-                                                            return (
-                                                                <div className="flex items-center justify-between pt-2 mb-2 text-sm border-t border-gray-200">
-                                                                    <div className="flex items-center gap-x-1 w-2/3">
-                                                                        <div className="w-60 w-4/5 text-blue-600">{item.product_info.name}</div>
-                                                                        <div className="font-bold w-1/5">x{item.quantity}</div>
+                                                            if (item.quantity <= item.product_info.quantity) {
+                                                                return (
+                                                                    <div className="flex items-center justify-between pt-2 mb-2 text-sm border-t border-gray-200" key={`payment-item-${index}`}>
+                                                                        <div className="flex items-center gap-x-1 w-2/3">
+                                                                            <div className="w-60 w-4/5 text-blue-600">{item.product_info.name}</div>
+                                                                            <div className="font-bold w-1/5">x{item.quantity}</div>
+                                                                        </div>
+                                                                        <div className="w-1/3 text-end">{CurrencyFormat(item.price * item.quantity)}</div>
                                                                     </div>
-                                                                    <div className="w-1/3 text-end">{CurrencyFormat(item.price * item.quantity)}</div>
-                                                                </div>
-                                                            )
+                                                                )
+                                                            }
                                                         })
                                                     }
                                                 </div>
