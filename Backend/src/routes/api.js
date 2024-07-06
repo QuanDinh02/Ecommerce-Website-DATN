@@ -95,8 +95,6 @@ const ApiRoute = (app) => {
     router.post('/sub-category/recommend', subCategoryController.getRecommendSubCategory);
     router.get('/sub-category', subCategoryController.getSubCategoryInfo);
 
-    router.put('/product', upload.single('image'), productController.handleUpdateProductImage);
-
     // CUSTOMER CART ITEM
     router.get('/cart-item', cartItemController.getQuickCartItems);
     router.post('/cart-item', cartItemController.addCartItem);

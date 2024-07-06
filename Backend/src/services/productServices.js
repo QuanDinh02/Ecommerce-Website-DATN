@@ -1278,44 +1278,6 @@ const getProductsBySubCategory = async (sub_category_id, item_limit, page, ratin
     }
 }
 
-const putUpdateProductImage = async (data) => {
-    try {
-        let { id, image } = data;
-
-        let existImage = await db.Image.findOne({
-            where: {
-                id: +id
-            },
-            attributes: ['id'],
-            raw: true
-        })
-
-        if (!_.isEmpty(existImage)) {
-
-            let result = await db.Image.update({
-                image: image
-            }, {
-                where: {
-                    id: +id
-                }
-            });
-            return {
-                EC: 0,
-                EM: 'Update product image successfully !',
-                DT: ''
-            }
-        }
-
-    } catch (error) {
-        console.log(error);
-        return {
-            EC: -2,
-            EM: 'Something is wrong on services !',
-            DT: ''
-        }
-    }
-}
-
 const getSearchProducts = async (product_name) => {
     try {
         const productList = await db.Product.findAll({
@@ -1700,7 +1662,7 @@ const getProductReviews = async (product_id, item_limit, page, rating) => {
 
 module.exports = {
     getProductsByCategory, getProductsBySubCategory,
-    putUpdateProductImage, getSearchProducts,
+    getSearchProducts,
     getProductDetail, getProductReviews, getSearchProductsWithPagination,
     getProductsHistory, getProductsHistorySwiper, getProductDetailShopInfo,
     getProductsByShopCategory, getShopInfo
