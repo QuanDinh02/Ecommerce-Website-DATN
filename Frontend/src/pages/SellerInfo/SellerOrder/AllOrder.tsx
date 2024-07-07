@@ -368,7 +368,7 @@ const AllOrder = () => {
                                             <tr>
                                                 <td colSpan={10}>
                                                     {
-                                                        <div className='pagination-container my-4 flex justify-center'>
+                                                        <div className='pagination-review-container my-4 flex justify-center'>
                                                             <ReactPaginate
                                                                 nextLabel=">"
                                                                 onPageChange={handlePageClick}

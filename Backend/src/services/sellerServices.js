@@ -1348,6 +1348,9 @@ const getDashboardData = async (seller_id) => {
         let shipping_success = 0;
         let cancel = 0;
 
+        let revenues = [...Array(12)].map(i => 0);
+        let saleData = [...Array(12)].map(i => 0);
+
         let orderListRaw = await db.Order.findAll({
             raw: true,
             attributes: ['id', 'orderDate', 'totalPrice'],
@@ -1357,6 +1360,47 @@ const getDashboardData = async (seller_id) => {
                 },
             }
         });
+
+        let product_list = await db.ProductType.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['quantity', 'currentPrice'],
+            include: {
+                model: db.Product,
+                attributes: ['id', 'name'],
+                where: {
+                    shop_id: {
+                        [Op.eq]: +seller_id
+                    }
+                }
+            },
+            where: {
+                quantity: {
+                    [Op.between]: [0, 10]
+                }
+            }
+        });
+
+
+        let format_product_list = product_list.map(product => {
+            return {
+                id: product.Product.id,
+                name: product.Product.name,
+                quantity: product.quantity,
+                price: product.currentPrice,
+            }
+        });
+
+        let outOfOrder_product_list = format_product_list.filter(product => product.quantity === 0);
+        let soon_outOfOrder_product_list_temp = format_product_list.filter(product => product.quantity !== 0);
+
+        let soon_outOfOrder_product_list = _.chain(soon_outOfOrder_product_list_temp).orderBy("quantity","asc").take(3).value();
+
+        let outOfOrder_product_list_quantity = outOfOrder_product_list.length;
+        let soon_outOfOrder_product_list_quantity = soon_outOfOrder_product_list.length;
+
+
+        outOfOrder_product_list = _(outOfOrder_product_list).take(3).value();
 
         await Promise.all(orderListRaw.map(async item => {
 
@@ -1399,6 +1443,23 @@ const getDashboardData = async (seller_id) => {
 
             if (order_status_id === 7) {
                 shipping_success += 1;
+                //console.log(`id = ${item.id}, month = ${item.orderDate.getMonth() + 1}, revenue = ${item.totalPrice}`);
+
+                revenues[item.orderDate.getMonth()] += item.totalPrice;
+
+                let order_item_list = await db.OrderItem.findAll({
+                    raw: true,
+                    attributes: ['quantity'],
+                    where: {
+                        orderID: {
+                            [Op.eq]: item.id
+                        }
+                    }
+                });
+
+                let orderSales = _.sumBy(order_item_list, 'quantity');
+
+                saleData[item.orderDate.getMonth()] += orderSales;
             }
 
             if (order_status_id === 10) {
@@ -1406,7 +1467,28 @@ const getDashboardData = async (seller_id) => {
             }
         }));
 
-        let data = [pending_confirm, pending_shipper_get, shipping, shipping_success, cancel];
+        let analysis_data = revenues.map((revenue, index) => {
+            return {
+                name: `T${index + 1}`,
+                revenue: revenue,
+                sales: saleData[index]
+            }
+        })
+
+        let overview_data = [pending_confirm, pending_shipper_get, shipping, shipping_success, cancel];
+
+        let data = {
+            overview_data: overview_data,
+            analysis_data: analysis_data,
+            out_of_order_product_list: {
+                quantity: outOfOrder_product_list_quantity,
+                data: outOfOrder_product_list
+            },
+            soon_out_of_order_product_list: {
+                quantity: soon_outOfOrder_product_list_quantity,
+                data: soon_outOfOrder_product_list
+            }
+        }
 
         return {
             EC: 0,

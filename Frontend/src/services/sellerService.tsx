@@ -183,5 +183,5 @@ export const getDashboardData = async () => {
     if (result && result.EC === 0) {
         return result.DT;
     }
-    return [];
+    return null;
 }

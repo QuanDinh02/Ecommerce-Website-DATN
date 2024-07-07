@@ -18,6 +18,11 @@ export const numberKFormat = (num: number) => {
     }
     return `${num}`;
 }
+
 export const CurrencyFormat = (number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+}
+
+export const CurrencyFormatVND = (number) => {
+    return new Intl.NumberFormat('it-IT', {style : 'currency', currency : 'VND'}).format(number);
 }
