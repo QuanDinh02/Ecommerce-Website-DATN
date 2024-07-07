@@ -204,3 +204,11 @@ export const getDashboardData = async () => {
     }
     return null;
 }
+
+export const getProducstAnnouncement = async (limit: number, page: number, type: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/products/announce?type=${type}&page=${page}&limit=${limit}`);
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}

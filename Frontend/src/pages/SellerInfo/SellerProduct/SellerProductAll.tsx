@@ -144,6 +144,18 @@ const SellerProductAll = () => {
         title: "Chọn danh mục sản phẩm con"
     });
 
+
+    const [categoryListUpdate, setCategoryListUpdate] = React.useState<ICategory[]>([]);
+    const [subCategoryListUpdate, setSubCategoryListUpdate] = React.useState<ISubCategory[]>([]);
+    const [productCategoryUpdate, setProductCategoryUpdate] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm"
+    });
+    const [productSubCategoryUpdate, setProductSubCategoryUpdate] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm con"
+    });
+
     const handlePageClick = (event) => {
         setCurrentPage(+event.selected + 1);
         setDataLoading(true);
@@ -200,38 +212,36 @@ const SellerProductAll = () => {
         if (item.sub_category.id !== null) {
             let subCategoryInfo = await getSubCategoryInfo(item.sub_category.id);
 
-            console.log(subCategoryInfo);
-
-            setProductCategory(draft => {
+            setProductCategoryUpdate(draft => {
                 draft.id = subCategoryInfo.category_info.id;
                 draft.title = subCategoryInfo.category_info.title;
             });
 
-            setProductSubCategory(draft => {
+            setProductSubCategoryUpdate(draft => {
                 draft.id = subCategoryInfo.id;
                 draft.title = subCategoryInfo.title;
             });
 
             let sub_category_list = await getSubCategoryByCategory(subCategoryInfo.category_info.id);
-            setSubCategoryList(sub_category_list);
+            setSubCategoryListUpdate(sub_category_list);
 
             setShowUpdateModal(true);
         }
 
         else {
-            setProductCategory(draft => {
+            setProductCategoryUpdate(draft => {
                 draft.id = 0;
                 draft.title = "Chọn danh mục sản phẩm";
             });
 
-            setProductSubCategory(draft => {
+            setProductSubCategoryUpdate(draft => {
                 draft.id = 0;
                 draft.title = "Chọn danh mục sản phẩm con";
             });
 
-            fetchCategoryList();
+            fetchCategoryListUpdate();
 
-            setSubCategoryList([]);
+            setSubCategoryListUpdate([]);
 
             setShowUpdateModal(true);
         }
@@ -269,7 +279,7 @@ const SellerProductAll = () => {
                         {
                             id: 0,
                             title: "Tất Cả"
-                        }, 
+                        },
                         ...sub_category_list
                     ]
                 );
@@ -328,10 +338,40 @@ const SellerProductAll = () => {
                     {
                         id: 0,
                         title: "Tất Cả"
-                    }, 
+                    },
                     ...result
                 ]
             );
+        }
+    }
+
+    const fetchCategoryListUpdate = async () => {
+        let result = await getCategoryList();
+        if (result) {
+            setCategoryListUpdate(result);
+        }
+    }
+
+    const handleSelectProductCategoryUpdate = async (category: ICategory) => {
+        if (category) {
+            setProductCategoryUpdate(draft => {
+                draft.id = category.id;
+                draft.title = category.title;
+            });
+
+            let sub_category_list = await getSubCategoryByCategory(category.id);
+            if (sub_category_list) {
+                setSubCategoryListUpdate(sub_category_list);
+            }
+        }
+    }
+
+    const handleSelectProductSubCategoryUpdate = (sub_category: ICategory) => {
+        if (sub_category) {
+            setProductSubCategoryUpdate(draft => {
+                draft.id = sub_category.id;
+                draft.title = sub_category.title;
+            })
         }
     }
 
@@ -393,7 +433,6 @@ const SellerProductAll = () => {
     }
 
     React.useEffect(() => {
-
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
         setDataLoading(true);
         fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
@@ -599,21 +638,21 @@ const SellerProductAll = () => {
                                 id={'product-name'} />
                             <div className="flex mt-4 gap-x-3">
                                 <CustomizeDropdown
-                                    data={categoryList}
-                                    value={productCategory}
-                                    setValue={handleSelectProductCategory}
+                                    data={categoryListUpdate}
+                                    value={productCategoryUpdate}
+                                    setValue={handleSelectProductCategoryUpdate}
                                     style="px-3 py-2 rounded-md border border-gray-300 w-1/2"
                                     id={"product-category"}
                                     label={"Danh mục sản phẩm"}
                                 />
                                 <CustomizeDropdown
-                                    data={subCategoryList}
-                                    value={productSubCategory}
-                                    setValue={handleSelectProductSubCategory}
+                                    data={subCategoryListUpdate}
+                                    value={productSubCategoryUpdate}
+                                    setValue={handleSelectProductSubCategoryUpdate}
                                     style="px-3 py-2 rounded-md border border-gray-300 w-1/2"
                                     id={"product-sub-category"}
                                     label={"Danh mục sản phẩm (con)"}
-                                    depend={productCategory.id === 0}
+                                    depend={productCategoryUpdate.id === 0}
                                 />
                             </div>
                             <div className="flex mt-4 gap-x-3">

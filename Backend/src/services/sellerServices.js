@@ -1957,6 +1957,123 @@ const getOrderSearch = async (shop_seller_id, order_id) => {
     }
 }
 
+const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
+    try {
+
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            if (type === 1) {
+
+                let product_list = await db.ProductType.findAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['quantity', 'currentPrice'],
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: +seller_id
+                            }
+                        }
+                    },
+                    where: {
+                        quantity: {
+                            [Op.eq]: 0
+                        }
+                    }
+                });
+
+                let format_product_list = await product_list.map(product => {
+                    return {
+                        id: product.Product.id,
+                        name: product.Product.name,
+                        quantity: product.quantity,
+                        price: product.currentPrice,
+                    }
+                });
+
+                const listLength = format_product_list.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+                let productListFinal = _(format_product_list).drop(offSet).take(item_limit).value();
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: productListFinal
+                    },
+                    EM: 'Get products announcement !'
+                }
+            }
+
+            if (type === 2) {
+                let product_list = await db.ProductType.findAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['quantity', 'currentPrice'],
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: +seller_id
+                            }
+                        }
+                    },
+                    where: {
+                        quantity: {
+                            [Op.between]: [1, 10]
+                        }
+                    }
+                });
+
+                let format_product_list = product_list.map(product => {
+                    return {
+                        id: product.Product.id,
+                        name: product.Product.name,
+                        quantity: product.quantity,
+                        price: product.currentPrice,
+                    }
+                });
+
+                const listLength = format_product_list.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+                let productListFinal = _(format_product_list).drop(offSet).take(item_limit).value();
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: productListFinal
+                    },
+                    EM: 'Get products announcement !'
+                }
+            }
+        } else {
+            return {
+                EC: -1,
+                DT: null,
+                EM: 'ITEM LIMIT is invalid !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
@@ -1966,5 +2083,5 @@ module.exports = {
     getShopCategory, createShopCategory, updateShopCategory,
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
     addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData,
-    getOrderSearch, getProductSearch
+    getOrderSearch, getProductSearch, getProductsAnnouncement
 }

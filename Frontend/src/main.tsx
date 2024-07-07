@@ -57,6 +57,9 @@ import ShopManagement from '@/pages/SellerInfo/ShopManagement.tsx';
 import OrderDetail from '@/pages/SellerInfo/SellerOrder/OrderDetail.tsx';
 import SellerControlDelivery from '@/pages/SellerInfo/SellerControlDellivery.tsx';
 import ShopCategory from '@/pages/SellerInfo/Shop/ShopCategory.tsx';
+import SellerNotification from '@/pages/SellerInfo/SellerNotification.tsx';
+import SellerSupport from '@/pages/SellerInfo/SellerSupport.tsx';
+import SellerProductAnnouncement from '@/pages/SellerInfo/SellerProduct/SellerProductAnnouncement.tsx';
 
 // SHIPPING UNIT
 import SUMain from '@/pages/ShippingUnit/SUMain.tsx';
@@ -99,8 +102,6 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import SellerNotification from './pages/SellerInfo/SellerNotification.tsx';
-import SellerSupport from './pages/SellerInfo/SellerSupport.tsx';
 
 const router = createBrowserRouter(
   [
@@ -188,6 +189,10 @@ const router = createBrowserRouter(
                 {
                   path: "new",
                   element: <SellerAddNewProduct />,
+                },
+                {
+                  path: "announce",
+                  element: <SellerProductAnnouncement/>,
                 }
               ]
             },

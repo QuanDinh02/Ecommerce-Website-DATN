@@ -6,6 +6,7 @@ import React from 'react';
 import { ThreeDots } from 'react-loader-spinner';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { IoIosArrowForward } from "react-icons/io";
+import { useNavigate } from 'react-router-dom';
 
 const data = [
     {
@@ -138,6 +139,8 @@ interface IDashboardData {
 
 const SellerDashboard = () => {
 
+    const navigate = useNavigate();
+
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
 
     const [dashboardData, setDashboardData] = React.useState<number[]>([0, 0, 0, 0, 0]);
@@ -162,6 +165,16 @@ const SellerDashboard = () => {
             setSoonOutOfOrderProductData(result.soon_out_of_order_product_list.data);
             setQuantitySoonOutOfOrder(result.soon_out_of_order_product_list.quantity);
         }
+    }
+
+    const handleNavigateToOutOfStockProduct = (id: number) => {
+        navigate({
+            pathname: "/seller-info/product/announce",
+            search: `?type=${id}`,
+
+        }, {
+            replace: true
+        });
     }
 
     React.useEffect(() => {
@@ -244,7 +257,7 @@ const SellerDashboard = () => {
                             <div className='w-1/2'>
                                 <div className='mb-4 flex items-center justify-between'>
                                     <div className='text-lg'>Sản phẩm hết hàng</div>
-                                    <div className='hover:underline text-blue-600 flex items-center cursor-pointer text-red-500'>Xem thêm <IoIosArrowForward /></div>
+                                    <div className='hover:underline text-blue-600 flex items-center cursor-pointer text-red-500' onClick={() => handleNavigateToOutOfStockProduct(1)}>Xem thêm <IoIosArrowForward /></div>
                                 </div>
                                 <table className="table-fixed w-full border">
                                     <thead>
@@ -303,7 +316,7 @@ const SellerDashboard = () => {
                             <div className='w-1/2'>
                                 <div className='mb-4 flex items-center justify-between'>
                                     <div className='text-lg'>Sản phẩm sắp hết hàng</div>
-                                    <div className='hover:underline text-blue-600 flex items-center cursor-pointer'>Xem thêm <IoIosArrowForward /></div>
+                                    <div className='hover:underline text-blue-600 flex items-center cursor-pointer' onClick={() => handleNavigateToOutOfStockProduct(2)}>Xem thêm <IoIosArrowForward /></div>
                                 </div>
                                 <table className="table-fixed w-full border">
                                     <thead>

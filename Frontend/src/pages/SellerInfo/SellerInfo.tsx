@@ -49,11 +49,7 @@ const SideBar: ISideBarItem[] = [
             {
                 path: "/order-status",
                 name: "Trạng thái đơn hàng",
-            },
-            // {
-            //     path: "/control-order-delivery",
-            //     name: "Đối soát hàng giao",
-            // }
+            }
         ]
     },
     {
@@ -69,6 +65,10 @@ const SideBar: ISideBarItem[] = [
             {
                 path: "/new",
                 name: "Thêm Sản Phẩm",
+            },
+            {
+                path: "/announce",
+                name: "Thông Báo",
             },
         ]
     },

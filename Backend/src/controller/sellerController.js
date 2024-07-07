@@ -601,6 +601,30 @@ const getDashboardData = async (req, res) => {
     }
 }
 
+const getProductsAnnouncement = async (req, res) => {
+    try {
+
+        let { user } = req;
+        let { limit, page, type } = req.query;
+        let result = await sellerServices.getProductsAnnouncement(+user.seller_id, +limit, +page, +type);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const getOrderSearch = async (req, res) => {
     try {
         let { user } = req;
@@ -628,5 +652,5 @@ module.exports = {
     getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
-    getDashboardData, getOrderSearch, getProductSearch
+    getDashboardData, getOrderSearch, getProductSearch, getProductsAnnouncement
 }
