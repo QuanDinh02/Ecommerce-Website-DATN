@@ -150,6 +150,8 @@ const ApiRoute = (app) => {
     router.post('/seller/register/verification-code', sellerController.sendVertificatedCode);
     router.post('/seller/register/verify', sellerController.handleCodeVertification);
 
+    router.get('/seller/products/inventory/search', checkUserJWT, sellerController.getProductInventorySearch);
+    router.put('/seller/products/inventory', checkUserJWT, sellerController.updateProductInventory);
     router.get('/seller/products/announce', checkUserJWT, sellerController.getProductsAnnouncement);
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
     router.get('/seller/products/search', checkUserJWT, sellerController.getProductSearch);

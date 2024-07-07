@@ -212,3 +212,16 @@ export const getProducstAnnouncement = async (limit: number, page: number, type:
     }
     return null;
 }
+
+export const updateShopProductInventory = async (product_type_id: number, quantity: number) => {
+    let result: APIResponse = await axios.put('/api/seller/products/inventory', { product_type_id: product_type_id, quantity: quantity });
+    return result;
+}
+
+export const getProductInventorySearch = async (product_id: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/products/inventory/search?id=${product_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return [];
+}

@@ -646,11 +646,57 @@ const getOrderSearch = async (req, res) => {
     }
 }
 
+const updateProductInventory = async (req, res) => {
+    try {
+        let { product_type_id, quantity } = req.body;
+        let result = await sellerServices.updateProductInventory(+product_type_id, +quantity);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getProductInventorySearch = async (req, res) => {
+    try {
+
+        let { id } = req.query;
+        let { user } = req;
+
+        let result = await sellerServices.getProductInventorySearch(+user.seller_id, +id);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
     getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
-    getDashboardData, getOrderSearch, getProductSearch, getProductsAnnouncement
+    getDashboardData, getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
+    getProductInventorySearch
 }

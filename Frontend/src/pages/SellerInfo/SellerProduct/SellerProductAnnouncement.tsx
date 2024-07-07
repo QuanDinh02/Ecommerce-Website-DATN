@@ -2,7 +2,8 @@
 import Button from "@/components/Button";
 import CopyClipboard from "@/components/CopyClipboard";
 import Modal from "@/components/Modal";
-import { getProducstAnnouncement } from "@/services/sellerService";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
+import { getProducstAnnouncement, getProductInventorySearch, updateShopProductInventory } from "@/services/sellerService";
 import { CurrencyFormatVND } from "@/utils/numberFormat";
 import React from "react";
 import { IoSearch } from "react-icons/io5";
@@ -52,6 +53,7 @@ interface IProduct {
     name: string
     quantity: number
     price: number
+    product_type_id: number
 }
 
 interface IData {
@@ -64,6 +66,7 @@ interface IData {
 interface IUpdateProductInventory {
     id: number
     quantity: number
+    product_type_id: number
 }
 
 const SellerProductAnnouncement = () => {
@@ -73,7 +76,7 @@ const SellerProductAnnouncement = () => {
 
     const [search, setSearch] = React.useState<string>("");
 
-    const [outOfOrderProductData, setOutOfOrderProductData] = React.useState<IProduct[]>([]);
+    const [outOfOrderProductData, setOutOfOrderProductData] = useImmer<IProduct[]>([]);
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [showUpdateModal, setShowUpdateModal] = React.useState<boolean>(false);
@@ -85,7 +88,8 @@ const SellerProductAnnouncement = () => {
 
     const [updateProductInventory, setUpdateProductInventory] = useImmer<IUpdateProductInventory>({
         id: 0,
-        quantity: 0
+        quantity: 0,
+        product_type_id: 0
     });
 
     const [productCurrentType, setProductCurrentType] = React.useState<number>(1);
@@ -97,11 +101,11 @@ const SellerProductAnnouncement = () => {
     }
 
     const handleCloseUpdateModal = (active: boolean) => {
-        // setUpdateCategory({
-        //     id: 0,
-        //     title: "",
-        //     quantity: 0
-        // });
+        setUpdateProductInventory({
+            id: 0,
+            quantity: 0,
+            product_type_id: 0
+        });
         setShowUpdateModal(active)
     }
 
@@ -109,6 +113,7 @@ const SellerProductAnnouncement = () => {
         setUpdateProductInventory(draft => {
             draft.id = value.id;
             draft.quantity = value.quantity;
+            draft.product_type_id = value.product_type_id;
         });
         setShowUpdateModal(true);
     }
@@ -122,25 +127,55 @@ const SellerProductAnnouncement = () => {
             return;
         }
     }
+    const handleSearchProduct = async () => {
+        let response: any = await getProductInventorySearch(+search);
+        if (response) {
+            setOutOfOrderProductData(response.product_list);
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 500);
+        }
+    }
+
 
     const handleKeyPress = (event) => {
-        // if (event.key === 'Enter') {
-        //     if (search === "") {
-        //         if (currentPage === 1) {
-        //             fetchProductsPagination(showItem, 1, productCategory.id, productSubCategory.id, sort.id);
-        //             return;
-        //         } else {
-        //             setCurrentPage(1);
-        //             return;
-        //         }
-        //     }
+        if (event.key === 'Enter') {
+            if (search === "") {
+                if (currentPage === 1) {
+                    fetchProductsPagination(showItem, currentPage, productCurrentType);
+                    return;
+                } else {
+                    setCurrentPage(1);
+                    return;
+                }
+            }
 
-        //     if (!isNaN(+search)) {
-        //         handleSearchProduct();
-        //     } else {
-        //         setProductList([]);
-        //     }
-        // }
+            if (!isNaN(+search) && +search > 0) {
+                handleSearchProduct();
+            } else {
+                setOutOfOrderProductData([]);
+            }
+        }
+    }
+
+    const handleUpdateProductInventory = async () => {
+        let res = await updateShopProductInventory(updateProductInventory.product_type_id, updateProductInventory.quantity);
+        if (res) {
+            if (res.EC === 0) {
+                successToast1(res.EM);
+                setOutOfOrderProductData(draft => {
+                    draft.forEach(product => {
+                        if (product.id === updateProductInventory.id) {
+                            product.quantity = updateProductInventory.quantity;
+                        }
+                    })
+                })
+                handleCloseUpdateModal(false);
+            } else {
+                errorToast1(res.EM);
+                handleCloseUpdateModal(false);
+            }
+        }
     }
 
     const hanldeSetProductType = (id: number) => {
@@ -358,8 +393,8 @@ const SellerProductAnnouncement = () => {
                         <input type="text" className="form_input" value={updateProductInventory.quantity} onChange={(e) => handleOnChangeEdit((e.target.value))} />
                     </div>
                     <div className="flex items-center justify-end gap-x-2 transition-all">
-                        <Button styles="rounded px-8 py-2 text-black cursor-pointer duration-200 border border-gray-300 hover:bg-gray-100" >Hủy</Button>
-                        <Button styles="rounded px-8 py-2 bg-[#FCB800] font-medium cursor-pointer duration-200">Lưu</Button>
+                        <Button styles="rounded px-8 py-2 text-black cursor-pointer duration-200 border border-gray-300 hover:bg-gray-100" OnClick={() => handleCloseUpdateModal(false)}>Hủy</Button>
+                        <Button styles="rounded px-8 py-2 bg-[#FCB800] font-medium cursor-pointer duration-200" OnClick={() => handleUpdateProductInventory()}>Lưu</Button>
                     </div>
                 </div>
             </Modal>

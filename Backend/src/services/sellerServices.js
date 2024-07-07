@@ -1969,7 +1969,7 @@ const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
                 let product_list = await db.ProductType.findAll({
                     raw: true,
                     nest: true,
-                    attributes: ['quantity', 'currentPrice'],
+                    attributes: ['id', 'quantity', 'currentPrice'],
                     include: {
                         model: db.Product,
                         attributes: ['id', 'name'],
@@ -1992,6 +1992,7 @@ const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
                         name: product.Product.name,
                         quantity: product.quantity,
                         price: product.currentPrice,
+                        product_type_id: product.id
                     }
                 });
 
@@ -2015,7 +2016,7 @@ const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
                 let product_list = await db.ProductType.findAll({
                     raw: true,
                     nest: true,
-                    attributes: ['quantity', 'currentPrice'],
+                    attributes: ['id', 'quantity', 'currentPrice'],
                     include: {
                         model: db.Product,
                         attributes: ['id', 'name'],
@@ -2038,6 +2039,7 @@ const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
                         name: product.Product.name,
                         quantity: product.quantity,
                         price: product.currentPrice,
+                        product_type_id: product.id
                     }
                 });
 
@@ -2074,6 +2076,98 @@ const getProductsAnnouncement = async (seller_id, item_limit, page, type) => {
     }
 }
 
+const updateProductInventory = async (product_type_id, quantity) => {
+    try {
+
+        await db.ProductType.update({
+            quantity: +quantity
+        }, {
+            where: {
+                id: +product_type_id
+            }
+        });
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Cập nhật tồn kho thành công'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getProductInventorySearch = async (shop_seller_id, product_id) => {
+    try {
+
+        let productInfo = await db.ProductType.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'quantity', 'currentPrice'],
+            include: {
+                model: db.Product,
+                attributes: ['id', 'name'],
+                where: {
+                    [Op.and]: [
+                        {
+                            id: {
+                                [Op.eq]: +product_id,
+                            }
+                        },
+                        {
+                            shop_id: {
+                                [Op.eq]: +shop_seller_id,
+                            }
+                        }
+                    ]
+                }
+            }
+        });
+
+        if (productInfo) {
+            let productInfoFormat = {
+                id: productInfo.Product.id,
+                name: productInfo.Product.name,
+                quantity: productInfo.quantity,
+                price: productInfo.currentPrice,
+                product_type_id: productInfo.id
+            }
+
+            let productSearch = [productInfoFormat];
+
+            return {
+                EC: 0,
+                DT: {
+                    product_list: productSearch
+                },
+                EM: 'Get product inventory search !'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: {
+                    product_list: []
+                },
+                EM: 'Get product inventory search !'
+            }
+        }
+
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
@@ -2083,5 +2177,6 @@ module.exports = {
     getShopCategory, createShopCategory, updateShopCategory,
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
     addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData,
-    getOrderSearch, getProductSearch, getProductsAnnouncement
+    getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
+    getProductInventorySearch
 }
