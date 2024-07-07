@@ -22,15 +22,38 @@ const transporter = nodemailer.createTransport({
 const getProductPagination = async (req, res) => {
     try {
 
-        let { limit, page } = req.query;
+        let { limit, page, category_id, sub_category_id, sort_id } = req.query;
         let { user } = req;
 
-        let result = await sellerServices.getProductPagination(+user.seller_id, +limit, +page);
+        let result = await sellerServices.getProductPagination(+user.seller_id, +limit, +page, +category_id, +sub_category_id, +sort_id);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
             EM: result.EM
         })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getProductSearch = async (req, res) => {
+    try {
+
+        let { id } = req.query;
+        let { user } = req;
+
+        let result = await sellerServices.getProductSearch(+user.seller_id, +id);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({
@@ -605,5 +628,5 @@ module.exports = {
     getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
-    getDashboardData, getOrderSearch
+    getDashboardData, getOrderSearch, getProductSearch
 }

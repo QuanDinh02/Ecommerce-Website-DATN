@@ -28,8 +28,16 @@ interface IUpdateSellerInfo {
     birth: Date
 }
 
-export const getProductsPagination = async (product_display_limit: number, page: number) => {
-    let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}`);
+export const getProductsPagination = async (product_display_limit: number, page: number, category: number, sub_category: number, sort: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}&category_id=${category}&sub_category_id=${sub_category}&sort_id=${sort}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const getProductSearch = async (product_id: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/products/search?id=${product_id}`);
     if (result && result?.DT) {
         return result.DT;
     }

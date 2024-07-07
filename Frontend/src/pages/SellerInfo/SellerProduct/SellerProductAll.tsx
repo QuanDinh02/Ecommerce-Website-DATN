@@ -4,15 +4,13 @@ import { RiEdit2Fill } from "react-icons/ri";
 import { HiTrash } from "react-icons/hi2";
 import { CurrencyFormat } from "@/utils/numberFormat";
 import { IoSearch } from "react-icons/io5";
-import { MdFilterList } from "react-icons/md";
-import { TiArrowUnsorted } from "react-icons/ti";
 import Button from "@/components/Button";
 import ReactPaginate from "react-paginate";
 import { Dropdown } from "@/components/Dropdown";
 import CustomizeDropdown from "./CustomizeProduct";
 import { useImmer } from "use-immer";
 import { ThreeDots } from "react-loader-spinner";
-import { deleteProduct, getCategoryList, getProductsPagination, getSubCategoryByCategory, updateProduct } from "@/services/sellerService";
+import { deleteProduct, getCategoryList, getProductSearch, getProductsPagination, getSubCategoryByCategory, updateProduct } from "@/services/sellerService";
 import LoadImage from "@/components/LoadImage";
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
@@ -21,6 +19,8 @@ import FloatingInput from "@/components/Floating/FloatingInput";
 import { TfiReload } from "react-icons/tfi";
 import { getSubCategoryInfo } from "@/services/subCategoryService";
 import FloatingNumberInput from "@/components/Floating/FloatingNumberInput";
+import FilterDropdown from "@/components/FilterDropdown";
+import CopyClipboard from "@/components/CopyClipboard";
 
 const MODULE = {
     toolbar: [
@@ -76,8 +76,23 @@ interface ICategory {
     title: string
 }
 
+const SORT_LIST = [
+    {
+        id: 0,
+        title: "Không theo thứ tự"
+    },
+    {
+        id: 1,
+        title: "Giá giảm dần"
+    },
+    {
+        id: 2,
+        title: "Giá tăng dần"
+    }
+];
+
 const tableHeaders = [
-    'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá hiện tại', 'Giá', 'Chỉnh sửa'
+    'Mã sản phẩm', 'Tên sản phẩm', '', 'Loại sản phẩm', 'Tồn kho', 'Giá hiện tại', 'Giá', 'Chỉnh sửa'
 ];
 
 const SHOW_ITEMS = [10, 25, 50];
@@ -95,6 +110,11 @@ const SellerProductAll = () => {
 
     const [showItem, setShowItem] = React.useState<number>(10);
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
+
+    const [sort, setSort] = useImmer({
+        id: 0,
+        title: "Sắp xếp theo"
+    });
 
     const [search, setSearch] = React.useState<string>("");
     const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -136,8 +156,8 @@ const SellerProductAll = () => {
         // });
     }
 
-    const fetchProductsPagination = async (limit: number, page: number) => {
-        let response: IData = await getProductsPagination(limit, page);
+    const fetchProductsPagination = async (limit: number, page: number, category: number, sub_category: number, sort: number) => {
+        let response: IData = await getProductsPagination(limit, page, category, sub_category, sort);
         if (response) {
             setProductList(response.product_list);
             setTotalPages(response.page_total);
@@ -155,7 +175,7 @@ const SellerProductAll = () => {
             setShowDeleteBox(false);
             setTimeout(() => {
                 setDataLoading(true);
-                fetchProductsPagination(showItem, 1);
+                fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
             }, 1000);
         } else {
             return;
@@ -244,7 +264,49 @@ const SellerProductAll = () => {
 
             let sub_category_list = await getSubCategoryByCategory(category.id);
             if (sub_category_list) {
-                setSubCategoryList(sub_category_list);
+                setSubCategoryList(
+                    [
+                        {
+                            id: 0,
+                            title: "Tất Cả"
+                        }, 
+                        ...sub_category_list
+                    ]
+                );
+                setProductSubCategory({
+                    id: 0,
+                    title: "Danh mục con"
+                });
+            }
+        }
+    }
+
+    const handleSearchProduct = async () => {
+        let response: any = await getProductSearch(+search);
+        if (response) {
+            setProductList(response.product_list);
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 500);
+        }
+    }
+
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            if (search === "") {
+                if (currentPage === 1) {
+                    fetchProductsPagination(showItem, 1, productCategory.id, productSubCategory.id, sort.id);
+                    return;
+                } else {
+                    setCurrentPage(1);
+                    return;
+                }
+            }
+
+            if (!isNaN(+search)) {
+                handleSearchProduct();
+            } else {
+                setProductList([]);
             }
         }
     }
@@ -261,7 +323,15 @@ const SellerProductAll = () => {
     const fetchCategoryList = async () => {
         let result = await getCategoryList();
         if (result) {
-            setCategoryList(result);
+            setCategoryList(
+                [
+                    {
+                        id: 0,
+                        title: "Tất Cả"
+                    }, 
+                    ...result
+                ]
+            );
         }
     }
 
@@ -300,7 +370,7 @@ const SellerProductAll = () => {
             if (result.EC === 0) {
                 successToast1(result.EM);
                 setUpdate(false);
-                fetchProductsPagination(showItem, currentPage);
+                fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
                 setTimeout(() => {
                     setShowUpdateModal(false);
                 }, 1000);
@@ -311,21 +381,24 @@ const SellerProductAll = () => {
         }
     }
 
-    React.useEffect(() => {
+    const handleSelectSort = (sort: ICategory) => {
+        if (sort) {
+            setSort(draft => {
+                draft.id = sort.id;
+                draft.title = sort.title;
+            });
 
-        if (showItem !== 0) {
             setCurrentPage(1);
-            fetchProductsPagination(showItem, 1);
         }
-
-    }, [showItem]);
+    }
 
     React.useEffect(() => {
 
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        fetchProductsPagination(showItem, currentPage);
+        setDataLoading(true);
+        fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
 
-    }, [currentPage]);
+    }, [currentPage, productCategory, productSubCategory, sort, showItem]);
 
     React.useEffect(() => {
         setTimeout(() => {
@@ -341,35 +414,56 @@ const SellerProductAll = () => {
         <>
             <div className="flex items-center justify-between mb-8">
                 <div className="text-xl">Sản phẩm <span className="text-lg text-gray-400 font-normal">({totalItems} sản phẩm)</span> </div>
-                <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit" OnClick={() => { navigate("/seller-info/product/new"); }}>Thêm Sản Phẩm</Button>
+                <div className="flex items-center gap-x-4">
+                    <div className="w-64 border border-gray-300 py-2 px-3 flex items-center gap-x-2 rounded">
+                        <IoSearch className="text-gray-500 w-4 h-4" />
+                        <input
+                            value={search}
+                            type="text"
+                            placeholder="Tìm theo mã sản phẩm"
+                            className="outline-none w-full"
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyPress={(event) => handleKeyPress(event)}
+                        />
+                    </div>
+                    <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit" OnClick={() => { navigate("/seller-info/product/new"); }}>Thêm Sản Phẩm</Button>
+                </div>
             </div>
-            <div className="w-full flex items-center justify-between mb-6">
-                <div className="w-1/2 border border-gray-300 py-2 px-3 flex items-center gap-x-1 rounded-lg">
-                    <IoSearch className="text-gray-400 w-6 h-6" />
-                    <input
-                        value={search}
-                        type="text"
-                        placeholder="Tìm sản phẩm..."
-                        className="outline-none w-full"
-                        onChange={(e) => setSearch(e.target.value)}
+            <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-x-3">
+                    <div>Hiển thị</div>
+                    <Dropdown data={SHOW_ITEMS} value={showItem} setValue={setShowItem} style={"border border-gray-200 h-10 w-20"} />
+                    <div>sản phẩm</div>
+                </div>
+                <div>
+
+                </div>
+                <div className="flex items-center gap-x-3">
+                    <FilterDropdown
+                        data={categoryList}
+                        value={productCategory}
+                        setValue={handleSelectProductCategory}
+                        style="px-3 py-2 rounded border border-gray-300 w-60"
+                        id={"product-category"}
+                    />
+                    <FilterDropdown
+                        data={subCategoryList}
+                        value={productSubCategory}
+                        setValue={handleSelectProductSubCategory}
+                        style="px-3 py-2 rounded border border-gray-300 w-60"
+                        id={"product-sub-category"}
+                        depend={productCategory.id === 0}
+                    />
+                    <FilterDropdown
+                        data={SORT_LIST}
+                        value={sort}
+                        setValue={handleSelectSort}
+                        style="px-3 py-2 rounded border border-gray-300 w-60"
+                        id={"sort-category"}
                     />
                 </div>
-                <div className="flex items-center gap-x-2">
-                    <div className="text-gray-600 px-3 py-1.5 border border-gray-300 bg-gray-100 flex items-center justify-center gap-x-1 rounded-lg cursor-pointer hover:bg-orange-400 hover:text-white hover:border-orange-400">
-                        <span><MdFilterList className="w-5 h-5" /></span>
-                        <span>Filter</span>
-                    </div>
-                    <div className="text-gray-600 px-3 py-1.5 border border-gray-300 bg-gray-100 flex items-center justify-center gap-x-1 rounded-lg cursor-pointer hover:bg-orange-400 hover:text-white hover:border-orange-400">
-                        <span><TiArrowUnsorted className="w-5 h-5" /></span>
-                        <span>Sort</span>
-                    </div>
-                </div>
             </div>
-            <div className="flex items-center gap-x-3 mb-4">
-                <div>Hiển thị</div>
-                <Dropdown data={SHOW_ITEMS} value={showItem} setValue={setShowItem} style={"border border-gray-200 h-10 w-20"} />
-                <div>sản phẩm</div>
-            </div>
+
             {
                 dataLoading ?
                     <div className="flex items-center justify-center w-full h-screen">
@@ -407,21 +501,26 @@ const SellerProductAll = () => {
                                                 {productList.map((item, index) => {
                                                     return (
                                                         <tr className="border-b border-gray-200" key={`product-${index}`}>
+                                                            <td className="py-3 px-2 text-sm" colSpan={1}>
+                                                                <span className="flex items-center gap-x-1">
+                                                                    {item.id} <span className="cursor-pointer"><CopyClipboard value={item.id} /></span>
+                                                                </span>
+                                                            </td>
                                                             <td className="py-3 px-2" colSpan={2}>
                                                                 <div className="flex items-center gap-x-2">
                                                                     <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.id} />
-                                                                    <div className="line-clamp-2 flex-1 font-medium text-sm cursor-pointer hover:underline hover:text-blue-600">{item.name}</div>
+                                                                    <div className="line-clamp-2 flex-1 font-medium text-sm">{item.name}</div>
                                                                 </div>
                                                             </td>
-                                                            <td className="py-3 px-2">
+                                                            <td className="py-3 px-2" colSpan={1}>
                                                                 {item.sub_category.title !== "" &&
                                                                     <span className="px-3 py-0.5 bg-gray-100 text-sm line-clamp-1 rounded-full w-fit">{item.sub_category.title}</span>
                                                                 }
                                                             </td>
-                                                            <td className="py-3 px-2">{item.quantity}</td>
-                                                            <td className="py-3 px-2"><span className="text-gray-600 font-medium">{CurrencyFormat(item.current_price)}</span></td>
-                                                            <td className="py-3 px-2"><span className="text-gray-600 font-medium">{CurrencyFormat(item.price)}</span></td>
-                                                            <td className="py-3 px-2">
+                                                            <td className="py-3 px-2" colSpan={1}>{item.quantity}</td>
+                                                            <td className="py-3 px-2" colSpan={1}><span className="text-gray-600 font-medium">{CurrencyFormat(item.current_price)}</span></td>
+                                                            <td className="py-3 px-2" colSpan={1}><span className="text-gray-600 font-medium">{CurrencyFormat(item.price)}</span></td>
+                                                            <td className="py-3 px-2" colSpan={1}>
                                                                 <div className="flex gap-4 items-center">
                                                                     <div className="w-8 h-8 bg-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-500 rounded-lg" onClick={() => handleShowUpdateModal(item)}>
                                                                         <RiEdit2Fill className="w-4 h-4 text-white" />

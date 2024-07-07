@@ -246,7 +246,7 @@ const AllOrder = () => {
                 navigate({
                     pathname: "/seller-info/order/order-status",
                     search: `?status=0`,
-        
+
                 }, {
                     replace: true
                 });
@@ -293,6 +293,7 @@ const AllOrder = () => {
                 <div className="text-xl w-1/3">Trạng thái đơn hàng</div>
                 <div className="flex items-center justify-end gap-x-6 w-2/3">
                     <div className="w-64 h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 rounded">
+                        <IoSearch className="text-gray-500 w-4 h-4" />
                         <input
                             value={search}
                             type="text"
@@ -301,7 +302,6 @@ const AllOrder = () => {
                             onChange={(e) => setSearch(e.target.value)}
                             onKeyDown={(event) => handleKeyPress(event)}
                         />
-                        <IoSearch className="text-gray-500 w-4 h-4" />
                     </div>
                     <div className="flex items-center gap-x-1">
                         <DatePicker
