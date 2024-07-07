@@ -152,6 +152,7 @@ const ApiRoute = (app) => {
 
     router.get('/seller/products', checkUserJWT, sellerController.getProductPagination)
     router.get('/seller/order', checkUserJWT, sellerController.getOrderPagination)
+    router.get('/seller/order/search', checkUserJWT, sellerController.getOrderSearch)
     router.put('/seller/order/confirm', checkUserJWT, sellerController.confirmCustomerOrder)
     router.put('/seller/order/packing', checkUserJWT, sellerController.packingCustomerOrder)
     router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);

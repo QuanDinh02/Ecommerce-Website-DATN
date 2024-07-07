@@ -36,8 +36,19 @@ export const getProductsPagination = async (product_display_limit: number, page:
     return null;
 }
 
-export const getOrderAll = async (order_display_limit: number, page: number, status: number) => {
-    let result: APIResponse = await axios.get(`/api/seller/order?limit=${order_display_limit}&page=${page}&status=${status}`);
+export const getOrderSearch = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/order/search?id=${order_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return [];
+}
+
+export const getOrderAll = async (order_display_limit: number, page: number, status: number, startDate: Date | null, endDate: Date | null) => {
+    let start_date = startDate ? startDate : 0;
+    let end_date = endDate ? endDate : 0;
+
+    let result: APIResponse = await axios.get(`/api/seller/order?limit=${order_display_limit}&page=${page}&status=${status}&startDate=${start_date}&endDate=${end_date}`);
     if (result && result?.DT) {
         return result.DT;
     }

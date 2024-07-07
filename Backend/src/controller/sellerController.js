@@ -44,10 +44,10 @@ const getProductPagination = async (req, res) => {
 const getOrderPagination = async (req, res) => {
     try {
 
-        let { limit, page, status } = req.query;
+        let { limit, page, status, startDate, endDate } = req.query;
         let { user } = req;
 
-        let result = await sellerServices.getOrderPagination(+user.seller_id, +limit, +page, +status);
+        let result = await sellerServices.getOrderPagination(+user.seller_id, +limit, +page, +status, startDate, endDate);
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -578,11 +578,32 @@ const getDashboardData = async (req, res) => {
     }
 }
 
+const getOrderSearch = async (req, res) => {
+    try {
+        let { user } = req;
+        let { id } = req.query;
+        let result = await sellerServices.getOrderSearch(+user.seller_id, +id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
     getOrderPagination, getOrderDetail, confirmCustomerOrder, packingCustomerOrder, getShopCategory,
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
-    getDashboardData
+    getDashboardData, getOrderSearch
 }

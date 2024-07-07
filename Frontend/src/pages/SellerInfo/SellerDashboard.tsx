@@ -210,7 +210,7 @@ const SellerDashboard = () => {
                         </div>
                         <div className='mb-10'>
                             <div className="text-black text-lg">Phân Tích Bán Hàng</div>
-                            <div className='text-gray-500 text-sm mb-4'>Tổng quan dữ liệu của shop đối với đơn hàng đã xác nhận</div>
+                            <div className='text-gray-500 text-sm mb-4'>Tổng quan dữ liệu của shop đối với đơn hàng đã giao hàng thành công</div>
                             <div className='w-full flex'>
                                 <ResponsiveContainer width="100%" height={300}>
                                     <BarChart

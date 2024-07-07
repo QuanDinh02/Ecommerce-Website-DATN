@@ -539,13 +539,14 @@ const updateSellerInfo = async (data) => {
     }
 }
 
-const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
+const getOrderPagination = async (shop_seller_id, item_limit, page, status, startDate, endDate) => {
     try {
         if (item_limit > 0) {
 
             let offSet = (page - 1) * item_limit;
 
             if (status == 0) {
+
                 let orderListRaw = await db.Order.findAll({
                     raw: true,
                     attributes: ['id', 'orderDate', 'totalPrice'],
@@ -555,6 +556,31 @@ const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
                         },
                     }
                 });
+
+                if (+startDate !== 0 && +endDate !== 0) {
+
+                    let start_date = new Date(startDate);
+                    let end_date = new Date(endDate);
+
+                    if (start_date.getTime() !== end_date.getTime()) {
+                        orderListRaw = orderListRaw.filter(order => order.orderDate >= start_date && order.orderDate <= end_date);
+                    }
+                    else {
+                        orderListRaw = orderListRaw.filter(order => {
+                            let order_date = new Date(order.orderDate);
+
+                            let order_month = order_date.getMonth() + 1; // months from 1-12
+                            let order_day = order_date.getDate();
+                            let order_year = order_date.getFullYear();
+
+                            let month = start_date.getMonth() + 1; // months from 1-12
+                            let day = start_date.getDate();
+                            let year = start_date.getFullYear();
+
+                            return order_day === day && order_month === month && order_year === year;
+                        });
+                    }
+                }
 
                 const listLength = orderListRaw.length;
                 const pageTotal = Math.ceil(listLength / item_limit);
@@ -617,8 +643,30 @@ const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
                     }
                 });
 
-                const listLength = orderListRaw.length;
-                const pageTotal = Math.ceil(listLength / item_limit);
+                if (+startDate !== 0 && +endDate !== 0) {
+
+                    let start_date = new Date(startDate);
+                    let end_date = new Date(endDate);
+
+                    if (start_date.getTime() !== end_date.getTime()) {
+                        orderListRaw = orderListRaw.filter(order => order.orderDate >= start_date && order.orderDate <= end_date);
+                    }
+                    else {
+                        orderListRaw = orderListRaw.filter(order => {
+                            let order_date = new Date(order.orderDate);
+
+                            let order_month = order_date.getMonth() + 1; // months from 1-12
+                            let order_day = order_date.getDate();
+                            let order_year = order_date.getFullYear();
+
+                            let month = start_date.getMonth() + 1; // months from 1-12
+                            let day = start_date.getDate();
+                            let year = start_date.getFullYear();
+
+                            return order_day === day && order_month === month && order_year === year;
+                        });
+                    }
+                }
 
                 orderListRaw.reverse();
                 //orderListRaw = _(orderListRaw).drop(offSet).take(item_limit).value();
@@ -657,6 +705,9 @@ const getOrderPagination = async (shop_seller_id, item_limit, page, status) => {
                 }));
 
                 let filter_order_list_data = order_list_data.filter(item => item.status.id === status);
+
+                const listLength = filter_order_list_data.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
 
                 let paginate_order_list_data = _(filter_order_list_data).drop(offSet).take(item_limit).value();
 
@@ -1394,7 +1445,7 @@ const getDashboardData = async (seller_id) => {
         let outOfOrder_product_list = format_product_list.filter(product => product.quantity === 0);
         let soon_outOfOrder_product_list_temp = format_product_list.filter(product => product.quantity !== 0);
 
-        let soon_outOfOrder_product_list = _.chain(soon_outOfOrder_product_list_temp).orderBy("quantity","asc").take(3).value();
+        let soon_outOfOrder_product_list = _.chain(soon_outOfOrder_product_list_temp).orderBy("quantity", "asc").take(3).value();
 
         let outOfOrder_product_list_quantity = outOfOrder_product_list.length;
         let soon_outOfOrder_product_list_quantity = soon_outOfOrder_product_list.length;
@@ -1505,6 +1556,90 @@ const getDashboardData = async (seller_id) => {
     }
 }
 
+const getOrderSearch = async (shop_seller_id, order_id) => {
+    try {
+
+        let orderInfo = await db.Order.findOne({
+            raw: true,
+            attributes: ['id', 'orderDate', 'totalPrice'],
+            where: {
+                [Op.and]: [
+                    {
+                        id: {
+                            [Op.eq]: order_id
+                        }
+                    },
+                    {
+                        sellerID: {
+                            [Op.eq]: shop_seller_id,
+                        }
+                    }
+                ]
+
+            }
+        });
+
+        if (orderInfo) {
+            let order_status_raw = await db.Shipment.findAll({
+                limit: 1,
+                raw: true,
+                nest: true,
+                attributes: ['id', 'updatedDate'],
+                include:
+                {
+                    model: db.ShipmentStatus,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    orderID: {
+                        [Op.eq]: +orderInfo.id,
+                    },
+                },
+                order: [
+                    ['updatedDate', 'DESC'],
+                    ['status', 'DESC'],
+                ]
+            });
+
+            let order_status_info = order_status_raw[0];
+
+            let order_status = order_status_info.ShipmentStatus;
+
+            let order_list_data = [
+                {
+                    id: orderInfo.id,
+                    orderDate: orderInfo.orderDate,
+                    totalPrice: orderInfo.totalPrice,
+                    status: order_status
+                }
+            ];
+
+            return {
+                EC: 0,
+                DT: {
+                    order_list: order_list_data
+                },
+                EM: 'Get order search !'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: {
+                    order_list: []
+                },
+                EM: 'Get order search !'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
 
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
@@ -1514,5 +1649,6 @@ module.exports = {
     getOrderDetail, confirmCustomerOrder, packingCustomerOrder,
     getShopCategory, createShopCategory, updateShopCategory,
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
-    addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData
+    addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData,
+    getOrderSearch
 }
