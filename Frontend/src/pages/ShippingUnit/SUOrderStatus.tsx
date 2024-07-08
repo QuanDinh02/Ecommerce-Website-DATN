@@ -3,13 +3,14 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import ReactPaginate from "react-paginate";
 import React from "react";
 import { dateTimeFormat } from "@/utils/dateFormat";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
 import { useImmer } from "use-immer";
 import Button from "@/components/Button";
 import DatePicker from "react-datepicker";
 import { IoSearch, IoFilterOutline } from "react-icons/io5";
-import { getOrderStatus } from "@/services/shippingUnitService";
+import { getOrderSearch, getOrderStatus } from "@/services/shippingUnitService";
+import { errorToast1 } from "@/components/Toast/Toast";
 interface IOrderShipmentStatus {
     id: number
     name: string
@@ -104,6 +105,7 @@ const SUOrderStatus = () => {
     const navigate = useNavigate();
 
     const [search, setSearch] = React.useState<string>("");
+    const [searchParams] = useSearchParams();
 
     const [dateRange, setDateRange] = React.useState([null, null]);
     const [startDate, endDate] = dateRange;
@@ -121,15 +123,12 @@ const SUOrderStatus = () => {
     const [orderStatus, setOrderStatus] = useImmer(ORDER_STATUS);
 
     const hanldeSetOrderStatus = (id: number) => {
-        setOrderCurrentStatus(id);
-        setOrderStatus(draft => {
-            draft.forEach(item => {
-                if (item.id === id) {
-                    item.selected = true;
-                } else {
-                    item.selected = false;
-                }
-            });
+        navigate({
+            pathname: "/fms/su/order/order-status",
+            search: `?status=${id}`,
+
+        }, {
+            replace: true
         });
     }
 
@@ -146,7 +145,7 @@ const SUOrderStatus = () => {
     }
 
     const fetchAllOrder = async (limit: number, page: number, status: number) => {
-        let response: IData = await getOrderStatus(limit, page, status);
+        let response: IData = await getOrderStatus(limit, page, status, startDate, endDate);
         if (response) {
             setOrderList(response.order_list);
             setTotalPages(response.page_total);
@@ -156,39 +155,95 @@ const SUOrderStatus = () => {
         }
     }
 
-    React.useEffect(() => {
+    const handleFilterOrderDate = () => {
+        if (startDate === null && endDate === null) {
+            fetchAllOrder(showItem, 1, orderCurrentStatus);
+            return;
+        }
 
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        setDataLoading(true);
-        fetchAllOrder(showItem, currentPage, orderCurrentStatus);
+        if (startDate === null || endDate === null) {
+            errorToast1("Khoảng thời gian không hợp lệ");
+            return;
+        }
 
-    }, [currentPage]);
-
-    React.useEffect(() => {
-
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        setDataLoading(true);
-        setCurrentPage(1);
         fetchAllOrder(showItem, 1, orderCurrentStatus);
+    }
 
-    }, [orderCurrentStatus]);
+    const searchOrderByOrderID = async (order_id: number) => {
+        let response: any = await getOrderSearch(order_id);
+        if (response) {
+            setOrderList(response.order_list);
+            setTimeout(() => {
+                setDataLoading(false);
+            }, 1000);
+        }
+    }
+
+    const handleKeyPress = async (event) => {
+
+        if (event.key === 'Enter') {
+            if (search === "") {
+                navigate({
+                    pathname: "/fms/su/order/order-status",
+                    search: `?status=0`,
+
+                }, {
+                    replace: true
+                });
+            }
+            else {
+                setDataLoading(true);
+                searchOrderByOrderID(+search);
+            }
+        }
+    }
+
+    React.useEffect(() => {
+
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+
+        let order_status = searchParams.get('status');
+
+        let activeOrderStatus: number = order_status ? +order_status : 0;
+
+        if (activeOrderStatus !== orderCurrentStatus) {
+            setOrderCurrentStatus(activeOrderStatus);
+            setOrderStatus(draft => {
+                draft.forEach(item => {
+                    if (item.id === activeOrderStatus) {
+                        item.selected = true;
+                    } else {
+                        item.selected = false;
+                    }
+                });
+            });
+            setDataLoading(true);
+            setCurrentPage(1);
+            fetchAllOrder(showItem, 1, activeOrderStatus);
+        } else {
+            setDataLoading(true);
+            fetchAllOrder(showItem, currentPage, orderCurrentStatus);
+        }
+
+    }, [searchParams.get('status'), currentPage]);
 
     return (
         <>
             <div className="search-bar flex items-center justify-between mb-4">
                 <div className="text-xl w-1/3">Trạng thái đơn hàng</div>
-                <div className="flex items-center justify-between gap-x-16 w-2/3">
-                    <div className="flex items-center gap-x-2 flex-1">
-                        <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 rounded">
-                            <input
-                                value={search}
-                                type="text"
-                                placeholder="Tìm mã đơn hàng"
-                                className="outline-none w-full text-sm rounded"
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                            <IoSearch className="text-gray-500 w-4 h-4" />
-                        </div>
+                <div className="flex items-center justify-end gap-x-6 w-2/3">
+                    <div className="w-64 h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 rounded">
+                        <IoSearch className="text-gray-500 w-4 h-4" />
+                        <input
+                            value={search}
+                            type="text"
+                            placeholder="Tìm theo mã đơn hàng"
+                            className="outline-none w-full text-sm rounded"
+                            onChange={(e) => setSearch(e.target.value)}
+                            onKeyDown={(event) => handleKeyPress(event)}
+                        />
+                    </div>
+                    <div className="flex items-center gap-x-1">
                         <DatePicker
                             showIcon
                             selectsRange={true}
@@ -201,8 +256,8 @@ const SUOrderStatus = () => {
                             className="border border-gray-300 rounded"
                             dateFormat="dd/MM/yyyy"
                         />
+                        <Button styles="transition duration-300 bg-blue-600 text-white border border-blue-600 px-4 py-1.5 rounded hover:text-blue-600 hover:bg-white cursor-pointer flex items-center gap-x-2 font-medium" OnClick={() => handleFilterOrderDate()}><IoFilterOutline /> Xem</Button>
                     </div>
-                    <Button styles="bg-blue-600 text-white px-4 py-1.5 rounded hover:opacity-80 cursor-pointer flex items-center gap-x-2 font-medium"><IoFilterOutline /> Xem</Button>
                 </div>
             </div>
             <div className="tab-list w-full mb-2">

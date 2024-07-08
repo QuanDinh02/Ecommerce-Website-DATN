@@ -9,12 +9,23 @@ export const getShippingUnits = async () => {
     return null;
 }
 
-export const getOrderStatus = async (order_display_limit: number, page: number, status: number) => {
-    let result: APIResponse = await axios.get(`/api/shipping-unit/order?limit=${order_display_limit}&page=${page}&status=${status}`);
+export const getOrderStatus = async (order_display_limit: number, page: number, status: number, startDate: Date | null, endDate: Date | null) => {
+    let start_date = startDate ? startDate : 0;
+    let end_date = endDate ? endDate : 0;
+    
+    let result: APIResponse = await axios.get(`/api/shipping-unit/order?limit=${order_display_limit}&page=${page}&status=${status}&startDate=${start_date}&endDate=${end_date}`);
     if (result && result?.DT) {
         return result.DT;
     }
     return null;
+}
+
+export const getOrderSearch = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/shipping-unit/order/search?id=${order_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return [];
 }
 
 export const getSUOrderDetail = async (order_id: number) => {

@@ -181,6 +181,7 @@ const ApiRoute = (app) => {
 
     // SHIPPING UNIT:
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
+    router.get('/shipping-unit/order/search', checkSysUserJWT, shippingUnitController.getOrderSearch)
     router.get('/shipping-unit/order', checkSysUserJWT, shippingUnitController.getOrderStatus);
     router.get('/shipping-unit/order/detail', checkSysUserJWT, shippingUnitController.getOrderDetail);
     router.put('/shipping-unit/order/received-confirmation', checkSysUserJWT, shippingUnitController.confirmReceiveOrderSeller);

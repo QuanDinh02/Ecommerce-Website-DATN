@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { ThreeDots } from "react-loader-spinner";
 import Button from "@/components/Button";
 import DatePicker from "react-datepicker";
-import { IoSearch, IoFilterOutline } from "react-icons/io5";
+import { IoFilterOutline } from "react-icons/io5";
 import { confirmReceiveOrderSeller, getOrderStatus } from "@/services/shippingUnitService";
 import Modal from "@/components/Modal";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
@@ -68,8 +68,6 @@ const SUOrderReceipt = () => {
 
     const navigate = useNavigate();
 
-    const [search, setSearch] = React.useState<string>("");
-
     const [dateRange, setDateRange] = React.useState([null, null]);
     const [startDate, endDate] = dateRange;
 
@@ -96,7 +94,7 @@ const SUOrderReceipt = () => {
     }
 
     const fetchAllOrder = async (limit: number, page: number, status: number) => {
-        let response: IData = await getOrderStatus(limit, page, status);
+        let response: IData = await getOrderStatus(limit, page, status, startDate, endDate);
         if (response) {
             setOrderList(response.order_list);
             setTotalPages(response.page_total);
@@ -109,6 +107,20 @@ const SUOrderReceipt = () => {
     const handleShowConfirmBox = (order_id: number) => {
         setUpdateOrder(order_id);
         setShowConfirmBox(true);
+    }
+
+    const handleFilterOrderDate = () => {
+        if (startDate === null && endDate === null) {
+            fetchAllOrder(showItem, 1, ORDER_STATUS);
+            return;
+        }
+
+        if (startDate === null || endDate === null) {
+            errorToast1("Khoảng thời gian không hợp lệ");
+            return;
+        }
+
+        fetchAllOrder(showItem, 1, ORDER_STATUS);
     }
 
     const handleConfirmOrder = async (order_id: number, order_status: number) => {
@@ -138,31 +150,12 @@ const SUOrderReceipt = () => {
 
     }, [currentPage]);
 
-    React.useEffect(() => {
-
-        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-        setDataLoading(true);
-        setCurrentPage(1);
-        fetchAllOrder(showItem, 1, ORDER_STATUS);
-
-    }, [ORDER_STATUS]);
-
     return (
         <>
             <div className="search-bar flex items-center justify-between mb-4">
                 <div className="text-xl w-1/3">Lấy hàng nhà bán</div>
-                <div className="flex items-center justify-between gap-x-16 w-2/3">
-                    <div className="flex items-center gap-x-2 flex-1">
-                        <div className="w-full h-10 bg-white py-2 px-3 flex items-center gap-x-3 border border-gray-200 rounded">
-                            <input
-                                value={search}
-                                type="text"
-                                placeholder="Tìm mã đơn hàng"
-                                className="outline-none w-full text-sm rounded"
-                                onChange={(e) => setSearch(e.target.value)}
-                            />
-                            <IoSearch className="text-gray-500 w-4 h-4" />
-                        </div>
+                <div className="flex items-center justify-end w-2/3">
+                    <div className="flex items-center gap-x-1">
                         <DatePicker
                             showIcon
                             selectsRange={true}
@@ -175,8 +168,8 @@ const SUOrderReceipt = () => {
                             className="border border-gray-300 rounded"
                             dateFormat="dd/MM/yyyy"
                         />
+                        <Button styles="transition duration-300 bg-blue-600 text-white border border-blue-600 px-4 py-1.5 rounded hover:text-blue-600 hover:bg-white cursor-pointer flex items-center gap-x-2 font-medium" OnClick={() => handleFilterOrderDate()}><IoFilterOutline /> Xem</Button>
                     </div>
-                    <Button styles="bg-blue-600 text-white px-4 py-1.5 rounded hover:opacity-80 cursor-pointer flex items-center gap-x-2 font-medium"><IoFilterOutline /> Xem</Button>
                 </div>
             </div>
             <div>

@@ -130,7 +130,6 @@ const SystemLogin = () => {
                                     <div className='mb-2 text-gray-500 font-medium tracking-wide'>PASSWORD</div>
                                     <input type="password" className="form_system_input" onChange={(e) => handleOnChange('password', e.target.value)} onKeyPress={(event) => handleKeyPress(event)} />
                                 </div>
-                                <div className="my-2 text-blue-600 hover:underline cursor-pointer font-medium w-fit">Forget password?</div>
                                 <div className='mt-6 w-full'>
                                     <Button
                                         styles={checkFullField() ? 'form_button_system_valid' : 'form_button'}

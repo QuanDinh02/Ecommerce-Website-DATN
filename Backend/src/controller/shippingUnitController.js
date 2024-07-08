@@ -21,10 +21,31 @@ const getShippingUnitList = async (req, res) => {
 const getOrderStatus = async (req, res) => {
     try {
 
-        let { limit, page, status } = req.query;
+        let { limit, page, status, startDate, endDate } = req.query;
         let { user } = req;
 
-        let result = await shippingUnitServices.getOrderStatus(+user.shipping_unit_id, +limit, +page, +status);
+        let result = await shippingUnitServices.getOrderStatus(+user.shipping_unit_id, +limit, +page, +status, startDate, endDate);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getOrderSearch = async (req, res) => {
+    try {
+        let { user } = req;
+        let { id } = req.query;
+        let result = await shippingUnitServices.getOrderSearch(+user.shipping_unit_id, +id);
+
         return res.status(200).json({
             EC: result.EC,
             DT: result.DT,
@@ -130,5 +151,6 @@ const handleConfirmCompleteShippingOrder = async (req, res) => {
 
 module.exports = {
     getShippingUnitList, getOrderStatus, getOrderDetail, 
-    confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder
+    confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder,
+    getOrderSearch
 }
