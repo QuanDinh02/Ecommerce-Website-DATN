@@ -1,5 +1,5 @@
 import LoadImage from "@/components/LoadImage";
-import { addProductToCategoryShop, getShopCategoryDetailExist, getShopCategoryDetailNotExist, removeProductOutCategoryShop } from "@/services/sellerService";
+import { addProductToCategoryShop, getCategoryList, getShopCategoryDetailExist, getShopCategoryDetailNotExist, removeProductOutCategoryShop } from "@/services/sellerService";
 import React from "react";
 import { ThreeDots } from "react-loader-spinner";
 import ReactPaginate from "react-paginate";
@@ -7,6 +7,8 @@ import { useSearchParams } from "react-router-dom";
 import { useImmer } from "use-immer";
 import { FiPlusCircle, FiMinusCircle } from "react-icons/fi";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
+import { getSubCategoryByCategory } from "@/services/subCategoryService";
+import FilterDropdown from "@/components/FilterDropdown";
 
 const PRODUCT_DISPLAY_LIMIT = 50;
 
@@ -28,6 +30,16 @@ interface IProductListFetch {
     product_list: IProduct[]
 }
 
+interface ICategory {
+    id: number
+    title: string
+}
+
+interface ISubCategory {
+    id: number
+    title: string
+}
+
 const ShopCategoryDetail = () => {
 
     const [searchParams] = useSearchParams();
@@ -40,6 +52,9 @@ const ShopCategoryDetail = () => {
 
     const [currentPageExist, setCurrentPageExist] = React.useState<number>(1);
     const [currentPageNotExist, setCurrentPageNotExist] = React.useState<number>(1);
+
+    const [categoryList, setCategoryList] = React.useState<ICategory[]>([]);
+    const [subCategoryList, setSubCategoryList] = React.useState<ISubCategory[]>([]);
 
     const [isExist, setIsExist] = React.useState<boolean>(true);
 
@@ -59,6 +74,66 @@ const ShopCategoryDetail = () => {
         }
     ]);
 
+    const [productCategory, setProductCategory] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm"
+    });
+
+    const [productSubCategory, setProductSubCategory] = useImmer({
+        id: 0,
+        title: "Chọn danh mục sản phẩm con"
+    });
+
+    const handleSelectProductCategory = async (category: ICategory) => {
+        if (category) {
+            setProductCategory(draft => {
+                draft.id = category.id;
+                draft.title = category.title;
+            });
+
+            let sub_category_list = await getSubCategoryByCategory(category.id);
+            if (sub_category_list) {
+                setSubCategoryList(
+                    [
+                        {
+                            id: 0,
+                            title: "Tất Cả"
+                        },
+                        ...sub_category_list
+                    ]
+                );
+                setProductSubCategory({
+                    id: 0,
+                    title: "Danh mục con"
+                });
+            }
+        }
+    }
+
+    const handleSelectProductSubCategory = (sub_category: ISubCategory) => {
+        if (sub_category) {
+            setProductSubCategory(draft => {
+                draft.id = sub_category.id;
+                draft.title = sub_category.title;
+            })
+        }
+    }
+
+    const fetchCategoryList = async () => {
+        let result = await getCategoryList();
+        if (result) {
+            setCategoryList(
+                [
+                    {
+                        id: 0,
+                        title: "Tất Cả"
+                    },
+                    ...result
+                ]
+            );
+        }
+    }
+
     const fetchProductExistInCategory = async () => {
         let result: IProductListFetch = await getShopCategoryDetailExist(shopCategoryID, currentPageExist, PRODUCT_DISPLAY_LIMIT);
         if (result) {
@@ -72,7 +147,7 @@ const ShopCategoryDetail = () => {
     }
 
     const fetchProductNotExistInCategory = async () => {
-        let result: IProductListFetch = await getShopCategoryDetailNotExist(currentPageNotExist, PRODUCT_DISPLAY_LIMIT);
+        let result: IProductListFetch = await getShopCategoryDetailNotExist(currentPageNotExist, PRODUCT_DISPLAY_LIMIT, productCategory.id, productSubCategory.id);
         if (result) {
             setTotalPages(result.page_total);
             setTotalItems(result.total_items);
@@ -134,6 +209,10 @@ const ShopCategoryDetail = () => {
     }
 
     React.useEffect(() => {
+        fetchCategoryList();
+    }, []);
+
+    React.useEffect(() => {
         if (shopCategoryID !== 0) {
             setDataLoading(true);
             fetchProductExistInCategory();
@@ -160,6 +239,12 @@ const ShopCategoryDetail = () => {
         }
 
     }, [currentPageNotExist]);
+
+    React.useEffect(() => {
+        if (tabs[1].selected) {
+            fetchProductNotExistInCategory();
+        }
+    }, [productCategory, productSubCategory]);
 
     React.useEffect(() => {
 
@@ -205,8 +290,28 @@ const ShopCategoryDetail = () => {
                     })
                 }
             </div>
-            <div>
-                <div className="mb-4">Tổng <span className="font-medium text-red-500">{totalItems}</span> sản phẩm</div>
+            <div className="flex items-center justify-between mb-6">
+                <div>Tổng <span className="font-medium text-red-500">{totalItems}</span> sản phẩm</div>
+                {
+                    tabs[1].selected &&
+                    <div className="flex items-center gap-x-3">
+                        <FilterDropdown
+                            data={categoryList}
+                            value={productCategory}
+                            setValue={handleSelectProductCategory}
+                            style="px-3 py-2 rounded border border-gray-300 w-60"
+                            id={"product-category"}
+                        />
+                        <FilterDropdown
+                            data={subCategoryList}
+                            value={productSubCategory}
+                            setValue={handleSelectProductSubCategory}
+                            style="px-3 py-2 rounded border border-gray-300 w-60"
+                            id={"product-sub-category"}
+                            depend={productCategory.id === 0}
+                        />
+                    </div>
+                }
             </div>
             {
                 dataLoading ?
@@ -245,7 +350,7 @@ const ShopCategoryDetail = () => {
                                             })
                                         }
                                     </div>
-                                    <div className='pagination-container my-4 flex justify-center'>
+                                    <div className='pagination-review-container my-4 flex justify-center'>
                                         <ReactPaginate
                                             nextLabel=">"
                                             onPageChange={handlePageClickExist}
@@ -289,7 +394,7 @@ const ShopCategoryDetail = () => {
                                             })
                                         }
                                     </div>
-                                    <div className='pagination-container my-4 flex justify-center'>
+                                    <div className='pagination-review-container my-4 flex justify-center'>
                                         <ReactPaginate
                                             nextLabel=">"
                                             onPageChange={handlePageClickNotExist}

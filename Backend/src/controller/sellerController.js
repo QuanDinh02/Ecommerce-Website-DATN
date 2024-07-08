@@ -447,8 +447,8 @@ const getShopCategoryDetailExist = async (req, res) => {
 const getShopCategoryDetailNotExist = async (req, res) => {
     try {
         let { user } = req;
-        let { limit, page } = req.query;
-        let result = await sellerServices.getShopCategoryDetailNotExist(+user.seller_id, +limit, +page);
+        let { limit, page, category_id, sub_category_id } = req.query;
+        let result = await sellerServices.getShopCategoryDetailNotExist(+user.seller_id, +limit, +page, +category_id, +sub_category_id);
 
         if (result) {
             return res.status(200).json({

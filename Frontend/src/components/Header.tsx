@@ -423,19 +423,33 @@ const Header = () => {
                 <div className={headerSectionTopStyle}>
                     {
                         scrollPosition > 144 ?
-                            <div className='categories relative cursor-pointer'
-                                onClick={() => setShowMenu(!showMenu)}>
-                                <div className='main'>
-                                    <FiMenu className="w-8 h-8" />
-                                    <span className='text-lg'>Danh mục</span>
-                                </div>
-                                {
-                                    showMenu &&
-                                    <div className='absolute top-[3.375rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
-                                        <CategoryMenu />
+                            <>
+                                {userRole !== "seller" ?
+                                    <div className='categories relative cursor-pointer'
+                                        onClick={() => setShowMenu(!showMenu)}>
+                                        <div className='main'>
+                                            <FiMenu className="w-8 h-8" />
+                                            <span className='text-lg'>Danh mục</span>
+                                        </div>
+                                        {
+                                            showMenu &&
+                                            <div className='absolute top-[3.375rem] z-50 text-black font-normal' onMouseLeave={() => handleShowMenu(false, true)}>
+                                                <CategoryMenu />
+                                            </div>
+                                        }
+                                    </div>
+                                    :
+                                    <div className='logo flex items-center gap-x-6'>
+                                        <div className='cursor-default'>
+                                            <span className='text-black'>Fox</span>
+                                            <span className='text-white'>Mart</span>
+                                        </div>
+                                        <div className='text-black font-normal cursor-default'>Người bán</div>
                                     </div>
                                 }
-                            </div>
+
+                            </>
+
                             :
                             <>
                                 {userRole === "customer" ?

@@ -178,9 +178,9 @@ export const getShopCategoryDetailExist = async (category_id: number, page: numb
     return null;
 }
 
-export const getShopCategoryDetailNotExist = async (page: number, limit: number) => {
+export const getShopCategoryDetailNotExist = async (page: number, limit: number, category_id: number, sub_category_id: number) => {
 
-    let result: APIResponse = await axios.get(`/api/seller/shop/category/detail/not-exist?page=${page}&limit=${limit}`);
+    let result: APIResponse = await axios.get(`/api/seller/shop/category/detail/not-exist?page=${page}&limit=${limit}&category_id=${category_id}&sub_category_id=${sub_category_id}`);
     if (result && result.EC === 0) {
         return result.DT;
     }

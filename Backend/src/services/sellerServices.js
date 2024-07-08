@@ -1452,13 +1452,13 @@ const getShopCategoryDetailExist = async (category_id, item_limit, page) => {
     }
 }
 
-const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
+const getShopCategoryDetailNotExist = async (seller_id, item_limit, page, category_id, sub_category_id) => {
     try {
         if (item_limit > 0) {
 
             let offSet = (page - 1) * item_limit;
 
-            let categoryList = await db.SubCategory.findAll({
+            let shopCategoryList = await db.SubCategory.findAll({
                 raw: true,
                 attributes: ['id', 'title'],
                 where: {
@@ -1466,10 +1466,74 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
                         [Op.eq]: +seller_id
                     }
                 }
-            })
+            });
 
-            if (categoryList.length !== 0) {
-                let category_id_list = categoryList.map(item => item.id);
+            let shop_category_list = shopCategoryList.map(item => +item.id);
+
+            if (category_id !== 0 && sub_category_id === 0) {
+
+                let subCategoryList = await db.SubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'title'],
+                    where: {
+                        categoryID: {
+                            [Op.eq]: category_id,
+                        },
+                    }
+                });
+
+                let sub_category_list = await subCategoryList.map(item => item.id);
+
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: seller_id
+                            }
+                        }
+                    },
+                    where: {
+                        [Op.and]: [
+                            {
+                                subCategoryID: {
+                                    [Op.in]: sub_category_list
+                                }
+                            },
+                            {
+                                subCategoryID: {
+                                    [Op.notIn]: shop_category_list
+                                }
+                            }
+                        ]
+                    },
+                    order: [['id', 'DESC']]
+                });
+
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
+
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let product_list_format = productListRaw.map(item => item.Product);
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: product_list_format
+                    },
+                    EM: 'Get products not exist in shop category !'
+                }
+            }
+
+            else if (sub_category_id !== 0) {
 
                 let productListRaw = await db.ProductSubCategory.findAll({
                     raw: true,
@@ -1485,41 +1549,7 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
                     },
                     where: {
                         subCategoryID: {
-                            [Op.notIn]: category_id_list,
-                        },
-                    },
-                    order: [['id', 'DESC']]
-                });
-
-                const listLength = productListRaw.length;
-                const pageTotal = Math.ceil(listLength / item_limit);
-
-                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
-
-                let product_list_format = productListRaw.map(item => item.Product);
-
-                return {
-                    EC: 0,
-                    DT: {
-                        page: page,
-                        page_total: pageTotal,
-                        total_items: listLength,
-                        product_list: product_list_format
-                    },
-                    EM: 'Get products not exist in shop category !'
-                }
-            } else {
-
-                let productListRaw = await db.ProductSubCategory.findAll({
-                    raw: true,
-                    nest: true,
-                    include: {
-                        model: db.Product,
-                        attributes: ['id', 'name'],
-                        where: {
-                            shop_id: {
-                                [Op.eq]: seller_id
-                            }
+                            [Op.eq]: sub_category_id
                         }
                     },
                     order: [['id', 'DESC']]
@@ -1542,21 +1572,47 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page) => {
                     },
                     EM: 'Get products not exist in shop category !'
                 }
-
             }
 
-            // return {
-            //     EC: 0,
-            //     DT: {
-            //         page: page,
-            //         page_total: pageTotal,
-            //         total_items: listLength,
-            //         product_list: product_list_format
-            //     },
-            //     EM: 'Get products by shop category !'
-            // } 
+            else {
+                let productListRaw = await db.ProductSubCategory.findAll({
+                    raw: true,
+                    nest: true,
+                    include: {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                        where: {
+                            shop_id: {
+                                [Op.eq]: seller_id
+                            }
+                        }
+                    },
+                    where: {
+                        subCategoryID: {
+                            [Op.notIn]: shop_category_list
+                        }
+                    },
+                    order: [['id', 'DESC']]
+                });
 
+                const listLength = productListRaw.length;
+                const pageTotal = Math.ceil(listLength / item_limit);
 
+                productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
+
+                let product_list_format = productListRaw.map(item => item.Product);
+
+                return {
+                    EC: 0,
+                    DT: {
+                        page: page,
+                        page_total: pageTotal,
+                        total_items: listLength,
+                        product_list: product_list_format
+                    },
+                    EM: 'Get products not exist in shop category !'
+                }
+            }
         }
 
         return {
