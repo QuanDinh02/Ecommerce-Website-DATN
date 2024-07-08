@@ -172,13 +172,22 @@ const FavoriteProductPage = () => {
                                                                     </td>
                                                                     <td className="py-3 px-2">{CurrencyFormat(item.price)}</td>
                                                                     <td className="py-3 px-2">
-                                                                        <div
-                                                                            className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 hover:opacity-80 cursor-pointer"
-                                                                            onClick={() => handleAddShoppingCart(item.product_info.id)}
-                                                                        >
-                                                                            <IoBagHandleOutline className="w-5 h-5" />
-                                                                            <span>Thêm vào giỏ hàng</span>
-                                                                        </div>
+                                                                        {
+                                                                            item.product_info.quantity > 0 ?
+                                                                                <div
+                                                                                    className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 hover:opacity-80 cursor-pointer"
+                                                                                    onClick={() => handleAddShoppingCart(item.product_info.id)}
+                                                                                >
+                                                                                    <IoBagHandleOutline className="w-5 h-5" />
+                                                                                    <span>Thêm vào giỏ hàng</span>
+                                                                                </div>
+                                                                                :
+                                                                                <div
+                                                                                    className="text-black py-4 bg-[#FCB800] rounded-[4px] text-center font-medium w-[12.5rem] flex items-center justify-center gap-x-2 opacity-50 cursor-not-allowed">
+                                                                                    <IoBagHandleOutline className="w-5 h-5" />
+                                                                                    <span>Thêm vào giỏ hàng</span>
+                                                                                </div>
+                                                                        }
                                                                     </td>
                                                                     <td className="py-3 px-2"><VscTrash className="text-gray-600 hover:text-red-500 w-6 h-6 cursor-pointer" onClick={() => {
                                                                         setDeleteWishListId(item.id);

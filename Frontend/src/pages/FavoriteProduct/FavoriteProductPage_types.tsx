@@ -1,6 +1,7 @@
 export interface IProductInfo {
     id: number
     name: string
+    quantity: number
     image: string
 }
 

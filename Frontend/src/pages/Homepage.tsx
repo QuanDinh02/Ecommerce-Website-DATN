@@ -6,7 +6,7 @@ import { GoDotFill, GoStarFill } from "react-icons/go";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { PiShoppingCartLight } from "react-icons/pi";
-import { successToast1 } from "@/components/Toast/Toast";
+import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoIosArrowForward, IoMdHeartEmpty } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
@@ -193,7 +193,7 @@ const RecommendItemList = (props: IProps) => {
             saveCustomerSearch(product_name);
 
             updateProductRecommendClick(product_id);
-            
+
             navigate({
                 pathname: "/product",
                 search: `?id=${product_id}`,
@@ -226,7 +226,12 @@ const RecommendItemList = (props: IProps) => {
                                     <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                         <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                             e.stopPropagation();
-                                            hanldeAddShoppingCart(1, item.id);
+                                            if (item.quantity > 0) {
+                                                hanldeAddShoppingCart(1, item.id);
+                                            } else {
+                                                errorToast1("Sản phẩm hết hàng");
+                                                return;
+                                            }
                                         }}>
                                             <PiShoppingCartLight className="w-6 h-6 " />
                                             <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -406,7 +411,12 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
-                                                hanldeAddShoppingCart(1, item.id);
+                                                if (item.quantity > 0) {
+                                                    hanldeAddShoppingCart(1, item.id);
+                                                } else {
+                                                    errorToast1("Sản phẩm hết hàng");
+                                                    return;
+                                                }
                                             }}>
                                                 <PiShoppingCartLight className="w-6 h-6 " />
                                                 <div className="tooltip-box absolute top-[-40px] flex flex-col items-center">
@@ -766,16 +776,34 @@ const Homepage = () => {
                             className="ql-no-border ql-line-clamp-3"
                         />
                         <div className="flex items-end gap-x-4">
-                            <div>
-                                <div className="mb-1">Số lượng</div>
-                                <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 select-none px-2">
-                                    <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
-                                    <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
-                                    <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
-                                </div>
-                            </div>
-                            <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(amount, productQuickView.id)}>Thêm vào giỏ hàng</div>
-                            <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
+                            {
+                                productQuickView.quantity > 0 ?
+                                    <>
+                                        <div>
+                                            <div className="mb-1">Số lượng</div>
+                                            <div className="w-28 h-11 border border-gray-300 flex items-center hover:border-black duration-300 select-none px-2">
+                                                <FiMinus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount - 1)} />
+                                                <input type="text" className="w-1/2 text-center outline-none select-none" value={amount} onChange={(e) => handleProductAmount(e.target.value)} />
+                                                <FiPlus className="w-6 h-6 cursor-pointer text-gray-400 hover:text-black duration-300" onClick={(e) => handleProductAmount(amount + 1)} />
+                                            </div>
+                                        </div>
+                                        <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] hover:opacity-80 cursor-pointer" onClick={() => hanldeAddShoppingCart(amount, productQuickView.id)}>Thêm vào giỏ hàng</div>
+                                        <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
+                                    </>
+                                    :
+                                    <>
+                                        <div>
+                                            <div className="mb-1">Số lượng</div>
+                                            <div className="w-28 h-11 border border-gray-300 flex items-center select-none px-2 cursor-not-allowed">
+                                                <FiMinus className="w-6 h-6 text-gray-400" />
+                                                <input type="text" className="w-1/2 text-center outline-none select-none cursor-not-allowed opacity-50" value={amount} />
+                                                <FiPlus className="w-6 h-6 text-gray-400" />
+                                            </div>
+                                        </div>
+                                        <div className="w-52 py-3 font-medium bg-[#FCB800] text-center rounded-[4px] opacity-50 cursor-not-allowed">Thêm vào giỏ hàng</div>
+                                        <div className="text-gray-600 hover:text-red-500 duration-300 cursor-pointer" onClick={() => handleAddFavouriteItem(productQuickView.id)}><FaRegHeart className="w-7 h-7" /></div>
+                                    </>
+                            }
                         </div>
                     </div>
                 </div>
