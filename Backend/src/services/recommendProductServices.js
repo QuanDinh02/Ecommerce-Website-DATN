@@ -727,19 +727,9 @@ const getRelevantRecommendProducts = async (item_id) => {
 
         let productList = await Promise.all(relevant_product_list.map(async item => {
 
-            let productInfo = await db.Product.findOne({
+            let productExist = await db.Product.findOne({
                 raw: true,
-                nest: true,
-                attributes: ['id', 'name', 'summary', 'shop_id'],
-                include: [{
-                    model: db.Seller,
-                    attributes: ['id', 'shopName']
-                },
-                {
-                    model: db.ProductRating,
-                    attributes: ['rating'],
-                }
-                ],
+                attributes: ['id'],
                 where: {
                     id: {
                         [Op.eq]: item.item_rec
@@ -747,48 +737,75 @@ const getRelevantRecommendProducts = async (item_id) => {
                 }
             });
 
-            let seller_info = {
-                id: productInfo.Seller.id,
-                name: productInfo.Seller.shopName,
-            }
-
-            let productType = await db.ProductType.findOne({
-                raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
-                where: {
-                    productID: {
-                        [Op.eq]: item.item_rec
+            if (productExist) {
+                let productInfo = await db.Product.findOne({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'name', 'summary', 'shop_id'],
+                    include: [{
+                        model: db.Seller,
+                        attributes: ['id', 'shopName']
+                    },
+                    {
+                        model: db.ProductRating,
+                        attributes: ['rating'],
                     }
+                    ],
+                    where: {
+                        id: {
+                            [Op.eq]: item.item_rec
+                        }
+                    }
+                });
+
+                let seller_info = {
+                    id: productInfo.Seller.id,
+                    name: productInfo.Seller.shopName,
                 }
-            });
 
-            // const getObjectParams = {
-            //     Bucket: bucketName,
-            //     Key: `${item.item_rec}.jpeg`
-            // }
+                let productType = await db.ProductType.findOne({
+                    raw: true,
+                    attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                    where: {
+                        productID: {
+                            [Op.eq]: item.item_rec
+                        }
+                    }
+                });
 
-            // const command = new GetObjectCommand(getObjectParams);
-            // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                // const getObjectParams = {
+                //     Bucket: bucketName,
+                //     Key: `${item.item_rec}.jpeg`
+                // }
 
-            return {
-                id: productInfo.id,
-                name: productInfo.name,
-                seller_info: seller_info,
-                summary: productInfo.summary,
-                //image: url,
-                image: "",
-                current_price: productType.currentPrice,
-                price: productType.price,
-                sold: productType.sold,
-                rating: productInfo.ProductRating.rating,
-                quantity: productType.quantity
+                // const command = new GetObjectCommand(getObjectParams);
+                // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                return {
+                    id: productInfo.id,
+                    name: productInfo.name,
+                    seller_info: seller_info,
+                    summary: productInfo.summary,
+                    //image: url,
+                    image: "",
+                    current_price: productType.currentPrice,
+                    price: productType.price,
+                    sold: productType.sold,
+                    rating: productInfo.ProductRating.rating,
+                    quantity: productType.quantity
+                }
+            }
+            else {
+                return null;
             }
         }));
+
+        let productFinal = productList.filter(item => item !== null);
 
         return {
             EC: 0,
             DT: {
-                product_list: productList
+                product_list: productFinal
             },
             EM: "Recommend relevant products !"
         }

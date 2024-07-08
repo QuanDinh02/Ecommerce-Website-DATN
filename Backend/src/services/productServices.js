@@ -259,13 +259,131 @@ const getProductsHistory = async (item_limit, page, data) => {
 
             let offSet = (page - 1) * item_limit;
 
-            const listLength = data.length;
+            let productList = await Promise.all(data.map(async item => {
+
+                let productExist = await db.Product.findOne({
+                    raw: true,
+                    attributes: ['id'],
+                    where: {
+                        id: {
+                            [Op.eq]: item
+                        }
+                    }
+                });
+
+                if (productExist) {
+                    let productInfo = await db.Product.findOne({
+                        raw: true,
+                        nest: true,
+                        attributes: ['id', 'name', 'summary', 'shop_id'],
+                        include: [
+                            {
+                                model: db.Seller,
+                                attributes: ['id', 'shopName']
+                            },
+                            {
+                                model: db.ProductRating,
+                                attributes: ['rating'],
+                            }
+                        ],
+                        where: {
+                            id: {
+                                [Op.eq]: item
+                            }
+                        }
+                    });
+
+                    let seller_info = {
+                        id: productInfo.Seller.id,
+                        name: productInfo.Seller.shopName,
+                    }
+
+                    let productType = await db.ProductType.findOne({
+                        raw: true,
+                        attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
+                        where: {
+                            productID: {
+                                [Op.eq]: item
+                            }
+                        }
+                    });
+
+                    // const getObjectParams = {
+                    //     Bucket: bucketName,
+                    //     Key: `${item}.jpeg`
+                    // }
+
+                    // const command = new GetObjectCommand(getObjectParams);
+                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        seller_info: seller_info,
+                        summary: productInfo.summary,
+                        //image: url,
+                        image: "",
+                        current_price: productType.currentPrice,
+                        price: productType.price,
+                        sold: productType.sold,
+                        rating: productInfo.ProductRating.rating,
+                        quantity: productType.quantity
+                    }
+                }
+                else {
+                    return null;
+                }
+
+            }));
+
+            let productFinal = productList.filter(item => item !== null);
+
+            const listLength = productFinal.length;
             const pageTotal = Math.ceil(listLength / item_limit);
 
-            let limit_data = _(data).drop(offSet).take(item_limit).value();
+            let limit_data = _(productFinal).drop(offSet).take(item_limit).value();
 
-            let productList = await Promise.all(limit_data.map(async item => {
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    product_list: limit_data
+                },
+                EM: "History products !"
+            }
+        }
+        return {
+            EC: -1,
+            DT: "",
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
 
+const getProductsHistorySwiper = async (data) => {
+    try {
+
+        let productList = await Promise.all(data.map(async item => {
+
+            let productExist = await db.Product.findOne({
+                raw: true,
+                attributes: ['id'],
+                where: {
+                    id: {
+                        [Op.eq]: item
+                    }
+                }
+            });
+
+            if (productExist) {
                 let productInfo = await db.Product.findOne({
                     raw: true,
                     nest: true,
@@ -323,103 +441,20 @@ const getProductsHistory = async (item_limit, page, data) => {
                     rating: productInfo.ProductRating.rating,
                     quantity: productType.quantity
                 }
-            }));
-
-            return {
-                EC: 0,
-                DT: {
-                    page: page,
-                    page_total: pageTotal,
-                    product_list: productList
-                },
-                EM: "History products !"
             }
-        }
-        return {
-            EC: -1,
-            DT: "",
-            EM: 'ITEM LIMIT is invalid !'
-        }
-    } catch (error) {
-        console.log(error);
-        return {
-            EC: -2,
-            DT: [],
-            EM: 'Something is wrong on services !',
-        }
-    }
-}
-
-const getProductsHistorySwiper = async (data) => {
-    try {
-
-        let limit_data = _(data).take(20).value();
-
-        let productList = await Promise.all(limit_data.map(async item => {
-
-            let productInfo = await db.Product.findOne({
-                raw: true,
-                nest: true,
-                attributes: ['id', 'name', 'summary', 'shop_id'],
-                include: [
-                    {
-                        model: db.Seller,
-                        attributes: ['id', 'shopName']
-                    },
-                    {
-                        model: db.ProductRating,
-                        attributes: ['rating'],
-                    }
-                ],
-                where: {
-                    id: {
-                        [Op.eq]: item
-                    }
-                }
-            });
-
-            let seller_info = {
-                id: productInfo.Seller.id,
-                name: productInfo.Seller.shopName,
-            }
-
-            let productType = await db.ProductType.findOne({
-                raw: true,
-                attributes: ['id', 'currentPrice', 'price', 'sold', 'quantity'],
-                where: {
-                    productID: {
-                        [Op.eq]: item
-                    }
-                }
-            });
-
-            // const getObjectParams = {
-            //     Bucket: bucketName,
-            //     Key: `${item}.jpeg`
-            // }
-
-            // const command = new GetObjectCommand(getObjectParams);
-            // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
-
-            return {
-                id: productInfo.id,
-                name: productInfo.name,
-                seller_info: seller_info,
-                summary: productInfo.summary,
-                //image: url,
-                image: "",
-                current_price: productType.currentPrice,
-                price: productType.price,
-                sold: productType.sold,
-                rating: productInfo.ProductRating.rating,
-                quantity: productType.quantity
+            else {
+                return null;
             }
         }));
+
+        let productFinal = productList.filter(item => item !== null);
+
+        let limit_data = _(productFinal).take(20).value();
 
         return {
             EC: 0,
             DT: {
-                product_list: productList
+                product_list: limit_data
             },
             EM: "History products !"
         }

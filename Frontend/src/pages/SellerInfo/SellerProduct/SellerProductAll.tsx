@@ -182,13 +182,18 @@ const SellerProductAll = () => {
 
     const handleDeleteProduct = async (product_id: number) => {
         let result = await deleteProduct(product_id);
-        if (result && result.EC === 0) {
-            successToast1(result.EM);
-            setShowDeleteBox(false);
-            setTimeout(() => {
-                setDataLoading(true);
-                fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
-            }, 1000);
+        if (result) {
+            if (result.EC === 0) {
+                successToast1(result.EM);
+                setShowDeleteBox(false);
+                setTimeout(() => {
+                    setDataLoading(true);
+                    fetchProductsPagination(showItem, currentPage, productCategory.id, productSubCategory.id, sort.id);
+                }, 1000);
+            } else {
+                errorToast1(result.EM);
+                return;
+            }
         } else {
             return;
         }

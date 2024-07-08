@@ -275,12 +275,12 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                     }
                 })
 
+                productListFormat.reverse();
+
                 const listLength = productListRaw.length;
                 const pageTotal = Math.ceil(listLength / item_limit);
 
                 let productListFormatPangination = handleSortData(productListFormat, sort_id, offSet, item_limit);
-
-                productListFormatPangination.reverse();
 
                 let productListFinalWithImage = await Promise.all(productListFormatPangination.map(async item => {
 
@@ -571,32 +571,72 @@ const updateProduct = async (data) => {
 
 const deleteProduct = async (product_id) => {
     try {
-        await db.Product.destroy({
+
+        let wishListItem = await db.WishList.findOne({
+            raw: true,
+            attributes: ['id'],
             where: {
-                id: +product_id
+                productID: {
+                    [Op.eq]: +product_id
+                }
             },
         });
 
-        await db.ProductType.destroy({
+        let cartItem = await db.CartItem.findOne({
+            raw: true,
+            attributes: ['id'],
             where: {
-                productID: +product_id
+                productID: {
+                    [Op.eq]: +product_id
+                }
             },
         });
 
-        await db.ProductSubCategory.destroy({
+        let orderItem = await db.OrderItem.findOne({
+            raw: true,
+            attributes: ['id'],
             where: {
-                productID: +product_id
+                productID: {
+                    [Op.eq]: +product_id
+                }
             },
         });
 
-        let file_path = path.resolve(__dirname, `../../../Frontend/src/assets/img/products/${product_id}.jpeg`);
+        if (wishListItem || cartItem || orderItem) {
+            return {
+                EC: -1,
+                DT: '',
+                EM: 'Không thể xóa sản phẩm !'
+            }
+        } else {
+            await db.Product.destroy({
+                where: {
+                    id: +product_id
+                },
+            });
 
-        await fs.remove(file_path);
-        return {
-            EC: 0,
-            DT: '',
-            EM: 'Xóa sản phẩm thành công !'
+            await db.ProductType.destroy({
+                where: {
+                    productID: +product_id
+                },
+            });
+
+            await db.ProductSubCategory.destroy({
+                where: {
+                    productID: +product_id
+                },
+            });
+
+            let file_path = path.resolve(__dirname, `../../../Frontend/src/assets/img/products/${product_id}.jpeg`);
+
+            await fs.remove(file_path);
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Xóa sản phẩm thành công !'
+            }
         }
+
     } catch (error) {
         console.log(error);
         return {
