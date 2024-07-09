@@ -50,3 +50,11 @@ export const handleCompleteShippingOrder = async (order_id: number) => {
     let result: APIResponse = await axios.put('/api/shipping-unit/order/complete-shipping', { id: order_id });
     return result;
 }
+
+export const getSUDashboardData = async () => {
+    let result: APIResponse = await axios.get('/api/shipping-unit/dashboard');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}

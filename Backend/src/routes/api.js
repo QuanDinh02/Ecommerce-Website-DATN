@@ -180,6 +180,7 @@ const ApiRoute = (app) => {
     router.delete('/seller/shop/category/product/:id', checkUserJWT, sellerController.removeProductOutCategoryShop);
 
     // SHIPPING UNIT:
+    router.get('/shipping-unit/dashboard', checkSysUserJWT, shippingUnitController.getDashboardData);
     router.get('/shipping-unit/list', shippingUnitController.getShippingUnitList);
     router.get('/shipping-unit/order/search', checkSysUserJWT, shippingUnitController.getOrderSearch)
     router.get('/shipping-unit/order', checkSysUserJWT, shippingUnitController.getOrderStatus);

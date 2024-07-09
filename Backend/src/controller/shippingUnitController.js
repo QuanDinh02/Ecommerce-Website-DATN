@@ -149,8 +149,31 @@ const handleConfirmCompleteShippingOrder = async (req, res) => {
     }
 }
 
+const getDashboardData = async (req, res) => {
+    try {
+
+        let { user } = req;
+        let result = await shippingUnitServices.getDashboardData(+user.shipping_unit_id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getShippingUnitList, getOrderStatus, getOrderDetail, 
     confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder,
-    getOrderSearch
+    getOrderSearch, getDashboardData
 }

@@ -188,7 +188,7 @@ const SUOrderComplete = () => {
                             />
                         </div>
                         :
-                        <table className="table-fixed w-full mb-8">
+                        <table className="table-fixed w-full mb-2">
                             <thead>
                                 <tr className='bg-gray-100 border-b-10 border-white'>
                                     {tableHeaders && tableHeaders.length > 0 &&

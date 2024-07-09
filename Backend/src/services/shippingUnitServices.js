@@ -598,6 +598,35 @@ const handleConfirmCompleteShippingOrder = async (order_id) => {
             orderID: order_id
         });
 
+        let order_item_list = await db.OrderItem.findAll({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'quantity', 'price'],
+            include: [
+                {
+                    raw: true,
+                    nest: true,
+                    model: db.Product,
+                    attributes: ['id', 'name'],
+                    include: {
+                        raw: true,
+                        model: db.ProductType,
+                        attributes: ['id']
+                    }
+                }
+            ],
+            where: {
+                orderID: {
+                    [Op.eq]: +order_id
+                }
+            }
+        });
+
+        await Promise.all(order_item_list.map(async order_item => {
+            let productInfo = order_item.Product;
+            await db.ProductType.increment({ sold: +order_item.quantity }, { where: { id: productInfo.ProductType.id } });
+        }))
+
         if (result) {
             return {
                 EC: 0,
@@ -623,8 +652,89 @@ const handleConfirmCompleteShippingOrder = async (order_id) => {
     }
 }
 
+const getDashboardData = async (shipping_unit_id) => {
+    try {
+
+        let pending_shipper_get = 0;
+        let shipping = 0;
+        let shipping_success = 0;
+        let customer_using_service = 0;
+
+        let orderListRaw = await db.Order.findAll({
+            raw: true,
+            attributes: ['id', 'orderDate', 'totalPrice'],
+            where: {
+                shippingUnit: {
+                    [Op.eq]: shipping_unit_id,
+                },
+            }
+        });
+
+        customer_using_service = orderListRaw.length;
+
+        await Promise.all(orderListRaw.map(async item => {
+
+            let order_status_raw = await db.Shipment.findAll({
+                limit: 1,
+                raw: true,
+                nest: true,
+                attributes: ['id', 'updatedDate'],
+                include:
+                {
+                    model: db.ShipmentStatus,
+                    attributes: ['id', 'name'],
+                },
+                where: {
+                    orderID: {
+                        [Op.eq]: +item.id,
+                    },
+                },
+                order: [
+                    ['updatedDate', 'DESC'],
+                    ['status', 'DESC'],
+                ]
+            });
+
+            let order_status_info = order_status_raw[0];
+
+            let order_status_id = order_status_info.ShipmentStatus.id;
+
+            if (order_status_id === 3) {
+                pending_shipper_get += 1;
+            }
+
+            if (order_status_id === 6) {
+                shipping += 1;
+            }
+
+            if (order_status_id === 7) {
+                shipping_success += 1;
+            }
+        }));
+
+        let overview_data = [pending_shipper_get, shipping, shipping_success, customer_using_service];
+
+        let data = {
+            overview_data: overview_data
+        }
+
+        return {
+            EC: 0,
+            DT: data,
+            EM: 'Get shipping unit dashboard data !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getShippingUnitList, getOrderStatus, getOrderDetail,
     confirmReceiveOrderSeller, handleShippingOrder, handleConfirmCompleteShippingOrder,
-    getOrderSearch
+    getOrderSearch, getDashboardData
 }
