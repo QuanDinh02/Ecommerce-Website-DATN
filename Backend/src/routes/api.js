@@ -167,7 +167,7 @@ const ApiRoute = (app) => {
     router.get('/seller/subcategories/:category_id', cacheMiddleware(300), sellerController.getSubCategoryList);
 
     router.get('/seller/info', checkUserJWT, sellerController.getSellerInfo);
-    router.put('/seller/info', checkUserJWT, sellerController.updateSellerInfo);
+    router.post('/seller/info', checkUserJWT, upload.single('image'), sellerController.updateSellerInfo);
 
     router.get('/seller/order/detail', checkUserJWT, sellerController.getOrderDetail);
     router.get('/seller/shop/category', checkUserJWT, sellerController.getShopCategory);

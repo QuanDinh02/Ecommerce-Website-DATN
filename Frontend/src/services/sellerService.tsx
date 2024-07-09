@@ -26,6 +26,7 @@ interface IUpdateSellerInfo {
     mobile: string
     gender: number
     birth: Date
+    image: File | null
 }
 
 export const getProductsPagination = async (product_display_limit: number, page: number, category: number, sub_category: number, sort: number) => {
@@ -124,7 +125,20 @@ export const getSellerInfo = async () => {
 }
 
 export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
-    let result: APIResponse = await axios.put('/api/seller/info', data);
+
+    const build_data = new FormData();
+    build_data.append('name', data.name);
+    build_data.append('mobile', data.mobile);
+    build_data.append('gender', `${data.gender}`);
+    build_data.append('birth', `${data.birth}`);
+    build_data.append('image', data.image ? data.image : "");
+
+    let result: APIResponse = await axios.post(`/api/seller/info`, build_data, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+
     return result;
 }
 

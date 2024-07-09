@@ -4,7 +4,6 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import configCors from './config/cors';
 import ApiRoute from './routes/api';
-import fileUpload from 'express-fileupload';
 //import connection from './config/connectDB';
 
 //For env File 
@@ -24,8 +23,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //config cookie parser
 app.use(cookieParser());
-
-app.use(fileUpload());
 
 // Routes
 ApiRoute(app);

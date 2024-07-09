@@ -7,6 +7,22 @@ const fs = require('fs-extra')
 import dotenv from 'dotenv';
 dotenv.config();
 
+const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY
+const secretAccessKey = process.env.SECRET_ACCESS_KEY;
+
+const s3 = new S3Client({
+    credentials: {
+        accessKeyId: accessKey,
+        secretAccessKey: secretAccessKey
+    },
+    region: bucketRegion
+});
+
 const SORT_TYPE_ORDER = [['desc'], ['asc']];
 
 const handleSortData = (data, sort_id, off_set, limit) => {
@@ -852,9 +868,19 @@ const getSellerInfo = async (seller_id) => {
             }
         })
 
+        const getObjectParams = {
+            Bucket: bucketName,
+            Key: `seller_${seller_id}.jpeg`
+        }
+
+        const command = new GetObjectCommand(getObjectParams);
+        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
         return {
             EC: 0,
-            DT: customerInfo,
+            DT: {
+                ...customerInfo, image: url
+            },
             EM: 'Customer Info !'
         }
     } catch (error) {
@@ -867,24 +893,59 @@ const getSellerInfo = async (seller_id) => {
     }
 }
 
-const updateSellerInfo = async (data) => {
+const updateSellerInfo = async (data, image_file) => {
     try {
-        await db.Seller.update({
-            name: data.name,
-            mobile: data.mobile,
-            gender: data.gender,
-            birth: data.birth
-        }, {
-            where: {
-                id: +data.id
-            }
-        });
+        let { id } = data;
 
-        return {
-            EC: 0,
-            DT: '',
-            EM: 'Cập nhật thông tin thành công'
+        if (image_file && image_file !== "") {
+            let imageName = `seller_${id}.jpeg`;
+
+            const params = {
+                Bucket: bucketName,
+                Key: imageName,
+                Body: image_file.buffer,
+                ContentType: image_file.mimetype
+            }
+
+            const command = new PutObjectCommand(params);
+
+            await s3.send(command);
+
+            await db.Seller.update({
+                name: data.name,
+                mobile: data.mobile,
+                gender: data.gender,
+                birth: data.birth
+            }, {
+                where: {
+                    id: +id
+                }
+            });
+
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Cập nhật thông tin thành công'
+            }
+        } else {
+            await db.Seller.update({
+                name: data.name,
+                mobile: data.mobile,
+                gender: data.gender,
+                birth: data.birth
+            }, {
+                where: {
+                    id: +id
+                }
+            });
+
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Cập nhật thông tin thành công'
+            }
         }
+
     } catch (error) {
         console.log(error);
         return {

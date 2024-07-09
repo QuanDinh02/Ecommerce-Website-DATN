@@ -353,13 +353,14 @@ const packingCustomerOrder = async (req, res) => {
 
 const updateSellerInfo = async (req, res) => {
     try {
+
         let { user } = req;
 
         let data = {
             ...req.body, id: +user.seller_id
         }
-
-        let result = await sellerServices.updateSellerInfo(data);
+        
+        let result = await sellerServices.updateSellerInfo(data, req.file);
 
         if (result) {
             return res.status(200).json({

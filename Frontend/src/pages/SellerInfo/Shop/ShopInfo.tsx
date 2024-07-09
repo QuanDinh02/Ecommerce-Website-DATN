@@ -44,7 +44,6 @@ const ShopInfo = () => {
             else {
                 setShopImage(URL.createObjectURL(image));
                 setImageFile(image);
-                console.log(image);
             }
         }
     }

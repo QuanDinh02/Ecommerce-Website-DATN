@@ -136,13 +136,6 @@ const CustomerInfo = () => {
                     :
                     <div className="px-[30px] w-[80rem] mx-auto py-8 flex gap-x-4">
                         <div className="customer-info__sidebar w-1/3 flex flex-col gap-x-2 w-60">
-                            <div className="p-3 flex items-center gap-x-2 mb-2">
-                                <div className="w-12 h-12 border rounded-full border-gray-600 flex items-center justify-center"><AiOutlineUser className="w-6 h-6 text-gray-500" /></div>
-                                <div>
-                                    <div className="user_name font-bold" onClick={() => navigate("/customer-info/account")}>{account.username}</div>
-                                    <div className="text-gray-500 flex items-center cursor-pointer hover:underline gap-x-1"><MdModeEdit /> Sửa hồ sơ</div>
-                                </div>
-                            </div>
                             <Accordion data={SideBar} user_type="customer" />
                         </div>
                         <div className="customer-info__content w-2/3 flex-1">

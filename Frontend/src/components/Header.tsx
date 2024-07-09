@@ -639,7 +639,7 @@ const Header = () => {
                                                     <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer w-full' onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowInfoSettingBox(false);
-                                                        navigate("/seller-info/dashboard");
+                                                        navigate("/seller-info/profile");
                                                     }}>Thông Tin Người Bán</div>
                                                 }
                                                 <div className='info-item py-2.5 px-5 font-medium hover:bg-gray-100 hover:text-green-500 cursor-pointer' onClick={() => handleUserLogout()}>Đăng Xuất</div>
