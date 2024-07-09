@@ -199,6 +199,7 @@ const ApiRoute = (app) => {
     router.put('/admin/customer/account', checkSysUserJWT, adminController.updateAccountStatus);
     router.get('/admin/seller', checkSysUserJWT, adminController.getSellerData);
     router.get('/admin/seller/search', checkSysUserJWT, adminController.getSellerSearch);
+    router.get('/admin/seller/detail', checkSysUserJWT, adminController.getSellerInfoDetail);
     router.get('/admin/shipping-unit', checkSysUserJWT, adminController.getShippingUnitData);
     router.get('/admin/shipping-unit/search', checkSysUserJWT, adminController.getShippingUnitSearch);
     router.post('/admin/shipping-unit', checkSysUserJWT, adminController.createShippingUnit);

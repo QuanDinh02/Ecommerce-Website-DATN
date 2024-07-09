@@ -1,16 +1,22 @@
 import Button from "@/components/Button"
 import CopyClipboard from "@/components/CopyClipboard"
 import { Dropdown } from "@/components/Dropdown"
-import { getSellerList, getSellerSearch, updateAccountStatus } from "@/services/adminService"
+import { getSellerDetailInfo, getSellerList, getSellerSearch, updateAccountStatus } from "@/services/adminService"
 import React from "react"
-import { IoSearch } from "react-icons/io5"
+import { IoCalendarOutline, IoSearch } from "react-icons/io5"
 import { ThreeDots } from "react-loader-spinner"
 import ReactPaginate from "react-paginate"
-import { FaPlus } from "react-icons/fa6";
 import ToggleButton from "@/components/ToggleButton"
 import { useImmer } from "use-immer"
 import Modal from "@/components/Modal"
 import { errorToast1, successToast1 } from "@/components/Toast/Toast"
+import { LuUser2 } from "react-icons/lu"
+import { AiOutlineMail } from "react-icons/ai"
+import { BsGenderAmbiguous } from "react-icons/bs"
+import { HiOutlinePhone } from "react-icons/hi2"
+import { PiCake, PiStorefrontLight } from "react-icons/pi"
+import { TfiLocationPin } from "react-icons/tfi";
+import { dateFormat } from "@/utils/dateFormat"
 
 interface IShop {
     id: number
@@ -26,6 +32,17 @@ interface ISellerActive {
     id: number
     uid: number
     active: boolean
+}
+
+interface ISellerInfoDetail {
+    name: string
+    email: string
+    mobile: string
+    address: string
+    gender: number
+    birth: Date
+    join_date: Date
+    shopName: string
 }
 
 const customerTableHeaders = [
@@ -74,12 +91,24 @@ const SellerManagement = () => {
 
     const [sellerList, setSellerList] = useImmer<IShop[]>([]);
     const [showActiveBox, setShowActiveBox] = React.useState<boolean>(false);
+    const [showInfoBox, setShowInfoBox] = React.useState<boolean>(false);
 
     const [sellerActive, setSellerActive] = useImmer<ISellerActive>({
         id: 0,
         uid: 0,
         active: false
     });
+
+    const [sellerInfoDetail, setSellerInfoDetail] = useImmer<ISellerInfoDetail>({
+        name: "",
+        email: "",
+        mobile: "",
+        address: "",
+        gender: 1,
+        birth: new Date(),
+        join_date: new Date(),
+        shopName: ""
+    })
 
     const [dataLoading, setDataLoading] = React.useState<boolean>(true);
     const [currentPage, setCurrentPage] = React.useState<number>(1);
@@ -167,6 +196,25 @@ const SellerManagement = () => {
                 errorToast1(result.EM);
                 return;
             }
+        }
+    }
+
+    const handleShowSellerDetailInfo = async (seller_id: number) => {
+        let result: ISellerInfoDetail | null = await getSellerDetailInfo(seller_id);
+        if (result) {
+
+            setSellerInfoDetail(draft => {
+                draft.name = result.name;
+                draft.email = result.email;
+                draft.mobile = result.mobile;
+                draft.address = result.address;
+                draft.gender = result.gender;
+                draft.birth = result.birth;
+                draft.join_date = result.join_date;
+                draft.shopName = result.shopName;
+            });
+
+            setShowInfoBox(true);
         }
     }
 
@@ -266,7 +314,7 @@ const SellerManagement = () => {
                                                                 </div>
                                                             </td>
                                                             <td className="py-4 px-3 text-center" colSpan={2}>
-                                                                <span className="cursor-pointer hover:underline hover:text-blue-500">Thông tin</span>
+                                                                <span className="cursor-pointer hover:underline hover:text-blue-500" onClick={() => handleShowSellerDetailInfo(item.id)}>Thông tin</span>
                                                             </td>
                                                         </tr>
                                                     )
@@ -313,6 +361,76 @@ const SellerManagement = () => {
                     }
                 </div>
             </div>
+            <Modal show={showInfoBox} setShow={setShowInfoBox} size="customize-h-auto" close_icon={true}>
+                <div className="text-xl mb-12 text-center">THÔNG TIN NGƯỜI BÁN</div>
+                <div className="w-full flex items-center justify-center">
+                    <div className="w-2/3 grid grid-cols-2 gap-x-20 mb-8">
+                        <div className="flex flex-col gap-y-6">
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <LuUser2 className="w-6 h-6" />
+                                    <div className="font-medium">Họ và Tên</div>
+                                </div>
+                                <div className="text-right"><span>{sellerInfoDetail.name}</span></div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <PiCake className="w-6 h-6" />
+                                    <div className="font-medium">Ngày sinh</div>
+                                </div>
+                                <div>{dateFormat(`${sellerInfoDetail.birth}`)}</div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <BsGenderAmbiguous className="w-6 h-6" />
+                                    <div className="font-medium">Giới tính</div>
+                                </div>
+                                <div>{sellerInfoDetail.gender === 1 ? "Nam" : "Nữ"}</div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <HiOutlinePhone className="w-6 h-6" />
+                                    <div className="font-medium">Số điện thoại</div>
+                                </div>
+                                <div>{sellerInfoDetail.mobile}</div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-y-6">
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <PiStorefrontLight className="w-6 h-6" />
+                                    <div className="font-medium">Tên shop</div>
+                                </div>
+                                <div className="text-right"><span>{sellerInfoDetail.shopName}</span></div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <IoCalendarOutline className="w-6 h-6" />
+                                    <div className="font-medium">Ngày tham gia</div>
+                                </div>
+                                <div>{dateFormat(`${sellerInfoDetail.join_date}`)}</div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2 shrink-0">
+                                    <TfiLocationPin className="w-6 h-6" />
+                                    <div className="font-medium">Địa chỉ</div>
+                                </div>
+                                <div className="text-right"><span>{sellerInfoDetail.address}</span></div>
+                            </div>
+                            <div className="flex items-center gap-x-2 justify-between">
+                                <div className="flex items-center gap-x-2">
+                                    <AiOutlineMail className="w-6 h-6" />
+                                    <div className="font-medium">Email</div>
+                                </div>
+                                <div className="text-right"><span>{sellerInfoDetail.email}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div className="flex items-center justify-end">
+                    <Button styles="rounded-[4px] px-8 py-2 border border-gray-200 text-black hover:bg-gray-200 cursor-pointer duration-200" OnClick={() => setShowInfoBox(false)}>Thoát</Button>
+                </div>
+            </Modal>
             <Modal show={showActiveBox} setShow={setShowActiveBox} size="delete-confirmation-box" close_icon={true}>
                 <div className="delete-confirmation-box w-full h-full relative flex flex-col justify-between">
                     {

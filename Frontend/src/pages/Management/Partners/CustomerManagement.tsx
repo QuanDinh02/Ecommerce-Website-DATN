@@ -356,36 +356,48 @@ const CustomerManagement = () => {
             <Modal show={showInfoBox} setShow={setShowInfoBox} size="customize-h-auto" close_icon={true}>
                 <div className="text-xl mb-12 text-center">THÔNG TIN KHÁCH HÀNG</div>
                 <div className="w-full flex items-center justify-center">
-                    <div className="w-2/3 grid grid-cols-2 gap-x-6 gap-y-8 mb-8">
-                        <div className="flex items-center gap-x-2">
-                            <LuUser2 className="w-6 h-6" />
-                            <div className="font-medium">Họ và Tên</div>
-                            <div>{customerInfoDetail.name}</div>
+                    <div className="w-2/3 grid grid-cols-2 gap-x-20 gap-y-8 mb-8">
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <LuUser2 className="w-6 h-6" />
+                                <div className="font-medium">Họ và Tên</div>
+                            </div>
+                            <div className="text-right"><span>{customerInfoDetail.name}</span></div>
                         </div>
-                        <div className="flex items-center gap-x-2">
-                            <AiOutlineMail className="w-6 h-6" />
-                            <div className="font-medium">Email</div>
-                            <div>{customerInfoDetail.email}</div>
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <AiOutlineMail className="w-6 h-6" />
+                                <div className="font-medium">Email</div>
+                            </div>
+                            <div className="text-right"><span>{customerInfoDetail.email}</span></div>
                         </div>
-                        <div className="flex items-center gap-x-2">
-                            <BsGenderAmbiguous className="w-6 h-6" />
-                            <div className="font-medium">Giới tính</div>
-                            <div>{customerInfoDetail.gender === 1 ? "Nam" : "Nữ"}</div>
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <BsGenderAmbiguous className="w-6 h-6" />
+                                <div className="font-medium">Giới tính</div>
+                            </div>
+                            <div className="text-right"><span>{customerInfoDetail.gender === 1 ? "Nam" : "Nữ"}</span></div>
                         </div>
-                        <div className="flex items-center gap-x-2">
-                            <HiOutlinePhone className="w-6 h-6" />
-                            <div className="font-medium">Điện thoại</div>
-                            <div>{customerInfoDetail.mobile}</div>
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <HiOutlinePhone className="w-6 h-6" />
+                                <div className="font-medium">Số điện thoại</div>
+                            </div>
+                            <div className="text-right"><span>{customerInfoDetail.mobile}</span></div>
                         </div>
-                        <div className="flex items-center gap-x-2">
-                            <PiCake className="w-6 h-6" />
-                            <div className="font-medium">Ngày sinh</div>
-                            <div>{dateFormat(`${customerInfoDetail.birth}`)}</div>
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <PiCake className="w-6 h-6" />
+                                <div className="font-medium">Ngày sinh</div>
+                            </div>
+                            <div className="text-right"><span>{dateFormat(`${customerInfoDetail.birth}`)}</span></div>
                         </div>
-                        <div className="flex items-center gap-x-2">
-                            <IoCalendarOutline className="w-6 h-6" />
-                            <div className="font-medium">Ngày tham gia</div>
-                            <div>{dateFormat(`${customerInfoDetail.join_date}`)}</div>
+                        <div className="flex items-center gap-x-2 justify-between">
+                            <div className="flex items-center gap-x-2">
+                                <IoCalendarOutline className="w-6 h-6" />
+                                <div className="font-medium">Ngày tham gia</div>
+                            </div>
+                            <div className="text-right"><span>{dateFormat(`${customerInfoDetail.join_date}`)}</span></div>
                         </div>
                     </div>
                 </div>

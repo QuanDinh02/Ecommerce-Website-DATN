@@ -98,6 +98,14 @@ export const getSellerSearch = async (search: string) => {
     return null;
 }
 
+export const getSellerDetailInfo = async (seller_id: number) => {
+    let result: APIResponse = await axios.get(`/api/admin/seller/detail?seller_id=${seller_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
 export const getShippingUnitList = async (shipping_display_limit: number, page: number) => {
     let result: APIResponse = await axios.get(`/api/admin/shipping-unit?limit=${shipping_display_limit}&page=${page}`);
     if (result && result?.DT) {

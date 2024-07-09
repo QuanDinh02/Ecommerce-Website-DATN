@@ -382,7 +382,7 @@ const getCustomerInfoDetail = async (customer_id) => {
         let customerInfo = await db.Customer.findOne({
             raw: true,
             nest: true,
-            attributes: ['name', 'mobile', 'email','gender','birth'],
+            attributes: ['name', 'mobile', 'email', 'gender', 'birth'],
             include: {
                 model: db.User,
                 attributes: ['registeredAt']
@@ -402,7 +402,7 @@ const getCustomerInfoDetail = async (customer_id) => {
                 email: customerInfo.email,
                 gender: customerInfo.gender,
                 birth: customerInfo.birth,
-                join_date:customerInfo.User.registeredAt
+                join_date: customerInfo.User.registeredAt
             }
 
             return {
@@ -415,7 +415,7 @@ const getCustomerInfoDetail = async (customer_id) => {
         return {
             EC: -1,
             DT: null,
-            EM: 'Customer not existed !'
+            EM: 'Customer is not existed !'
         }
 
     } catch (error) {
@@ -428,7 +428,6 @@ const getCustomerInfoDetail = async (customer_id) => {
     }
 
 }
-
 
 const getCustomerSearch = async (search_content) => {
     try {
@@ -648,6 +647,61 @@ const getSellerSearch = async (search_content) => {
             EM: 'Something is wrong on services !',
         }
     }
+}
+
+const getSellerInfoDetail = async (seller_id) => {
+    try {
+
+        let sellerInfo = await db.Seller.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['name', 'mobile', 'email', 'gender', 'birth','shopName', 'address'],
+            include: {
+                model: db.User,
+                attributes: ['registeredAt']
+            },
+            where: {
+                id: {
+                    [Op.eq]: +seller_id
+                }
+            }
+        });
+
+        if (sellerInfo) {
+
+            let data = {
+                name: sellerInfo.name,
+                mobile: sellerInfo.mobile,
+                address: sellerInfo.address,
+                email: sellerInfo.email,
+                gender: sellerInfo.gender,
+                birth: sellerInfo.birth,
+                join_date: sellerInfo.User.registeredAt,
+                shopName: sellerInfo.shopName
+            }
+
+            return {
+                EC: 0,
+                DT: data,
+                EM: 'Get seller info detail !'
+            }
+        }
+
+        return {
+            EC: -1,
+            DT: null,
+            EM: 'Seller is not existed !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
 }
 
 const getShippingUnitData = async (item_limit, page) => {
@@ -920,5 +974,5 @@ module.exports = {
     getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
     getShippingUnitData, getShippingUnitSearch, createShippingUnit, updateShippingUnit,
-    updateShippingUnitPassword, updateAccountStatus, getCustomerInfoDetail
+    updateShippingUnitPassword, updateAccountStatus, getCustomerInfoDetail, getSellerInfoDetail
 }

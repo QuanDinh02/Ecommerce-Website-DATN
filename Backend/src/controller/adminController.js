@@ -168,7 +168,6 @@ const getCustomerInfoDetail = async (req, res) => {
     }
 }
 
-
 const getSellerData = async (req, res) => {
     try {
 
@@ -202,6 +201,36 @@ const getSellerSearch = async (req, res) => {
             DT: result.DT,
             EM: result.EM
         })
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getSellerInfoDetail = async (req, res) => {
+    try {
+        let { user } = req;
+        let { seller_id } = req.query;
+
+        if (user.role === "admin") {
+            let result = await adminServices.getSellerInfoDetail(+seller_id);
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            });
+        } else {
+            return res.status(401).json({
+                EC: -1,
+                DT: "",
+                EM: "Bạn không có quyền thao tác"
+            })
+        }
 
     } catch (error) {
         console.log(error);
@@ -328,5 +357,5 @@ module.exports = {
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
     getShippingUnitData, getShippingUnitSearch, createShippingUnit,
     updateShippingUnit, updateShippingUnitPassword, updateAccountStatus,
-    getCustomerInfoDetail
+    getCustomerInfoDetail, getSellerInfoDetail
 }

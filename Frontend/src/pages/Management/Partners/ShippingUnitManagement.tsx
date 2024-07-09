@@ -39,7 +39,7 @@ const suTableHeaders = [
     },
     {
         name: "Địa chỉ",
-        size: 1,
+        size: 2,
         style: "",
     },
     {
@@ -54,7 +54,7 @@ const suTableHeaders = [
     },
     {
         name: "",
-        size: 2,
+        size: 1,
         style: "",
     },
 ];
@@ -319,7 +319,7 @@ const ShippingUnitManagement = () => {
                                                             <td className="py-4 px-3" colSpan={1}>
                                                                 <span className="line-clamp-2">{item.nameUnit}</span>
                                                             </td>
-                                                            <td className="py-4 px-3" colSpan={1}>
+                                                            <td className="py-4 px-3" colSpan={2}>
                                                                 <span className="line-clamp-2">{item.address}</span>
                                                             </td>
                                                             <td className="py-4 px-3" colSpan={1}>
@@ -328,12 +328,8 @@ const ShippingUnitManagement = () => {
                                                             <td className="py-4 px-3" colSpan={1}>
                                                                 <span className="line-clamp-2">{item.description}</span>
                                                             </td>
-                                                            <td className="py-4 px-3" colSpan={2}>
-                                                                <div className="w-full flex items-center justify-center gap-x-4">
-                                                                    <span className="cursor-pointer hover:underline hover:text-orange-500" onClick={() => handleShowUpdateModal(item)}>Chỉnh sửa</span>
-                                                                    <span className="cursor-pointer hover:underline hover:text-blue-500">Thông tin</span>
-                                                                </div>
-
+                                                            <td className="py-4 px-3" colSpan={1}>
+                                                                <span className="cursor-pointer hover:underline hover:text-orange-500" onClick={() => handleShowUpdateModal(item)}>Chỉnh sửa</span>
                                                             </td>
                                                         </tr>
                                                     )
@@ -380,7 +376,7 @@ const ShippingUnitManagement = () => {
                     }
                 </div>
             </div>
-            <Modal show={showUpdateModal} setShow={handleCloseModal} size="update-modal">
+            <Modal show={showUpdateModal} setShow={handleCloseModal} size="w-4/6-h-auto">
                 <div className="flex flex-col h-full relative">
                     <div className="text-xl mb-8">Cập nhật thông tin đơn vị vận chuyển</div>
                     <div className="text-lg mb-4">Thông tin đơn vị vận chuyển</div>
