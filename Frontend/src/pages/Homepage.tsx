@@ -2,14 +2,14 @@
 import React from "react";
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import { GoDotFill, GoStarFill } from "react-icons/go";
+import { GoDotFill } from "react-icons/go";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Autoplay } from 'swiper/modules';
 import { PiShoppingCartLight } from "react-icons/pi";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import { IoBagCheckOutline, IoEyeOutline } from "react-icons/io5";
 import { IoIosArrowForward, IoMdHeartEmpty } from "react-icons/io";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Modal from "@/components/Modal";
 import { CurrencyFormat, numberKFormat } from "@/utils/numberFormat";
 import { FiMinus, FiPlus } from "react-icons/fi";
@@ -44,9 +44,7 @@ import Banner_5 from '../assets/img/homepage/Banner_5.svg';
 import Banner_6 from '../assets/img/homepage/Banner_6.svg';
 import Banner_7 from '../assets/img/homepage/Banner_7.jpg';
 import Banner_8 from '../assets/img/homepage/Banner_8.jpg';
-import { getOnlyCategories } from "@/services/categoryService";
 
-import { categoryIconLarge } from "@/data/homepage";
 import { updateProductRecommendClick } from "@/services/productTrackingService";
 import LinkNewTabProductDetail from "@/components/LinkNewTab";
 
@@ -221,8 +219,8 @@ const RecommendItemList = (props: IProps) => {
                         <div className="product cursor-pointer px-4 py-2 bg-white border border-gray-200 hover:shadow-md hover:border-gray-400 group" key={`sale-off-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                             <div className="relative">
                                 <div className="product__image w-40 mx-auto mb-6 relative py-4">
-                                    {/* <LoadImageS3 img_style="w-40 h-40" img_url={item.image}/> */}
-                                    <LoadImage img_style="w-40 h-40" product_id={item.id} />
+                                    <LoadImageS3 img_style="w-40 h-40" img_url={item.image} />
+                                    {/* <LoadImage img_style="w-40 h-40" product_id={item.id} /> */}
                                     <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                         <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                             e.stopPropagation();
@@ -406,8 +404,8 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                             <SwiperSlide>
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group h-full" key={`history-item-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
-                                        {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} />
+                                        <LoadImageS3 img_style="w-full h-40" img_url={item.image} />
+                                        {/* <LoadImage img_style="w-full h-40" product_id={item.id} /> */}
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -730,8 +728,8 @@ const Homepage = () => {
             <Modal show={showQuickView} setShow={handleCloseQuickView} size="customize-h-auto">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
-                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
+                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
+                        {/* <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} /> */}
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

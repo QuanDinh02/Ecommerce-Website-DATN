@@ -142,7 +142,7 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
                         {showLoadingIcon ? <FaSpinner className='animate-spin' /> : "TIẾP THEO"}
                     </Button>
                 </div>
-                <div className='flex items-center my-2'>
+                {/* <div className='flex items-center my-2'>
                     <div className='border-t border-gray-400 w-2/5'></div>
                     <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
                     <div className='border-t border-gray-400 w-2/5'></div>
@@ -156,7 +156,7 @@ const EnterEmailRegister = (props: IEnterEmailProp) => {
                         <img src={Google_Icon} alt="" className="w-6 h-6" />
                         <div>Tiếp tục với Google</div>
                     </div>
-                </div>
+                </div> */}
                 <div className='text-center mt-4'>
                     <span className='text-gray-400'>Đã có tài khoản?</span>
                     <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => navigate(PATH.Login)}>Đăng nhập tại đây</span>

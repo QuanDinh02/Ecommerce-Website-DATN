@@ -1,5 +1,6 @@
 import LinkNewTabProductDetail from "@/components/LinkNewTab";
 import LoadImage from "@/components/LoadImage";
+import LoadImageS3 from "@/components/LoadImageS3";
 import { getCustomerOrderDetail } from "@/services/orderServices";
 import { dateFormat, dateTimeFormat } from "@/utils/dateFormat";
 import { CurrencyFormat } from "@/utils/numberFormat";
@@ -20,6 +21,7 @@ interface IOrderItem {
     price: number
     product_id: number
     product_name: string
+    product_image: string
 }
 
 interface IOrderStatus {
@@ -326,7 +328,8 @@ const OrderTracking = () => {
                                                     <tr key={`product-${index}`}>
                                                         <td className="py-3 px-2" colSpan={2}>
                                                             <div className="flex items-center gap-x-3">
-                                                                <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.product_id} />
+                                                                {/* <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.product_id} /> */}
+                                                                <LoadImageS3 img_style="w-16 h-16 rounded-lg" img_url={item.product_image} />
                                                                 <div className="line-clamp-2 font-medium text-sm cursor-pointer hover:underline hover:text-blue-600 w-60" onClick={() => handleProductDetailNavigation(item.product_id)}><LinkNewTabProductDetail id={item.product_id} name={item.product_name} /></div>
                                                             </div>
                                                         </td>

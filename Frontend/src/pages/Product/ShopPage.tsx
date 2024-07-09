@@ -33,6 +33,7 @@ import classNames from "classnames";
 import { dateSpan } from "@/utils/dateFormat";
 import { LiaUserCheckSolid } from "react-icons/lia";
 import { RiMessage2Line } from "react-icons/ri";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 interface IShopInfo {
     id: number
@@ -421,7 +422,8 @@ const ShopPage = () => {
                         <div className="shop-page__info w-[80rem] mx-auto px-[30px] py-4">
                             <div className="flex flex-col">
                                 <div className="flex items-center flex-col gap-y-2">
-                                    <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div>
+                                    {/* <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div> */}
+                                    <LoadImageS3 img_style="w-20 h-20 rounded-full" img_url={shopInfo.image} />
                                     <div className="shop_name text-2xl mb-2">{shopInfo.shop_name}</div>
                                 </div>
                                 <div className="flex items-center justify-center gap-x-10">
@@ -527,8 +529,8 @@ const ShopPage = () => {
                                                                                 return (
                                                                                     <div className="product bg-white shadow border border-white hover:border-gray-400 hover:shadow-md cursor-pointer px-4 py-2 group" key={`category-item-grid-${item.id}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                                                                         <div className="product__image flex flex-col items-center justify-center relative">
-                                                                                            {/* <LoadImageS3 img_style="w-40 h-60" img_url={item.image} /> */}
-                                                                                            <LoadImage img_style="w-40 h-52" product_id={item.id} />
+                                                                                            <LoadImageS3 img_style="w-40 h-52" img_url={item.image} />
+                                                                                            {/* <LoadImage img_style="w-40 h-52" product_id={item.id} /> */}
                                                                                             <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                                                                                 <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                                                                     e.stopPropagation();
@@ -627,8 +629,8 @@ const ShopPage = () => {
             <Modal show={showQuickView} setShow={setShowQuickView} size="customize">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
-                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
+                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
+                        {/* <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} /> */}
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

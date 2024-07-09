@@ -29,6 +29,12 @@ interface IUpdateSellerInfo {
     image: File | null
 }
 
+interface IUpdateShopInfo {
+    shopName: string
+    intro: string
+    image: File | null
+}
+
 export const getProductsPagination = async (product_display_limit: number, page: number, category: number, sub_category: number, sort: number) => {
     let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}&category_id=${category}&sub_category_id=${sub_category}&sort_id=${sort}`);
     if (result && result?.DT) {
@@ -134,6 +140,30 @@ export const updateSellerInfo = async (data: IUpdateSellerInfo) => {
     build_data.append('image', data.image ? data.image : "");
 
     let result: APIResponse = await axios.post(`/api/seller/info`, build_data, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+
+    return result;
+}
+
+export const getShopInfo = async () => {
+    let result: APIResponse = await axios.get('/api/seller/shop/info');
+    if (result && result.EC === 0) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const updateShopInfo = async (data: IUpdateShopInfo) => {
+
+    const build_data = new FormData();
+    build_data.append('shopName', data.shopName);
+    build_data.append('intro', data.intro);
+    build_data.append('image', data.image ? data.image : "");
+
+    let result: APIResponse = await axios.post(`/api/seller/shop/info`, build_data, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }

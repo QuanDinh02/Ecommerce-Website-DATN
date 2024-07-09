@@ -298,6 +298,28 @@ const getSellerInfo = async (req, res) => {
     }
 }
 
+const getSellerShopInfo = async (req, res) => {
+    try {
+        let { user } = req;
+        let result = await sellerServices.getSellerShopInfo(+user.seller_id);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -2,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const confirmCustomerOrder = async (req, res) => {
     try {
         let { id, packing } = req.body;
@@ -352,6 +374,34 @@ const updateSellerInfo = async (req, res) => {
         }
 
         let result = await sellerServices.updateSellerInfo(data, req.file);
+
+        if (result) {
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            })
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const updateShopInfo = async (req, res) => {
+    try {
+
+        let { user } = req;
+
+        let data = {
+            ...req.body, id: +user.seller_id
+        }
+
+        let result = await sellerServices.updateShopInfo(data, req.file);
 
         if (result) {
             return res.status(200).json({
@@ -690,5 +740,5 @@ module.exports = {
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
     getDashboardData, getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
-    getProductInventorySearch
+    getProductInventorySearch, getSellerShopInfo, updateShopInfo
 }

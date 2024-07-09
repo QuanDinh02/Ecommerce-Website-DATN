@@ -21,6 +21,7 @@ export interface IProductReview {
     rating: number
     customer: ICustomerInfo
     createdAt: Date
+    customer_image: string
 }
 
 export interface IRatings {

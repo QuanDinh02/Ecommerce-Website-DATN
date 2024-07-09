@@ -6,7 +6,7 @@ import { RootState } from "@/redux/reducer/rootReducer";
 import { useSelector } from "react-redux";
 import { customerCancelOrder, getAllOrderByCustomer, getSearchCustomerOrder } from "@/services/orderServices";
 import { IOrder, ORDER_STATUS } from "./OrderType";
-import { dateFormat, dateTimeFormat } from "@/utils/dateFormat";
+import { dateTimeFormat } from "@/utils/dateFormat";
 import { ThreeDots } from "react-loader-spinner";
 import LoadImageS3 from "@/components/LoadImageS3";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -239,7 +239,8 @@ const AllOrder = () => {
                                                                     item.order_item_list.map((product, product_idx) => {
                                                                         return (
                                                                             <div className="flex gap-x-6" key={`product-item-${item.id}-${product_idx}`} onClick={() => handleProductDetailNavigation(product.product_id)}>
-                                                                                <LoadImage img_style="w-24 h-24" product_id={product.product_id} />
+                                                                                {/* <LoadImage img_style="w-24 h-24" product_id={product.product_id} /> */}
+                                                                                <LoadImageS3 img_style="w-24 h-24" img_url={product.product_image}/>
                                                                                 <div className="flex flex-col gap-y-2">
                                                                                     <div className="opacity-90 line-clamp-1 cursor-pointer hover:underline hover:text-blue-600">
                                                                                         <LinkNewTabProductDetail id={product.product_id} name={product.product_name} />

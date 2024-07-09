@@ -191,8 +191,8 @@ const ShoppingCartPage = () => {
                                                                     return (
                                                                         <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                             <td>
-                                                                                {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
-                                                                                <LoadImage img_style="w-24 h-24 opacity-50" product_id={item.product_info.id} />
+                                                                                <LoadImageS3 img_style="w-24 h-24 opacity-50" img_url={item.product_info.image}/>
+                                                                                {/* <LoadImage img_style="w-24 h-24 opacity-50" product_id={item.product_info.id} /> */}
                                                                             </td>
                                                                             <td className="py-3 px-2 opacity-50">
                                                                                 <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>
@@ -215,8 +215,8 @@ const ShoppingCartPage = () => {
                                                                 return (
                                                                     <tr key={`cart-item-${index}`} className="border-b border-gray-300">
                                                                         <td>
-                                                                            {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image}/> */}
-                                                                            <LoadImage img_style="w-24 h-24" product_id={item.product_info.id} />
+                                                                            <LoadImageS3 img_style="w-24 h-24" img_url={item.product_info.image}/>
+                                                                            {/* <LoadImage img_style="w-24 h-24" product_id={item.product_info.id} /> */}
                                                                         </td>
                                                                         <td className="py-3 px-2">
                                                                             <div className="cursor-pointer text-sm text-blue-500 hover:text-[#FCB800] duration-300 w-80 line-clamp-2 mb-2" onClick={() => handleProductDetailNavigation(item.product_info.id)}>
@@ -267,15 +267,6 @@ const ShoppingCartPage = () => {
                                                     </div>
                                                     <div className="bg-[#FCB800] px-5 py-3 w-[23rem] mt-4 cursor-pointer hover:opacity-80 text-center font-medium" onClick={() => navigate("/payment")}>Tiến hành đặt hàng</div>
                                                 </div>
-                                                {/* <div className="border border-gray-200 bg-gray-100 py-4 px-8 w-[23rem]">
-                                                    <div className="text-lg mb-2 font-medium">Mã giảm giá/ Quà tặng</div>
-                                                    <div className="flex items-center  gap-x-1">
-                                                        <div className="border border-gray-400 h-12 px-5 flex items-center flex-1 bg-white">
-                                                            <input type="text" className="outline-none w-full" placeholder="Nhập mã giảm giá" />
-                                                        </div>
-                                                        <div className="bg-[#FCB800] px-5 py-3 w-fit font-medium cursor-pointer hover:opacity-80">Nhập Mã</div>
-                                                    </div>
-                                                </div> */}
                                             </div>
                                         </div>
                                         :

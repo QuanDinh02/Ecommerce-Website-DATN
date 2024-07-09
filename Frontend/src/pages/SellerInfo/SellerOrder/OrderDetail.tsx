@@ -8,6 +8,7 @@ import { CurrencyFormat } from "@/utils/numberFormat";
 import { getOrderDetail } from "@/services/sellerService";
 import { dateTimeFormat } from "@/utils/dateFormat";
 import { ThreeDots } from "react-loader-spinner";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 const tableHeaders = [
     {
@@ -38,6 +39,7 @@ interface IOrderItem {
     price: number
     product_id: number
     product_name: string
+    product_image: string
 }
 
 interface IOrderAddress {
@@ -162,7 +164,8 @@ const OrderDetail = () => {
                                                                 <tr key={`product-${index}`}>
                                                                     <td className="py-3 px-2" colSpan={1}>
                                                                         <div className="flex items-center gap-x-3">
-                                                                            <LoadImage img_style={"w-20 h-20 rounded-lg"} product_id={item.product_id} />
+                                                                            {/* <LoadImage img_style={"w-20 h-20 rounded-lg"} product_id={item.product_id} /> */}
+                                                                            <LoadImageS3 img_style="w-20 h-20 rounded-lg" img_url={item.product_image} />
                                                                         </div>
                                                                     </td>
                                                                     <td colSpan={3}>

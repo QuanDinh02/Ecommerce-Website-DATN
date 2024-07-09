@@ -7,7 +7,7 @@ const fs = require('fs-extra')
 import dotenv from 'dotenv';
 dotenv.config();
 
-const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
 const bucketName = process.env.BUCKET_NAME;
@@ -131,13 +131,13 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                         }
                     });
 
-                    // const getObjectParams = {
-                    //     Bucket: bucketName,
-                    //     Key: `${item.id}.jpeg`
-                    // }
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${item.id}.jpeg`
+                    }
 
-                    // const command = new GetObjectCommand(getObjectParams);
-                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                     let sub_category = productSubCategory.SubCategory;
 
@@ -145,8 +145,7 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                         id: productInfo.id,
                         name: productInfo.name,
                         summary: productInfo.summary,
-                        //image: url,
-                        image: "",
+                        image: url,
                         current_price: productType.currentPrice,
                         price: productType.price,
                         quantity: productType.quantity,
@@ -221,13 +220,13 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                         }
                     });
 
-                    // const getObjectParams = {
-                    //     Bucket: bucketName,
-                    //     Key: `${item.id}.jpeg`
-                    // }
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${item.id}.jpeg`
+                    }
 
-                    // const command = new GetObjectCommand(getObjectParams);
-                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                     let sub_category = productSubCategory.SubCategory;
 
@@ -235,8 +234,7 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                         id: productInfo.id,
                         name: productInfo.name,
                         summary: productInfo.summary,
-                        //image: url,
-                        image: "",
+                        image: url,
                         current_price: productType.currentPrice,
                         price: productType.price,
                         quantity: productType.quantity,
@@ -314,20 +312,19 @@ const getProductPagination = async (shop_seller_id, item_limit, page, category_i
                         }
                     });
 
-                    // const getObjectParams = {
-                    //     Bucket: bucketName,
-                    //     Key: `${item.id}.jpeg`
-                    // }
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${item.id}.jpeg`
+                    }
 
-                    // const command = new GetObjectCommand(getObjectParams);
-                    // const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
                     let sub_category = productSubCategory.SubCategory;
 
                     return {
                         ...item,
-                        //image: url,
-                        image: "",
+                        image: url,
                         sub_category: {
                             id: sub_category.id !== null ? sub_category.id : null,
                             title: sub_category.title !== null ? sub_category.title : "",
@@ -483,6 +480,7 @@ const createNewProduct = async (data, img_file) => {
                 currentPrice: data.currentPrice === 0 ? data.price : data.currentPrice,
                 price: data.price,
                 productID: product_info.id,
+                sold: 0
             });
 
             await db.ProductSubCategory.create({
@@ -493,6 +491,13 @@ const createNewProduct = async (data, img_file) => {
             await db.ProductRating.create({
                 productID: product_info.id,
                 rating: 0
+            })
+
+            await db.ProductTracking.create({
+                productID: product_info.id,
+                view: 0,
+                recommend: 0,
+                recommend_view: 0
             })
 
             if (img_file && img_file !== "") {
@@ -637,9 +642,27 @@ const deleteProduct = async (product_id) => {
                 },
             });
 
-            let file_path = path.resolve(__dirname, `../../../Frontend/src/assets/img/products/${product_id}.jpeg`);
+            await db.ProductTracking.destroy({
+                where: {
+                    productID: +product_id
+                },
+            });
 
-            await fs.remove(file_path);
+            await db.ProductRating.destroy({
+                where: {
+                    productID: +product_id
+                },
+            });
+
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${product_id}.jpeg`
+            }
+
+            const command = new DeleteObjectCommand(getObjectParams);
+
+            await s3.send(command);
+
             return {
                 EC: 0,
                 DT: '',
@@ -887,6 +910,43 @@ const getSellerInfo = async (seller_id) => {
     }
 }
 
+const getSellerShopInfo = async (seller_id) => {
+    try {
+        let shopInfo = await db.Seller.findOne({
+            raw: true,
+            attributes: ['id', 'shopName', 'intro'],
+            where: {
+                id: {
+                    [Op.eq]: +seller_id
+                }
+            }
+        })
+
+        const getObjectParams = {
+            Bucket: bucketName,
+            Key: `shop_${seller_id}.jpeg`
+        }
+
+        const command = new GetObjectCommand(getObjectParams);
+        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+        return {
+            EC: 0,
+            DT: {
+                ...shopInfo, image: url
+            },
+            EM: 'Shop Info !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 const updateSellerInfo = async (data, image_file) => {
     try {
         let { id } = data;
@@ -937,6 +997,65 @@ const updateSellerInfo = async (data, image_file) => {
                 EC: 0,
                 DT: '',
                 EM: 'Cập nhật thông tin thành công'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const updateShopInfo = async (data, image_file) => {
+    try {
+        let { id } = data;
+
+        if (image_file && image_file !== "") {
+            let imageName = `shop_${id}.jpeg`;
+
+            const params = {
+                Bucket: bucketName,
+                Key: imageName,
+                Body: image_file.buffer,
+                ContentType: image_file.mimetype
+            }
+
+            const command = new PutObjectCommand(params);
+
+            await s3.send(command);
+
+            await db.Seller.update({
+                shopName: data.shopName,
+                intro: data.intro,
+            }, {
+                where: {
+                    id: +id
+                }
+            });
+
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Cập nhật thông tin shop thành công'
+            }
+        } else {
+            await db.Seller.update({
+                shopName: data.shopName,
+                intro: data.intro,
+            }, {
+                where: {
+                    id: +id
+                }
+            });
+
+            return {
+                EC: 0,
+                DT: '',
+                EM: 'Cập nhật thông tin shop thành công'
             }
         }
 
@@ -1200,19 +1319,28 @@ const getOrderDetail = async (order_id) => {
             }
         });
 
-        let order_item_list_format = await order_item_list.map(order_item => {
+        let order_item_list_format = await Promise.all(order_item_list.map(async order_item => {
             let orderItem = order_item;
             let productInfo = orderItem.Product;
 
             delete orderItem.Product;
 
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: `${productInfo.id}.jpeg`
+            }
+
+            const command = new GetObjectCommand(getObjectParams);
+            const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
             return {
                 ...orderItem,
                 product_id: productInfo.id,
-                product_name: productInfo.name
+                product_name: productInfo.name,
+                product_image: url
             }
 
-        });
+        }));
 
         let transaction_info = await db.Transaction.findOne({
             raw: true,
@@ -1472,13 +1600,23 @@ const getShopCategoryDetailExist = async (category_id, item_limit, page) => {
             productListRaw.reverse();
             productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-            let product_list_format = productListRaw.map(item => {
+            let product_list_format = await Promise.all(productListRaw.map(async item => {
+
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: `${item.Product.id}.jpeg`
+                }
+
+                const command = new GetObjectCommand(getObjectParams);
+                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
                 return {
                     id: item.Product.id,
                     name: item.Product.name,
-                    index: item.id
+                    index: item.id,
+                    image: url
                 };
-            })
+            }))
 
             return {
                 EC: 0,
@@ -1574,7 +1712,24 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page, catego
 
                 productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-                let product_list_format = productListRaw.map(item => item.Product);
+                let product_list_format = await Promise.all(productListRaw.map(async item => {
+
+                    let productInfo = item.Product;
+
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${productInfo.id}.jpeg`
+                    }
+
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        image: url
+                    };
+                }))
 
                 return {
                     EC: 0,
@@ -1615,7 +1770,24 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page, catego
 
                 productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-                let product_list_format = productListRaw.map(item => item.Product);
+                let product_list_format = await Promise.all(productListRaw.map(async item => {
+
+                    let productInfo = item.Product;
+
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${productInfo.id}.jpeg`
+                    }
+
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        image: url
+                    };
+                }))
 
                 return {
                     EC: 0,
@@ -1655,7 +1827,24 @@ const getShopCategoryDetailNotExist = async (seller_id, item_limit, page, catego
 
                 productListRaw = _(productListRaw).drop(offSet).take(item_limit).value();
 
-                let product_list_format = productListRaw.map(item => item.Product);
+                let product_list_format = await Promise.all(productListRaw.map(async item => {
+
+                    let productInfo = item.Product;
+
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${productInfo.id}.jpeg`
+                    }
+
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        image: url
+                    };
+                }))
 
                 return {
                     EC: 0,
@@ -2329,5 +2518,5 @@ module.exports = {
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
     addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData,
     getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
-    getProductInventorySearch
+    getProductInventorySearch, getSellerShopInfo, updateShopInfo
 }

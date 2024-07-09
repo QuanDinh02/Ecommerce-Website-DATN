@@ -545,8 +545,8 @@ const Header = () => {
                                                                 if (index <= 3) {
                                                                     return (
                                                                         <div key={`shopping-cart-item-${item.id}`} className='flex pb-5 mb-4 border-b border-gray-300 gap-x-2'>
-                                                                            {/* <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/> */}
-                                                                            <LoadImage img_style="w-12 h-12" product_id={item.product_info.id} />
+                                                                            <LoadImageS3 img_style="w-12 h-12" img_url={item.product_info.image}/>
+                                                                            {/* <LoadImage img_style="w-12 h-12" product_id={item.product_info.id} /> */}
                                                                             <div className='flex items-center justify-between w-full'>
                                                                                 <div>
                                                                                     <div

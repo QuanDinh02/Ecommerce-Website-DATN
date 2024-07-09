@@ -368,7 +368,7 @@ const userLogin = async (userData) => {
             let userExist = await db.User.findOne({
                 nest: true,
                 raw: true,
-                attributes: ['id', 'username', 'password', 'role'],
+                attributes: ['id', 'username', 'password', 'role', 'active'],
                 include: {
                     model: db.UserRole,
                     attributes: ['id', 'name'],
@@ -388,7 +388,19 @@ const userLogin = async (userData) => {
                     password: userExist.password,
                     role: role
                 }
+
+                let active = userExist.active;
+
                 //checkPassword(userData.password, user.password)
+                if(active === 0) {
+                    return {
+                        EC: -1,
+                        DT: '',
+                        EM: 'Tài khoản đã bị khóa !'
+
+                    }
+                }
+
                 if (checkPassword(userData.password, user.password)) {
 
                     let customer_id = 0;

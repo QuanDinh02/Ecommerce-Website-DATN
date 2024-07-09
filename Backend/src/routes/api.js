@@ -169,6 +169,9 @@ const ApiRoute = (app) => {
     router.get('/seller/info', checkUserJWT, sellerController.getSellerInfo);
     router.post('/seller/info', checkUserJWT, upload.single('image'), sellerController.updateSellerInfo);
 
+    router.get('/seller/shop/info', checkUserJWT, sellerController.getSellerShopInfo);
+    router.post('/seller/shop/info', checkUserJWT, upload.single('image'), sellerController.updateShopInfo);
+
     router.get('/seller/order/detail', checkUserJWT, sellerController.getOrderDetail);
     router.get('/seller/shop/category', checkUserJWT, sellerController.getShopCategory);
     router.post('/seller/shop/category', checkUserJWT, sellerController.createShopCategory);

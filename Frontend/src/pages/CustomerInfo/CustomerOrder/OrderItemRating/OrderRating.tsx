@@ -9,6 +9,7 @@ import OldStarRating from "./OldStarRating";
 import Button from "@/components/Button";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import LinkNewTabProductDetail from "@/components/LinkNewTab";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 interface IProductReview {
     id: number
@@ -19,6 +20,7 @@ interface IProductReview {
 interface IProduct {
     id: number
     name: string
+    image: string
     review: IProductReview
     update: boolean
 }
@@ -176,7 +178,8 @@ const OrderRating = () => {
                                     return (
                                         <div className="bg-white mb-6 p-4 shadow-md rounded" key={`product-${product.id}`}>
                                             <div className="flex gap-x-4">
-                                                <LoadImage img_style={"w-28 h-28 rounded border"} product_id={product.id} />
+                                                {/* <LoadImage img_style={"w-28 h-28 rounded border"} product_id={product.id} /> */}
+                                                <LoadImageS3 img_style="w-16 h-16 rounded-lg" img_url={product.image} />
                                                 <div className="w-full">
                                                     <div className="w-full">
                                                         <div className="line-clamp-1 mb-2 cursor-pointer hover:underline hover:text-blue-600" onClick={() => handleProductDetailNavigation(product.id)}><LinkNewTabProductDetail id={product.id} name={product.name} /></div>

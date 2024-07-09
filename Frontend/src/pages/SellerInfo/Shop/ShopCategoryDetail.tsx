@@ -9,18 +9,21 @@ import { FiPlusCircle, FiMinusCircle } from "react-icons/fi";
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import { getSubCategoryByCategory } from "@/services/subCategoryService";
 import FilterDropdown from "@/components/FilterDropdown";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 const PRODUCT_DISPLAY_LIMIT = 50;
 
 interface IProduct {
     id: number
     name: string
+    image: string
 }
 
 interface IExistProduct {
     id: number
     name: string
     index: number
+    image: string
 }
 
 interface IProductListFetch {
@@ -340,7 +343,7 @@ const ShopCategoryDetail = () => {
                                                     <div key={`product-exist-${index}`} className="flex items-center justify-between border-b border-gray-200 p-2 hover:bg-gray-50">
                                                         <div className="w-full flex items-center justify-between">
                                                             <div className="flex gap-x-2 w-2/3">
-                                                                <LoadImage img_style="w-12 h-12" product_id={product.id} />
+                                                                <LoadImageS3 img_style="w-12 h-12" img_url={product.image} />
                                                                 <div><span className="text-sm line-clamp-2">{product.name}</span></div>
                                                             </div>
                                                             <FiMinusCircle className="w-6 h-6 transition duration-300 text-gray-400 hover:text-red-500 cursor-pointer hover:scale-110" onClick={() => handleRemoveProductCategory(product.id, product.index)} />
@@ -384,7 +387,7 @@ const ShopCategoryDetail = () => {
                                                     <div key={`product-not-exist-${index}`} className="flex items-center justify-between border-b border-gray-200 p-2 hover:bg-gray-50">
                                                         <div className="w-full flex items-center justify-between">
                                                             <div className="flex gap-x-2 w-2/3">
-                                                                <LoadImage img_style="w-12 h-12" product_id={product.id} />
+                                                                <LoadImageS3 img_style="w-12 h-12" img_url={product.image} />
                                                                 <div><span className="text-sm line-clamp-2">{product.name}</span></div>
                                                             </div>
                                                             <FiPlusCircle className="w-6 h-6 transition duration-300 text-gray-400 hover:text-green-600 cursor-pointer hover:scale-110" onClick={() => handleAddProductToCategory(product.id)} />

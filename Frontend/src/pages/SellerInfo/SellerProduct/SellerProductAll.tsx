@@ -21,6 +21,7 @@ import { getSubCategoryInfo } from "@/services/subCategoryService";
 import FloatingNumberInput from "@/components/Floating/FloatingNumberInput";
 import FilterDropdown from "@/components/FilterDropdown";
 import CopyClipboard from "@/components/CopyClipboard";
+import LoadImageS3 from "@/components/LoadImageS3";
 
 const MODULE = {
     toolbar: [
@@ -124,6 +125,7 @@ const SellerProductAll = () => {
     const [productList, setProductList] = React.useState<IProduct[]>([]);
 
     const [productID, setProductID] = React.useState<number>(0);
+    const [productImage, setProductImage] = React.useState<string>("");
     const [productName, setProductName] = React.useState<string>("");
     const [productPrice, setProductPrice] = React.useState<number>(0);
     const [productCurrentPrice, setProductCurrentPrice] = React.useState<number>(0);
@@ -208,6 +210,7 @@ const SellerProductAll = () => {
     let handleShowUpdateModal = async (item: IProduct) => {
 
         setProductID(item.id);
+        setProductImage(item.image);
         setProductName(item.name);
         setProductPrice(item.price);
         setProductCurrentPrice(item.current_price);
@@ -552,7 +555,8 @@ const SellerProductAll = () => {
                                                             </td>
                                                             <td className="py-3 px-2" colSpan={2}>
                                                                 <div className="flex items-center gap-x-2">
-                                                                    <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.id} />
+                                                                    {/* <LoadImage img_style={"w-16 h-16 rounded-lg"} product_id={item.id} /> */}
+                                                                    <LoadImageS3 img_style="w-16 h-16 rounded-lg" img_url={item.image} />
                                                                     <div className="line-clamp-2 flex-1 font-medium text-sm">{item.name}</div>
                                                                 </div>
                                                             </td>
@@ -691,7 +695,8 @@ const SellerProductAll = () => {
                             <div className="font-medium mt-6 mb-4 text-sm">ẢNH SẢN PHẨM</div>
                             <div className="w-full grid grid-cols-4 gap-y-2 gap-x-2 border border-gray-300 rounded-md p-2">
                                 <div className="w-full h-32 border border-gray-200 relative rounded-md group cursor-pointer">
-                                    <LoadImage img_style="w-full h-full rounded-md" product_id={productID} />
+                                    {/* <LoadImage img_style="w-full h-full rounded-md" product_id={productID} /> */}
+                                    <LoadImageS3 img_style="w-full h-full rounded-lg" img_url={productImage} />
                                 </div>
                             </div>
                         </div>

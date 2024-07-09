@@ -54,6 +54,8 @@ import { PiStorefrontLight } from "react-icons/pi";
 import classNames from "classnames";
 import { updateProductRecommendClick } from "@/services/productTrackingService";
 import LinkNewTabProductDetail from "@/components/LinkNewTab";
+import LoadImageS3 from "@/components/LoadImageS3";
+import LoadCustomerImageS3 from "@/components/LoadCustomerImageS3";
 
 interface IRecommendProduct {
     id: number
@@ -247,8 +249,8 @@ const RelevantRecommendItemList = (props: IProps) => {
                             <SwiperSlide>
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
-                                        {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`recommend-item-img-${item.id}`} />
+                                        <LoadImageS3 img_style="w-full h-full" img_url={item.image} key={`recommend-item-img-${item.id}`} />
+                                        {/* <LoadImage img_style="w-full h-40" product_id={item.id} key={`recommend-item-img-${item.id}`} /> */}
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -434,8 +436,8 @@ const HistoryItemList = (props: IHistoryItemProps) => {
                             <SwiperSlide>
                                 <div className="product border border-white hover:border-gray-400 cursor-pointer px-4 py-2 group" key={`recommend-relavent-product-${index}`} onClick={() => handleProductDetailNavigation(item.id, item.name)}>
                                     <div className="product__image w-40 mx-auto mb-6 relative py-4">
-                                        {/* <LoadImageS3 img_style="w-full h-full" img_url={item.image} /> */}
-                                        <LoadImage img_style="w-full h-40" product_id={item.id} key={`history-item-img-${item.id}`} />
+                                        <LoadImageS3 img_style="w-full h-40" img_url={item.image} key={`history-item-img-${item.id}`} />
+                                        {/* <LoadImage img_style="w-full h-40" product_id={item.id} key={`history-item-img-${item.id}`} /> */}
                                         <div className="product__utility w-full absolute bottom-[-10px] bg-white hidden items-center justify-center gap-x-4 mb-2 group-hover:flex duration-300">
                                             <div className="utility-item w-8 h-8 hover:bg-[#FCB800] hover:rounded-full flex items-center justify-center relative" onClick={(e) => {
                                                 e.stopPropagation();
@@ -945,8 +947,8 @@ const ProductDetailPage = () => {
                                     <div className="flex">
                                         <div className="product__images mr-16">
                                             <div className="w-80 h-80 flex items-center justify-center">
-                                                {/* <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image}/> */}
-                                                <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} key={`product-img-${productDetailInfo.id}`} />
+                                                <LoadImageS3 img_style="w-full h-full" img_url={productDetailInfo.product_image} />
+                                                {/* <LoadImage img_style="w-full h-full" product_id={productDetailInfo.id} key={`product-img-${productDetailInfo.id}`} /> */}
                                             </div>
                                         </div>
                                         <div className="product__informations flex-1">
@@ -1046,7 +1048,8 @@ const ProductDetailPage = () => {
                                     </div>
                                     <div className="border-t border-gray-100 mt-6"></div>
                                     <div className="p-5 flex items-center gap-x-4 bg-gray-50 border border-gray-300">
-                                        <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div>
+                                        <LoadImageS3 img_style="w-16 h-16 rounded-full" img_url={shopInfo.image} />
+                                        {/* <div className="w-16 h-16 border border-gray-200 bg-[#FCB800] rounded-full text-3xl text-white flex items-center justify-center">S</div> */}
                                         <div className="pr-8 border-r border-gray-300 mr-4">
                                             <div className="shop_name text-lg mb-2">{shopInfo.shop_name}</div>
                                             <div className="px-3 py-1 border border-gray-300 bg-white hover:bg-gray-100 cursor-pointer flex items-center justify-center gap-x-2" onClick={() => handleShopNavigation(shopInfo.id)}><PiStorefrontLight className="w-5 h-5" /> Xem Shop</div>
@@ -1130,7 +1133,7 @@ const ProductDetailPage = () => {
                                                             return (
                                                                 <div key={`customer-comment-${item.id}`} className="mb-10">
                                                                     <div className="flex gap-x-2 mb-3">
-                                                                        <div className="w-12 h-12 rounded-full bg-cyan-200 flex items-center justify-center text-cyan-600">CS</div>
+                                                                        <LoadCustomerImageS3 img_style="w-12 h-12 rounded-full" img_url={item.customer_image} key={`customer-comment-${item.id}`} />
                                                                         <div className="flex flex-col">
                                                                             <div className="flex items-center gap-x-2">
                                                                                 <div className="font-medium">{item?.customer?.name ? item?.customer?.name : "Ẩn Danh"}</div>
@@ -1201,8 +1204,8 @@ const ProductDetailPage = () => {
             <Modal show={showQuickView} setShow={handleCloseQuickView} size="customize">
                 <div className="product-quick-view flex w-full relative">
                     <div className="product-quick-view__image w-2/5 flex items-center justify-center">
-                        {/* <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} /> */}
-                        <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} />
+                        <LoadImageS3 img_style="w-[24rem] h-[24rem]" img_url={productQuickView.image_url} />
+                        {/* <LoadImage img_style="w-[24rem] h-[24rem]" product_id={productQuickView.id} /> */}
                     </div>
                     <div className="product-quick-view__info w-3/5">
                         <div className="product__name font-medium text-2xl">{productQuickView.name}</div>

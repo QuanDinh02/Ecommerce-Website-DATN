@@ -11,7 +11,7 @@ import { IoCheckmark } from "react-icons/io5";
 import { PiEyeLight, PiEyeSlash } from "react-icons/pi";
 import { FaSpinner } from "react-icons/fa";
 import { AddCartItem, AddWishListItem, UserLogin } from '@/redux/actions/action';
-import { successToast1 } from '@/components/Toast/Toast';
+import { errorToast1, successToast1 } from '@/components/Toast/Toast';
 import { fetchAccount, userLogin } from '@/services/userService';
 import { fetchCartItem } from '@/services/cartItemService';
 import { fetchWishList } from '@/services/wishListService';
@@ -120,10 +120,7 @@ const LoginPage = () => {
         } else {
             let result: APIReponse = await userLogin(user.username, user.password);
             if (result) {
-                if (result.EC !== 0) {
-                    setShowErrorMsg(true);
-                    setShowLoadingIcon(false);
-                } else {
+                if (result.EC === 0) {
                     successToast1("Đăng nhập thành công !");
                     setShowLoadingIcon(false);
 
@@ -132,6 +129,15 @@ const LoginPage = () => {
                         window.location.reload();
                         navigate(-1);
                     }, 2000);
+                }
+                else if (result.EC === 1) {
+                    setShowErrorMsg(true);
+                    setShowLoadingIcon(false);
+                }
+                else {
+                    errorToast1(result.EM);
+                    setShowLoadingIcon(false);
+                    return
                 }
             }
         }
@@ -242,7 +248,7 @@ const LoginPage = () => {
                                 {showLoadingIcon ? <FaSpinner className='animate-spin' /> : "ĐĂNG NHẬP"}
                             </Button>
                         </div>
-                        <div className='flex items-center my-2'>
+                        {/* <div className='flex items-center my-2'>
                             <div className='border-t border-gray-400 w-2/5'></div>
                             <div className='text-gray-400 text-center w-1/5'>Hoặc</div>
                             <div className='border-t border-gray-400 w-2/5'></div>
@@ -256,7 +262,7 @@ const LoginPage = () => {
                                 <img src={Google_Icon} alt="" className="w-6 h-6" />
                                 <div>Tiếp tục với Google</div>
                             </div>
-                        </div>
+                        </div> */}
                         <div className='text-center mt-4'>
                             <span className='text-gray-400'>Người dùng mới?</span>
                             <span className='text-blue-600 ml-1 hover:underline hover:cursor-pointer text-orange-400 font-medium' onClick={() => redirectPage(PATH.Register)}>Đăng ký tại đây</span>

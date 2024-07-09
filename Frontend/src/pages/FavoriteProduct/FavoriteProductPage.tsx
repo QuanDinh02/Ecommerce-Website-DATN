@@ -158,8 +158,8 @@ const FavoriteProductPage = () => {
                                                             return (
                                                                 <tr key={`favorite-item-${item.id}`} className="border-b border-gray-300">
                                                                     <td>
-                                                                        {/* <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} /> */}
-                                                                        <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} />
+                                                                        <LoadImageS3 img_style="w-32 h-32" img_url={item.product_info.image} />
+                                                                        {/* <LoadImage img_style="w-32 h-32" product_id={item.product_info.id} /> */}
                                                                     </td>
                                                                     <td className="py-3 px-2">
                                                                         <div

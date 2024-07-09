@@ -1,12 +1,12 @@
 import React from "react";
-import { CiImageOn } from "react-icons/ci";
+import { LuUser2 } from "react-icons/lu";
 
-interface ILoadImageS3 {
+interface LoadCustomerImageS3 {
     img_style: string
     img_url: string
 }
 
-const LoadImageS3 = (props: ILoadImageS3) => {
+const LoadCustomerImageS3 = (props: LoadCustomerImageS3) => {
 
     let { img_url, img_style } = props;
 
@@ -18,11 +18,11 @@ const LoadImageS3 = (props: ILoadImageS3) => {
                 !error ?
                     <img src={img_url} alt='' className={img_style} onError={() => setError(true)} />
                     :
-                    <CiImageOn className={`text-gray-300 shrink-0 ${img_style}`} />
+                    <div className={`${img_style} bg-gray-200 flex items-center justify-center text-gray-400`}><LuUser2 className="w-6 h-6" /></div>
             }
         </>
 
     )
 }
 
-export default LoadImageS3;
+export default LoadCustomerImageS3;

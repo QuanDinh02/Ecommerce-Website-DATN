@@ -170,10 +170,10 @@ const SystemMain = () => {
                                 onClick={() => handleShowWidgetInfo()}
                                 ref={infoSettingBox}
                             >
-                                <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer w-full flex items-center gap-x-2' onClick={(e) => {
+                                {/* <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer w-full flex items-center gap-x-2' onClick={(e) => {
                                     e.stopPropagation();
                                     setShowInfoSettingBox(false);
-                                }}><MdOutlineAccountCircle className="w-5 h-5"/> Quản lý Tài Khoản</div>
+                                }}><MdOutlineAccountCircle className="w-5 h-5"/> Quản lý Tài Khoản</div> */}
                                 <div className='info-item py-2.5 px-5 hover:bg-gray-100 hover:text-blue-600 cursor-pointer flex items-center gap-x-2' onClick={(e) => {
                                     e.stopPropagation();
                                     handleUserSysLogout();
