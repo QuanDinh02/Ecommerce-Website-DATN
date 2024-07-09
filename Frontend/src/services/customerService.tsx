@@ -7,11 +7,11 @@ interface IActivity {
 }
 
 interface IUpdateCustomerInfo {
-    id: number
     name: string
     mobile: string
     gender: number
     birth: Date
+    image: File | null
 }
 
 interface IUpdateCustomerPassword {
@@ -92,7 +92,20 @@ export const removeCustomerAddress = async (address_id: number) => {
 }
 
 export const updateCustomerInfo = async (data: IUpdateCustomerInfo) => {
-    let result: APIResponse = await axios.put('/api/customer/info', data);
+
+    const build_data = new FormData();
+    build_data.append('name', data.name);
+    build_data.append('mobile', data.mobile);
+    build_data.append('gender', `${data.gender}`);
+    build_data.append('birth', `${data.birth}`);
+    build_data.append('image', data.image ? data.image : "");
+
+    let result: APIResponse = await axios.post(`/api/customer/info`, build_data, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+
     return result;
 }
 

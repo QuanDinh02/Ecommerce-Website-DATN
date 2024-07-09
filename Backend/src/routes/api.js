@@ -49,7 +49,7 @@ const ApiRoute = (app) => {
 
     // CUSTOMER
     router.get('/customer/info', customerController.getCustomerInfo);
-    router.put('/customer/info', customerController.updateCustomerInfo);
+    router.post('/customer/info', checkUserJWT, upload.single('image'), customerController.updateCustomerInfo);
     router.put('/customer/info/password', checkUserJWT, customerController.changeCustomerPassword);
 
     router.get('/customer/info/address', checkUserJWT, customerController.getAllCustomerAddress);
@@ -159,7 +159,7 @@ const ApiRoute = (app) => {
     router.get('/seller/order/search', checkUserJWT, sellerController.getOrderSearch)
     router.put('/seller/order/confirm', checkUserJWT, sellerController.confirmCustomerOrder)
     router.put('/seller/order/packing', checkUserJWT, sellerController.packingCustomerOrder)
-    router.post('/seller/product', checkUserJWT, sellerController.createNewProduct);
+    router.post('/seller/product', checkUserJWT, upload.single('image'), sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);
 

@@ -171,8 +171,13 @@ const updateCustomerDefaultAddress = async (req, res) => {
 
 const updateCustomerInfo = async (req, res) => {
     try {
-        let data = req.body;
-        let result = await customerServices.updateCustomerInfo(data);
+        let { user } = req;
+
+        let data = {
+            ...req.body, id: +user.customer_id
+        }
+
+        let result = await customerServices.updateCustomerInfo(data, req.file);
 
         if (result) {
             return res.status(200).json({

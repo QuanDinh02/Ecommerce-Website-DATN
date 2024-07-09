@@ -495,46 +495,40 @@ const createNewProduct = async (data, img_file) => {
                 rating: 0
             })
 
-            let result = await singleFileUpload(img_file, product_info.id);
-            if (result) {
-                if (result.EC === 0) {
-                    return {
-                        EC: 0,
-                        DT: "",
-                        EM: 'Thêm sản phẩm thành công!'
-                    }
-                } else {
-                    return {
-                        EC: -1,
-                        DT: "",
-                        EM: 'Thêm sản phẩm thành công với ảnh lỗi !'
-                    }
+            if (img_file && img_file !== "") {
+                let imageName = `${product_info.id}.jpeg`;
+
+                const params = {
+                    Bucket: bucketName,
+                    Key: imageName,
+                    Body: img_file.buffer,
+                    ContentType: img_file.mimetype
+                }
+
+                const command = new PutObjectCommand(params);
+
+                await s3.send(command);
+
+                return {
+                    EC: 0,
+                    DT: "",
+                    EM: 'Thêm sản phẩm thành công!'
+                }
+            } else {
+                return {
+                    EC: 0,
+                    DT: "",
+                    EM: 'Thêm sản phẩm thành công!'
                 }
             }
+
         } else {
             return {
                 EC: -1,
                 DT: "",
-                EM: 'Create new product failed!'
+                EM: 'Thêm sản phẩm thất bại!'
             }
         }
-
-        // let result = await singleFileUpload(img_file, "TEST");
-        // if (result) {
-        //     if (result.EC === 0) {
-        //         return {
-        //             EC: 0,
-        //             DT: "",
-        //             EM: 'Create new product successfully!'
-        //         }
-        //     } else {
-        //         return {
-        //             EC: -1,
-        //             DT: "",
-        //             EM: 'Create new product successfully with upload image failed !'
-        //         }
-        //     }
-        // }
 
     } catch (error) {
         console.log(error);
@@ -858,7 +852,7 @@ const handleOTPVertification = async (data) => {
 
 const getSellerInfo = async (seller_id) => {
     try {
-        let customerInfo = await db.Seller.findOne({
+        let sellerInfo = await db.Seller.findOne({
             raw: true,
             attributes: ['id', 'name', 'mobile', 'gender', 'birth', 'email'],
             where: {
@@ -879,9 +873,9 @@ const getSellerInfo = async (seller_id) => {
         return {
             EC: 0,
             DT: {
-                ...customerInfo, image: url
+                ...sellerInfo, image: url
             },
-            EM: 'Customer Info !'
+            EM: 'Seller Info !'
         }
     } catch (error) {
         console.log(error);

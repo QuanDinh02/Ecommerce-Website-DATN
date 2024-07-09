@@ -9,6 +9,7 @@ import { getCategoryList, getSubCategoryByCategory, createNewProduct } from "@/s
 import { errorToast1, successToast1 } from "@/components/Toast/Toast";
 import FloatingNumberInput from "@/components/Floating/FloatingNumberInput";
 import CustomizeDropdown from "./CustomizeProduct";
+import { RotatingLines } from "react-loader-spinner";
 
 const FILE_UPLOAD_SIZE_MAX = 2 * 1024 * 1024; // 2MB
 
@@ -65,6 +66,8 @@ const SellerAddNewProduct = () => {
             image_file: null
         }
     ]);
+
+    const [isCreating, setIsCreating] = React.useState<boolean>(false);
 
     const [productDescription, setProductDescription] = React.useState<string>("");
 
@@ -217,12 +220,14 @@ const SellerAddNewProduct = () => {
             return;
         }
 
-        if(productCurrentPrice >= productPrice) {
+        if (productCurrentPrice >= productPrice) {
             errorToast1("Giá giảm thấp hơn giá gốc");
             return;
         }
 
         let currentPrice = productCurrentPrice === 0 ? productPrice : productCurrentPrice;
+
+        setIsCreating(true);
 
         let result = await createNewProduct({
             name: productName,
@@ -236,14 +241,17 @@ const SellerAddNewProduct = () => {
 
         if (result) {
             if (result.EC === 0) {
-                successToast1(result.EM);
+
                 setTimeout(() => {
+                    successToast1(result.EM);
                     refreshNewForm();
+                    setIsCreating(false);
                 }, 1000);
             } else {
                 errorToast1(result.EM);
                 setTimeout(() => {
                     refreshNewForm();
+                    setIsCreating(false);
                 }, 1000);
                 return;
             }
@@ -369,6 +377,19 @@ const SellerAddNewProduct = () => {
                 <Button styles="px-4 py-2 rounded-lg border border-gray-300 w-fit mt-4" OnClick={() => refreshNewForm()}>Làm mới</Button>
                 <Button styles="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 w-fit mt-4" OnClick={() => handleCreateProduct()}>Thêm Sản Phẩm</Button>
             </div>
+            {
+                isCreating &&
+                <div className="absolute w-full h-full bg-black opacity-30 z-[100] inset-0 flex items-center justify-center">
+                    <RotatingLines
+                        width="80"
+                        strokeWidth="5"
+                        strokeColor="white"
+                        animationDuration="0.75"
+                        ariaLabel="rotating-lines-loading"
+                        visible={true}
+                    />
+                </div>
+            }
         </>
     )
 }

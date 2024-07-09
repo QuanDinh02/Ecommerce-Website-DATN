@@ -102,21 +102,12 @@ const createNewProduct = async (req, res) => {
             sub_category_id: +sub_category_id,
         }
 
-        if (!req.files || Object.keys(req.files).length === 0) {
-            return res.status(400).json({
-                EC: -1,
-                DT: "",
-                EM: "No file image is uploaded"
-            })
-        }
-        else {
-            let result = await sellerServices.createNewProduct(data, req.files.image);
-            return res.status(200).json({
-                EC: result.EC,
-                DT: result.DT,
-                EM: result.EM
-            })
-        }
+        let result = await sellerServices.createNewProduct(data, req.file);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
 
     } catch (error) {
         console.log(error);
@@ -359,7 +350,7 @@ const updateSellerInfo = async (req, res) => {
         let data = {
             ...req.body, id: +user.seller_id
         }
-        
+
         let result = await sellerServices.updateSellerInfo(data, req.file);
 
         if (result) {
