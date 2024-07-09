@@ -331,7 +331,7 @@ const ShippingUnitManagement = () => {
                                                             <td className="py-4 px-3" colSpan={2}>
                                                                 <div className="w-full flex items-center justify-center gap-x-4">
                                                                     <span className="cursor-pointer hover:underline hover:text-orange-500" onClick={() => handleShowUpdateModal(item)}>Chỉnh sửa</span>
-                                                                    <span className="cursor-pointer hover:underline hover:text-blue-500">Xem chi tiết</span>
+                                                                    <span className="cursor-pointer hover:underline hover:text-blue-500">Thông tin</span>
                                                                 </div>
 
                                                             </td>

@@ -18,6 +18,11 @@ interface IUpdateSU {
     description: string
 }
 
+interface IUpdateAccountStatus {
+    uid: number
+    status: number
+}
+
 interface IChangePassword {
     su_id: number
     old_password: string
@@ -62,6 +67,19 @@ export const getCustomerSearch = async (search: string) => {
         return result.DT;
     }
     return null;
+}
+
+export const getCustomerDetailInfo = async (customer_id: number) => {
+    let result: APIResponse = await axios.get(`/api/admin/customer/detail?customer_id=${customer_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const updateAccountStatus = async (data: IUpdateAccountStatus) => {
+    let result: APIResponse = await axios.put('/api/admin/customer/account', data);
+    return result;
 }
 
 export const getSellerList = async (seller_display_limit: number, page: number) => {

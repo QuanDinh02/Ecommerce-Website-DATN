@@ -108,6 +108,67 @@ const getCustomerSearch = async (req, res) => {
     }
 }
 
+const updateAccountStatus = async (req, res) => {
+    try {
+        let { user } = req;
+        let data = req.body;
+
+        if (user.role === "admin") {
+            let result = await adminServices.updateAccountStatus(data);
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            });
+        } else {
+            return res.status(401).json({
+                EC: -1,
+                DT: "",
+                EM: "Bạn không có quyền thao tác"
+            })
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getCustomerInfoDetail = async (req, res) => {
+    try {
+        let { user } = req;
+        let { customer_id } = req.query;
+
+        if (user.role === "admin") {
+            let result = await adminServices.getCustomerInfoDetail(+customer_id);
+            return res.status(200).json({
+                EC: result.EC,
+                DT: result.DT,
+                EM: result.EM
+            });
+        } else {
+            return res.status(401).json({
+                EC: -1,
+                DT: "",
+                EM: "Bạn không có quyền thao tác"
+            })
+        }
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+
 const getSellerData = async (req, res) => {
     try {
 
@@ -266,5 +327,6 @@ module.exports = {
     getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
     getShippingUnitData, getShippingUnitSearch, createShippingUnit,
-    updateShippingUnit, updateShippingUnitPassword
+    updateShippingUnit, updateShippingUnitPassword, updateAccountStatus,
+    getCustomerInfoDetail
 }

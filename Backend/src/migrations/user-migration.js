@@ -23,7 +23,10 @@ module.exports = {
             },
             refreshToken: {
                 type: Sequelize.STRING
-            }
+            },
+            active: {
+                type: Sequelize.TINYINT
+            },
         });
     },
     async down(queryInterface, Sequelize) {

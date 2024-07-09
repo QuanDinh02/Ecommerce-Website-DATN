@@ -323,7 +323,11 @@ const getCustomerData = async (item_limit, page) => {
             let customerList = await db.Customer.findAll({
                 raw: true,
                 nest: true,
-                attributes: ['id', 'name', 'mobile', 'email']
+                attributes: ['id', 'name', 'mobile', 'email'],
+                include: {
+                    model: db.User,
+                    attributes: ['id', 'active']
+                },
             });
 
             const listLength = customerList.length;
@@ -333,13 +337,24 @@ const getCustomerData = async (item_limit, page) => {
 
             let customerDataPangination = _(customerList).drop(offSet).take(item_limit).value();
 
+            let customerDataPanginationFormat = customerDataPangination.map(customer => {
+                return {
+                    id: customer.id,
+                    name: customer.name,
+                    mobile: customer.mobile,
+                    email: customer.email,
+                    uid: customer.User.id,
+                    active: customer.User.active,
+                }
+            });
+
             return {
                 EC: 0,
                 DT: {
                     page: page,
                     page_total: pageTotal,
                     total_items: listLength,
-                    customer_list: customerDataPangination
+                    customer_list: customerDataPanginationFormat
                 },
                 EM: 'Get customer data !'
             }
@@ -361,11 +376,71 @@ const getCustomerData = async (item_limit, page) => {
 
 }
 
+const getCustomerInfoDetail = async (customer_id) => {
+    try {
+
+        let customerInfo = await db.Customer.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['name', 'mobile', 'email','gender','birth'],
+            include: {
+                model: db.User,
+                attributes: ['registeredAt']
+            },
+            where: {
+                id: {
+                    [Op.eq]: +customer_id
+                }
+            }
+        });
+
+        if (customerInfo) {
+
+            let data = {
+                name: customerInfo.name,
+                mobile: customerInfo.mobile,
+                email: customerInfo.email,
+                gender: customerInfo.gender,
+                birth: customerInfo.birth,
+                join_date:customerInfo.User.registeredAt
+            }
+
+            return {
+                EC: 0,
+                DT: data,
+                EM: 'Get customer info detail !'
+            }
+        }
+
+        return {
+            EC: -1,
+            DT: null,
+            EM: 'Customer not existed !'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+
+}
+
+
 const getCustomerSearch = async (search_content) => {
     try {
         let customerList = await db.Customer.findAll({
             raw: true,
+            nest: true,
             attributes: ['id', 'name', 'mobile', 'email'],
+            include: {
+                raw: true,
+                model: db.User,
+                attributes: ['id', 'active']
+            },
             where: {
                 [Op.or]: [
                     {
@@ -383,10 +458,21 @@ const getCustomerSearch = async (search_content) => {
             }
         });
 
+        let customerListFormat = customerList.map(customer => {
+            return {
+                id: customer.id,
+                name: customer.name,
+                mobile: customer.mobile,
+                email: customer.email,
+                uid: customer.User.id,
+                active: customer.User.active,
+            }
+        })
+
         return {
             EC: 0,
             DT: {
-                customer_list: customerList
+                customer_list: customerListFormat
             },
             EM: 'Get customer data search !'
         }
@@ -402,6 +488,45 @@ const getCustomerSearch = async (search_content) => {
     }
 }
 
+const updateAccountStatus = async (data) => {
+    try {
+
+        await db.User.update({
+            active: +data.status
+        }, {
+            where: {
+                id: +data.uid
+            }
+        });
+
+        if (+data.status === 1) {
+            return {
+                EC: 0,
+                DT: "",
+                EM: 'Mở tài khoản thành công!'
+            }
+        }
+
+        if (+data.status === 0) {
+            return {
+                EC: 0,
+                DT: "",
+                EM: 'Khóa tài khoản thành công!'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: "",
+            EM: 'Không thể cập nhật!'
+        }
+
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
 const getSellerData = async (item_limit, page) => {
     try {
         if (item_limit > 0) {
@@ -410,7 +535,13 @@ const getSellerData = async (item_limit, page) => {
 
             let sellerList = await db.Seller.findAll({
                 raw: true,
-                attributes: ['id', 'name', 'shopName', 'mobile', 'email']
+                nest: true,
+                attributes: ['id', 'name', 'shopName', 'mobile', 'email'],
+                include: {
+                    raw: true,
+                    model: db.User,
+                    attributes: ['id', 'active']
+                },
             });
 
             const listLength = sellerList.length;
@@ -420,13 +551,25 @@ const getSellerData = async (item_limit, page) => {
 
             let sellerDataPangination = _(sellerList).drop(offSet).take(item_limit).value();
 
+            let sellerDataPanginationFormat = sellerDataPangination.map(seller => {
+                return {
+                    id: seller.id,
+                    name: seller.name,
+                    shopName: seller.shopName,
+                    mobile: seller.mobile,
+                    email: seller.email,
+                    uid: seller.User.id,
+                    active: seller.User.active,
+                }
+            });
+
             return {
                 EC: 0,
                 DT: {
                     page: page,
                     page_total: pageTotal,
                     total_items: listLength,
-                    seller_list: sellerDataPangination
+                    seller_list: sellerDataPanginationFormat
                 },
                 EM: 'Get seller data !'
             }
@@ -452,7 +595,13 @@ const getSellerSearch = async (search_content) => {
     try {
         let seller_list = await db.Seller.findAll({
             raw: true,
+            nest: true,
             attributes: ['id', 'name', 'shopName', 'mobile', 'email'],
+            include: {
+                raw: true,
+                model: db.User,
+                attributes: ['id', 'active']
+            },
             where: {
                 [Op.or]: [
                     {
@@ -470,10 +619,22 @@ const getSellerSearch = async (search_content) => {
             }
         });
 
+        let sellerListFormat = seller_list.map(seller => {
+            return {
+                id: seller.id,
+                name: seller.name,
+                shopName: seller.shopName,
+                mobile: seller.mobile,
+                email: seller.email,
+                uid: seller.User.id,
+                active: seller.User.active,
+            }
+        })
+
         return {
             EC: 0,
             DT: {
-                seller_list: seller_list
+                seller_list: sellerListFormat
             },
             EM: 'Get shop data search !'
         }
@@ -693,7 +854,7 @@ const updateShippingUnitPassword = async (data) => {
     try {
 
         let { su_id, old_password, new_password } = data;
-        
+
         let suInfo = await db.ShippingUnit.findOne({
             raw: true,
             attributes: ['userID'],
@@ -758,5 +919,6 @@ const updateShippingUnitPassword = async (data) => {
 module.exports = {
     getAnalysisProduct, getAnalysisProductSearch, getDashboardData,
     getCustomerData, getCustomerSearch, getSellerData, getSellerSearch,
-    getShippingUnitData, getShippingUnitSearch, createShippingUnit, updateShippingUnit, updateShippingUnitPassword
+    getShippingUnitData, getShippingUnitSearch, createShippingUnit, updateShippingUnit,
+    updateShippingUnitPassword, updateAccountStatus, getCustomerInfoDetail
 }

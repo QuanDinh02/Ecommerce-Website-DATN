@@ -3,14 +3,15 @@ import { IoIosCloseCircle } from "react-icons/io";
 
 interface MProps {
     show: boolean;
-    setShow: (status: boolean) => void; 
+    setShow: (status: boolean) => void;
     children: React.ReactNode;
     size?: string;
+    close_icon?: boolean;
 }
 
 const Modal = (props: MProps) => {
 
-    const { show, setShow, children, size: type } = props;
+    const { show, setShow, children, size: type, close_icon = false } = props;
 
     const sizes = {
         'customize': 'w-[72.25rem] max-h-4/5',
@@ -37,9 +38,12 @@ const Modal = (props: MProps) => {
                                     {children}
                                 </div>
                             </div>
-                            <div className={type != "full" ? "absolute top-[-15px] right-[-15px] z-50" : "absolute top-[5px] right-[5px] z-50"} onClick={() => handleCloseModal()}>
-                                <IoIosCloseCircle className="w-10 h-10 cursor-pointer hover:text-red-500 bg-white rounded-full" />
-                            </div>
+                            {
+                                !close_icon &&
+                                <div className={type != "full" ? "absolute top-[-15px] right-[-15px] z-50" : "absolute top-[5px] right-[5px] z-50"} onClick={() => handleCloseModal()}>
+                                    <IoIosCloseCircle className="w-10 h-10 cursor-pointer hover:text-red-500 bg-white rounded-full" />
+                                </div>
+                            }
                         </div>
                     </div>
                 </>
