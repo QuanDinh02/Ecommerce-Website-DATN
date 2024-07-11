@@ -1,11 +1,18 @@
 const { Sequelize } = require('sequelize');
+const fs = require("fs");
 
-const sequelize = new Sequelize('ECOMMERCE', 'root', '1234', {
-    host: 'localhost',
+const sequelize = new Sequelize('ecommerce', 'avnadmin', 'AVNS_SQHY8Ivz7J5kp9ElUF2', {
+    host: 'mysql-ecommerce-nhut0789541410-f8ba.e.aivencloud.com',
     dialect: 'mysql',
+    port: 27163,
     logging: false,
     define: {
         freezeTableName: true
+    },
+    dialectOptions: {
+        ssl: {
+            ca: fs.readFileSync(__dirname + '/ca.pem')
+        }
     }
 });
 
