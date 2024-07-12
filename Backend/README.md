@@ -1,4 +1,4 @@
-# Insurance-API (Insurance Website)
+# Ecommerce-API (Ecommerce Website)
 
 ## Installing
 
@@ -21,4 +21,4 @@ $ npm run start
 ```
 ### * Note
 
-Change username, password, database (development) in file config.json in folder /src/config before testing API
+Change DB_USERNAME, DB_PASSWORD, DB_DATABASE_NAME in file .env in folder before testing API

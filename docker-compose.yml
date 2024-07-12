@@ -1,0 +1,28 @@
+# https://docs.docker.com/compose/compose-file/compose-versioning/#compatibility-matrix
+# => run: docker version để biết enginer version bao nhiêu
+# version: "3.9"
+services:
+  nginx:
+    container_name: my-nginx
+    depends_on:
+      - backend
+    restart: always # because it is routing traffic to our entire app
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile
+    ports:
+      - 80:80
+    volumes:
+      # - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/config/default.conf:/etc/nginx/conf.d/default.conf
+
+  backend:
+    restart: unless-stopped
+    container_name: my-backend
+    build:
+      context: ./Backend
+    ports:
+      - 8080:8080
+    expose:
+      - "8080"
+  # docker compose -p ecommerce up -d

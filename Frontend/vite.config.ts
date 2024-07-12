@@ -26,6 +26,7 @@ export default ({ mode }) => {
         },
         base: process.env.VITE_BASE_URL,
         server: {
+            host: true,
             port: parseInt(process.env.VITE_PORT)
         },
     });
