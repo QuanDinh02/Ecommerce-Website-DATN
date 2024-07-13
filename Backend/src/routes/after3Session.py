@@ -14,10 +14,8 @@ import re
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
 
-
-def create_query_table(query, queries, encoded_queries, extra_params = {}):
+def create_query_table(query, encoded_queries, extra_params = {}):
     itemRealSearch = []
-        
     for i, encoded_query in enumerate(encoded_queries):
         result_docs = client.ft(INDEX_NAME).search(query, {'query_vector': np.array(encoded_query, dtype=np.float32).tobytes()} | extra_params).docs
         for doc in result_docs:
@@ -84,7 +82,6 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
         )
         ORDER BY s.createdAt DESC, sa.productID, sa.type;
     '''
-
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
     itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['name_embeddings'], type_to_weight[item['type']]) for item in res4Session]
@@ -133,14 +130,14 @@ def get_predicted_ratings(user_id, item_ids, mysql_config={}):
     query_avg_ratings = "SELECT user_id, avg_rating FROM AVGRating"
     cursor.execute(query_avg_ratings)
     avg_ratings = cursor.fetchall()
-    avg_ratings_dict = {row['user_id']: row['avg_rating'] for row in avg_ratings}
+    avg_ratings_dict = {str(row['user_id']): float(row['avg_rating']) for row in avg_ratings}
 
     # Get training data
     query_training_data = "SELECT user_id, item_id, rating, timestamp FROM TrainingData"
     cursor.execute(query_training_data)
     training_data = cursor.fetchall()
     training_data_dict = {(row['user_id'], row['item_id']): row['rating'] for row in training_data}
-    
+
     query_get_sim = f'''
         select user_v, sim
         from Sim
@@ -237,20 +234,29 @@ def update_product(redis_client, cursor, embedder):
         i += 1
 
 if __name__ == "__main__":
+    # mysql_config = {
+    #     'user': 'root',
+    #     'password': '1234',
+    #     'host': 'localhost',
+    #     'database': 'ecommerce',
+    # }
+    
     mysql_config = {
-        'user': 'root',
-        'password': '1234',
-        'host': 'localhost',
+        'user': 'avnadmin',
+        'password': 'AVNS_SQHY8Ivz7J5kp9ElUF2',
+        'host': 'mysql-ecommerce-nhut0789541410-f8ba.e.aivencloud.com',
         'database': 'ecommerce',
+        "port": '27163'
     }
+    
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
-        
+    
     client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
 
-    params = sys.argv[1]
-    customerID = params
-    # customerID = '10577013'
+    # params = sys.argv[1]
+    # customerID = params
+    customerID = '10577013'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -289,7 +295,7 @@ if __name__ == "__main__":
             encoded_queries = embedder.encode(search_content)
             print(len(encoded_queries))
             print("Search 50 items...")
-            itemRealSearch = create_query_table(query, search_content, encoded_queries)
+            itemRealSearch = create_query_table(query, encoded_queries)
             print("Ranking...")
             rankingItems = ranking_items(itemSessionVector, itemRealSearch)
             

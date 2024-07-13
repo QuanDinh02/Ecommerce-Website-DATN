@@ -12,7 +12,7 @@ def get_unrated_products_and_predict(user_id, mysql_config={}):
     query_avg_ratings = "SELECT user_id, avg_rating FROM AVGRating"
     cursor.execute(query_avg_ratings)
     avg_ratings = cursor.fetchall()
-    avg_ratings_dict = {row['user_id']: row['avg_rating'] for row in avg_ratings}
+    avg_ratings_dict = {str(row['user_id']): float(row['avg_rating']) for row in avg_ratings}
 
     # Get training data
     query_training_data = "SELECT user_id, item_id, rating, timestamp FROM TrainingData"
@@ -87,15 +87,24 @@ def get_unrated_products_and_predict(user_id, mysql_config={}):
 
 if __name__ == '__main__':
 
-    mysql_config = {
-        'user': 'root',
-        'password': '1234',
-        'host': 'localhost',
-        'database': 'ecommerce',
-    }
+    # mysql_config = {
+    #     'user': 'root',
+    #     'password': '1234',
+    #     'host': 'localhost',
+    #     'database': 'ecommerce',
+    # }
 
+    mysql_config = {
+        'user': 'avnadmin',
+        'password': 'AVNS_SQHY8Ivz7J5kp9ElUF2',
+        'host': 'mysql-ecommerce-nhut0789541410-f8ba.e.aivencloud.com',
+        'database': 'ecommerce',
+        "port": '27163'
+    }
+    
     params = sys.argv[1]
     user_id = params
+    # user_id = '10577013'
     
     result = get_unrated_products_and_predict(user_id, mysql_config=mysql_config)
     a = {'data': result}
