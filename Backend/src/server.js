@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import configCors from './config/cors';
 import ApiRoute from './routes/api';
-//import connection from './config/connectDB';
+import connection from './config/connectDB';
 
 //For env File 
 dotenv.config();
@@ -15,7 +15,7 @@ const port = process.env.PORT || 8081;
 // cors config
 configCors(app);
 
-//connection();
+connection();
 
 //config body-parser
 app.use(bodyParser.json());

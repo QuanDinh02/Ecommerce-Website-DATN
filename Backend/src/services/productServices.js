@@ -307,25 +307,30 @@ const getProductsHistory = async (item_limit, page, data) => {
                         }
                     });
 
-                    const getObjectParams = {
-                        Bucket: bucketName,
-                        Key: `${item}.jpeg`
+                    if (!productType) {
+                        return null;
                     }
+                    else {
+                        const getObjectParams = {
+                            Bucket: bucketName,
+                            Key: `${item}.jpeg`
+                        }
 
-                    const command = new GetObjectCommand(getObjectParams);
-                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                        const command = new GetObjectCommand(getObjectParams);
+                        const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
 
-                    return {
-                        id: productInfo.id,
-                        name: productInfo.name,
-                        seller_info: seller_info,
-                        summary: productInfo.summary,
-                        image: url,
-                        current_price: productType.currentPrice,
-                        price: productType.price,
-                        sold: productType.sold,
-                        rating: productInfo.ProductRating.rating,
-                        quantity: productType.quantity
+                        return {
+                            id: productInfo.id,
+                            name: productInfo.name,
+                            seller_info: seller_info,
+                            summary: productInfo.summary,
+                            image: url,
+                            current_price: productType.currentPrice,
+                            price: productType.price,
+                            sold: productType.sold,
+                            rating: productInfo.ProductRating.rating,
+                            quantity: productType.quantity
+                        }
                     }
                 }
                 else {
@@ -418,25 +423,31 @@ const getProductsHistorySwiper = async (data) => {
                     }
                 });
 
-                const getObjectParams = {
-                    Bucket: bucketName,
-                    Key: `${item}.jpeg`
+                if (!productType) {
+                    return null;
                 }
 
-                const command = new GetObjectCommand(getObjectParams);
-                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+                else {
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${item}.jpeg`
+                    }
 
-                return {
-                    id: productInfo.id,
-                    name: productInfo.name,
-                    seller_info: seller_info,
-                    summary: productInfo.summary,
-                    image: url,
-                    current_price: productType.currentPrice,
-                    price: productType.price,
-                    sold: productType.sold,
-                    rating: productInfo.ProductRating.rating,
-                    quantity: productType.quantity
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        seller_info: seller_info,
+                        summary: productInfo.summary,
+                        image: url,
+                        current_price: productType.currentPrice,
+                        price: productType.price,
+                        sold: productType.sold,
+                        rating: productInfo.ProductRating.rating,
+                        quantity: productType.quantity
+                    }
                 }
             }
             else {
