@@ -34,7 +34,6 @@ import {
 import { getSubCategoryInfo } from "@/services/subCategoryService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
-import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import ProductRatingFilter from "./ProductRatingFilter";

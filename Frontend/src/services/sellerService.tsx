@@ -35,6 +35,18 @@ interface IUpdateShopInfo {
     image: File | null
 }
 
+interface IShopResonse {
+    id: number
+    comment: string
+    parentID: number
+}
+
+interface IProductReview {
+    id: number
+    rating: number
+    comment: string
+}
+
 export const getProductsPagination = async (product_display_limit: number, page: number, category: number, sub_category: number, sort: number) => {
     let result: APIResponse = await axios.get(`/api/seller/products?limit=${product_display_limit}&page=${page}&category_id=${category}&sub_category_id=${sub_category}&sort_id=${sort}`);
     if (result && result?.DT) {
@@ -68,6 +80,36 @@ export const getOrderAll = async (order_display_limit: number, page: number, sta
         return result.DT;
     }
     return null;
+}
+
+export const getProductReviewByOrder = async (order_display_limit: number, page: number, startDate: Date | null, endDate: Date | null) => {
+    let start_date = startDate ? startDate : 0;
+    let end_date = endDate ? endDate : 0;
+
+    let result: APIResponse = await axios.get(`/api/seller/product-review/order?limit=${order_display_limit}&page=${page}&startDate=${start_date}&endDate=${end_date}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return null;
+}
+
+export const responseCustomerRating = async (response: IShopResonse, review: IProductReview) => {
+
+    let data = {
+        response: response,
+        review: review
+    }
+    
+    let result: APIResponse = await axios.post('/api/seller/product-review/order/response', data);
+    return result;
+}
+
+export const getSearchProductReviewByOrder = async (order_id: number) => {
+    let result: APIResponse = await axios.get(`/api/seller/product-review/order/search?id=${order_id}`);
+    if (result && result?.DT) {
+        return result.DT;
+    }
+    return [];
 }
 
 export const deleteProduct = async (product_id: number) => {

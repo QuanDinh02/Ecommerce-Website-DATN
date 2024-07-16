@@ -25,7 +25,6 @@ interface IUpdateAccountStatus {
 
 interface IChangePassword {
     su_id: number
-    old_password: string
     new_password: string
 }
 
