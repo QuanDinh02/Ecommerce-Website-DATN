@@ -60,6 +60,7 @@ import ShopCategory from '@/pages/SellerInfo/Shop/ShopCategory.tsx';
 import SellerNotification from '@/pages/SellerInfo/SellerNotification.tsx';
 import SellerSupport from '@/pages/SellerInfo/SellerSupport.tsx';
 import SellerProductAnnouncement from '@/pages/SellerInfo/SellerProduct/SellerProductAnnouncement.tsx';
+import ProductReviewManagement from '@/pages/SellerInfo/Shop/ProductReviewManagement.tsx';
 
 // SHIPPING UNIT
 import SUMain from '@/pages/ShippingUnit/SUMain.tsx';
@@ -167,6 +168,10 @@ const router = createBrowserRouter(
                 {
                   path: "info",
                   element: <ShopInfo />
+                },
+                {
+                  path: "review",
+                  element: <ProductReviewManagement/>
                 },
                 {
                   path: "category",

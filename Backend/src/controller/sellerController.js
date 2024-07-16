@@ -86,6 +86,49 @@ const getOrderPagination = async (req, res) => {
     }
 }
 
+const getOrderReviewPagination = async (req, res) => {
+    try {
+
+        let { limit, page, startDate, endDate } = req.query;
+        let { user } = req;
+
+        let result = await sellerServices.getOrderReviewPagination(+user.seller_id, +limit, +page, startDate, endDate);
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
+const getOrderReviewSearch = async (req, res) => {
+    try {
+        let { user } = req;
+        let { id } = req.query;
+        let result = await sellerServices.getOrderReviewSearch(+user.seller_id, +id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 const createNewProduct = async (req, res) => {
     try {
 
@@ -733,6 +776,28 @@ const getProductInventorySearch = async (req, res) => {
     }
 }
 
+const sellerResponseCustomerRating = async (req, res) => {
+    try {
+        let { user } = req;
+        let data = req.body;
+
+        let result = await sellerServices.sellerResponseCustomerRating(data, +user.seller_id);
+
+        return res.status(200).json({
+            EC: result.EC,
+            DT: result.DT,
+            EM: result.EM
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            EC: -1,
+            DT: '',
+            EM: "error from server !"
+        })
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct, getCategoryList, getSubCategoryList,
     updateProduct, sendVertificatedCode, handleCodeVertification, getSellerInfo, updateSellerInfo,
@@ -740,5 +805,6 @@ module.exports = {
     createShopCategory, editShopCategory, removeShopCategory, getShopCategoryDetailExist,
     getShopCategoryDetailNotExist, addProductToCategoryShop, removeProductOutCategoryShop,
     getDashboardData, getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
-    getProductInventorySearch, getSellerShopInfo, updateShopInfo
+    getProductInventorySearch, getSellerShopInfo, updateShopInfo, getOrderReviewPagination, getOrderReviewSearch,
+    sellerResponseCustomerRating
 }

@@ -159,6 +159,9 @@ const ApiRoute = (app) => {
     router.get('/seller/order/search', checkUserJWT, sellerController.getOrderSearch)
     router.put('/seller/order/confirm', checkUserJWT, sellerController.confirmCustomerOrder)
     router.put('/seller/order/packing', checkUserJWT, sellerController.packingCustomerOrder)
+    router.get('/seller/product-review/order', checkUserJWT, sellerController.getOrderReviewPagination);
+    router.get('/seller/product-review/order/search', checkUserJWT, sellerController.getOrderReviewSearch);
+    router.post('/seller/product-review/order/response', checkUserJWT, sellerController.sellerResponseCustomerRating);
     router.post('/seller/product', checkUserJWT, upload.single('image'), sellerController.createNewProduct);
     router.put('/seller/product', checkUserJWT, sellerController.updateProduct);
     router.delete('/seller/product/:id', sellerController.deleteProduct);

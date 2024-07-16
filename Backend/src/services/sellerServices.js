@@ -2508,6 +2508,497 @@ const getProductInventorySearch = async (shop_seller_id, product_id) => {
     }
 }
 
+const getOrderReviewPagination = async (shop_seller_id, item_limit, page, startDate, endDate) => {
+    try {
+        if (item_limit > 0) {
+
+            let offSet = (page - 1) * item_limit;
+
+            let orderListRaw = await db.Order.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'orderDate', 'totalPrice'],
+                include: {
+                    raw: true,
+                    model: db.Customer,
+                    attributes: ['name', 'mobile']
+                },
+                where: {
+                    sellerID: {
+                        [Op.eq]: shop_seller_id,
+                    },
+                }
+            });
+
+            if (+startDate !== 0 && +endDate !== 0) {
+
+                let start_date = new Date(startDate);
+                let end_date = new Date(endDate);
+
+                if (start_date.getTime() !== end_date.getTime()) {
+                    orderListRaw = orderListRaw.filter(order => order.orderDate >= start_date && order.orderDate <= end_date);
+                }
+                else {
+                    orderListRaw = orderListRaw.filter(order => {
+                        let order_date = new Date(order.orderDate);
+
+                        let order_month = order_date.getMonth() + 1; // months from 1-12
+                        let order_day = order_date.getDate();
+                        let order_year = order_date.getFullYear();
+
+                        let month = start_date.getMonth() + 1; // months from 1-12
+                        let day = start_date.getDate();
+                        let year = start_date.getFullYear();
+
+                        return order_day === day && order_month === month && order_year === year;
+                    });
+                }
+            }
+
+            orderListRaw.reverse();
+
+            let order_list_data = await Promise.all(orderListRaw.map(async item => {
+
+                let order_status_raw = await db.Shipment.findAll({
+                    limit: 1,
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'updatedDate'],
+                    include:
+                    {
+                        model: db.ShipmentStatus,
+                        attributes: ['id', 'name'],
+                    },
+                    where: {
+                        orderID: {
+                            [Op.eq]: +item.id,
+                        },
+                    },
+                    order: [
+                        ['updatedDate', 'DESC'],
+                        ['status', 'DESC'],
+                    ]
+                });
+
+                let order_status_info = order_status_raw[0];
+
+                let order_status = order_status_info.ShipmentStatus;
+
+                return {
+                    ...item,
+                    status: order_status
+                }
+            }));
+
+            let filter_order_list_data = order_list_data.filter(item => item.status.id === 7);
+
+            const listLength = filter_order_list_data.length;
+            const pageTotal = Math.ceil(listLength / item_limit);
+
+            let paginate_order_list_data = _(filter_order_list_data).drop(offSet).take(item_limit).value();
+
+            let finalData = await Promise.all(paginate_order_list_data.map(async order => {
+
+                let order_item_list = await db.OrderItem.findAll({
+                    raw: true,
+                    nest: true,
+                    attributes: ['id', 'quantity', 'price'],
+                    include: [
+                        {
+                            model: db.Product,
+                            attributes: ['id', 'name'],
+                        }
+                    ],
+                    where: {
+                        orderID: {
+                            [Op.eq]: +order.id
+                        }
+                    }
+                });
+
+                let product_review_data_raw = await db.OrderProductReview.findAll({
+                    raw: true,
+                    nest: true,
+                    include: [
+                        {
+                            model: db.ProductReview,
+                            attributes: ['id', 'rating', 'productID', 'comment'],
+                        }
+                    ],
+                    where: {
+                        orderID: {
+                            [Op.eq]: +order.id
+                        }
+                    }
+                });
+
+                let product_review_data = await product_review_data_raw.map(item => {
+                    return item.ProductReview;
+                })
+
+                let product_list = await Promise.all(order_item_list.map(async order_item => {
+
+                    let orderItem = order_item;
+                    let productInfo = orderItem.Product;
+
+                    const getObjectParams = {
+                        Bucket: bucketName,
+                        Key: `${productInfo.id}.jpeg`
+                    }
+
+                    const command = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                    let review = product_review_data.filter(item => item.productID === productInfo.id);
+
+                    if (review.length === 0) {
+                        return {
+                            id: productInfo.id,
+                            name: productInfo.name,
+                            image: url,
+                            review: {
+                                id: 0,
+                                rating: 0,
+                                comment: ""
+                            },
+                            shop_response: {
+                                id: 0,
+                                comment: "",
+                                parentID: 0
+                            }
+                        }
+                    } else {
+                        let shop_response = await db.ProductReview.findOne({
+                            raw: true,
+                            attributes: ['id', 'comment', 'parentID'],
+                            where: {
+                                parentID: {
+                                    [Op.eq]: +review[0].id
+                                }
+                            }
+                        });
+
+                        if (shop_response) {
+                            return {
+                                id: productInfo.id,
+                                name: productInfo.name,
+                                image: url,
+                                review: {
+                                    id: review[0].id,
+                                    rating: review[0].rating,
+                                    comment: review[0].comment
+                                },
+                                shop_response: shop_response
+                            }
+                        }
+
+                        return {
+                            id: productInfo.id,
+                            name: productInfo.name,
+                            image: url,
+                            review: {
+                                id: review[0].id,
+                                rating: review[0].rating,
+                                comment: review[0].comment
+                            },
+                            shop_response: {
+                                id: 0,
+                                comment: "",
+                                parentID: 0
+                            }
+                        }
+                    }
+
+                }));
+
+                return {
+                    id: +order.id,
+                    orderDate: order.orderDate,
+                    customer_info: order.Customer,
+                    product_list: product_list
+                }
+
+            }));
+
+            return {
+                EC: 0,
+                DT: {
+                    page: page,
+                    page_total: pageTotal,
+                    total_items: listLength,
+                    order_list: finalData
+                },
+                EM: 'Get product review by order !'
+            }
+        }
+
+        return {
+            EC: 0,
+            DT: [],
+            EM: 'ITEM LIMIT is invalid !'
+        }
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const getOrderReviewSearch = async (shop_seller_id, order_id) => {
+    try {
+
+        let orderInfo = await db.Order.findOne({
+            raw: true,
+            nest: true,
+            attributes: ['id', 'orderDate', 'totalPrice'],
+            include: {
+                raw: true,
+                model: db.Customer,
+                attributes: ['name', 'mobile']
+            },
+            where: {
+                [Op.and]: [
+                    {
+                        id: {
+                            [Op.eq]: order_id
+                        }
+                    },
+                    {
+                        sellerID: {
+                            [Op.eq]: shop_seller_id,
+                        }
+                    }
+                ]
+
+            }
+        });
+
+        if (orderInfo) {
+
+            let order_item_list = await db.OrderItem.findAll({
+                raw: true,
+                nest: true,
+                attributes: ['id', 'quantity', 'price'],
+                include: [
+                    {
+                        model: db.Product,
+                        attributes: ['id', 'name'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: +orderInfo.id
+                    }
+                }
+            });
+
+            let product_review_data_raw = await db.OrderProductReview.findAll({
+                raw: true,
+                nest: true,
+                include: [
+                    {
+                        model: db.ProductReview,
+                        attributes: ['id', 'rating', 'productID', 'comment'],
+                    }
+                ],
+                where: {
+                    orderID: {
+                        [Op.eq]: +orderInfo.id
+                    }
+                }
+            });
+
+            let product_review_data = await product_review_data_raw.map(item => {
+                return item.ProductReview;
+            })
+
+            let product_list = await Promise.all(order_item_list.map(async order_item => {
+
+                let orderItem = order_item;
+                let productInfo = orderItem.Product;
+
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: `${productInfo.id}.jpeg`
+                }
+
+                const command = new GetObjectCommand(getObjectParams);
+                const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+
+                let review = product_review_data.filter(item => item.productID === productInfo.id);
+
+                if (review.length === 0) {
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        image: url,
+                        review: {
+                            id: 0,
+                            rating: 0,
+                            comment: ""
+                        },
+                        shop_response: {
+                            id: 0,
+                            comment: 0,
+                            parentID: 0
+                        }
+                    }
+                } else {
+                    let shop_response = await db.ProductReview.findOne({
+                        raw: true,
+                        attributes: ['id', 'comment', 'parentID'],
+                        where: {
+                            parentID: {
+                                [Op.eq]: +review[0].id
+                            }
+                        }
+                    });
+
+                    if (shop_response) {
+                        return {
+                            id: productInfo.id,
+                            name: productInfo.name,
+                            image: url,
+                            review: {
+                                id: review[0].id,
+                                rating: review[0].rating,
+                                comment: review[0].comment
+                            },
+                            shop_response: shop_response
+                        }
+                    }
+
+                    return {
+                        id: productInfo.id,
+                        name: productInfo.name,
+                        image: url,
+                        review: {
+                            id: review[0].id,
+                            rating: review[0].rating,
+                            comment: review[0].comment
+                        },
+                        shop_response: {
+                            id: 0,
+                            comment: 0,
+                            parentID: 0
+                        }
+                    }
+                }
+
+            }));
+
+            let finalData = {
+                id: +orderInfo.id,
+                orderDate: orderInfo.orderDate,
+                customer_info: orderInfo.Customer,
+                product_list: product_list
+            }
+
+            return {
+                EC: 0,
+                DT: {
+                    order_list: [finalData]
+                },
+                EM: 'Get search product review by order!'
+            }
+        } else {
+            return {
+                EC: 0,
+                DT: {
+                    order_list: []
+                },
+                EM: 'Get search product review by order!'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
+const sellerResponseCustomerRating = async (data, seller_id) => {
+    try {
+
+        let { response, review } = data;
+
+        let date = new Date();
+
+        if (response.id === 0) {
+
+            let response_info = await db.ProductReview.create({
+                comment: response.comment,
+                parentID: review.id,
+                shopID: seller_id,
+                createdAt: date,
+                updatedAt: date
+            });
+
+            if (response_info) {
+                let responseInfo = response_info.dataValues;
+
+                return {
+                    EC: 0,
+                    DT: {
+                        id: responseInfo.id,
+                        comment: responseInfo.comment,
+                        parentID: responseInfo.parentID
+                    },
+                    EM: 'Đã phản hồi người mua'
+                }
+            } else {
+                return {
+                    EC: -1,
+                    DT: {
+                        id: 0,
+                        comment: "",
+                        parentID: 0
+                    },
+                    EM: 'Lỗi không thể phản hồi người mua'
+                }
+            }
+
+        } else {
+
+            await db.ProductReview.update({
+                comment: response.comment,
+                updatedAt: date
+            }, {
+                where: {
+                    id: {
+                        [Op.eq]: +response.id
+                    }
+                }
+            });
+
+            return {
+                EC: 0,
+                DT: {
+                    id: response.id,
+                    comment: response.comment,
+                    parentID: response.parentID
+                },
+                EM: 'Đã cập nhật phản hồi'
+            }
+        }
+
+    } catch (error) {
+        console.log(error);
+        return {
+            EC: -2,
+            DT: [],
+            EM: 'Something is wrong on services !',
+        }
+    }
+}
+
 module.exports = {
     getProductPagination, createNewProduct, deleteProduct,
     getAllCategories, getSubCategoriesByCategory, updateProduct,
@@ -2518,5 +3009,6 @@ module.exports = {
     deleteShopCategory, getShopCategoryDetailExist, getShopCategoryDetailNotExist,
     addProductToCategoryShop, removeProductOutCategoryShop, getDashboardData,
     getOrderSearch, getProductSearch, getProductsAnnouncement, updateProductInventory,
-    getProductInventorySearch, getSellerShopInfo, updateShopInfo
+    getProductInventorySearch, getSellerShopInfo, updateShopInfo,
+    getOrderReviewPagination, getOrderReviewSearch, sellerResponseCustomerRating
 }

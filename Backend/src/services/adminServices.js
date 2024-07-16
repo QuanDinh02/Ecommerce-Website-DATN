@@ -907,7 +907,7 @@ const updateShippingUnit = async (data) => {
 const updateShippingUnitPassword = async (data) => {
     try {
 
-        let { su_id, old_password, new_password } = data;
+        let { su_id, new_password } = data;
 
         let suInfo = await db.ShippingUnit.findOne({
             raw: true,
@@ -922,9 +922,9 @@ const updateShippingUnitPassword = async (data) => {
         if (suInfo) {
             let user_id = suInfo.userID;
 
-            let userInfo = await db.User.findOne({
-                raw: true,
-                attributes: ['password'],
+            await db.User.update({
+                password: hashPassword(new_password),
+            }, {
                 where: {
                     id: {
                         [Op.eq]: +user_id
@@ -932,30 +932,10 @@ const updateShippingUnitPassword = async (data) => {
                 }
             });
 
-            let user_password = userInfo.password;
-            if (checkPassword(old_password, user_password)) {
-
-                await db.User.update({
-                    password: hashPassword(new_password),
-                }, {
-                    where: {
-                        id: {
-                            [Op.eq]: +user_id
-                        }
-                    }
-                });
-
-                return {
-                    EC: 0,
-                    DT: "",
-                    EM: 'Thay đổi mật khẩu thành công!'
-                }
-            } else {
-                return {
-                    EC: -1,
-                    DT: "",
-                    EM: 'Mật khẩu cũ không đúng!'
-                }
+            return {
+                EC: 0,
+                DT: "",
+                EM: 'Thay đổi mật khẩu thành công!'
             }
         }
         return {

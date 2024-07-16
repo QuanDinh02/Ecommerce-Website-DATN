@@ -736,6 +736,8 @@ const ProductDetailPage = () => {
             setActiveProduct({
                 ...activeProduct, id: product_id ? product_id : 0, name: response.name
             });
+
+            setDataLoading(false);
         }
     }
 
@@ -864,6 +866,7 @@ const ProductDetailPage = () => {
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
 
         if (productID !== 0) {
+            setDataLoading(true);
             fetchProductDetail(productID);
             fetchProductReviews(productID);
             fetchShopInfoDetail(productID);
@@ -885,12 +888,12 @@ const ProductDetailPage = () => {
         }
     }, [ratingFilter])
 
-    React.useEffect(() => {
+    // React.useEffect(() => {
 
-        setTimeout(() => {
-            setDataLoading(false);
-        }, 1000);
-    }, []);
+    //     setTimeout(() => {
+    //         setDataLoading(false);
+    //     }, 1000);
+    // }, []);
 
     return (
         <>

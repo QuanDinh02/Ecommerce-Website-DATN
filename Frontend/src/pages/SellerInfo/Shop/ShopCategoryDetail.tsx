@@ -1,4 +1,3 @@
-import LoadImage from "@/components/LoadImage";
 import { addProductToCategoryShop, getCategoryList, getShopCategoryDetailExist, getShopCategoryDetailNotExist, removeProductOutCategoryShop } from "@/services/sellerService";
 import React from "react";
 import { ThreeDots } from "react-loader-spinner";
