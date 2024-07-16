@@ -256,12 +256,17 @@ if __name__ == "__main__":
     
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
-    
-    client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
+
+    client = redis.Redis(
+        host='redis-19166.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com',
+        port=19166,
+        password='8CQNangMeI7C8nAGaZHyprdhWFdUaYp0')
+    # client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
 
     params = sys.argv[1]
     customerID = params
     # customerID = '6202671'
+    
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -289,8 +294,8 @@ if __name__ == "__main__":
                 .dialect(2)
         )
         
-        print("Updating new product embeddings...")
-        update_product(client, cursor, embedder)
+        # print("Updating new product embeddings...")
+        # update_product(client, cursor, embedder)
         
         print("Get items 4 SS...")
         itemSessionVector = getInfo4Session(customerID, client, mysql_config)
@@ -306,7 +311,6 @@ if __name__ == "__main__":
             
             if (len(rankingItems)) > 0:
                 break
-        d = timeit.default_timer()
         print(tuple(rankingItems))
         
         print("Check items...")
@@ -325,7 +329,7 @@ if __name__ == "__main__":
         
         print("Predict rating...")
         result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
-        e = timeit.default_timer()
+
         data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
     else:
