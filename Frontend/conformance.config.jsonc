@@ -1,0 +1,7 @@
+{
+    "SET_COOKIE_VALIDATION": {
+        "cookieAllowList": [
+            "jwt","rjwt","jwtsys", "rjwtsys"
+        ]
+    }
+}
