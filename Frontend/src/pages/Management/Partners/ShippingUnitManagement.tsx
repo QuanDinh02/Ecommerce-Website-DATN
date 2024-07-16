@@ -89,10 +89,7 @@ const ShippingUnitManagement = () => {
         description: ""
     });
 
-    const [updatePassword, setUpdatePassword] = useImmer<IUpdatePassword>({
-        old_password: "",
-        new_password: ""
-    });
+    const [newPassword, setNewPassword] = React.useState<string>("");
 
     const handleUpdateOnChange = (field: string, value: string) => {
         setUpdateSU(draft => {
@@ -109,16 +106,11 @@ const ShippingUnitManagement = () => {
             description: ""
         });
 
-        setUpdatePassword({
-            old_password: "",
-            new_password: ""
-        });
+        setNewPassword("");
     }
 
-    const handlePasswordOnChange = (field: string, value: string) => {
-        setUpdatePassword(draft => {
-            draft[field] = value;
-        });
+    const handlePasswordOnChange = (value: string) => {
+        setNewPassword(value);
     }
 
     const handleShowUpdateModal = (su: IShippingUnit) => {
@@ -128,10 +120,7 @@ const ShippingUnitManagement = () => {
 
     const handleCloseModal = (active: boolean) => {
         setShowUpdateModal(false);
-        setUpdatePassword({
-            old_password: "",
-            new_password: ""
-        });
+        setNewPassword("");
     }
 
     const fetchShippingUnitList = async (limit: number, page: number) => {
@@ -217,20 +206,14 @@ const ShippingUnitManagement = () => {
 
     const changeSUPassword = async () => {
 
-        if (updatePassword.old_password.length === 0) {
-            errorToast1("Vui lòng nhập mật khẩu cũ !");
-            return;
-        }
-
-        if (updatePassword.new_password.length === 0) {
+        if (newPassword.length === 0) {
             errorToast1("Vui lòng nhập mật khẩu mới !");
             return;
         }
 
         let result = await changePasswordShippingUnit({
             su_id: updateSU.id,
-            old_password: updatePassword.old_password,
-            new_password: updatePassword.new_password,
+            new_password: newPassword,
         });
 
         if (result) {
@@ -379,38 +362,40 @@ const ShippingUnitManagement = () => {
             <Modal show={showUpdateModal} setShow={handleCloseModal} size="w-4/6-h-auto">
                 <div className="flex flex-col h-full relative">
                     <div className="text-xl mb-8">Cập nhật thông tin đơn vị vận chuyển</div>
-                    <div className="text-lg mb-4">Thông tin đơn vị vận chuyển</div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
-                        <div>
-                            <div className='input_label font-medium'>Tên đơn vị vận chuyển {requiredField()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('nameUnit', e.target.value)} value={updateSU.nameUnit} placeholder="Nhập tên đơn vị vận chuyển" />
+                    <div className="flex gap-x-10">
+                        <div className="w-1/2">
+                            <div className="text-lg mb-4">Thông tin đơn vị vận chuyển</div>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
+                                <div>
+                                    <div className='input_label font-medium'>Tên đơn vị vận chuyển {requiredField()}</div>
+                                    <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('nameUnit', e.target.value)} value={updateSU.nameUnit} placeholder="Nhập tên đơn vị vận chuyển" />
+                                </div>
+                                <div>
+                                    <div className='input_label font-medium'>Số điện thoại {requiredField()} <span className="text-sm text-gray-400">(10 hoặc 11 số)</span></div>
+                                    <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('mobile', e.target.value)} value={updateSU.mobile} placeholder="Nhập số điện thoại đơn vị vận chuyển" />
+                                </div>
+                                <div>
+                                    <div className='input_label font-medium'>Địa chỉ {requiredField()}</div>
+                                    <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('address', e.target.value)} value={updateSU.address} placeholder="Nhập địa chỉ đơn vị vận chuyển" />
+                                </div>
+                                <div>
+                                    <div className='input_label font-medium'>Mô tả đơn vị</div>
+                                    <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('description', e.target.value)} value={updateSU.description} placeholder="Nhập mô tả đơn vị vận chuyển" />
+                                </div>
+                            </div>
+                            <Button styles="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1" OnClick={() => handleUpdateSU()}><BiSave /> Lưu</Button>
                         </div>
-                        <div>
-                            <div className='input_label font-medium'>Số điện thoại {requiredField()} <span className="text-sm text-gray-400">(10 hoặc 11 số)</span></div>
-                            <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('mobile', e.target.value)} value={updateSU.mobile} placeholder="Nhập số điện thoại đơn vị vận chuyển" />
-                        </div>
-                        <div>
-                            <div className='input_label font-medium'>Địa chỉ {requiredField()}</div>
-                            <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('address', e.target.value)} value={updateSU.address} placeholder="Nhập địa chỉ đơn vị vận chuyển" />
-                        </div>
-                        <div>
-                            <div className='input_label font-medium'>Mô tả đơn vị</div>
-                            <input type="text" className="form_input" onChange={(e) => handleUpdateOnChange('description', e.target.value)} value={updateSU.description} placeholder="Nhập mô tả đơn vị vận chuyển" />
+                        <div className="w-1/2">
+                            <div className="text-lg mb-4">Đổi mật khẩu</div>
+                            <div className="flex items-end gap-x-3">
+                                <div>
+                                    <div className='input_label font-medium'>Mật khẩu mới</div>
+                                    <input type="password" className="form_input" onChange={(e) => setNewPassword(e.target.value)} value={newPassword} placeholder="Nhập mật khẩu mới" />
+                                </div>
+                                <Button styles="px-4 py-3 rounded bg-red-500 text-white hover:bg-red-600 w-fit flex items-center justify-center gap-x-1 h-fit" OnClick={() => changeSUPassword()}>Đổi mật khẩu</Button>
+                            </div>
                         </div>
                     </div>
-                    <Button styles="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1" OnClick={() => handleUpdateSU()}><BiSave /> Lưu</Button>
-                    <div className="text-lg my-4">Đổi mật khẩu</div>
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-4">
-                        <div>
-                            <div className='input_label font-medium'>Mật khẩu cũ</div>
-                            <input type="password" className="form_input" onChange={(e) => handlePasswordOnChange('old_password', e.target.value)} value={updatePassword.old_password} placeholder="Nhập mật khẩu cũ" />
-                        </div>
-                        <div>
-                            <div className='input_label font-medium'>Mật khẩu mới</div>
-                            <input type="password" className="form_input" onChange={(e) => handlePasswordOnChange('new_password', e.target.value)} value={updatePassword.new_password} placeholder="Nhập mật khẩu mới" />
-                        </div>
-                    </div>
-                    <Button styles="px-4 py-2 rounded bg-red-500 text-white hover:bg-orange-500 w-fit flex items-center justify-center gap-x-1" OnClick={() => changeSUPassword()}>Đổi mật khẩu</Button>
                 </div>
             </Modal>
         </>

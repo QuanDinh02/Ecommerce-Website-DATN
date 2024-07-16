@@ -35,7 +35,6 @@ import {
 import { getCategoryInfo } from "@/services/categoryService";
 import LoadImageS3 from "@/components/LoadImageS3";
 import Rating from "@/components/Rating";
-import LoadImage from "@/components/LoadImage";
 import ReactQuill from "react-quill";
 import classNames from "classnames";
 import ProductRatingFilter from "./ProductRatingFilter";
@@ -307,6 +306,7 @@ const CategoryPage = () => {
     const fetchSubCategory = async (category_id: number) => {
         let response: ISubCategory[] = await getSubCategoryByCategoryWebsite(+category_id);
         if (response) {
+            setDataLoading(false);
             setSubCategoryList(response);
         }
     }
@@ -547,15 +547,10 @@ const CategoryPage = () => {
     React.useEffect(() => {
 
         if (categoryID !== 0) {
+            setDataLoading(true);
             fetchSubCategory(categoryID);
         }
     }, [categoryID]);
-
-    React.useEffect(() => {
-        setTimeout(() => {
-            setDataLoading(false);
-        }, 1000);
-    }, []);
 
     return (
         <>
