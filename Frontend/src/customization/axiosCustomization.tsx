@@ -3,7 +3,7 @@ import axiosRetry from 'axios-retry';
 
 // Set config defaults when creating the instance
 const instance = axios.create({
-    baseURL: 'http://localhost:8080'
+    baseURL: import.meta.env.VITE_BACKEND_URL
 });
 
 instance.defaults.withCredentials = true;
