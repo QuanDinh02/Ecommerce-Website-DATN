@@ -72,14 +72,13 @@ def get_unrated_products_and_predict(user_id, mysql_config={}):
 
             # Sort the list in descending order by 'predict_rating'
         sorted_result = sorted(unrated_products, key=lambda x: float(x['predict_rating']), reverse=True)
-        print(sorted_result[:20])
+        # print(sorted_result[:20])
         # Convert the sorted list to a JSON string
         json_result = json.dumps(sorted_result[:25], ensure_ascii=False, indent=4)
         res ={'customer_id': user_id, 'list': json_result}
         res_json = json.dumps(res, ensure_ascii=False, indent=4)
         return res_json
     else:
-        # json_result = json.dumps([{'product_id': '', 'predict_rating': ''}], ensure_ascii=False, indent=4)
         json_result = json.dumps([], ensure_ascii=False, indent=4)
         res ={'customer_id': user_id, 'list': json_result}
         res_json = json.dumps(res, ensure_ascii=False, indent=4)

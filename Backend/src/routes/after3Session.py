@@ -10,12 +10,14 @@ from redis.commands.search.query import Query
 import requests
 import sys
 import re
+import timeit
 
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
 
 def create_query_table(query, encoded_queries, extra_params = {}):
     itemRealSearch = []
+    
     for i, encoded_query in enumerate(encoded_queries):
         result_docs = client.ft(INDEX_NAME).search(query, {'query_vector': np.array(encoded_query, dtype=np.float32).tobytes()} | extra_params).docs
         for doc in result_docs:
@@ -208,30 +210,33 @@ def extract_ids(keys):
 def update_product(redis_client, cursor, embedder):
     pattern = 'ecommerce:product:*'
     all_keys = get_all_keys(pattern, redis_client)
-
     redis_product_ids = extract_ids(all_keys)
+
     
     query_get_product_mysql = '''
         select distinct id, name from Product
     '''
     cursor.execute(query_get_product_mysql)
-    product_mysql_dict = [data for data in cursor.fetchall()]
+    product_mysql = cursor.fetchall()
+    product_mysql_dict = [data for data in product_mysql]
+    
     new_products = [product for product in product_mysql_dict if str(product['id']) not in redis_product_ids]
 
-    pipeline = redis_client.pipeline(transaction=False)
-    i = 0
-    for product in new_products:
-        name_embedding = embedder.encode(product['name']).astype(np.float32).tolist()  
-        product_key = f"ecommerce:product:{product['id']}"
-        product_data = {
-            'id': product['id'],
-            'name': product['name'],
-            'name_embeddings': name_embedding
-        }
-        print(f"{i}. New product added - ID: {product['id']}, Name: {product['name']}")
-        pipeline.json().set(product_key, '$', product_data)
-        pipeline.execute()
-        i += 1
+    if(len(new_products)!= 0 ):
+        pipeline = redis_client.pipeline(transaction=False)
+        i = 0
+        for product in new_products:
+            name_embedding = embedder.encode(product['name']).astype(np.float32).tolist()  
+            product_key = f"ecommerce:product:{product['id']}"
+            product_data = {
+                'id': product['id'],
+                'name': product['name'],
+                'name_embeddings': name_embedding
+            }
+            print(f"{i}. New product added - ID: {product['id']}, Name: {product['name']}")
+            pipeline.json().set(product_key, '$', product_data)
+            pipeline.execute()
+            i += 1
 
 if __name__ == "__main__":
     # mysql_config = {
@@ -254,9 +259,9 @@ if __name__ == "__main__":
     
     client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
 
-    # params = sys.argv[1]
-    # customerID = params
-    customerID = '10577013'
+    params = sys.argv[1]
+    customerID = params
+    # customerID = '6202671'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -273,7 +278,7 @@ if __name__ == "__main__":
     search_content = getSearhContent(customerID, mysql_config)
     print(search_content)
     
-    if(search_content): 
+    if(search_content):
         print("Load model...")
         embedder = SentenceTransformer('keepitreal/vietnamese-sbert')
         query = (
@@ -301,7 +306,7 @@ if __name__ == "__main__":
             
             if (len(rankingItems)) > 0:
                 break
-        
+        d = timeit.default_timer()
         print(tuple(rankingItems))
         
         print("Check items...")
@@ -320,7 +325,7 @@ if __name__ == "__main__":
         
         print("Predict rating...")
         result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
-
+        e = timeit.default_timer()
         data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
     else:
