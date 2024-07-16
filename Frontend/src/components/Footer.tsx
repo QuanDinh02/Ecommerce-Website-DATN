@@ -1,11 +1,6 @@
-import { FaSquareFacebook } from "react-icons/fa6";
-import { FaTwitter } from "react-icons/fa";
-import { GrInstagram } from "react-icons/gr";
-import { FaYoutube } from "react-icons/fa";
-import GooglePlay from "../assets/img/footer/google_play.png";
-import AppStore from "../assets/img/footer/app_store.png";
 
 const Footer = () => {
+
     return (
         <div className="footer">
             <div className="w-full border-t border-gray-300"></div>
@@ -18,7 +13,7 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-            <div className="w-full border-t border-gray-300"></div>
+            {/* <div className="w-full border-t border-gray-300"></div>
             <div className="links-section">
                 <div className="links-item">
                     <div className="title">Liên hệ</div>
@@ -41,8 +36,8 @@ const Footer = () => {
                     <div className="title">Làm quen với chúng tôi</div>
                     <div className="link">Giới thiệu về FoxMart</div>
                 </div>
-            </div>
-            <div className="social-media-apps-section">
+            </div> */}
+            {/* <div className="social-media-apps-section">
                 <div className="icons">
                     <FaSquareFacebook className="icon" />
                     <FaTwitter className="icon" />
@@ -53,8 +48,12 @@ const Footer = () => {
                     <img src={AppStore} alt="" />
                     <img src={GooglePlay} alt="" />
                 </div>
+            </div> */}
+            <div className="copyright h-full bg-[#F5F5F5] text-gray-700 py-2 text-center">
+                <div className="mb-3 text-red-500 font-medium">Website này chỉ mang tính chất học thuật</div>
+                <div className="mb-3 text-red-500 font-medium">Mọi nội dung và tài liệu được cung cấp chỉ nhằm mục đích học tập và nghiên cứu.</div>
+                <div>© 2023-2024 FoxMart.com</div>
             </div>
-            <div className="copyright">© 2023-2024 FoxMart.com</div>
         </div>
     )
 }
