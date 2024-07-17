@@ -6,11 +6,9 @@ from redis.commands.search.query import Query
 from sentence_transformers import SentenceTransformer
 import mysql.connector
 import json
-from redis.commands.search.query import Query
 import requests
 import sys
 import re
-import timeit
 
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
@@ -86,7 +84,14 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
     '''
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
-    itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['name_embeddings'], type_to_weight[item['type']]) for item in res4Session]
+    itemSessionVector = []
+    for item in res4Session:
+        redis_key = f'ecommerce:product:{item["productID"]}'
+        if redis_client.exists(redis_key):
+            product_data = redis_client.json().get(redis_key)
+            if 'name_embeddings' in product_data:
+                itemSessionVector.append((product_data['name_embeddings'], type_to_weight[item['type']]))
+
     return itemSessionVector
 
 def getSearhContent(cusID, mysql_config={}):
@@ -194,58 +199,7 @@ def get_predicted_ratings(user_id, item_ids, mysql_config={}):
         res_json = json.dumps(res, ensure_ascii=False, indent=4)
         return res_json
 
-def get_all_keys(pattern, redis_client):
-    cursor = '0'
-    keys = []
-    while cursor != 0:
-        cursor, partial_keys = redis_client.scan(cursor=cursor, match=pattern)
-        keys.extend([key for key in partial_keys])
-    return keys
-
-def extract_ids(keys):
-    pattern = re.compile(r'ecommerce:product:(\d+)')
-    ids = [pattern.search(str(key)).group(1) for key in keys if pattern.search(key)]
-    return ids
-
-def update_product(redis_client, cursor, embedder):
-    pattern = 'ecommerce:product:*'
-    all_keys = get_all_keys(pattern, redis_client)
-    redis_product_ids = extract_ids(all_keys)
-
-    
-    query_get_product_mysql = '''
-        select distinct id, name from Product
-    '''
-    cursor.execute(query_get_product_mysql)
-    product_mysql = cursor.fetchall()
-    product_mysql_dict = [data for data in product_mysql]
-    
-    new_products = [product for product in product_mysql_dict if str(product['id']) not in redis_product_ids]
-
-    if(len(new_products)!= 0 ):
-        pipeline = redis_client.pipeline(transaction=False)
-        i = 0
-        for product in new_products:
-            name_embedding = embedder.encode(product['name']).astype(np.float32).tolist()  
-            product_key = f"ecommerce:product:{product['id']}"
-            product_data = {
-                'id': product['id'],
-                'name': product['name'],
-                'name_embeddings': name_embedding
-            }
-            print(f"{i}. New product added - ID: {product['id']}, Name: {product['name']}")
-            pipeline.json().set(product_key, '$', product_data)
-            pipeline.execute()
-            i += 1
-
 if __name__ == "__main__":
-    # mysql_config = {
-    #     'user': 'root',
-    #     'password': '1234',
-    #     'host': 'localhost',
-    #     'database': 'ecommerce',
-    # }
-    
     mysql_config = {
         'user': 'avnadmin',
         'password': 'AVNS_SQHY8Ivz7J5kp9ElUF2',
@@ -256,8 +210,11 @@ if __name__ == "__main__":
     
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
-    
-    client = redis.Redis(host = 'localhost', port=6379, decode_responses=True)
+
+    client = redis.Redis(
+        host='redis-19166.c292.ap-southeast-1-1.ec2.redns.redis-cloud.com',
+        port=19166,
+        password='8CQNangMeI7C8nAGaZHyprdhWFdUaYp0')
 
     params = sys.argv[1]
     customerID = params
@@ -289,9 +246,6 @@ if __name__ == "__main__":
                 .dialect(2)
         )
         
-        print("Updating new product embeddings...")
-        update_product(client, cursor, embedder)
-        
         print("Get items 4 SS...")
         itemSessionVector = getInfo4Session(customerID, client, mysql_config)
         
@@ -306,7 +260,6 @@ if __name__ == "__main__":
             
             if (len(rankingItems)) > 0:
                 break
-        d = timeit.default_timer()
         print(tuple(rankingItems))
         
         print("Check items...")
@@ -325,7 +278,6 @@ if __name__ == "__main__":
         
         print("Predict rating...")
         result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
-        e = timeit.default_timer()
         data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
     else:
