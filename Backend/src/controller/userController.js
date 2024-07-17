@@ -31,8 +31,8 @@ const handleUserLogin = async (req, res) => {
         if (result) {
             if (result.DT && result.DT.accessToken) {
 
-                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
-                res.cookie("rjwt", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN })
+                res.cookie("jwt", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN, sameSite: 'none', secure: true })
+                res.cookie("rjwt", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN, sameSite: 'none', secure: true })
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -57,8 +57,8 @@ const handleSystemUserLogin = async (req, res) => {
         let result = await LoginRegisterService.userSystemLogin(data);
         if (result) {
             if (result.DT && result.DT.accessToken) {
-                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN })
-                res.cookie("rjwtsys", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN })
+                res.cookie("jwtsys", result.DT.accessToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_ACCESS_TOKEN, sameSite: 'none', secure: true })
+                res.cookie("rjwtsys", result.DT.refreshToken, { httpOnly: true, maxAge: +process.env.MAX_AGE_REFRESH_TOKEN, sameSite: 'none', secure: true })
             }
             return res.status(200).json({
                 EC: result.EC,
@@ -98,8 +98,8 @@ const handleUserRegister = async (req, res) => {
 
 const handleUserLogout = async (req, res) => {
     try {
-        res.clearCookie("jwt");
-        res.clearCookie("rjwt");
+        res.clearCookie("jwt", { httpOnly: true, sameSite: 'None', secure: true });
+        res.clearCookie("rjwt", { httpOnly: true, sameSite: 'None', secure: true });
         return res.status(200).json({
             EC: 0,
             DT: "",
@@ -118,8 +118,8 @@ const handleUserLogout = async (req, res) => {
 
 const handleSystemUserLogout = async (req, res) => {
     try {
-        res.clearCookie("jwtsys");
-        res.clearCookie("rjwtsys");
+        res.clearCookie("jwtsys", { httpOnly: true, sameSite: 'None', secure: true });
+        res.clearCookie("rjwtsys", { httpOnly: true, sameSite: 'None', secure: true });
         return res.status(200).json({
             EC: 0,
             DT: "",
