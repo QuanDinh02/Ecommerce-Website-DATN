@@ -94,7 +94,7 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
 
     return itemSessionVector
 
-def getSearhContent(cusID, mysql_config={}):
+def getSearchContent(cusID, mysql_config={}):
     cnx = mysql.connector.connect(**mysql_config)
     cursor = cnx.cursor(dictionary=True)
     query_get_search = f'''
@@ -232,7 +232,7 @@ if __name__ == "__main__":
     }
     
     print("Get search content...")
-    search_content = getSearhContent(customerID, mysql_config)
+    search_content = getSearchContent(customerID, mysql_config)
     print(search_content)
     
     if(search_content):
