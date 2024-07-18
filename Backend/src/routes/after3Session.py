@@ -219,7 +219,6 @@ if __name__ == "__main__":
 
     params = sys.argv[1]
     customerID = params
-    # # customerID = '6202671'
     # customerID = '1'
     weight = {
             'w_click' : 0.2,
@@ -251,43 +250,37 @@ if __name__ == "__main__":
         print("Get items 4 SS...")
         itemSessionVector = getInfo4Session(customerID, client, mysql_config)
         
-        # while(True):
-        #     print("Encode search...")
-        #     encoded_queries = embedder.encode(search_content)
-        #     print(len(encoded_queries))
-        #     print("Search 50 items...")
-        #     itemRealSearch = create_query_table(query, encoded_queries)
-        #     print("Ranking...")
-        #     rankingItems = ranking_items(itemSessionVector, itemRealSearch)
+        while(True):
+            print("Encode search...")
+            encoded_queries = embedder.encode(search_content)
+            print(len(encoded_queries))
+            print("Search 50 items...")
+            itemRealSearch = create_query_table(query, encoded_queries)
+            print("Ranking...")
+            rankingItems = ranking_items(itemSessionVector, itemRealSearch)
             
-        #     if (len(rankingItems)) > 0:
-        #         break
-        # print(tuple(rankingItems))
+            if (len(rankingItems)) > 0:
+                break
+        print(tuple(rankingItems))
         
-        # print("Check items...")
+        print("Check items...")
         
-        # query_rated_item = f'''
-        #     select distinct productID
-        #     from ProductReview
-        #     where customerID = {customerID} and productID in {tuple(rankingItems)};
-        # '''
-        # cursor.execute(query_rated_item)
-        # ListRated = cursor.fetchall()
-        # print(ListRated)
+        query_rated_item = f'''
+            select distinct productID
+            from ProductReview
+            where customerID = {customerID} and productID in {tuple(rankingItems)};
+        '''
+        cursor.execute(query_rated_item)
+        ListRated = cursor.fetchall()
+        print(ListRated)
         
-        # ListPredict = [index for index in rankingItems if index not in ListRated]
-        # print(ListPredict)
+        ListPredict = [index for index in rankingItems if index not in ListRated]
+        print(ListPredict)
         
-        # print("Predict rating...")
-        # result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
+        print("Predict rating...")
+        result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
         
-        # data = {'data': result}
-        # res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
-        
-        json_result = json.dumps([{'product_id': '', 'predict_rating': ''}], ensure_ascii=False, indent=4)
-        res ={'customer_id': customerID, 'list': json_result}
-        res_json = json.dumps(res, ensure_ascii=False, indent=4)
-        data = {'data': res_json}
+        data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
     else:
         json_result = json.dumps([{'product_id': '', 'predict_rating': ''}], ensure_ascii=False, indent=4)
