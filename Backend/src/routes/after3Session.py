@@ -8,7 +8,6 @@ import mysql.connector
 import json
 import requests
 import sys
-import re
 
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
@@ -84,13 +83,15 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
     '''
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
-    itemSessionVector = []
-    for item in res4Session:
-        redis_key = f'ecommerce:product:{item["productID"]}'
-        if redis_client.exists(redis_key):
-            product_data = redis_client.json().get(redis_key)
-            if 'name_embeddings' in product_data:
-                itemSessionVector.append((product_data['name_embeddings'], type_to_weight[item['type']]))
+    
+    itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['name_embeddings'], type_to_weight[item['type']]) for item in res4Session]
+    # itemSessionVector = []
+    # for item in res4Session:
+    #     redis_key = f'ecommerce:product:{item["productID"]}'
+    #     if redis_client.exists(redis_key):
+    #         product_data = redis_client.json().get(redis_key)
+    #         if 'name_embeddings' in product_data:
+    #             itemSessionVector.append((product_data['name_embeddings'], type_to_weight[item['type']]))
 
     return itemSessionVector
 
@@ -246,9 +247,6 @@ if __name__ == "__main__":
                 .paging(0, 100)
                 .dialect(2)
         )
-        
-        # print("Updating new product embeddings...")
-        # update_product(client, cursor, embedder)
         
         print("Get items 4 SS...")
         itemSessionVector = getInfo4Session(customerID, client, mysql_config)
