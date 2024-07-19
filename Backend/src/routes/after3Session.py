@@ -8,7 +8,6 @@ import mysql.connector
 import json
 import requests
 import sys
-import re
 
 INDEX_NAME = 'idx:product-name'
 DOC_PREFIX = 'ecommerce:product:'
@@ -84,6 +83,8 @@ def getInfo4Session(cusID, redis_client, mysql_config={}):
     '''
     cursor.execute(query_info_4Session)
     res4Session = cursor.fetchall()
+    
+    # itemSessionVector = [(redis_client.json().get(f'ecommerce:product:{item["productID"]}')['name_embeddings'], type_to_weight[item['type']]) for item in res4Session]
     itemSessionVector = []
     for item in res4Session:
         redis_key = f'ecommerce:product:{item["productID"]}'
@@ -218,7 +219,7 @@ if __name__ == "__main__":
 
     params = sys.argv[1]
     customerID = params
-    # customerID = '6202671'
+    # customerID = '1'
     weight = {
             'w_click' : 0.2,
             'w_favorite': 0.3,
@@ -278,6 +279,7 @@ if __name__ == "__main__":
         
         print("Predict rating...")
         result = get_predicted_ratings(customerID, ListPredict, mysql_config = mysql_config)
+        
         data = {'data': result}
         res = requests.post('http://127.0.0.1:8080/api/simulating-3session-recommend', json=data)
     else:
